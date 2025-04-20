@@ -14,5 +14,4 @@ T恤 (T-shirt)
 短款上衣 (Crop top)
 瑜伽服 (Yoga top)
 内衣 (Underwear)
-
 # 下方为用户自行添加的预设项

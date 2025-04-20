@@ -18,5 +18,9 @@
 披肩 (Shawl)
 毛线帽 (Beanie)
 腰包 (Fanny pack)
-
+胸针 (Brooch)
+领带夹 (Tie clip)
+袖扣 (Cufflinks)
+钥匙扣 (Keychain)
+徽章 (Badge)
 # 下方为用户自行添加的预设项

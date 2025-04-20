@@ -19,5 +19,9 @@ A字裙 (A-line skirt)
 瑜伽裤 (Yoga pants)
 瑜伽短裤 (Yoga shorts)
 休闲短裤 (Casual shorts)
-
+灯笼裤 (Harem pants)
+灯笼短裤 (Harem shorts)
+工装短裤 (Cargo shorts)
+运动短裤 (Athletic shorts)
+骑行裤 (Cycling shorts)
 # 下方为用户自行添加的预设项

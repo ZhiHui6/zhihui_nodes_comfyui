@@ -21,21 +21,25 @@ class PhotographPromptGenerator:
     def INPUT_TYPES(cls):
         return {
             "required": {
+                "人物": (cls._load_options("character_options.txt"),),
+                "性别": (cls._load_options("gender_options.txt"),),
+                "姿势": (cls._load_options("pose_options.txt"),),
+                "动作": (cls._load_options("movements_options.txt"),),
+                "朝向": (cls._load_options("orientation_options.txt"),),
+                "上衣": (cls._load_options("tops_options.txt"),),
+                "下装": (cls._load_options("bottoms_options.txt"),),
+                "靴子": (cls._load_options("boots_options.txt"),),
+                "配饰": (cls._load_options("accessories_options.txt"),),
                 "相机": (cls._load_options("camera_options.txt"),),
                 "镜头": (cls._load_options("lens_options.txt"),),
                 "灯光": (cls._load_options("lighting_options.txt"),),
                 "俯仰": (cls._load_options("top_down_options.txt"),),
                 "地点": (cls._load_options("location_options.txt"),),
-                "姿势": (cls._load_options("pose_options.txt"),),
-                "朝向": (cls._load_options("orientation_options.txt"),),
-                "动作": (cls._load_options("movements_options.txt"),),
-                "上衣": (cls._load_options("tops_options.txt"),),
-                "下装": (cls._load_options("bottoms_options.txt"),),
-                "靴子": (cls._load_options("boots_options.txt"),),
-                "配饰": (cls._load_options("accessories_options.txt"),),
+                "天气": (cls._load_options("weather_options.txt"),),
+                "季节": (cls._load_options("season_options.txt"),),
                 "template": ("STRING", {
                     "multiline": True,
-                    "default": "This is a photo from a fashion magazine, A photo taken with {相机} with {镜头}, {灯光}，Shoot from a {俯仰} perspective, a beautiful model wearing a blue-black leather down jacket at the foot of the {地点}, the clothes have the logo 'NEPL'. The model is {姿势}, {朝向}, She was wearing {下装} and {靴子}, there is thick snow on the ground, a path stretches to the distance, {动作} movements, strong visual impact."
+                    "default": "This is a photo from a fashion magazine, A photo taken with {相机} with {镜头}, {灯光}，Shoot from a {俯仰} perspective, a beautiful {性别} model wearing a blue-black leather down jacket at the foot of the {地点}, the clothes have the logo 'NEPL'. The model is {姿势}, {朝向}, {性别} was wearing {下装} and {靴子}, there is thick snow on the ground, a path stretches to the distance, {动作} movements, strong visual impact."
                 }),
             },
         }
@@ -51,13 +55,13 @@ class PhotographPromptGenerator:
             return random.choice(actual_options)
         return selected_option
 
-    def generate_text(self, 相机, 镜头, 灯光,俯仰,地点,姿势,朝向,动作,上衣,下装,靴子,配饰,template,):
+    def generate_text(self, 相机, 镜头, 灯光,俯仰,地点,姿势,朝向,动作,上衣,下装,靴子,配饰,天气,季节,人物,性别,template,):
    
         selections = {
             field: self.random_choice(value, self.INPUT_TYPES()['required'][field][0])
             for field, value in zip(
-                ["相机", "镜头", "灯光", "俯仰", "地点", "姿势", "朝向", "动作", "上衣", "下装", "靴子", "配饰"],
-                [相机, 镜头, 灯光, 俯仰, 地点, 姿势, 朝向, 动作, 上衣, 下装, 靴子, 配饰]
+                ["相机", "镜头", "灯光", "俯仰", "地点", "姿势", "朝向", "动作", "上衣", "下装", "靴子", "配饰", "天气", "季节", "人物", "性别"],
+                [相机, 镜头, 灯光, 俯仰, 地点, 姿势, 朝向, 动作, 上衣, 下装, 靴子, 配饰, 天气, 季节, 人物, 性别]
             )
         }
       
@@ -76,8 +80,7 @@ class PhotographPromptGenerator:
         return (output,keyword,help_text)
     
     @classmethod
-    def IS_CHANGED(self, 相机, 镜头, 灯光,俯仰,地点,姿势,朝向,动作,上衣,下装,靴子,配饰,template,):
-
+    def IS_CHANGED(cls, 相机, 镜头, 灯光, 俯仰, 地点, 姿势, 朝向, 动作, 上衣, 下装, 靴子, 配饰, 天气, 季节, 人物, 性别, template):
         return str(time.time())
     
 NODE_CLASS_MAPPINGS = {
