@@ -1,0 +1,13 @@
+# 动作选项 / Movements Options
+夸张的 (Exaggerated)
+专业的 (Professional)
+自然的 (Natural)
+活泼的 (Lively)
+优雅的 (Graceful)
+动态的 (Dynamic)
+放松的 (Relaxed)
+强烈的 (Intense)
+自信的 (Confident)
+戏剧性的 (Dramatic)
+
+# 下方为用户自行添加的预设项

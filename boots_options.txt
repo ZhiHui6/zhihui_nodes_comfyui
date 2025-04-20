@@ -1,0 +1,23 @@
+# 鞋子选项 / Footwear Options
+皮靴 (Leather boots)
+运动鞋 (Sneakers)
+及膝长靴 (Knee-high boots)
+短靴 (Ankle boots)
+切尔西靴 (Chelsea boots)
+高跟靴 (Heeled boots)
+过膝靴 (Over-the-knee boots)
+粗跟靴 (Block heel boots)
+玛丽珍鞋 (Mary Janes)
+战斗靴 (Combat boots)
+平底靴 (Flat boots)
+芭蕾平底鞋 (Ballet flats)
+厚底靴 (Platform boots)
+乐福鞋 (Loafers)
+穆勒鞋 (Mules)
+马丁靴 (Doc Martens)
+踝带高跟鞋 (Strappy heels)
+绑带靴 (Lace-up boots)
+雪地靴 (Snow boots)
+沙滩鞋 (Beach sandals)
+
+# 下方为用户自行添加的预设项

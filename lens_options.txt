@@ -1,0 +1,8 @@
+# 镜头选项 / Lens Options
+标准镜头 (Standard Lens)
+中长焦镜头 (Medium Telephoto Lens)
+长焦镜头 (Telephoto Lens)
+鱼眼镜头 (Fisheye Lens)
+超广角镜头 (Ultra-Wide-Angle Lens)
+
+# 下方为用户自行添加的预设项
