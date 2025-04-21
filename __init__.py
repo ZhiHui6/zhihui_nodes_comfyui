@@ -10,6 +10,7 @@ from .TextModifier import TextModifier
 from .PhotographPromptGenerator import PhotographPromptGenerator
 from .TextSwitch import TextSwitch
 from .Image_Switcher import ImageSwitch
+from .ExtraOptions import ExtraOptions
 
 NODE_CLASS_MAPPINGS = {
     "PromptPreset": PromptPreset,
@@ -24,6 +25,7 @@ NODE_CLASS_MAPPINGS = {
     "PhotographPromptGenerator": PhotographPromptGenerator,
     "TextSwitch": TextSwitch,
     "ImageSwitch": ImageSwitch,
+    "ExtraOptions": ExtraOptions,
 }
 
 NODE_DISPLAY_NAME_MAPPINGS = {
@@ -39,6 +41,7 @@ NODE_DISPLAY_NAME_MAPPINGS = {
     "PhotographPromptGenerator": "摄影提示词生成器",
     "TextSwitch": "文本切换器(可注释)",
     "ImageSwitch": "图像切换器(可注释)",
+    "ExtraOptions": "额外选项列表",
 }
 
 __all__ = ['NODE_CLASS_MAPPINGS', 'NODE_DISPLAY_NAME_MAPPINGS']
