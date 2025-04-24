@@ -13,12 +13,12 @@ class ImageSwitch:
         return {
             "required": {
                 "图像1_注释": ("STRING", {"multiline": False, "default": ""}),
-                "图像1": ("IMAGE", {"forceInput": True}),
-                "图像2_注释": ("STRING", {"multiline": False, "default": ""}),
-                "图像2": ("IMAGE", {"forceInput": True})
+                "图像2_注释": ("STRING", {"multiline": False, "default": ""})
             },
             "optional": {
-                "选择切换": (["1", "2"], {"default": "1"})
+                "图像1": ("IMAGE", {}),
+                "图像2": ("IMAGE", {}),
+                "选择图像": (["1", "2"], {"default": "1"})
             }
         }
 
@@ -27,9 +27,14 @@ class ImageSwitch:
     FUNCTION = "execute"
     CATEGORY = "zhihui/图像"
 
-    def execute(self, 图像1_注释, 图像2_注释, 图像1, 图像2, 选择切换):
+    def execute(self, 图像1_注释, 图像2_注释, 图像1=None, 图像2=None, 选择图像="1"):
         images = [图像1, 图像2]
-        return (images[int(选择切换)-1],)
+        idx = int(选择图像)-1
+        if idx < 0 or idx > 1:
+            return (None,)
+        if images[idx] is None:
+            return (None,)
+        return (images[idx],)
 
 NODE_CLASS_MAPPINGS = {
     "ImageSwitch": ImageSwitch
