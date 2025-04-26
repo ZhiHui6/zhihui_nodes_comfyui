@@ -1,0 +1,15 @@
+# 光线选项 / Lighting Options
+自然光 (Natural Light)
+侧光 (Side Lighting)
+逆光 (Backlighting)
+环境光 (Ambient Light)
+人造光 (Artificial Lighting)
+高对比光 (High Contrast Lighting)
+柔和光 (Soft Lighting)
+低角度光 (Low-Angle Lighting)
+分割光 (Split Lighting)
+窗影光 (Window Light)
+聚光灯 (Spotlighting)
+闪光灯 (Flash Lighting)
+夜间光 (Nighttime Lighting)
+# 下方为用户自行添加的预设项

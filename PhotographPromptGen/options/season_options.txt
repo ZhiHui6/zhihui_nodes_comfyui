@@ -1,0 +1,6 @@
+# 季节选项 / Season Options
+春季 (Spring)
+夏季 (Summer)
+秋季 (Autumn)
+冬季 (Winter)
+# 下方为用户自行添加的预设项

@@ -1,0 +1,17 @@
+# 上装选项 / Tops Options
+T恤 (T-shirt)
+衬衫 (Shirt)
+针织衫 (Knitwear)
+连帽卫衣 (Hooded sweatshirt)
+圆领卫衣 (Crewneck sweatshirt)
+毛衣 (Sweater)
+夹克 (Jacket)
+外套 (Coat)
+西装 (Blazer)
+羽绒服 (Down jacket)
+开衫 (Cardigan)
+高领上衣 (Turtleneck)
+短款上衣 (Crop top)
+瑜伽服 (Yoga top)
+内衣 (Underwear)
+# 下方为用户自行添加的预设项

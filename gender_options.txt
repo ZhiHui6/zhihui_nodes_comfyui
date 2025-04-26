@@ -1,6 +1,0 @@
-# 性别选项 / Gender Options
-男性 (Male)
-女性 (Female)
-男人 (Man)
-女人 (Woman)
-# 下方为用户自行添加的预设项

@@ -1,13 +1,13 @@
 from .Prompt_Preset import PromptPreset
 from .Prompt_Preset_MultipleChoice import PromptPresetMultipleChoice
 from .TriggerWord_Merger import TriggerWordMerger
-from .VideoBatchLoader import VideoBatchLoader
-from .VideoCombine import VideoCombine
+from .Video_processing.VideoBatchLoader import VideoBatchLoader
+from .Video_processing.VideoCombine import VideoCombine
 from .ImageScaler import ImageScaler
 from .MultiLineTextNode import MultiLineTextNode
 from .TextCombinerNode import TextCombinerNode
 from .TextModifier import TextModifier
-from .PhotographPromptGenerator import PhotographPromptGenerator
+from .PhotographPromptGen.PhotographPromptGenerator import PhotographPromptGenerator
 from .TextSwitch import TextSwitch
 from .Image_Switcher import ImageSwitch
 from .ExtraOptions import ExtraOptions
@@ -41,7 +41,7 @@ NODE_DISPLAY_NAME_MAPPINGS = {
     "PhotographPromptGenerator": "摄影提示词生成器",
     "TextSwitch": "文本切换器(可注释)",
     "ImageSwitch": "图像切换器(可注释)",
-    "ExtraOptions": "额外选项列表",
+    "ExtraOptions": "额外引导选项（通用）",
 }
 
 __all__ = ['NODE_CLASS_MAPPINGS', 'NODE_DISPLAY_NAME_MAPPINGS']

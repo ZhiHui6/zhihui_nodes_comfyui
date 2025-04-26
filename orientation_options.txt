@@ -1,6 +1,0 @@
-# 方向选项 / Orientation Options
-面向观众 (Facing the audience)
-侧面 (Sideways)
-背面 (The back)
-三分之一侧面 (Three-Quarter View)
-# 下方为用户自行添加的预设项

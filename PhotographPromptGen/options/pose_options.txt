@@ -1,0 +1,12 @@
+# 姿势选项 / Pose Options
+站立 (Standing)
+半蹲 (Squatting)
+半蹲 (Walking)
+坐着 (Sitting)
+手插口袋 (Hands in pockets)
+躺卧 (Lying down)
+弯腰 (Bending over)
+伸展 (Stretching)
+跳跃 (Jumping)
+鞠躬 (Bowling)
+# 下方为用户自行添加的预设项
