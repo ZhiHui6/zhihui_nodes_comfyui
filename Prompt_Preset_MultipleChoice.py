@@ -103,11 +103,3 @@ class PromptPresetMultipleChoice:
             if 提示词9_开关 and 提示词9: enabled_prompts.append(提示词9)
             if 提示词10_开关 and 提示词10: enabled_prompts.append(提示词10)
         return ("\n".join(filter(None, enabled_prompts)),)
-
-NODE_CLASS_MAPPINGS = {
-    "PromptPresetMultipleChoice": PromptPresetMultipleChoice
-}
-
-NODE_DISPLAY_NAME_MAPPINGS = {
-    "PromptPresetMultipleChoice": "Prompt Preset (Multiple Choice)"
-}

@@ -51,11 +51,3 @@ class ImageScaler:
         )
 
         return (scaled_image.permute(0, 2, 3, 1),)
-
-NODE_CLASS_MAPPINGS = {
-    "ImageScaler": ImageScaler
-}
-
-NODE_DISPLAY_NAME_MAPPINGS = {
-    "ImageScaler": "图像缩放器"
-}

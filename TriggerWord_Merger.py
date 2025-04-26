@@ -29,11 +29,3 @@ class TriggerWordMerger:
             return (self.cached_trigger,)
             
         return (f"{self.cached_trigger}, {self.cached_text}",)
-
-NODE_CLASS_MAPPINGS = {
-    "TriggerWordMerger": TriggerWordMerger
-}
-
-NODE_DISPLAY_NAME_MAPPINGS = {
-    "TriggerWordMerger": "Trigger Word Merger"
-}

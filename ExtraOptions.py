@@ -94,11 +94,3 @@ class ExtraOptions:
             if 包括图片是sfw_暗示性还是nsfw: enabled_texts.append(self.preset_texts["text15"])
             if 只描述图片中最重要的元素: enabled_texts.append(self.preset_texts["text16"])
         return ("\n".join(filter(None, enabled_texts)),)
-
-NODE_CLASS_MAPPINGS = {
-    "ExtraOptions": ExtraOptions
-}
-
-NODE_DISPLAY_NAME_MAPPINGS = {
-    "ExtraOptions": "额外选项列表"
-}

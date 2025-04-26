@@ -35,11 +35,3 @@ class ImageSwitch:
         if images[idx] is None:
             return (None,)
         return (images[idx],)
-
-NODE_CLASS_MAPPINGS = {
-    "ImageSwitch": ImageSwitch
-}
-
-NODE_DISPLAY_NAME_MAPPINGS = {
-    "ImageSwitch": "ImageSwitch"
-}

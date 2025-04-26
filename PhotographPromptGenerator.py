@@ -82,12 +82,3 @@ class PhotographPromptGenerator:
     @classmethod
     def IS_CHANGED(cls, 相机, 镜头, 灯光, 俯仰, 地点, 姿势, 朝向, 动作, 上衣, 下装, 靴子, 配饰, 天气, 季节, 人物, 性别, template):
         return str(time.time())
-    
-NODE_CLASS_MAPPINGS = {
-    "AJPromptGeneratorNode": PhotographPromptGenerator,
-}
-
-NODE_DISPLAY_NAME_MAPPINGS = {
-    "PhotographPromptGenerator": "摄影提示词生成器",
-
-}

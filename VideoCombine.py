@@ -81,11 +81,3 @@ class VideoCombine:
                 except:
                     pass
         return max_counter + 1
-
-NODE_CLASS_MAPPINGS = {
-    "VideoCombine": VideoCombine
-}
-
-NODE_DISPLAY_NAME_MAPPINGS = {
-    "VideoCombine": "Video Combine"
-}

@@ -110,11 +110,3 @@ class VideoBatchLoader:
         if not os.path.isdir(directory):
             return "无效的目录路径: {}".format(directory)
         return True
-
-NODE_CLASS_MAPPINGS = {
-    "VideoBatchLoader": VideoBatchLoader
-}
-
-NODE_DISPLAY_NAME_MAPPINGS = {
-    "VideoBatchLoader": "Video Batch Loader"
-}

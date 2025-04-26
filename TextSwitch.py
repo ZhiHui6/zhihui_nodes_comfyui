@@ -38,11 +38,3 @@ class TextSwitch:
         self.text_cache["文本4"] = 文本4
         prompts = [文本1, 文本2, 文本3, 文本4]
         return (prompts[int(选择文本)-1],)
-
-NODE_CLASS_MAPPINGS = {
-    "TextSwitch": TextSwitch
-}
-
-NODE_DISPLAY_NAME_MAPPINGS = {
-    "TextSwitch": "TextSwitch"
-}

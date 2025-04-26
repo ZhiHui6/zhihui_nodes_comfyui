@@ -80,11 +80,3 @@ class PromptPreset:
                   self.prompt_cache["提示词7"], self.prompt_cache["提示词8"], self.prompt_cache["提示词9"], 
                   self.prompt_cache["提示词10"]]
         return (prompts[int(选择提示词)-1],)
-
-NODE_CLASS_MAPPINGS = {
-    "PromptPreset": PromptPreset
-}
-
-NODE_DISPLAY_NAME_MAPPINGS = {
-    "PromptPreset": "Prompt Preset"
-}
