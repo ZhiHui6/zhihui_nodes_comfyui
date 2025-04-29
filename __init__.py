@@ -11,6 +11,7 @@ from .PhotographPromptGen.PhotographPromptGenerator import PhotographPromptGener
 from .TextSwitch import TextSwitch
 from .Image_Switcher import ImageSwitch
 from .ExtraOptions import ExtraOptions
+from .ColorTracking import ImitationHueNode as ColorTracking
 
 NODE_CLASS_MAPPINGS = {
     "PromptPreset": PromptPreset,
@@ -26,6 +27,7 @@ NODE_CLASS_MAPPINGS = {
     "TextSwitch": TextSwitch,
     "ImageSwitch": ImageSwitch,
     "ExtraOptions": ExtraOptions,
+    "ColorTracking": ColorTracking,
 }
 
 NODE_DISPLAY_NAME_MAPPINGS = {
@@ -42,6 +44,7 @@ NODE_DISPLAY_NAME_MAPPINGS = {
     "TextSwitch": "文本切换器(可注释)",
     "ImageSwitch": "图像切换器(可注释)",
     "ExtraOptions": "额外引导选项（通用）",
+    "ColorTracking": "颜色跟踪器",
 }
 
 __all__ = ['NODE_CLASS_MAPPINGS', 'NODE_DISPLAY_NAME_MAPPINGS']
