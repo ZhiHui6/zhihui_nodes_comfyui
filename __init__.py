@@ -12,6 +12,7 @@ from .TextSwitch import TextSwitch
 from .Image_Switcher import ImageSwitch
 from .ExtraOptions import ExtraOptions
 from .ColorTracking import ImitationHueNode as ColorTracking
+from .Image_Switcher_4way import ImageSwitcher4Way
 
 NODE_CLASS_MAPPINGS = {
     "PromptPreset": PromptPreset,
@@ -28,6 +29,7 @@ NODE_CLASS_MAPPINGS = {
     "ImageSwitch": ImageSwitch,
     "ExtraOptions": ExtraOptions,
     "ColorTracking": ColorTracking,
+    "ImageSwitcher4Way": ImageSwitcher4Way,
 }
 
 NODE_DISPLAY_NAME_MAPPINGS = {
@@ -45,6 +47,7 @@ NODE_DISPLAY_NAME_MAPPINGS = {
     "ImageSwitch": "图像切换器(可注释)",
     "ExtraOptions": "额外引导选项（通用）",
     "ColorTracking": "颜色跟踪器",
+    "ImageSwitcher4Way": "图像切换器(4路)",
 }
 
 __all__ = ['NODE_CLASS_MAPPINGS', 'NODE_DISPLAY_NAME_MAPPINGS']
