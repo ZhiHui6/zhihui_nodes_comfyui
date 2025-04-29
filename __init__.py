@@ -12,7 +12,7 @@ from .TextSwitch import TextSwitch
 from .Image_Switcher import ImageSwitch
 from .ExtraOptions import ExtraOptions
 from .ColorTracking import ImitationHueNode as ColorTracking
-from .Image_Switcher_4way import ImageSwitcher4Way
+from .Image_Switcher_4way import ImageSwitch as ImageSwitcher4Way
 
 NODE_CLASS_MAPPINGS = {
     "PromptPreset": PromptPreset,
