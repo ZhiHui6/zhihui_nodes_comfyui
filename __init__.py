@@ -13,6 +13,7 @@ from .Image_Switcher import ImageSwitch
 from .ExtraOptions import ExtraOptions
 from .ColorTracking import ImitationHueNode as ColorTracking
 from .Image_Switcher_4way import ImageSwitch as ImageSwitcher4Way
+from .PromptOptimizer import PromptOptimizer
 
 NODE_CLASS_MAPPINGS = {
     "PromptPreset": PromptPreset,
@@ -30,6 +31,7 @@ NODE_CLASS_MAPPINGS = {
     "ExtraOptions": ExtraOptions,
     "ColorTracking": ColorTracking,
     "ImageSwitcher4Way": ImageSwitcher4Way,
+    "PromptOptimizer": PromptOptimizer,
 }
 
 NODE_DISPLAY_NAME_MAPPINGS = {
@@ -48,6 +50,7 @@ NODE_DISPLAY_NAME_MAPPINGS = {
     "ExtraOptions": "额外引导选项（通用）",
     "ColorTracking": "颜色跟踪器",
     "ImageSwitcher4Way": "图像切换器(4路)",
+    "PromptOptimizer": "提示词优化器",
 }
 
 __all__ = ['NODE_CLASS_MAPPINGS', 'NODE_DISPLAY_NAME_MAPPINGS']
