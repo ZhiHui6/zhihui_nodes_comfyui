@@ -185,7 +185,7 @@ def color_transfer(source, target, mask=None, 强度=1.0, 皮肤保护=0.2, 自�
     return final_result
 
 
-class ImitationHueNode:
+class ColorTracking:
     @classmethod
     def INPUT_TYPES(s):
         return {

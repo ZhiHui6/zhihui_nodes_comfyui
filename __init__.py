@@ -1,26 +1,22 @@
-from .Prompt_Preset import PromptPreset
-from .Prompt_Preset_MultipleChoice import PromptPresetMultipleChoice
-from .TriggerWord_Merger import TriggerWordMerger
-from .Video_processing.VideoBatchLoader import VideoBatchLoader
-from .Video_processing.VideoCombine import VideoCombine
+from .PromptPreset.PromptPresetMultipleChoice import PromptPresetMultipleChoice
+from .PromptPreset.PromptPresetOneChoice import PromptPresetOneChoice
+from .TriggerWordMerger import TriggerWordMerger
 from .ImageScaler import ImageScaler
 from .MultiLineTextNode import MultiLineTextNode
 from .TextCombinerNode import TextCombinerNode
 from .TextModifier import TextModifier
 from .PhotographPromptGen.PhotographPromptGenerator import PhotographPromptGenerator
 from .TextSwitch import TextSwitch
-from .Image_Switcher import ImageSwitch
+from .ImgSwitch.Image_Switcher import ImageSwitch
+from .ImgSwitch.Image_Switcher_4way import ImageSwitch
 from .ExtraOptions import ExtraOptions
-from .ColorTracking import ImitationHueNode as ColorTracking
-from .Image_Switcher_4way import ImageSwitch as ImageSwitcher4Way
+from .ColorTracking import ColorTracking
 from .PromptOptimizer import PromptOptimizer
 
 NODE_CLASS_MAPPINGS = {
-    "PromptPreset": PromptPreset,
+    "PromptPresetOneChoice": PromptPresetOneChoice,
     "PromptPresetMultipleChoice": PromptPresetMultipleChoice,
     "TriggerWordMerger": TriggerWordMerger,
-    "VideoBatchLoader": VideoBatchLoader,
-    "VideoCombine": VideoCombine,
     "ImageScaler": ImageScaler,
     "MultiLineTextNode": MultiLineTextNode,
     "TextCombinerNode": TextCombinerNode,
@@ -30,16 +26,15 @@ NODE_CLASS_MAPPINGS = {
     "ImageSwitch": ImageSwitch,
     "ExtraOptions": ExtraOptions,
     "ColorTracking": ColorTracking,
-    "ImageSwitcher4Way": ImageSwitcher4Way,
+    "ImageSwitcher4Way": ImageSwitch,
     "PromptOptimizer": PromptOptimizer,
+
 }
 
 NODE_DISPLAY_NAME_MAPPINGS = {
-    "PromptPreset": "单选提示预设(可注释)",
+    "PromptPresetOneChoice": "单选提示预设(可注释)",
     "PromptPresetMultipleChoice": "多选提示预设(可注释)",
     "TriggerWordMerger": "触发词合并器",
-    "VideoBatchLoader": "视频批量加载器",
-    "VideoCombine": "视频合并器",
     "ImageScaler": "图像缩放器",
     "MultiLineTextNode": "多行文本(可注释)",
     "TextCombinerNode": "提示词合并器(可注释)",
