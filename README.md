@@ -124,8 +124,3 @@
 2. 将整个自定义节点文件夹 comfyui_zhihui_nodes 复制到ComfyUI的 custom_nodes 目录下
 3. 重启ComfyUI
 4. 在ComfyUI的节点选项卡中，你应该可以看到新添加的节点。
-
-## 致谢
-本项目中的一些节点借鉴了以下作者，感谢他们在github开源社区中的贡献！
-- [**JioJe**]
-- [**jinwei1660**]
