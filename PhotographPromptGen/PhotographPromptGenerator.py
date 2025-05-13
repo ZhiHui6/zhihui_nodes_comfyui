@@ -47,7 +47,7 @@ class PhotographPromptGenerator:
     RETURN_TYPES = ("STRING","STRING","STRING")
     RETURN_NAMES =("模版","标签","帮助")
     FUNCTION = "generate_text"
-    CATEGORY ="zhihui/文本"
+    CATEGORY ="zhihui/生成器"
 
     def random_choice(self, selected_option, options):
         if selected_option == "随机 (Random)":

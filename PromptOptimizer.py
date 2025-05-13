@@ -22,8 +22,7 @@ class PromptOptimizer:
     RETURN_TYPES = ("STRING", "STRING")
     RETURN_NAMES = ("输出优化", "帮助信息")
     FUNCTION = "optimize_prompt"
-
-    CATEGORY = "utils"
+    CATEGORY = "zhihui/生成器"
 
     def optimize_prompt(self, 用户提示词, seed, 扩写模式, 节点开关, 输出语言, 自定义规则=""):  
         if not 节点开关:

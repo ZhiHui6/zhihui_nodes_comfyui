@@ -7,8 +7,8 @@ from .TextCombinerNode import TextCombinerNode
 from .TextModifier import TextModifier
 from .PhotographPromptGen.PhotographPromptGenerator import PhotographPromptGenerator
 from .TextSwitch import TextSwitch
-from .ImgSwitch.Image_Switcher import ImageSwitch
-from .ImgSwitch.Image_Switcher_4way import ImageSwitch
+from .ImgSwitch.ImageSwitch2way import ImageSwitch2way
+from .ImgSwitch.ImageSwitch4way import ImageSwitch4way
 from .ExtraOptions import ExtraOptions
 from .ColorTracking import ColorTracking
 from .PromptOptimizer import PromptOptimizer
@@ -23,12 +23,11 @@ NODE_CLASS_MAPPINGS = {
     "TextModifier": TextModifier,
     "PhotographPromptGenerator": PhotographPromptGenerator,
     "TextSwitch": TextSwitch,
-    "ImageSwitch": ImageSwitch,
+    "ImageSwitch2way": ImageSwitch2way,
     "ExtraOptions": ExtraOptions,
     "ColorTracking": ColorTracking,
-    "ImageSwitcher4Way": ImageSwitch,
+    "ImageSwitch4way": ImageSwitch4way,
     "PromptOptimizer": PromptOptimizer,
-
 }
 
 NODE_DISPLAY_NAME_MAPPINGS = {
@@ -41,10 +40,10 @@ NODE_DISPLAY_NAME_MAPPINGS = {
     "TextModifier": "文本修改器",
     "PhotographPromptGenerator": "摄影提示词生成器",
     "TextSwitch": "文本切换器(可注释)",
-    "ImageSwitch": "图像切换器(可注释)",
+    "ImageSwitch2way": "图像切换器-2路(可注释)",
+    "ImageSwitch4way": "图像切换器-4路(可注释)",
     "ExtraOptions": "额外引导选项（通用）",
     "ColorTracking": "颜色跟踪器",
-    "ImageSwitcher4Way": "图像切换器(4路)",
     "PromptOptimizer": "提示词优化器",
 }
 
