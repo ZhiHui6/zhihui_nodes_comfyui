@@ -83,7 +83,7 @@ class ExtraOptions:
         }
 
     RETURN_TYPES = ("STRING",)
-    RETURN_NAMES = ("输出文本",)
+    RETURN_NAMES = ("引导输出",)
     FUNCTION = "execute"
     CATEGORY = "zhihui/文本"
 
