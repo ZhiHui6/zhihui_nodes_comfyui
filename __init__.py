@@ -12,6 +12,7 @@ from .ImgSwitch.ImageSwitch4way import ImageSwitch4way
 from .ExtraOptions import ExtraOptions
 from .ColorTracking import ColorTracking
 from .PromptOptimizer import PromptOptimizer
+from .SystemPrompt.SystemPromptLoader import SystemPromptLoader
 
 NODE_CLASS_MAPPINGS = {
     "PromptPresetOneChoice": PromptPresetOneChoice,
@@ -28,6 +29,7 @@ NODE_CLASS_MAPPINGS = {
     "ColorTracking": ColorTracking,
     "ImageSwitch4way": ImageSwitch4way,
     "PromptOptimizer": PromptOptimizer,
+    "SystemPromptLoader": SystemPromptLoader,
 }
 
 NODE_DISPLAY_NAME_MAPPINGS = {
@@ -45,6 +47,7 @@ NODE_DISPLAY_NAME_MAPPINGS = {
     "ExtraOptions": "额外引导选项（通用）",
     "ColorTracking": "颜色跟踪器",
     "PromptOptimizer": "提示词优化器",
+    "SystemPromptLoader": "系统引导词加载器",
 }
 
 __all__ = ['NODE_CLASS_MAPPINGS', 'NODE_DISPLAY_NAME_MAPPINGS']
