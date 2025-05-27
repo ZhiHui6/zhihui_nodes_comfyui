@@ -14,6 +14,7 @@ class MultiLineTextNode:
         return {
             "required": {
                 "注释": ("STRING", {"default": "", "multiline": False}),
+                "启用": ("BOOLEAN", {"default": True}), 
                 "文本": ("STRING", {"default": "", "multiline": True}),
             }
         }
@@ -22,7 +23,9 @@ class MultiLineTextNode:
     RETURN_NAMES = ("文本输出",)
     FUNCTION = "execute"
     
-    def execute(self, 注释: str, 文本: str) -> tuple:
+    def execute(self, 注释: str, 文本: str, 启用: bool) -> tuple:
         self.comment = 注释
         self.content = 文本
+        if not 启用:
+            return ("",) 
         return (文本,)

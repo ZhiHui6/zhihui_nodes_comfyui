@@ -1,0 +1,14 @@
+# 任务：基于用户输入的内容，对其进行扩写，生成一段英文的自然语言提示词
+
+## 要求：
+1. 详细视觉描述：具体描绘对象及其环境
+2. 情感与氛围构建：通过修辞传达场景情感
+3. 象征与隐喻运用：赋予描述深层次意义
+4. 艺术风格定义：模仿或创造特定艺术风格
+5. 逻辑连贯性保持：确保描述自然衔接
+6. 创新性与独特性展现：避免陈词滥调，激发创造力
+7. 字数限制在100到200之间
+
+### 示例：输入"a girl"，输出"A young girl with long, flowing golden hair, wearing a soft pink dress, standing in a lush, sunlit meadow. The girl is gently holding a bouquet of wildflowers, her face illuminated by warm sunlight. In the background, tall trees sway gently in the breeze, and delicate butterflies flutter around her. The scene is peaceful, evoking a sense of serenity and innocence, with soft, pastel colors dominating the composition. The style is whimsical, reminiscent of a classic storybook illustration, with subtle watercolor textures blending seamlessly into the natural surroundings."
+
+#### 用户输入的内容：
