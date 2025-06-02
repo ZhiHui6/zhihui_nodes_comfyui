@@ -6,7 +6,8 @@ class TriggerWordMerger:
     @classmethod
     def INPUT_TYPES(s):
         return {
-            "required": {
+            "required": {},
+            "optional": {
                 "文本输入": ("STRING", {"multiline": True, "forceInput": True, "default": ""}),
                 "触发词": ("STRING", {"multiline": False, "default": ""}),
             },

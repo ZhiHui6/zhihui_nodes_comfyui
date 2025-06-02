@@ -15,7 +15,7 @@ class ImageScaler:
                 "图像输入": ("IMAGE",),
                 "缩放依据": (["长边", "短边"], {"default": "长边"}),
                 "目标尺寸": ("INT", {"default": 1024, "min": 1, "max": 99999, "step": 1}),
-                "插值方式": (["nearest", "bilinear", "bicubic", "nearest exact"], {"default": "bilinear"}),
+                "插值方式": (["nearest", "bilinear", "bicubic", "nearest exact", "area"], {"default": "bilinear"}),
             }
         }
 
@@ -40,7 +40,8 @@ class ImageScaler:
             "nearest": "nearest",
             "bilinear": "bilinear",
             "bicubic": "bicubic",
-            "nearest exact": "nearest-exact"
+            "nearest exact": "nearest-exact",
+            "area": "area"
         }[插值方式]
 
         scaled_image = F.interpolate(
