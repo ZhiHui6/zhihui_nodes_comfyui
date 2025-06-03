@@ -13,8 +13,10 @@ from .ExtraOptions import ExtraOptions
 from .ColorTracking import ColorTracking
 from .PromptOptimizer import PromptOptimizer
 from .SystemPrompt.SystemPromptLoader import SystemPromptLoader
+from .ColorRemoval import ColorRemoval
 
 NODE_CLASS_MAPPINGS = {
+    "ColorRemoval": ColorRemoval,
     "PromptPresetOneChoice": PromptPresetOneChoice,
     "PromptPresetMultipleChoice": PromptPresetMultipleChoice,
     "TriggerWordMerger": TriggerWordMerger,
@@ -48,6 +50,7 @@ NODE_DISPLAY_NAME_MAPPINGS = {
     "ColorTracking": "颜色跟踪器",
     "PromptOptimizer": "提示词优化器",
     "SystemPromptLoader": "系统引导词加载器",
+    "ColorRemoval": "去色"
 }
 
 __all__ = ['NODE_CLASS_MAPPINGS', 'NODE_DISPLAY_NAME_MAPPINGS']
