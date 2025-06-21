@@ -10,12 +10,12 @@ class BaiduTranslateNode:
     def INPUT_TYPES(cls):
         return {
             "required": {
-                "enable_translate": ("BOOLEAN", {"default": True}),
-                "key_load_method": (["明文加载", "后台加载"],),
+                "启用翻译": ("BOOLEAN", {"default": True}),
+                "密钥加载": (["明文加载", "后台加载"],),
                 "app_id": ("STRING", {"default": "", "multiline": False}),
                 "api_key": ("STRING", {"default": "", "multiline": False}),
-                "from_lang": (["auto", "zh", "en", "jp", "kor", "fra", "spa", "th", "ara", "ru", "pt", "de", "it", "el", "nl", "pl", "bul", "est", "dan", "fin", "cs", "rom", "slo", "swe", "hu", "cht", "vie"], {"default": "auto"}),
-                "to_lang": (["zh", "en", "jp", "kor", "fra", "spa", "th", "ara", "ru", "pt", "de", "it", "el", "nl", "pl", "bul", "est", "dan", "fin", "cs", "rom", "slo", "swe", "hu", "cht", "vie"], {"default": "zh"}),
+                "源语言": (["auto", "zh", "en"], {"default": "auto"}),
+                "目标语言": (["zh", "en"], {"default": "en"}),
                 "text": ("STRING", {"default": "", "multiline": True}),
             }
         }
@@ -25,11 +25,11 @@ class BaiduTranslateNode:
     FUNCTION = "translate"
     CATEGORY = "zhihui_nodes_comfyui/Translate"
 
-    def translate(self, enable_translate, key_load_method, app_id, api_key, from_lang, to_lang, text):
-        if not enable_translate:
+    def translate(self, 启用翻译, 密钥加载, app_id, api_key, 源语言, 目标语言, text):
+        if not 启用翻译:
             return (text,)
 
-        if key_load_method == "明文加载":
+        if 密钥加载 == "明文加载":
             if not app_id or not api_key:
                 raise ValueError("明文加载模式下必须填写APP_ID和API_KEY")
             baidu_app_id = app_id
@@ -57,8 +57,8 @@ class BaiduTranslateNode:
         
         params = {
             "q": text,
-            "from": from_lang,
-            "to": to_lang,
+            "from": 源语言,
+            "to": 目标语言,
             "appid": baidu_app_id,
             "salt": salt,
             "sign": sign
@@ -73,11 +73,3 @@ class BaiduTranslateNode:
             pass
             
         return (text,)
-
-NODE_CLASS_MAPPINGS = {
-    "BaiduTranslateNode": BaiduTranslateNode
-}
-
-NODE_DISPLAY_NAME_MAPPINGS = {
-    "BaiduTranslateNode": "百度翻译节点"
-}
