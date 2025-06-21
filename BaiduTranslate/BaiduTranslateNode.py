@@ -21,7 +21,7 @@ class BaiduTranslateNode:
         }
 
     RETURN_TYPES = ("STRING",)
-    RETURN_NAMES = ("translated_text",)
+    RETURN_NAMES = ("译文结果",)
     FUNCTION = "translate"
     CATEGORY = "zhihui_nodes_comfyui/Translate"
 
@@ -49,7 +49,6 @@ class BaiduTranslateNode:
         if not baidu_app_id or not baidu_api_key:
             return (text,)
 
-        # 百度翻译API实现
         url = "https://fanyi-api.baidu.com/api/trans/vip/translate"
         salt = "12345678"
         sign = baidu_app_id + text + salt + baidu_api_key
