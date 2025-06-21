@@ -14,6 +14,7 @@ from .ColorTracking import ColorTracking
 from .PromptOptimizer import PromptOptimizer
 from .SystemPrompt.SystemPromptLoader import SystemPromptLoader
 from .ColorRemoval import ColorRemoval
+from .BaiduTranslate.BaiduTranslateNode import BaiduTranslateNode
 
 NODE_CLASS_MAPPINGS = {
     "ColorRemoval": ColorRemoval,
@@ -32,6 +33,7 @@ NODE_CLASS_MAPPINGS = {
     "ImageSwitch4way": ImageSwitch4way,
     "PromptOptimizer": PromptOptimizer,
     "SystemPromptLoader": SystemPromptLoader,
+    "BaiduTranslateNode": BaiduTranslateNode,
 }
 
 NODE_DISPLAY_NAME_MAPPINGS = {
@@ -48,9 +50,10 @@ NODE_DISPLAY_NAME_MAPPINGS = {
     "ImageSwitch4way": "图像切换器-4路(可注释)",
     "ExtraOptions": "额外引导选项（通用）",
     "ColorTracking": "颜色跟踪器",
+    "BaiduTranslateNode": "百度翻译",
     "PromptOptimizer": "提示词优化器",
     "SystemPromptLoader": "系统引导词加载器",
-    "ColorRemoval": "去色"
+    "ColorRemoval": "去色",
 }
 
 __all__ = ['NODE_CLASS_MAPPINGS', 'NODE_DISPLAY_NAME_MAPPINGS']

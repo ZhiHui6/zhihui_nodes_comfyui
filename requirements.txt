@@ -1,3 +1,5 @@
 opencv-python
+hashlib
+requests
 torch
 numpy
