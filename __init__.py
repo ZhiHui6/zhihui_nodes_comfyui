@@ -14,6 +14,7 @@ from .PromptOptimizer import PromptOptimizer
 from .SystemPrompt.SystemPromptLoader import SystemPromptLoader
 from .ColorRemoval import ColorRemoval
 from .BaiduTranslate.BaiduTranslateNode import BaiduTranslateNode
+from .ImgSwitch.AutoImageSwitch import AutoImageSwitch
 
 NODE_CLASS_MAPPINGS = {
     "ColorRemoval": ColorRemoval,
@@ -32,6 +33,7 @@ NODE_CLASS_MAPPINGS = {
     "PromptOptimizer": PromptOptimizer,
     "SystemPromptLoader": SystemPromptLoader,
     "BaiduTranslateNode": BaiduTranslateNode,
+    "AutoImageSwitch": AutoImageSwitch,
 }
 
 NODE_DISPLAY_NAME_MAPPINGS = {
@@ -51,6 +53,7 @@ NODE_DISPLAY_NAME_MAPPINGS = {
     "PromptOptimizer": "提示词优化器",
     "SystemPromptLoader": "系统引导词加载器",
     "ColorRemoval": "去色",
+    "AutoImageSwitch": "自动图像切换",
 }
 
 __all__ = ['NODE_CLASS_MAPPINGS', 'NODE_DISPLAY_NAME_MAPPINGS']

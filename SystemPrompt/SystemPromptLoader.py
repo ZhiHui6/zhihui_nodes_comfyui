@@ -8,7 +8,6 @@ if not os.path.exists(PRESETS_DIR):
     os.makedirs(PRESETS_DIR)
 
 def get_all_preset_options():
-    """获取所有预设选项，格式为 '文件夹/文件名'"""
     if not os.path.isdir(PRESETS_DIR):
         return ["未找到预设文件夹"]
     
@@ -24,7 +23,6 @@ def get_all_preset_options():
     return options if options else ["未找到预设文件"]
 
 def parse_preset_path(preset_path):
-    """解析预设路径，返回文件夹和文件名"""
     if '/' not in preset_path:
         return None, None
     parts = preset_path.split('/', 1)

@@ -34,7 +34,7 @@ class ImageSwitch4way:
     def execute(self, 图像1_注释, 图像2_注释, 图像3_注释, 图像4_注释, 图像1=None, 图像2=None, 图像3=None, 图像4=None, 选择图像="1"):
         images = [图像1, 图像2, 图像3, 图像4]
         idx = int(选择图像)-1
-        if idx < 0 or idx > 3: # 修正索引范围检查
+        if idx < 0 or idx > 3:
             return (None,)
         if images[idx] is None:
             return (None,)
