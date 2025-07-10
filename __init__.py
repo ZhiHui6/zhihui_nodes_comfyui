@@ -15,6 +15,7 @@ from .SystemPrompt.SystemPromptLoader import SystemPromptLoader
 from .ColorRemoval import ColorRemoval
 from .BaiduTranslate.BaiduTranslateNode import BaiduTranslateNode
 from .ImgSwitch.AutoImageSwitch import AutoImageSwitch
+from .TextExtractor import TextExtractor
 
 NODE_CLASS_MAPPINGS = {
     "ColorRemoval": ColorRemoval,
@@ -34,6 +35,7 @@ NODE_CLASS_MAPPINGS = {
     "SystemPromptLoader": SystemPromptLoader,
     "BaiduTranslateNode": BaiduTranslateNode,
     "AutoImageSwitch": AutoImageSwitch,
+    "TextExtractor": TextExtractor,
 }
 
 NODE_DISPLAY_NAME_MAPPINGS = {
@@ -54,6 +56,7 @@ NODE_DISPLAY_NAME_MAPPINGS = {
     "SystemPromptLoader": "系统引导词加载器",
     "ColorRemoval": "去色",
     "AutoImageSwitch": "自动图像切换",
+    "TextExtractor": "中英文本提取器",
 }
 
 __all__ = ['NODE_CLASS_MAPPINGS', 'NODE_DISPLAY_NAME_MAPPINGS']
