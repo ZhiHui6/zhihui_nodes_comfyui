@@ -1,0 +1,14 @@
+[project]
+name = "zhihui_nodes_comfyui"
+description = "ComfyUI node collection: text processing tools, image processing nodes, prompt generators and system prompt loaders, ect."
+version = "1.0.0"
+license = {file = "LICENSE"}
+
+[project.urls]
+Repository = "https://github.com/zhihui6/zhihui_nodes_comfyui"
+#  Used by Comfy Registry https://comfyregistry.org
+
+[tool.comfy]
+PublisherId = "zhihui6"
+DisplayName = "Zhihui_Nodes_Comfyui"
+Icon = "👩🏻‍🎨"
