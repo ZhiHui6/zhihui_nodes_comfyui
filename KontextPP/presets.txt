@@ -100,7 +100,47 @@
     {
       "name": "像素艺术",
       "brief": "Deconstruct the image into the charming, retro aesthetic of 16-bit era pixel art. Describe the technical and artistic constraints: 'Reduce the entire image to a limited color palette of 64 colors. Redraw all shapes and subjects with sharp, aliased pixel edges. Use dithering patterns to create gradients and shading, capturing the authentic look and feel of a classic Super Nintendo game.'"
-    }
-  ],
+    },
+    {
+      "name": "转写实风格",
+      "brief": "Convert this anime-style image into a realistic photograph and keep the characteristics of the main character. cinematic lighting, detailed skin texture, natural shadows, photorealistic details."
+    },
+    {
+      "name": "三视图",
+      "brief": "Generate a complete character reference sheet showing the same person from three different angles while maintaining all character details and proportions. Create a professional character turnaround with: 1. **Front View**: Show the character facing directly forward with arms at their sides, displaying all facial features, clothing details, and accessories clearly. 2. **Back View**: Present the character from behind, showing the back of their head, hair style, clothing back details, and overall silhouette. 3. **Side View (Profile)**: Display the character in perfect profile, showing the side silhouette, facial profile, and how clothing and accessories appear from the side. All three views should be arranged side by side on a clean white background, maintaining consistent lighting, scale, and character proportions across all angles. Ensure the character's pose is neutral and standing upright for clear reference purposes."
+    },
+    {
+      "name": "卡通漫画化",
+      "brief": "Convert the image into a hand-drawn, comic-style version, while maintaining the main character's identity and details. Describe the artistic transformation: 'Replace all colors with a limited palette of black, white, and red, creating a comic book-style effect. Redraw the subject's face using a clean, crisp outline, and add comic book-style details like black and white ink strokes, red highlights, and black shadows. Retain the subject's pose, clothing, and accessories, while transforming the scene into a comic book-style world.'"
+      },
+      {
+        "name": "证件照",
+        "brief": "Convert to professional ID photo, maintaining consistent facial features. Background should be pure solid blue (#2E5A8D), taken from the front, wearing formal business attire (white shirt + dark suit), studio lighting should be symmetrical and with soft shadows, expression should be natural, eyes should be directly facing the camera, shoulders should be visible, forehead should be visible, both ears should be visible, both eyebrows should be visible, hair should be neatly combed, high resolution 4K, realistic skin texture, clear facial focus. No accessories, no logos, no borders. Hands should be naturally hanging down, legs should not be visible, keep the upper body. No headwear, no hair accessories, no hair clips, no glasses, no tattoos, no scars."
+      },
+      {
+        "name": "乐高积木风格",
+        "brief": "Transform into LEGO brick style. Convert all elements to colorful plastic building blocks with visible studs on top. Maintain geometric simplicity with clean edges and bright saturated colors. Characters should have cylindrical heads, rectangular bodies, and simplified facial features. Objects become modular brick constructions. Background consists of interlocking LEGO baseplates. Apply glossy plastic texture throughout. Preserve overall composition while emphasizing blocky, toy-like aesthetic."
+      },
+      {
+        "name": "铅笔素描风格",
+        "brief": "Convert to realistic pencil sketch drawing. Apply authentic graphite pencil strokes with varying pressure and texture. Use crosshatching and shading techniques for depth and volume. Maintain fine line details with soft gradations from light to dark tones. Paper texture should be visible through the graphite. Emphasize contrast through strategic use of highlights and shadows. Preserve artistic hand-drawn quality with natural imperfections and organic line variations."
+      },
+      {
+        "name": "吉卜力动漫风格",
+        "brief": "Transform into Studio Ghibli anime style."
+      },
+      {
+        "name": "全息扫描影像",
+        "brief": "Convert the image into vintage sci-fi hologram, scanning lines, Holographic data content information box etc."
+      },
+      {
+        "name": "随机金属材质",
+        "brief": "Transform the subject into a sculpture made from randomly selected metallic material. Choose one from ：gold (warm golden luster with soft reflections), silver (bright mirror-like surface with cool tones), copper (reddish-brown patina with oxidized green accents), mercury (liquid metallic surface with flowing reflections), iron (dark matte finish with rust textures), stainless steel (polished chrome surface with sharp reflections), bronze (antique finish with weathered patina), titanium (lightweight appearance with subtle blue tints), or platinum (pure white metallic sheen). Apply appropriate surface properties including reflectivity, oxidation patterns, weight appearance, and environmental interaction effects specific to the chosen metal."
+      },
+      {
+        "name": "自定义",
+        "brief": ""
+      }
+    ],
   "suffix": "Your response must consist of concise instruction ready for the image editing AI. Do not add any conversational text, explanations, or deviations; only the instructions."
 }

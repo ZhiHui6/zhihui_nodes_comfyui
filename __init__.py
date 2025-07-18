@@ -59,7 +59,7 @@ NODE_DISPLAY_NAME_MAPPINGS = {
     "ColorRemoval": "去色",
     "AutoImageSwitch": "自动图像切换",
     "TextExtractor": "中英文本提取器",
-    "KontextPresets": "Kontext预设集(增强版)",
+    "KontextPresetsPlus": "Kontext预设集(增强版)",
 }
 
 __all__ = ['NODE_CLASS_MAPPINGS', 'NODE_DISPLAY_NAME_MAPPINGS']

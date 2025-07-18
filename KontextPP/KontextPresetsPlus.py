@@ -1,13 +1,13 @@
 import json
-import requests
 import os
+import requests
+import time
 
 class KontextPresetsPlus:
     data = None
     
     @classmethod
     def load_presets(cls):
-        """从presets.txt文件加载预设数据"""
         if cls.data is not None:
             return cls.data
             
@@ -20,7 +20,6 @@ class KontextPresetsPlus:
             print(f"✅ 成功加载预设文件: {presets_file}")
         except FileNotFoundError:
             print(f"❌ 预设文件未找到: {presets_file}")
-            # 使用默认的空数据结构
             cls.data = {
                 "prefix": "You are a creative prompt engineer.",
                 "预设集": [],
@@ -46,12 +45,17 @@ class KontextPresetsPlus:
     @classmethod
     def INPUT_TYPES(cls):
         data = cls.load_presets()
+        preset_names = [预设["name"] for 预设 in data.get("预设集", [])]
         return {
             "required": {
-                "预设": ([预设["name"] for 预设 in data.get("预设集", [])],),
-                "启用扩写": ("BOOLEAN", {"default": False}),
-                "扩写模型": (["openai", "mistral", "qwen-coder", "llama", "sur", "unity", "searchgpt", "evil"],),
-                "创意温度": ("FLOAT", {"default": 0.7, "min": 0.0, "max": 2.0, "step": 0.1, "round": 0.1, "display": "slider"}),
+                "预设": (preset_names, {"default": preset_names[0] if preset_names else "无预设"}),
+                "输出完整信息": ("BOOLEAN", {"default": False}),
+                "扩写模型": (["deepseek", "gemini", "openai", "mistral", "qwen-coder", "llama", "sur", "unity", "searchgpt", "evil"], {"default": "openai"}),
+                "启用内置扩写": ("BOOLEAN", {"default": False}),
+
+            },
+            "optional": {
+                "自定义内容": ("STRING", {"multiline": True, "default": "", "placeholder": "当选择'自定义'预设时，请在此输入您的自定义内容..."}),
             }
         }
     RETURN_TYPES = ("STRING",)
@@ -67,13 +71,17 @@ class KontextPresetsPlus:
                 return 预设["brief"]
         return None
     
-    def call_llm_api(self, prompt, 扩写模型="", 创意温度=0.7):
+    def call_llm_api(self, prompt, 扩写模型=""):
         try:
             api_url = "https://text.pollinations.ai/"
+            random_seed = int(time.time() * 1000000) % 0xffffffffffffffff
+            print(f"🎲 API调用随机种子: {random_seed}")
+            
             payload = {
                 "messages": [{"role": "user", "content": prompt}],
                 "扩写模型": 扩写模型,
-                "创意温度": 创意温度
+                "seed": random_seed,
+                "timestamp": int(time.time())
             }
             response = requests.post(api_url, 
                                    json=payload,
@@ -95,42 +103,55 @@ class KontextPresetsPlus:
                     504: "网关超时 - API响应时间过长"
                 }
                 error_msg = error_messages.get(response.status_code, f"未知错误 - HTTP状态码: {response.status_code}")
-                print(f"❌ API调用失败: {error_msg} | 模型: {扩写模型} | 创意温度: {创意温度}")
+                print(f"❌ API调用失败: {error_msg} | 模型: {扩写模型}")
                 return f"[API错误] {error_msg}\n\n原始提示词:\n{prompt}"
                 
         except requests.exceptions.Timeout:
             error_msg = "请求超时 - API服务响应时间超过45秒"
-            print(f"⏰ {error_msg} | 模型: {扩写模型} | 创意温度: {创意温度}")
+            print(f"⏰ {error_msg} | 模型: {扩写模型}")
             return f"[超时错误] {error_msg}\n\n原始提示词:\n{prompt}"
             
         except requests.exceptions.ConnectionError:
             error_msg = "网络连接失败 - 无法连接到API服务器"
-            print(f"🌐 {error_msg} | 模型: {扩写模型} | 创意温度: {创意温度}")
+            print(f"🌐 {error_msg} | 模型: {扩写模型}")
             return f"[连接错误] {error_msg}\n\n原始提示词:\n{prompt}"
             
         except requests.exceptions.RequestException as e:
             error_msg = f"网络请求异常 - {str(e)}"
-            print(f"📡 {error_msg} | 模型: {扩写模型} | 创意温度: {创意温度}")
+            print(f"📡 {error_msg} | 模型: {扩写模型}")
             return f"[网络错误] {error_msg}\n\n原始提示词:\n{prompt}"
             
         except json.JSONDecodeError:
             error_msg = "API响应格式错误 - 无法解析服务器返回的数据"
-            print(f"📄 {error_msg} | 模型: {扩写模型} | 创意温度: {创意温度}")
+            print(f"📄 {error_msg} | 模型: {扩写模型}")
             return f"[数据格式错误] {error_msg}\n\n原始提示词:\n{prompt}"
             
         except Exception as e:
             error_msg = f"未知异常 - {str(e)}"
-            print(f"❓ {error_msg} | 模型: {扩写模型} | 创意温度: {创意温度}")
+            print(f"❓ {error_msg} | 模型: {扩写模型}")
             return f"[系统错误] {error_msg}\n\n原始提示词:\n{prompt}"
 
-    def get_预设(self, 预设, 启用扩写, 扩写模型, 创意温度):
+    def _process_with_llm(self, brief_content, prefix, suffix, 扩写模型):
+        brief = "The Brief:" + brief_content
+        full_prompt = prefix + "\n" + brief + "\n" + suffix
+        return self.call_llm_api(full_prompt, 扩写模型)
+    
+    def get_预设(self, 预设, 输出完整信息, 启用内置扩写, 扩写模型, 自定义内容=""):
         data = self.load_presets()
-        
-        brief = "The Brief:"+self.get_brief_by_name(预设)
-        original_string = data.get("prefix")+"\n"+brief+"\n"+data.get("suffix")
-        
-        if 启用扩写:
-            processed_string = self.call_llm_api(original_string, 扩写模型, 创意温度)
-            return (processed_string,)
+        prefix = data.get("prefix", "")
+        suffix = data.get("suffix", "")
+              
+        if 预设 == "自定义":
+            brief_content = 自定义内容 if 自定义内容.strip() else ""
         else:
-            return (original_string,)
+            brief_content = self.get_brief_by_name(预设)
+        
+        if 启用内置扩写:
+            processed_string = self._process_with_llm(brief_content, prefix, suffix, 扩写模型)
+            return (processed_string,)
+        
+        if 输出完整信息:
+            full_info = f"{prefix}\n\n{brief_content}\n\n{suffix}"
+            return (full_info,)
+        else:
+            return (brief_content,)
