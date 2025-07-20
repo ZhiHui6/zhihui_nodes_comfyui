@@ -41,41 +41,42 @@
 
 ### 💡 提示词处理类节点
 
-#### 6. 摄影提示词生成器 (`PhotographPromptGenerator`)
+#### 6. Kontext预设基础版 (`LoadKontextPresetsBasic`)
+- **功能**: 提供专业的图像变换预设库，包含13项专业预设。
+
+#### 7. Kontext预设增强版 (`KontextPresetsPlus`)
+- **功能**: 提供专业的图像变换预设，内置免费在线扩写功能，支持用户自定义预设，为图像编辑提供创意指导。
+- **特点**:
+    - **丰富预设库**: 包含20余项专业预设。
+    - **双预设库**: 支持默认预设和用户自定义预设，用户可自由新增更多创意预设，通过分类标识区分预设来源。（用户预设文件"user_presets"位于"...\custom_nodes\zhihui_nodes_comfyui\KontextPresets\KontextPresetsPlus"）
+    - **智能扩写**: 支持多种LLM模型（OpenAI、Mistral、Qwen等）对预设内容进行创意扩写。
+    - **灵活输出**: 支持输出原始预设内容、完整信息或AI扩写后的内容。
+![节点展示](预览图/Kontext预设增强版节点展示)
+![效果展示](预览图/Kontext预设增强版效果预览.jpg)
+
+#### 8. 摄影提示词生成器 (`PhotographPromptGenerator`)
 - **功能**: 根据预设的摄影要素（如相机、镜头、光照、场景等）组合生成专业的摄影风格提示词。
 - **特点**: 
     - 支持从自定义文本文件加载选项，灵活扩展。
     - 支持随机选择，增加创意多样性。
     - 输出模板可自定义。
-- **适用场景**: 产品摄影、人像摄影、场景构建。
 
-#### 7. 提示词优化器 (`PromptOptimizer`)
+#### 9. 提示词优化器 (`PromptOptimizer`)
 - **功能**: 在线智能扩写和优化用户输入的提示词，无需本地硬件支持。
 - **模式**: 提供标准、详细和自定义三种扩写模式。
 - **语言**: 支持中英文双语输出。
 
-#### 8. 提示词预设 - 单选 (`PromptPresetOneChoice`)
+#### 10. 提示词预设 - 单选 (`PromptPresetOneChoice`)
 - **功能**: 提供6个预设选项，用户可以方便地在不同预设之间切换。
 
-#### 9. 提示词预设 - 多选 (`PromptPresetMultipleChoice`)
+#### 11. 提示词预设 - 多选 (`PromptPresetMultipleChoice`)
 - **功能**: 支持同时选择多个预设，并将它们合并输出，每个预设都带有独立的开关和注释功能。
 
-#### 10. 触发词合并器 (`TriggerWordMerger`)
+#### 12. 触发词合并器 (`TriggerWordMerger`)
 - **功能**: 将特定的触发词（Trigger Words）与主文本智能合并，并支持权重控制（例如 `(word:1.5)`）。
 
-#### 11. 系统引导词加载器 (`SystemPromptLoader`)
+#### 13. 系统引导词加载器 (`SystemPromptLoader`)
 - **功能**: 从预设文件夹动态加载系统级引导词（System Prompt），并可选择性地与用户输入合并。
-
-#### 12. Kontext预设基础版 (`LoadKontextPresetsBasic`)
-- **功能**: 提供专业的图像变换预设库，包含13项专业预设。
-
-#### 13. Kontext预设增强版 (`KontextPresetsPlus`)
-- **功能**: 提供专业的图像变换预设，内置免费在线扩写功能，支持用户自定义预设，为图像编辑提供创意指导。
-- **特点**:
-    - **丰富预设库**: 包含20余项专业预设。
-    - **双预设系统**: 支持默认预设和用户自定义预设，用户可自由新增更多创意预设，通过分类标识区分预设来源。（用户预设文件"user_presets"位于"...\custom_nodes\zhihui_nodes_comfyui\KontextPresets\KontextPresetsPlus"）
-    - **智能扩写**: 支持多种LLM模型（OpenAI、Mistral、Qwen等）对预设内容进行创意扩写。
-    - **灵活输出**: 支持输出原始预设内容、完整信息或AI扩写后的内容。
 
 ### 🖼️ 图像处理类节点
 
