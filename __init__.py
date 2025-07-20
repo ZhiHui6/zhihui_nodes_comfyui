@@ -16,7 +16,10 @@ from .ColorRemoval import ColorRemoval
 from .BaiduTranslate.BaiduTranslateNode import BaiduTranslateNode
 from .ImgSwitch.AutoImageSwitch import AutoImageSwitch
 from .TextExtractor import TextExtractor
-from .KontextPP.KontextPresetsPlus import KontextPresetsPlus
+from .KontextPresets.KontextPresetsPlus.KontextPresetsPlus import KontextPresetsPlus
+from .KontextPresets.KontextPresetsBasic import LoadKontextPresetsBasic
+from .TranslateNodeBeta import TranslateNodeBeta
+
 
 NODE_CLASS_MAPPINGS = {
     "ColorRemoval": ColorRemoval,
@@ -38,6 +41,8 @@ NODE_CLASS_MAPPINGS = {
     "AutoImageSwitch": AutoImageSwitch,
     "TextExtractor": TextExtractor,
     "KontextPresetsPlus": KontextPresetsPlus,
+    "LoadKontextPresetsBasic": LoadKontextPresetsBasic,
+    "TranslateNodeBeta": TranslateNodeBeta,
 }
 
 NODE_DISPLAY_NAME_MAPPINGS = {
@@ -60,6 +65,8 @@ NODE_DISPLAY_NAME_MAPPINGS = {
     "AutoImageSwitch": "自动图像切换",
     "TextExtractor": "中英文本提取器",
     "KontextPresetsPlus": "Kontext预设集(增强版)",
+    "LoadKontextPresetsBasic": "Kontext预设集(基础版)",
+    "TranslateNodeBeta": "中英文翻译器[beta]",
 }
 
 __all__ = ['NODE_CLASS_MAPPINGS', 'NODE_DISPLAY_NAME_MAPPINGS']

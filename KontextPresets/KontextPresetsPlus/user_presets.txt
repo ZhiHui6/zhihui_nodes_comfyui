@@ -1,0 +1,6 @@
+[
+    {
+      "name": "我的自定义风格1",
+      "brief": "Transform the image into my personal artistic style with vibrant colors, dynamic composition, and expressive brushstrokes that capture emotion and movement."
+    },
+]
