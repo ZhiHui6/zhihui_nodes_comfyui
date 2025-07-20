@@ -51,6 +51,7 @@
     - **双预设库**: 支持默认预设和用户自定义预设，用户可自由新增更多创意预设，通过分类标识区分预设来源。（用户预设文件"user_presets"位于"...\custom_nodes\zhihui_nodes_comfyui\KontextPresets\KontextPresetsPlus"）
     - **智能扩写**: 支持多种LLM模型（OpenAI、Mistral、Qwen等）对预设内容进行创意扩写。
     - **灵活输出**: 支持输出原始预设内容、完整信息或AI扩写后的内容。
+
 ![节点展示](预览图/Kontext预设增强版节点展示.jpg)
 ![效果展示](预览图/Kontext预设增强版效果预览.jpg)
 
