@@ -64,11 +64,11 @@ class LoadKontextPresetsBasic:
     def INPUT_TYPES(cls):
         return {
             "required": {
-                "preset": ([preset["name"] for preset in cls.data.get("预设集", [])],),
+                "预设": ([preset["name"] for preset in cls.data.get("预设集", [])],),
             }
         }
     RETURN_TYPES = ("STRING",)
-    RETURN_NAMES = ("Prompt",)
+    RETURN_NAMES = ("提示词内容",)
     FUNCTION = "get_preset"
     CATEGORY = "utils"
     

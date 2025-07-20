@@ -100,7 +100,7 @@ class KontextPresetsPlus:
             }
         }
     RETURN_TYPES = ("STRING",)
-    RETURN_NAMES = ("预设内容",)
+    RETURN_NAMES = ("提示词内容",)
     FUNCTION = "get_预设"
     CATEGORY = "utils"
     
