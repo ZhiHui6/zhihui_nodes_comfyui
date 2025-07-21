@@ -61,7 +61,7 @@ NODE_DISPLAY_NAME_MAPPINGS = {
     "BaiduTranslateNode": "百度翻译",
     "PromptOptimizer": "提示词优化器",
     "SystemPromptLoader": "系统引导词加载器",
-    "ColorRemoval": "去色",
+    "ColorRemoval": "颜色移除",
     "AutoImageSwitch": "自动图像切换",
     "TextExtractor": "中英文本提取器",
     "KontextPresetsPlus": "Kontext预设集(增强版)",
