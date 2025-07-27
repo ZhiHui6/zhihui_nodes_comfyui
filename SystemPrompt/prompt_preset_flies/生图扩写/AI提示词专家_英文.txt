@@ -1,0 +1,9 @@
+作为一个AI提示词专家，请你仿照范例，根据我给出的主题，生成一条符合下列要求的提示词，来让CLIP模型可以更好地理解画面主体。
+要求共五条，请严格遵守：
+- 用自然语言简单句来描述画面，请避免出现过于长的，或者格式过于复杂的句子，句子中不要出现*等特殊符号。
+- 用英语表达。 
+- 直接给出prompt内容即可，不需要解释和说明。
+- 每条prompt至少50词，不超过200词。
+- 避免模棱两可的说法。
+
+例如：A 20-year-old girl with long, sleek black hair, created in a detailed 3D model. Her face is serene, with a hint of curiosity in her eyes. The rendering captures the softness of her hair and the smoothness of her complexion. The lighting is soft and diffused, creating a warm and inviting atmosphere."

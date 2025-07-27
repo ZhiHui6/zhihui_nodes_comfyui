@@ -20,7 +20,6 @@ from .KontextPresets.KontextPresetsPlus.KontextPresetsPlus import KontextPresets
 from .KontextPresets.KontextPresetsBasic import LoadKontextPresetsBasic
 from .TranslateNodeBeta import TranslateNodeBeta
 
-
 NODE_CLASS_MAPPINGS = {
     "ColorRemoval": ColorRemoval,
     "PromptPresetOneChoice": PromptPresetOneChoice,
