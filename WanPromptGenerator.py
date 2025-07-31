@@ -141,22 +141,7 @@ class WanPromptGenerator:
         return processed_value
 
     def _call_llm_api(self, text, model="openai"):
-        system_prompt = """# 你是万相2.2视频提示词优化专家，请将用户提供的文本扩写出更多极致丰富的各种细节，转换为专业生成视频用的提示词。
-## 规则：
-- 输出格式：中文逗号分隔。
-- 必须包含：光线类型+时间段+景别
-- 根据内容自动添加：构图、色调、运镜、风格等。
-- 直接输出结果，无需解释。
-## 元素选择：
-- 光线：日光/人工光/月光/火光/柔光/硬光/顶光/侧光/背光/边缘光
-- 时间：白天/夜晚/黄昏/日落/日出/黎明
-- 景别：特写/中近景/中景/全景/远景
-- 运镜：推镜头/拉镜头/跟拍/环绕/手持
-- 色调：暖色调/冷色调/高饱和度/低饱和度
-### 示例：
-- 输入：一个女孩在海边
-- 输出：日落，柔光，边缘光，中景，一个女孩站在海边凝望远方，海浪轻轻拍打，暖色调。
-"""
+        system_prompt = """你现在是阿里万相视频提示词生成专家，你需要将用户提供的文本，进行极致详细地扩写更多丰富细节并转换为用于生成视频的专业提示词。请直接给出最终文本，不要有冗余的解释。"""
         full_prompt = f"{system_prompt}{text}"
         encoded_prompt = urllib.parse.quote(full_prompt)
     
@@ -188,17 +173,23 @@ class WanPromptGenerator:
             print(error_message)
             return text
 
+    RETURN_TYPES = ("STRING", "STRING")
+    RETURN_NAMES = ("扩写后提示词", "原始提示词")
+    
     def generate_prompt(self, 启用扩写, 扩写模型="openai", 添加前缀=False, 预设组合="不使用预设", 补充提示词="", **kwargs):
         
         if 预设组合 != "不使用预设":
-            prompt = self.预设组合映射.get(预设组合, "")
-            if 启用扩写 and prompt:
-                prompt = self._call_llm_api(prompt, 扩写模型)
+            original_prompt = self.预设组合映射.get(预设组合, "")
             if 补充提示词.strip():
-                prompt = f"{prompt}，{补充提示词.strip()}" if prompt else 补充提示词.strip()
-            if 添加前缀 and prompt:
-                prompt = f"画面采用{prompt}"
-            return (prompt,)
+                original_prompt = f"{original_prompt}，{补充提示词.strip()}" if original_prompt else 补充提示词.strip()
+            if 添加前缀 and original_prompt:
+                original_prompt = f"画面采用{original_prompt}"
+            
+            expanded_prompt = original_prompt
+            if 启用扩写 and original_prompt:
+                expanded_prompt = self._call_llm_api(original_prompt, 扩写模型)
+            
+            return (expanded_prompt, original_prompt)
         
         processed_args = {}
         
@@ -270,13 +261,12 @@ class WanPromptGenerator:
         if 补充提示词.strip():
              prompt = f"{prompt}，{补充提示词.strip()}" if prompt else 补充提示词.strip()
 
+        original_prompt = prompt
+        expanded_prompt = prompt
         if 启用扩写 and prompt:
-            prompt = self._call_llm_api(prompt, 扩写模型)
+            expanded_prompt = self._call_llm_api(prompt, 扩写模型)
         
-        if 添加前缀 and prompt:
-            prompt = f"画面采用{prompt}"
-        
-        return (prompt,)
+        return (expanded_prompt, original_prompt)
     
     @classmethod
     def IS_CHANGED(cls, **kwargs):
