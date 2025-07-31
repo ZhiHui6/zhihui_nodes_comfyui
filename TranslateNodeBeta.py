@@ -4,7 +4,6 @@ import json
 
 class TranslateNodeBeta:
 
-    
     @classmethod
     def INPUT_TYPES(cls):
         return {

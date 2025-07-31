@@ -19,6 +19,7 @@ from .TextExtractor import TextExtractor
 from .KontextPresets.KontextPresetsPlus.KontextPresetsPlus import KontextPresetsPlus
 from .KontextPresets.KontextPresetsBasic import LoadKontextPresetsBasic
 from .TranslateNodeBeta import TranslateNodeBeta
+from .WanPromptGenerator import WanPromptGenerator
 
 NODE_CLASS_MAPPINGS = {
     "ColorRemoval": ColorRemoval,
@@ -42,6 +43,7 @@ NODE_CLASS_MAPPINGS = {
     "KontextPresetsPlus": KontextPresetsPlus,
     "LoadKontextPresetsBasic": LoadKontextPresetsBasic,
     "TranslateNodeBeta": TranslateNodeBeta,
+    "WanPromptGenerator": WanPromptGenerator,
 }
 
 NODE_DISPLAY_NAME_MAPPINGS = {
@@ -66,6 +68,7 @@ NODE_DISPLAY_NAME_MAPPINGS = {
     "KontextPresetsPlus": "Kontext预设集(增强版)",
     "LoadKontextPresetsBasic": "Kontext预设集(基础版)",
     "TranslateNodeBeta": "中英文翻译器[beta]",
+    "WanPromptGenerator": "万相提示词生成器",
 }
 
 __all__ = ['NODE_CLASS_MAPPINGS', 'NODE_DISPLAY_NAME_MAPPINGS']
