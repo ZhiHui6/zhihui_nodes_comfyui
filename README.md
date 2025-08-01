@@ -4,15 +4,17 @@
 
 ## 📖 项目介绍
 
-这是一个由<span style="color: red;"> **潪绘·Binity** </span>精心创建的 ComfyUI 自定义节点工具合集项目，旨在为用户提供一系列实用、高效的节点，以增强和扩展 ComfyUI 的功能。本节点集涵盖文本处理、提示词优化、图像处理等多个方面，为您的 AI 创作提供全方位支持。
+这是一个由<span style="color: red;"> **潪绘·Binity** </span>精心创建的 ComfyUI 自定义节点工具合集，旨在为用户提供一系列实用、高效的节点，以增强和扩展 ComfyUI 的功能。本节点集包含20+功能，涵盖文本处理、提示词优化、图像处理等多个方面，为您的 AI 创作提供全方位支持。
 
 ### ✨ 主要特点
 
-- 🔄 **双语翻译服务**：集成百度翻译API和免费在线翻译，支持中英文双向转换和自动语言检测
+- 🔄 **双语翻译工具**：配有百度翻译和免费在线翻译节点，支持中英文双向转换
 - 📝 **全面文本处理**：提供多行文本编辑、文本合并分离、内容提取修改、语言过滤等5类文本操作节点
-- 🎯 **智能提示词系统**：包含Kontext预设库、摄影风格生成器、系统引导词加载器等等专业的提示词生成工具
-- 🖼️ **实用图像工具**：支持多算法图像缩放、智能切换检测、颜色移除等等
-- 🧩 **即插即用设计**：20个独立功能节点，可单独使用或自由组合构建复杂AI工作流
+- 🎯 **智能提示词系统**：Kontext预设增强版、摄影提示词生成器、万相视频提示词生成器等专业的提示词生成工具
+- 🖼️ **实用图像工具**：支持多算法图像缩放、智能切换、颜色移除等等
+
+
+> 如果这个项目对您有帮助，请给我们一个 ⭐**Star**！您的支持是我们持续改进的动力。
 
 ## ⭐ 明星节点
 
@@ -20,77 +22,43 @@
 
 <table>
 <tr>
-<th width="25%">节点名称</th>
+<th width="30%">节点名称</th>
 <th width="15%">类别</th>
 <th>核心功能</th>
-<th width="15%">推荐指数</th>
 </tr>
 
 <tr>
 <td><b>🎯 Kontext预设增强版</b><br><code>LoadKontextPresetsPlus</code></td>
 <td>提示词处理</td>
 <td>内置20+创意预设的Kontext图像编辑预设工具，支持用户自定义预设扩展，集成多种LLM模型免费在线智能扩写。</td>
-<td>⭐⭐⭐⭐⭐</td>
 </tr>
 
 <tr>
-<td><b>🤖 系统引导词加载器</b><br><code>SystemPromptLoader</code></td>
+<td><b>🎬 万相视频提示词生成器</b><br><code>WanPromptGenerator</code></td>
 <td>提示词处理</td>
-<td>专业系统引导词预设工具，内置众多类别模板，输出引导内容给下游LLM节点生成专业的提示词。</td>
-
-<td>⭐⭐⭐⭐⭐</td>
+<td>基于万相2.2官方文档编写的全能型提示词生成器，支持自定义和预设两种组合方法，涵盖运镜、场景、光线、构图等16个维度的专业视频提示词生成。</td>
 </tr>
 
 <tr>
 <td><b>📸 摄影提示词生成器</b><br><code>PhotographPromptGenerator</code></td>
 <td>提示词处理</td>
 <td>专业摄影风格提示词生成器，涵盖人物、场景、镜头、光线等15个维度，一键生成专业摄影提示词。</td>
-<td>⭐⭐⭐⭐</td>
+</tr>
+
+<tr>
+<td><b>🤖 系统引导词加载器</b><br><code>SystemPromptLoader</code></td>
+<td>提示词处理</td>
+<td>专业系统引导词预设工具，内置众多类别模板，输出引导内容给下游LLM节点生成专业的提示词。</td>
 </tr>
 
 <tr>
 <td><b>🔍 额外引导选项</b><br><code>ExtraOptions</code></td>
 <td>提示词处理</td>
 <td>类似JoyCaption额外选项的通用式图像反推辅助，集成了5种反推类型，提供26个精细化选项开关。</td>
-<td>⭐⭐⭐⭐</td>
 </tr>
 </table>
 
-> 💡 **使用建议**：新用户建议从 **Kontext预设增强版** 和 **摄影提示词生成器** 开始体验，这两个节点能够快速提升您的创作效率和作品质量。
-
----
-
-## 🚀 安装方式
-
-### 📦 通过 ComfyUI Manager 安装（推荐）
-
-1. 安装 [ComfyUI Manager](https://github.com/ltdrdata/ComfyUI-Manager)
-2. 在 Manager 菜单中选择 "Install Custom Nodes"
-3. 搜索 `zhihui-nodes-comfyui`（暂未支持） ，或通过 Git URL 进行安装：
-   ```
-   https://github.com/ZhiHui6/zhihui-nodes-comfyui.git
-   ```
-4. 点击 "Install" 按钮并等待安装完成
-5. 重启 ComfyUI，即可在节点菜单中找到新添加的节点
-
-### 🔧 手动安装
-
-1. 下载本仓库的 ZIP 文件或通过 Git 克隆：
-   ```bash
-   git clone https://github.com/ZhiHui6/zhihui-nodes-comfyui.git
-   ```
-2. 将整个 `zhihui-nodes-comfyui` 文件夹解压或复制到 ComfyUI 的 `custom_nodes` 目录下
-3. 重启 ComfyUI
-
-### 📋 依赖项
-
-本节点集大部分功能无需额外依赖，开箱即用。部分在线功能（如翻译、提示词优化）需要网络连接。
-
-如需手动安装依赖，可执行：
-
-```bash
-pip install -r requirements.txt
-```
+> 💡 **使用建议**：新用户建议从 **摄影提示词生成器** 和 **万相视频提示词生成器** 开始体验，这两个节点能够快速提升您的创作效率和作品质量。
 
 ---
 
@@ -180,10 +148,8 @@ pip install -r requirements.txt
 
 <b>特点</b>：
 - <b>双模式切换</b>：支持自定义组合和预设组合模式，通过开关按钮一键切换
-- <b>丰富预设</b>：内置5种预设组合（电影级画面、动作风格、记录风格、浪漫风格、恐怖风格）
 - <b>多维度选择</b>：涵盖主体类型、场景类型、光源类型、光线类型、时间段、景别、构图、镜头焦段、机位角度、镜头类型、色调、运镜方式、人物情绪、运动类型、视觉风格、特效镜头16个专业维度
 - <b>智能扩写</b>：支持多种LLM模型（OpenAI、Claude、DeepSeek、Gemini等）免费在线扩写
-- <b>补充提示词</b>：设有支持多行文本输入的提示词输入框，用户可以在框中输入自定义的文本，会被追加到原文中。
 </td>
 </tr>
 <tr>
@@ -281,18 +247,43 @@ pip install -r requirements.txt
 
 ---
 
-## 🤝 贡献指南
 
-我们欢迎各种形式的贡献，包括但不限于：
+## 🚀 安装方式
 
-> 🔴 报告问题和提出建议
-> 💡 提交功能请求
-> 📚 改进文档
-> 💻 提交代码贡献
+### 📦 通过 ComfyUI Manager 安装（推荐）
 
-如果您有任何想法或建议，请随时提出 Issue 或 Pull Request。
+1. 安装 [ComfyUI Manager](https://github.com/ltdrdata/ComfyUI-Manager)
+2. 在 Manager 菜单中选择 "Install Custom Nodes"
+3. 搜索 `zhihui-nodes-comfyui`（暂未支持） ，或通过 Git URL 进行安装：
+   ```
+   https://github.com/ZhiHui6/zhihui-nodes-comfyui.git
+   ```
+4. 点击 "Install" 按钮并等待安装完成
+5. 重启 ComfyUI，即可在节点菜单中找到新添加的节点
+
+### 🔧 手动安装
+
+1. 下载本仓库的 ZIP 文件或通过 Git 克隆：
+   ```bash
+   git clone https://github.com/ZhiHui6/zhihui-nodes-comfyui.git
+   ```
+2. 将整个 `zhihui-nodes-comfyui` 文件夹解压或复制到 ComfyUI 的 `custom_nodes` 目录下
+3. 重启 ComfyUI
 
 ---
 
-## 🎉 感谢使用 zhihui-nodes-comfyui
-如果这个项目对您有帮助，请给我们一个 ⭐**Star**！您的支持是我们持续改进的动力。
+### 📋 依赖项
+
+本节点集大部分功能无需额外依赖，开箱即用。部分在线功能（如翻译、提示词优化）需要网络连接。
+
+如需手动安装依赖，可执行：
+
+```bash
+pip install -r requirements.txt
+```
+## 🤝 贡献指南
+
+我们欢迎各种形式的贡献，包括但不限于：
+[🔴**报告问题和提出建议**] | [**💡提交功能请求**] | [**📚改进文档**] | [**💻提交代码贡献**]
+
+如果您有任何想法或建议，请随时提出 Issue 或 Pull Request。
