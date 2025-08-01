@@ -5,6 +5,9 @@ import urllib.parse
 class WanPromptGenerator:
     CATEGORY = "zhihui/生成器"
     FUNCTION = "generate_prompt"
+    
+    RETURN_TYPES = ("STRING", "STRING")
+    RETURN_NAMES = ("源提示词", "提示词输出")
 
     光源类型选项 = [
         "关闭", "随机", "日光", "人工光", "月光", "实用光", "火光", "荧光", "阴天光", "混合光", "晴天光"
@@ -170,9 +173,6 @@ class WanPromptGenerator:
                 error_message += f" | 服务器响应: {response.text}"
             print(error_message)
             return text
-
-    RETURN_TYPES = ("STRING", "STRING")
-    RETURN_NAMES = ("提示词输出", "源提示词")
     
     def generate_prompt(self, 启用扩写, 模型品牌="openai", 添加前缀=False, 预设组合="不使用预设", 请输入您的补充文本="", **kwargs):
         
