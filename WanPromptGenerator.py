@@ -108,11 +108,11 @@ class WanPromptGenerator:
                 "运动类型": (s.运动类型选项, {"default": "关闭"}),
                 "视觉风格": (s.视觉风格选项, {"default": "关闭"}),
                 "特效镜头": (s.特效镜头选项, {"default": "关闭"}),
+                "预设组合": (s.预设组合选项, {"default": "不使用预设"}), 
                 "添加前缀": ("BOOLEAN", {"default": False}),
-                "预设组合": (s.预设组合选项, {"default": "不使用预设"}),    
                 "启用扩写": ("BOOLEAN", {"default": False}),
                 "模型品牌": (["claude","deepseek", "gemini", "openai", "mistral", "qwen-coder", "llama", "sur", "unity", "searchgpt", "evil"], {"default": "openai"}), 
-                "补充提示词": ("STRING", {"default": "", "multiline": True}),
+                "请输入您的补充文本": ("STRING", {"default": "", "multiline": True}),
             }
         }
 
@@ -174,12 +174,12 @@ class WanPromptGenerator:
     RETURN_TYPES = ("STRING", "STRING")
     RETURN_NAMES = ("提示词输出", "源提示词")
     
-    def generate_prompt(self, 启用扩写, 模型品牌="openai", 添加前缀=False, 预设组合="不使用预设", 补充提示词="", **kwargs):
+    def generate_prompt(self, 启用扩写, 模型品牌="openai", 添加前缀=False, 预设组合="不使用预设", 请输入您的补充文本="", **kwargs):
         
         if 预设组合 != "不使用预设":
             original_prompt = self.预设组合映射.get(预设组合, "")
-            if 补充提示词.strip():
-                original_prompt = f"{original_prompt}，{补充提示词.strip()}" if original_prompt else 补充提示词.strip()
+            if 请输入您的补充文本.strip():
+                original_prompt = f"{original_prompt}，{请输入您的补充文本.strip()}" if original_prompt else 请输入您的补充文本.strip()
             if 添加前缀 and original_prompt:
                 original_prompt = f"画面采用{original_prompt}"
             
@@ -255,8 +255,8 @@ class WanPromptGenerator:
         if processed_args.get('人物情绪') and not 添加前缀:
             prompt = f"{prompt}，{processed_args.get('人物情绪')}" if prompt else processed_args.get('人物情绪')
         
-        if 补充提示词.strip():
-             prompt = f"{prompt}，{补充提示词.strip()}" if prompt else 补充提示词.strip()
+        if 请输入您的补充文本.strip():
+             prompt = f"{prompt}，{请输入您的补充文本.strip()}" if prompt else 请输入您的补充文本.strip()
 
         original_prompt = prompt
         if 添加前缀 and original_prompt:
