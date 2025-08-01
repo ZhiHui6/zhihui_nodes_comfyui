@@ -5,8 +5,6 @@ import urllib.parse
 class WanPromptGenerator:
     CATEGORY = "zhihui/生成器"
     FUNCTION = "generate_prompt"
-    RETURN_TYPES = ("STRING",)
-    RETURN_NAMES = ("提示词",)
 
     光源类型选项 = [
         "关闭", "随机", "日光", "人工光", "月光", "实用光", "火光", "荧光", "阴天光", "混合光", "晴天光"
@@ -45,7 +43,8 @@ class WanPromptGenerator:
     ]
     
     运镜方式选项 = [
-        "关闭", "随机", "[基础]镜头推进", "[基础]镜头拉远", "[基础]镜头向右移动", "[基础]镜头向左移动", "[基础]镜头上摇", "[基础]镜头下摇", "[高级]手持镜头", "[高级]跟随镜头", "[高级]环绕运镜", "[高级]复合运镜"
+        "关闭", "随机", "[基础]镜头推进", "[基础]镜头拉远", "[基础]镜头向右移动", "[基础]镜头向左移动", "[基础]镜头上摇", "[基础]镜头下摇", "[高级]手持镜头", "[高级]跟随镜头", "[高级]环绕运镜", "[高级]复合运镜",
+        "[测试]慢动作推轨镜头", "[测试]无人机环绕拉升", "[测试]焦点转移", "[测试]手持肩扛式跟拍", "[测试]穿越镜头", "[测试]第一人称视角", "[测试]高速旋转镜头", "[测试]水下镜头", "[测试]反射镜头", "[测试]剪影镜头", "[测试]长焦压缩镜头", "[测试]荷兰角", "[测试]弧形滑轨镜头", "[测试]由下至上摇摄"
     ]
     
     人物情绪选项 = [
@@ -112,14 +111,13 @@ class WanPromptGenerator:
                 "添加前缀": ("BOOLEAN", {"default": False}),
                 "预设组合": (s.预设组合选项, {"default": "不使用预设"}),    
                 "启用扩写": ("BOOLEAN", {"default": False}),
-                "扩写模型": (["claude","deepseek", "gemini", "openai", "mistral", "qwen-coder", "llama", "sur", "unity", "searchgpt", "evil"], {"default": "openai"}), 
+                "模型品牌": (["claude","deepseek", "gemini", "openai", "mistral", "qwen-coder", "llama", "sur", "unity", "searchgpt", "evil"], {"default": "openai"}), 
                 "补充提示词": ("STRING", {"default": "", "multiline": True}),
             }
         }
 
-    def _get_random_option(self, options_list, exclude_list=None):
-        if exclude_list is None:
-            exclude_list = ["关闭", "随机", "自定义"]
+    def _get_random_option(self, options_list):
+        exclude_list = ["关闭", "随机"]
         available_options = [opt for opt in options_list if opt not in exclude_list and not opt.endswith("随机")]
         return random.choice(available_options) if available_options else ""
 
@@ -141,7 +139,7 @@ class WanPromptGenerator:
         return processed_value
 
     def _call_llm_api(self, text, model="openai"):
-        system_prompt = """你现在是阿里万相视频提示词生成专家，你需要将用户提供的文本，进行极致详细地扩写更多丰富细节并转换为用于生成视频的专业提示词。请直接给出最终文本，不要有冗余的解释。"""
+        system_prompt = f"""你现在是[阿里·通义万相2.2]视频提示词生成专家，你需要将用户提供的文本进行极致详细地扩写出丰富的细节并转换为用于生成视频的专业提示词。请直接给出最终文本，不要有冗余的解释。"""
         full_prompt = f"{system_prompt}{text}"
         encoded_prompt = urllib.parse.quote(full_prompt)
     
@@ -174,9 +172,9 @@ class WanPromptGenerator:
             return text
 
     RETURN_TYPES = ("STRING", "STRING")
-    RETURN_NAMES = ("扩写后提示词", "原始提示词")
+    RETURN_NAMES = ("提示词输出", "源提示词")
     
-    def generate_prompt(self, 启用扩写, 扩写模型="openai", 添加前缀=False, 预设组合="不使用预设", 补充提示词="", **kwargs):
+    def generate_prompt(self, 启用扩写, 模型品牌="openai", 添加前缀=False, 预设组合="不使用预设", 补充提示词="", **kwargs):
         
         if 预设组合 != "不使用预设":
             original_prompt = self.预设组合映射.get(预设组合, "")
@@ -187,12 +185,11 @@ class WanPromptGenerator:
             
             expanded_prompt = original_prompt
             if 启用扩写 and original_prompt:
-                expanded_prompt = self._call_llm_api(original_prompt, 扩写模型)
+                expanded_prompt = self._call_llm_api(original_prompt, 模型品牌)
             
             return (expanded_prompt, original_prompt)
         
         processed_args = {}
-        
         processed_args['主体类型'] = self._process_option(kwargs.get('主体类型'), self.主体类型选项)
         processed_args['场景类型'] = self._process_option(kwargs.get('场景类型'), self.场景类型选项)
         processed_args['运镜方式'] = self._process_option(kwargs.get('运镜方式'), self.运镜方式选项)
@@ -217,7 +214,7 @@ class WanPromptGenerator:
             processed_args[key] = self._process_option(kwargs.get(key), options)
 
         elements = [
-            f"{processed_args.get('视觉风格')}风格" if processed_args.get('视觉风格') else "",
+            processed_args.get('视觉风格'),
             processed_args.get('光源类型'),
             processed_args.get('光线类型'),
             processed_args.get('镜头类型'),
@@ -262,9 +259,12 @@ class WanPromptGenerator:
              prompt = f"{prompt}，{补充提示词.strip()}" if prompt else 补充提示词.strip()
 
         original_prompt = prompt
-        expanded_prompt = prompt
-        if 启用扩写 and prompt:
-            expanded_prompt = self._call_llm_api(prompt, 扩写模型)
+        if 添加前缀 and original_prompt:
+            original_prompt = f"画面采用{original_prompt}"
+        
+        expanded_prompt = original_prompt
+        if 启用扩写 and original_prompt:
+            expanded_prompt = self._call_llm_api(original_prompt, 模型品牌)
         
         return (expanded_prompt, original_prompt)
     

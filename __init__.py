@@ -68,7 +68,7 @@ NODE_DISPLAY_NAME_MAPPINGS = {
     "KontextPresetsPlus": "Kontext预设集(增强版)",
     "LoadKontextPresetsBasic": "Kontext预设集(基础版)",
     "TranslateNodeBeta": "中英文翻译器[beta]",
-    "WanPromptGenerator": "万相提示词生成器",
+    "WanPromptGenerator": "万相视频提示词生成器",
 }
 
 __all__ = ['NODE_CLASS_MAPPINGS', 'NODE_DISPLAY_NAME_MAPPINGS']
