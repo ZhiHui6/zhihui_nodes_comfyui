@@ -38,6 +38,7 @@ class SystemPromptLoader:
         
         return {
             "required": {
+                "启用节点": ("BOOLEAN", {"default": True}),
                 "用户提示词": ("STRING", {"multiline": True, "default": ""}),
                 "引导预设": (preset_options, ),
                 "用户词写入引导词中": ("BOOLEAN", {"default": False}),
@@ -53,7 +54,10 @@ class SystemPromptLoader:
     CATEGORY = "zhihui/文本"
     OUTPUT_NODE = True
 
-    def load_preset(self, 用户提示词, 引导预设, 用户词写入引导词中):
+    def load_preset(self, 用户提示词, 引导预设, 用户词写入引导词中, 启用节点):
+        if not 启用节点:
+            return (用户提示词, "",)
+            
         system_prompt_content = ""
         
         if 引导预设 in ["未找到预设文件夹", "未找到预设文件"]:
