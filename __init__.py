@@ -6,7 +6,7 @@ from .MultiLineTextNode import MultiLineTextNode
 from .TextCombinerNode import TextCombinerNode
 from .TextModifier import TextModifier
 from .PhotographPromptGen.PhotographPromptGenerator import PhotographPromptGenerator
-from .TextSwitch import TextSwitch
+from .TextSwitch.TextSwitch import TextSwitch
 from .ImgSwitch.ImageSwitch2way import ImageSwitch2way
 from .ImgSwitch.ImageSwitch4way import ImageSwitch4way
 from .ExtraOptions import ExtraOptions
@@ -20,6 +20,7 @@ from .KontextPresets.KontextPresetsPlus.KontextPresetsPlus import KontextPresets
 from .KontextPresets.KontextPresetsBasic import LoadKontextPresetsBasic
 from .TranslateNodeBeta import TranslateNodeBeta
 from .WanPromptGenerator import WanPromptGenerator
+from .TextSwitch.AutoTextSwitch import AutoTextSwitch
 
 NODE_CLASS_MAPPINGS = {
     "ColorRemoval": ColorRemoval,
@@ -44,6 +45,7 @@ NODE_CLASS_MAPPINGS = {
     "LoadKontextPresetsBasic": LoadKontextPresetsBasic,
     "TranslateNodeBeta": TranslateNodeBeta,
     "WanPromptGenerator": WanPromptGenerator,
+    "AutoTextSwitch": AutoTextSwitch,
 }
 
 NODE_DISPLAY_NAME_MAPPINGS = {
@@ -69,6 +71,7 @@ NODE_DISPLAY_NAME_MAPPINGS = {
     "LoadKontextPresetsBasic": "Kontext预设集(基础版)",
     "TranslateNodeBeta": "中英文翻译器[beta]",
     "WanPromptGenerator": "万相视频提示词生成器",
+    "AutoTextSwitch": "自动文本切换",
 }
 
 __all__ = ['NODE_CLASS_MAPPINGS', 'NODE_DISPLAY_NAME_MAPPINGS']
