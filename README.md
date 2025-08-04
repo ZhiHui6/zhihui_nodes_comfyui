@@ -258,9 +258,9 @@
 
 1. 安装 [ComfyUI Manager](https://github.com/ltdrdata/ComfyUI-Manager)
 2. 在 Manager 菜单中选择 "Install Custom Nodes"
-3. 搜索 `zhihui-nodes-comfyui`（暂未支持） ，或通过 Git URL 进行安装：
+3. 搜索 `zhihui_nodes_comfyui`（暂未支持） ，或通过 Git URL 进行安装：
    ```
-   https://github.com/ZhiHui6/zhihui-nodes-comfyui.git
+   https://github.com/ZhiHui6/zhihui_nodes_comfyui.git
    ```
 4. 点击 "Install" 按钮并等待安装完成
 5. 重启 ComfyUI，即可在节点菜单中找到新添加的节点
@@ -269,9 +269,9 @@
 
 1. 下载本仓库的 ZIP 文件或通过 Git 克隆：
    ```bash
-   git clone https://github.com/ZhiHui6/zhihui-nodes-comfyui.git
+   git clone https://github.com/ZhiHui6/zhihui_nodes_comfyui.git
    ```
-2. 将整个 `zhihui-nodes-comfyui` 文件夹解压或复制到 ComfyUI 的 `custom_nodes` 目录下
+2. 将整个 `zhihui_nodes_comfyui` 文件夹解压或复制到 ComfyUI 的 `custom_nodes` 目录下
 3. 重启 ComfyUI
 
 ---
