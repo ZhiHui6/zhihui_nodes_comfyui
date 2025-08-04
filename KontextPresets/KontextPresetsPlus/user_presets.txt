@@ -1,6 +1,402 @@
 [
     {
-      "name": "我的自定义风格1",
-      "brief": "Transform the image into my personal artistic style with vibrant colors, dynamic composition, and expressive brushstrokes that capture emotion and movement."
+      "name": "像素风格",
+      "brief": "Pixel art"
     },
+    {
+      "name": "低多边形风格",
+      "brief": "Low-poly style"
+    },
+    {
+      "name": "波普艺术风格",
+      "brief": "Pop art style"
+    },
+    {
+      "name": "瑞克和莫蒂那种风格",
+      "brief": "Rick and Morty style"
+    },
+    {
+      "name": "3D 柴比风格",
+      "brief": "3D chaibi style, blind box toys, celluloid rendering style, cute big head shape, smooth plastic texture"
+    },
+    {
+      "name": "油画风格",
+      "brief": "Oil painting style"
+    },
+    {
+      "name": "萌系Q版风格",
+      "brief": "Chibi"
+    },
+    {
+      "name": "折纸风格",
+      "brief": "Origami style, paper art, geometric folding, low-poly texture, flat shading"
+    },
+    {
+      "name": "3D皮克斯风格",
+      "brief": "3D Pixar style"
+    },
+    {
+      "name": "水彩画风格",
+      "brief": "watercolor paint, translucent washes, wet-in-wet"
+    },
+    {
+      "name": "木炭画风格",
+      "brief": "Charcoal Drawing"
+    },
+    {
+      "name": "夸张漫画风格",
+      "brief": "Caricature style"
+    },
+    {
+      "name": "极简主义风格",
+      "brief": "Minimalist, blank composition, clean lines, monochrome block faces"
+    },
+    {
+      "name": "吉卜力风格",
+      "brief": "Ghibli style"
+    },
+    {
+      "name": "浮世绘风格",
+      "brief": "Ukiyo-e style"
+    },
+    {
+      "name": "铅笔素描风格",
+      "brief": "Pencil Sketch"
+    },
+    {
+      "name": "漫画风格",
+      "brief": "Manga style"
+    },
+    {
+      "name": "迪士尼风格",
+      "brief": "Disney style"
+    },
+    {
+      "name": "矢量扁平插画",
+      "brief": "Vector flat illustration"
+    },
+    {
+      "name": "蒸汽波风格",
+      "brief": "Vaporwave style, digital noise, nostalgic contradictory beauty"
+    },
+    {
+      "name": "伊拉苏托亚风格",
+      "brief": "Irasutoya style, flat design, simple vector illustration, cute characters"
+    },
+    {
+      "name": "定格动画风格",
+      "brief": "Stop-motion animation"
+    },
+    {
+      "name": "蒸汽朋克风格",
+      "brief": "Steampunk"
+    },
+    {
+      "name": "现实主义风格",
+      "brief": "Realism"
+    },
+    {
+      "name": "色彩线条画风格",
+      "brief": "Color Line Drawing style"
+    },
+    {
+      "name": "渐变插画风格",
+      "brief": "Gradient illustration style"
+    },
+    {
+      "name": "平铺陈列风格",
+      "brief": "knolling, top-down layout, organized objects"
+    },
+    {
+      "name": "涂鸦艺术风格",
+      "brief": "Graffiti art style, thick lines, high contrast colors"
+    },
+    {
+      "name": "素描风格",
+      "brief": "graphite sketch, hatching shadows, rough texture"
+    },
+    {
+      "name": "乔乔风格",
+      "brief": "Jojo style"
+    },
+    {
+      "name": "人偶风格",
+      "brief": "Action figures"
+    },
+    {
+      "name": "奇幻艺术风格",
+      "brief": "Fantasy Art"
+    },
+    {
+      "name": "水彩风格",
+      "brief": "Watercolor"
+    },
+    {
+      "name": "手绘素描风格",
+      "brief": "hand-drawn sketch style"
+    },
+    {
+      "name": "故事风格",
+      "brief": "Storyboard style"
+    },
+    {
+      "name": "赛博朋克风格",
+      "brief": "cyberpunk, neon lights, rainy cityscape"
+    },
+    {
+      "name": "极简主义风格",
+      "brief": "minimalist, clean lines, monochrome palette"
+    },
+    {
+      "name": "未来主义风格",
+      "brief": "futuristic, dynamic lines, cybernetic elements"
+    },
+    {
+      "name": "中国古代卡通风格",
+      "brief": "Ancient Chinese cartoon style"
+    },
+    {
+      "name": "气球艺术风格",
+      "brief": "Balloon art"
+    },
+    {
+      "name": "新艺术风格",
+      "brief": "Art Nouveau"
+    },
+    {
+      "name": "数字绘画风格",
+      "brief": "Digital Painting"
+    },
+    {
+      "name": "线条艺术风格",
+      "brief": "Line Art"
+    },
+    {
+      "name": "工业动画风格",
+      "brief": "Normal anime style"
+    },
+    {
+      "name": "二次元动漫风格",
+      "brief": "anime style, Makoto Shinkai, vibrant eyes"
+    },
+    {
+      "name": "卡通风格",
+      "brief": "Cartoon style"
+    },
+    {
+      "name": "90年代复古动漫",
+      "brief": "90's retro anime"
+    },
+    {
+      "name": "3D皮克斯中式卡通",
+      "brief": "3D cartoon style, Pixar style, ancient Chinese cartoon style"
+    },
+    {
+      "name": "雕塑艺术风格",
+      "brief": "Sculpture"
+    },
+    {
+      "name": "印象主义",
+      "brief": "Impressionism"
+    },
+    {
+      "name": "辛普森风格",
+      "brief": "Simpsons style"
+    },
+    {
+      "name": "新世纪福音战士风格",
+      "brief": "EVA style"
+    },
+    {
+      "name": "黏土动画风格",
+      "brief": "Claymation style"
+    },
+    {
+      "name": "史努比风格",
+      "brief": "Snoopy Style"
+    },
+    {
+      "name": "怀旧复古风格",
+      "brief": "Vintage"
+    },
+    {
+      "name": "工笔国画风格",
+      "brief": "Gongbi Chinese painting style"
+    },
+    {
+      "name": "等距3D风格",
+      "brief": "Isometric 3D style"
+    },
+    {
+      "name": "哆啦A梦风格",
+      "brief": "Doraemon style"
+    },
+    {
+      "name": "复古科幻动漫",
+      "brief": "Retro sci-fi anime"
+    },
+    {
+      "name": "龙珠风格",
+      "brief": "dragon ball style"
+    },
+    {
+      "name": "装饰艺术风格",
+      "brief": "Art Deco"
+    },
+    {
+      "name": "扁平化设计风格",
+      "brief": "Flat Design style"
+    },
+    {
+      "name": "南方公园风格",
+      "brief": "South Park style"
+    },
+    {
+      "name": "西方卡通风格",
+      "brief": "Western Cartoon style"
+    },
+    {
+      "name": "赛博朋克动漫风格",
+      "brief": "Cyberpunk Anime style"
+    },
+    {
+      "name": "广告牌风格",
+      "brief": "Billboard"
+    },
+    {
+      "name": "毛绒材质",
+      "brief": "Fur material"
+    },
+    {
+      "name": "粉彩画风格",
+      "brief": "Pastel Drawing style"
+    },
+    {
+      "name": "潮流复古风格",
+      "brief": "Retro style"
+    },
+    {
+      "name": "新海城风格",
+      "brief": "Makoto Shinkai style"
+    },
+    {
+      "name": "杂志封面风格",
+      "brief": "Magazine Cover"
+    },
+    {
+      "name": "乐高积木",
+      "brief": "Sculpture"
+    },
+    {
+      "name": "数字绘景风格",
+      "brief": "Matte Painting"
+    },
+    {
+      "name": "韩式都市漫画风格",
+      "brief": "Korean fashion urban comic style"
+    },
+    {
+      "name": "梵高风格",
+      "brief": "Van Gogh Style"
+    },
+    {
+      "name": "名侦探柯南风格",
+      "brief": "Detective Conan style"
+    },
+    {
+      "name": "3D盲盒风格",
+      "brief": "Neatly arranged, top-down layout, accessories neatly placed in the box, add the title \"FLUX\", and write \"Kontext\" in the upper right corner 3D digital rendering, high definition."
+    },
+    {
+      "name": "哥特式风格",
+      "brief": "Gothic style, the overall atmosphere is mysterious, dark and melancholy, often with pointed arches, stained glasses, bats, crows and other elements, and the color tone is dominated by dark colors such as black and dark purple, showing a unique medieval mysterious charm."
+    },
+    {
+      "name": "蒸汽幻想水彩风格",
+      "brief": "The steam-fantasy watercolor style combines the mechanical aesthetic of steampunk with the freshness and transparency of watercolor. The steam-filled mechanical castle is soft and layered in colors under a watercolor-stained sky, revealing a dreamlike and poetic world of steam."
+    },
+    {
+      "name": "立体拼贴蒸汽风格",
+      "brief": "Three-dimensional collage steam style, through three-dimensional collage techniques, a variety of steampunk elements such as gears, copper pipes, dials, etc. are combined. The picture has a three-dimensional sense and handmade texture, presenting a steampunk world of retro machinery."
+    },
+    {
+      "name": "赛博朋克国风风格",
+      "brief": "The cyberpunk national style style integrates traditional Chinese cultural elements with cyberpunk style, such as traditional architecture with neon lights, ancient chivalrous images combined with mechanical prosthetics, showing a unique oriental cyber future scene."
+    },
+    {
+      "name": "蒸汽幻想漫画风格",
+      "brief": "Steam fantasy comic style, using the narrative and expression techniques of comics, showing the world of steam fantasy. Full of dynamic graphics, depicting steam-powered adventures, vivid characters and imaginative plots."
+    },
+    {
+      "name": "东方玄幻风格",
+      "brief": "Oriental fantasy style, rooted in Oriental myths and legends and Xianxia culture, common flying sky, mythical beasts, magic weapons, fantasy spells and other elements, the picture is colorful and mysterious, showing the fantasy world of Oriental Xianxia full of fantasy imagination."
+    },
+    {
+      "name": "暗黑童话涂鸦风格",
+      "brief": "The style of dark fairy tale graffiti, combining the weird atmosphere of dark fairy tales and the casual freedom of graffiti, depicts dark fairy tale scenes with exaggerated and distorted lines and bright and dark colors, such as dilapidated castles and evil witches, full of mystery and rebellion."
+    },
+    {
+      "name": "极简主义童话风格",
+      "brief": "Minimalist fairy tale style, with minimalist clean lines and pure colors, outlining fairy tale scenes. Remove complicated details, use the most concise graphics and colors to convey the innocence and beauty of fairy tales, giving people a concise and profound visual experience."
+    },
+    {
+      "name": "波西米亚童话风格",
+      "brief": "Bohemian fairy tale style, combining bohemian free-spirited, colorful and fairy tale romantic fantasy. The paintings are full of bright colors and intricate patterns, depicting elves and fairies living in exotic forests or small towns."
+    },
+    {
+      "name": "太空废土风格",
+      "brief": "Space wasteland style, depicting abandoned scenes in the universe, such as a ruined space station, scrapped starships floating in the dark universe, with cool colors and broken textures, creating a barren and lonely post-apocalyptic space atmosphere."
+    },
+    {
+      "name": "水墨禅意风格",
+      "brief": "Ink Zen style, the use of ink painting techniques to convey Zen, the picture is often expressed in a concise landscape, ethereal artistic conception, the blank space is full of charm, the color is elegant, let people feel the quiet and far-reaching oriental philosophy."
+    },
+    {
+      "name": "洛可可童话风格",
+      "brief": "Rococo fairy tale style, combining the exquisite luxury of Rococo style with fairy tale elements. The fairytale castle is decorated with rococo carvings, and the princess and the elf are dressed in gorgeous costumes and pastel colors, full of romantic and dreamy atmosphere."
+    },
+    {
+      "name": "糖果梦幻风格",
+      "brief": "The candy dream style is full of sweet and dreamy colors, mainly soft and sweet tones such as pink and purple, and the common candy-shaped buildings, cloud-like marshmallows, and cute dreamy creatures in the picture create a sweet world like a fairy tale."
+    },
+    {
+      "name": "中国工笔科幻风格",
+      "brief": "Chinese Gongbi science fiction style, with the delicate lines and delicate depiction techniques of Chinese gongbi painting, expresses science fiction themes, such as the combination of ancient style flying and future technology aircraft, showing a unique oriental science fiction imagination."
+    },
+    {
+      "name": "民俗风格",
+      "brief": "Folk style, integrated into the folk culture elements of a specific region, such as folklore, traditional clothing, characteristic architecture, etc., the colors and patterns are full of strong local characteristics, showing the local customs."
+    },
+    {
+      "name": "纸艺拼贴风格",
+      "brief": "Paper art collage style, simulating the effect of paper art hand-collage, the picture is composed of paper pieces of different colors and textures, and there are hand-cut traces on the edge of the graphic, creating a retro and creative artistic sense."
+    },
+    {
+      "name": "童话风格",
+      "brief": "Fairy tale style, full of childlike fun and fantasy, bright and bright colors, cute and exaggerated images, often depicting fairy tale elements such as castles, elves, magical creatures, etc., showing an innocent and beautiful dream world."
+    },
+    {
+      "name": "海洋奇幻风格",
+      "brief": "Ocean fantasy style, with the ocean as the theme, incorporating fantasy elements, such as huge mysterious sea monsters, glowing coral forests, swimming crystal palaces, and most of the colors are blue, turquoise and other ocean tones, showing a dreamlike underwater wonder."
+    },
+    {
+      "name": "科幻废土风格",
+      "brief": "Sci-fi wasteland style, depicting the scene of the future world being reduced to ruins due to disasters and other reasons, combined with sci-fi elements, such as dilapidated high-tech equipment, mutated creatures, etc., with gray colors, conveying a sense of desolation, dilapidation and apocalypse."
+    },
+    {
+      "name": "新艺术风格",
+      "brief": "Art Nouveau focuses on drawing inspiration from natural forms, with beautiful and smooth lines, full of curves, often using plants, insects and other elements, and is highly decorative."
+    },
+    {
+      "name": "极地风格",
+      "brief": "Polar style, the picture often shows the unique landscapes of the polar regions, such as glaciers, snow-capped mountains, aurora aurora and so on, with a cold tone, creating a vast, cold and mysterious atmosphere."
+    },
+    {
+      "name": "民俗刺绣风格",
+      "brief": "Folk embroidery style, imitating the stitches and patterns of folk embroidery, using delicate lines and rich colors to build a picture, with a strong folk handicraft texture, showing the charm of traditional folk culture."
+    },
+    {
+      "name": "中式工笔仙侠玄幻风格",
+      "brief": "Chinese Gongbi Xianxia fantasy style: the color tone is simple and elegant, mainly in traditional Xianxia tones such as blue, white, and light purple. The delicate lines of Gongbi are used to depict the scenes of Xianxia in the fantasy fairyland, such as the misty Lingfeng and the flowing fairy waterfall, the Xianxia are dressed in flowing Taoist robes, holding magic weapons that emit spiritual light, surrounded by mysterious runes, creating an ethereal, fantasy and rich oriental charm."
+    }
 ]
