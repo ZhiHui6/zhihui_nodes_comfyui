@@ -133,6 +133,7 @@ class WanPromptGenerator:
                 "启用扩写": ("BOOLEAN", {"default": False}),
                 "模型品牌": (["claude","deepseek", "gemini", "openai", "mistral", "qwen-coder", "llama", "sur", "unity", "searchgpt", "evil"], {"default": "openai"}), 
                 "请输入您的补充文本": ("STRING", {"default": "", "multiline": True}),
+                "自定系统引导词": ("STRING", {"default": "", "multiline": True, "forceInput": True}),
             }
         }
 
@@ -167,8 +168,11 @@ class WanPromptGenerator:
 
         return processed_value
 
-    def _call_llm_api(self, text, model="openai"):
-        system_prompt = f"""你现在是[阿里·通义万相2.2]视频提示词生成专家，你需要将用户提供的文本进行极致详细地扩写出丰富的细节并转换为用于生成视频的专业提示词。请直接给出最终文本，不要有冗余的解释。"""
+    def _call_llm_api(self, text, model="openai", custom_system_prompt=""):
+        if custom_system_prompt.strip():
+            system_prompt = custom_system_prompt
+        else:
+            system_prompt = f"""你现在是[通义万相2.2]视频提示词生成专家，你需要将用户提供的文本进行极致详细地扩写出丰富的细节并转换为用于生成视频的专业提示词。请直接给出最终文本，不要有冗余的解释。"""
         full_prompt = f"{system_prompt}{text}"
         encoded_prompt = urllib.parse.quote(full_prompt)
     
@@ -200,7 +204,7 @@ class WanPromptGenerator:
             print(error_message)
             return text
     
-    def generate_prompt(self, 启用扩写, 启用节点=True, 模型品牌="openai", 添加前缀=False, 预设组合="不使用预设", 请输入您的补充文本="", **kwargs):
+    def generate_prompt(self, 启用扩写, 启用节点=True, 模型品牌="openai", 添加前缀=False, 预设组合="不使用预设", 请输入您的补充文本="", 自定义引导词="", **kwargs):
         
         if not 启用节点:
             return ("", "")
@@ -214,7 +218,7 @@ class WanPromptGenerator:
             
             expanded_prompt = original_prompt
             if 启用扩写 and original_prompt:
-                expanded_prompt = self._call_llm_api(original_prompt, 模型品牌)
+                expanded_prompt = self._call_llm_api(original_prompt, 模型品牌, 自定义引导词)
             
             return (expanded_prompt, original_prompt)
         
@@ -295,7 +299,7 @@ class WanPromptGenerator:
         
         expanded_prompt = original_prompt
         if 启用扩写 and original_prompt:
-            expanded_prompt = self._call_llm_api(original_prompt, 模型品牌)
+            expanded_prompt = self._call_llm_api(original_prompt, 模型品牌, 自定义引导词)
         
         return (expanded_prompt, original_prompt)
     

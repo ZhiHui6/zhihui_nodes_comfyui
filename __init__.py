@@ -12,6 +12,7 @@ from .ImgSwitch.ImageSwitch4way import ImageSwitch4way
 from .ExtraOptions import ExtraOptions
 from .PromptOptimizer import PromptOptimizer
 from .SystemPrompt.SystemPromptLoader import SystemPromptLoader
+from .SystemPrompt.SystemPromptLoaderBase import SystemPromptLoaderBase
 from .ColorRemoval import ColorRemoval
 from .BaiduTranslate.BaiduTranslateNode import BaiduTranslateNode
 from .ImgSwitch.AutoImageSwitch import AutoImageSwitch
@@ -38,6 +39,8 @@ NODE_CLASS_MAPPINGS = {
     "ImageSwitch4way": ImageSwitch4way,
     "PromptOptimizer": PromptOptimizer,
     "SystemPromptLoader": SystemPromptLoader,
+    "SystemPromptLoaderBase": SystemPromptLoaderBase,
+    "ColorRemoval": ColorRemoval,
     "BaiduTranslateNode": BaiduTranslateNode,
     "AutoImageSwitch": AutoImageSwitch,
     "TextExtractor": TextExtractor,
@@ -64,6 +67,7 @@ NODE_DISPLAY_NAME_MAPPINGS = {
     "BaiduTranslateNode": "百度翻译",
     "PromptOptimizer": "提示词优化器",
     "SystemPromptLoader": "系统引导词加载器",
+    "SystemPromptLoaderBase": "系统引导词加载器(基础版)",
     "ColorRemoval": "颜色移除",
     "AutoImageSwitch": "自动图像切换",
     "TextExtractor": "中英文本提取器",
