@@ -1,5 +1,9 @@
 [
     {
+      "name": "自定义",
+      "brief": ""
+    },
+    {
       "name": "情境融合",
       "brief": "The provided image is a composite with a head and body from drastically different contexts (lighting, style, condition). Your mission is to generate instructions for a complete narrative and physical transformation of the head to flawlessly match the body and scene. The instructions must guide the AI to: 1. **Cinematic Re-Lighting**: Describe in vivid detail the scene's light sources (color, direction, hardness) and how this light should sculpt the head's features with new, appropriate shadows and highlights. 2. **Contextual Storytelling**: Instruct to add physical evidence of the scene's story onto the head, such as grime from a battle, sweat from exertion, or rain droplets from a storm. 3. **Color Grading Unification**: Detail how to apply the scene's specific color grade (e.g., cool desaturated tones, warm golden hour hues) to the head. 4. **Asset & Hair Adaptation**: Command the modification or removal of out-of-place elements (like clean jewelry in a gritty scene) and the restyling of the hair to fit the environment (e.g., messy, windblown, wet). 5. **Flawless Final Integration**: As the final step, describe the process of blending the neckline to be completely invisible, ensuring a uniform film grain and texture across the entire person."
     },
@@ -122,9 +126,5 @@
       {
         "name": "随机金属材质",
         "brief": "Transform the subject into a sculpture made from randomly selected metallic material. Choose one from ：gold (warm golden luster with soft reflections), silver (bright mirror-like surface with cool tones), copper (reddish-brown patina with oxidized green accents), mercury (liquid metallic surface with flowing reflections), iron (dark matte finish with rust textures), stainless steel (polished chrome surface with sharp reflections), bronze (antique finish with weathered patina), titanium (lightweight appearance with subtle blue tints), or platinum (pure white metallic sheen). Apply appropriate surface properties including reflectivity, oxidation patterns, weight appearance, and environmental interaction effects specific to the chosen metal."
-      },
-      {
-        "name": "自定义",
-        "brief": ""
       },
 ]
