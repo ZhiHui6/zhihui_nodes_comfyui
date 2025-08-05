@@ -13,8 +13,8 @@ class MultiLineTextNode:
     def INPUT_TYPES(cls):
         return {
             "required": {
-                "注释": ("STRING", {"default": "", "multiline": False}),
                 "启用": ("BOOLEAN", {"default": True}), 
+                "注释": ("STRING", {"default": "", "multiline": False}),
                 "文本": ("STRING", {"default": "", "multiline": True}),
             }
         }
