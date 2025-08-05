@@ -1,30 +1,29 @@
-from .PromptPreset.PromptPresetMultipleChoice import PromptPresetMultipleChoice
-from .PromptPreset.PromptPresetOneChoice import PromptPresetOneChoice
-from .TriggerWordMerger import TriggerWordMerger
-from .ImageScaler import ImageScaler
-from .MultiLineTextNode import MultiLineTextNode
-from .TextCombinerNode import TextCombinerNode
-from .TextModifier import TextModifier
-from .PhotographPromptGen.PhotographPromptGenerator import PhotographPromptGenerator
-from .TextSwitch.TextSwitch import TextSwitch
-from .ImgSwitch.ImageSwitch2way import ImageSwitch2way
-from .ImgSwitch.ImageSwitch4way import ImageSwitch4way
-from .ExtraOptions import ExtraOptions
-from .PromptOptimizer import PromptOptimizer
-from .SystemPrompt.SystemPromptLoader import SystemPromptLoader
-from .SystemPrompt.SystemPromptLoaderBase import SystemPromptLoaderBase
-from .ColorRemoval import ColorRemoval
-from .BaiduTranslate.BaiduTranslateNode import BaiduTranslateNode
-from .ImgSwitch.AutoImageSwitch import AutoImageSwitch
-from .TextExtractor import TextExtractor
-from .KontextPresets.KontextPresetsPlus.KontextPresetsPlus import KontextPresetsPlus
-from .KontextPresets.KontextPresetsBasic import LoadKontextPresetsBasic
-from .TranslateNodeBeta import TranslateNodeBeta
-from .WanPromptGenerator import WanPromptGenerator
-from .TextSwitch.AutoTextSwitch import AutoTextSwitch
+from .Nodes.PromptPreset.PromptPresetMultipleChoice import PromptPresetMultipleChoice
+from .Nodes.PromptPreset.PromptPresetOneChoice import PromptPresetOneChoice
+from .Nodes.TriggerWordMerger import TriggerWordMerger
+from .Nodes.ImageScaler import ImageScaler
+from .Nodes.MultiLineTextNode import MultiLineTextNode
+from .Nodes.TextCombinerNode import TextCombinerNode
+from .Nodes.TextModifier import TextModifier
+from .Nodes.PhotographPromptGen.PhotographPromptGenerator import PhotographPromptGenerator
+from .Nodes.TextSwitch.TextSwitch import TextSwitch
+from .Nodes.ImgSwitch.ImageSwitch2way import ImageSwitch2way
+from .Nodes.ImgSwitch.ImageSwitch4way import ImageSwitch4way
+from .Nodes.ExtraOptions import ExtraOptions
+from .Nodes.PromptOptimizer import PromptOptimizer
+from .Nodes.SystemPrompt.SystemPromptLoader import SystemPromptLoader
+from .Nodes.SystemPrompt.SystemPromptLoaderBase import SystemPromptLoaderBase
+from .Nodes.ColorRemoval import ColorRemoval
+from .Nodes.BaiduTranslate.BaiduTranslateNode import BaiduTranslateNode
+from .Nodes.ImgSwitch.AutoImageSwitch import AutoImageSwitch
+from .Nodes.TextExtractor import TextExtractor
+from .Nodes.KontextPresets.KontextPresetsPlus.KontextPresetsPlus import KontextPresetsPlus
+from .Nodes.KontextPresets.KontextPresetsBasic import LoadKontextPresetsBasic
+from .Nodes.TranslateNodeBeta import TranslateNodeBeta
+from .Nodes.WanPromptGenerator import WanPromptGenerator
+from .Nodes.TextSwitch.AutoTextSwitch import AutoTextSwitch
 
 NODE_CLASS_MAPPINGS = {
-    "ColorRemoval": ColorRemoval,
     "PromptPresetOneChoice": PromptPresetOneChoice,
     "PromptPresetMultipleChoice": PromptPresetMultipleChoice,
     "TriggerWordMerger": TriggerWordMerger,
