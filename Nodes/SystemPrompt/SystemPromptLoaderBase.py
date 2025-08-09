@@ -38,7 +38,6 @@ class SystemPromptLoaderBase:
         
         return {
             "required": {
-                "启用节点": ("BOOLEAN", {"default": True}),
                 "引导预设": (preset_options, ),
             },
             }
@@ -52,10 +51,7 @@ class SystemPromptLoaderBase:
     CATEGORY = "zhihui/文本"
     OUTPUT_NODE = True
 
-    def load_preset(self, 引导预设, 启用节点):
-        if not 启用节点:
-            return ("",)
-            
+    def load_preset(self, 引导预设):
         system_prompt_content = ""
         
         if 引导预设 in ["未找到预设文件夹", "未找到预设文件"]:
@@ -74,3 +70,8 @@ class SystemPromptLoaderBase:
                 system_prompt_content = "预设路径格式错误。"
 
         return (system_prompt_content,)
+        
+    @classmethod
+    def IS_CHANGED(cls, **kwargs):
+        import time
+        return time.time()
