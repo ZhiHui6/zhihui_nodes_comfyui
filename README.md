@@ -349,6 +349,8 @@ pip install -r requirements.txt
 ## 🤝 贡献指南
 
 我们欢迎各种形式的贡献，包括但不限于：
+<div align="left">
 [🔴**报告问题和提出建议**] | [**💡提交功能请求**] | [**📚改进文档**] | [**💻提交代码贡献**]
+</div>
 
 如果您有任何想法或建议，请随时提出 Issue 或 Pull Request。
