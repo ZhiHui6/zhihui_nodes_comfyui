@@ -87,7 +87,12 @@
 </tr>
 <tr>
 <td><b>文本提取器</b><br><code>TextExtractor</code></td>
-<td>从混合文本中提取纯中文或纯英文字符，支持标点和数字的提取，并自动清理格式。对于处理双语提示词或分离不同语言内容非常有用。</td>
+<td>从混合文本中提取纯中文或纯英文字符，支持标点和数字的提取，并自动清理格式。对于处理双语提示词或分离不同语言内容非常有用。<br><br>
+<div align="left">
+<a href="预览图/中英文本提取器.jpg" target="_blank">
+<img src="预览图/中英文本提取器.jpg" alt="文本提取器" width="45%"/>
+</a>
+</div></td>
 </tr>
 <tr>
 <td><b>文本切换器</b><br><code>TextSwitch</code></td>
@@ -96,6 +101,26 @@
 <tr>
 <td><b>自动文本切换器</b><br><code>AutoTextSwitch</code></td>
 <td>自动检测多个输入端口中哪一个有文本输入，并将其无缝输出到下游节点。简化工作流程设计，减少手动切换操作。<br><b>注意</b>：仅支持单端口有文本输入的场景，多端口同时输入会报错。</td>
+</tr>
+<tr>
+<td><b>文本扩展器</b><br><code>TextExpander</code></td>
+<td>
+
+使用多种LLM模型对输入文本进行智能扩写和创意增强，支持字符量控制和自定义系统引导词。
+
+<b>特点</b>：
+- <b>多模型支持</b>：支持claude、deepseek、gemini、openai、mistral、qwen-coder、llama、sur、unity、searchgpt、evil等11种AI模型
+- <b>字符量控制</b>：可精确控制输出文本的字符数量，确保生成内容符合要求
+- <b>创意温度调节</b>：通过温度参数控制生成内容的创意程度（0.1-2.0）
+- <b>系统引导词</b>：支持自定义系统引导词，引导AI生成特定风格的内容
+- <b>灵活输入</b>：支持直接输入系统引导词或通过外部节点加载
+
+<div align="left">
+<a href="预览图/提示词扩展(通用).jpg" target="_blank">
+<img src="预览图/提示词扩展(通用).jpg" alt="文本扩展器" width="45%"/>
+</a>
+</div>
+</td>
 </tr>
 </table>
 
@@ -118,11 +143,11 @@
 
 <b>特点</b>：
 - <b>丰富预设库</b>：包含20余项专业预设
-- <b>双预设库</b>：支持默认预设和用户自定义预设，用户可自由新增更多创意预设，通过分类标识区分预设来源。<a href="KontextPresets/KontextPresetsPlus/用户预设说明.md" style="font-weight:bold;color:yellow;">用户预设使用说明</a>
+- <b>双预设库</b>：支持默认预设和用户自定义预设，用户可自由新增更多创意预设，通过分类标识区分预设来源。<a href="doc/Kontext预设_用户文件说明.md" style="font-weight:bold;color:yellow;">用户预设使用说明</a>
 - <b>智能扩写</b>：支持多种LLM模型（OpenAI、Mistral、Qwen等）对预设内容进行创意扩写
 - <b>灵活输出</b>：支持输出原始预设内容、完整信息或AI扩写后的内容
 
-<div align="center">
+<div align="left">
 <a href="预览图/Kontext预设增强版节点展示.jpg" target="_blank">
 <img src="预览图/Kontext预设增强版节点展示.jpg" alt="节点展示" width="45%" style="margin-right:5%"/>
 </a>
@@ -142,6 +167,12 @@
 - 支持从自定义文本文件加载选项，灵活扩展
 - 支持随机选择，增加创意多样性
 - 输出模板可自定义，适应不同的摄影风格需求
+
+<div align="left">
+<a href="预览图/摄影提示词生成器.jpg" target="_blank">
+<img src="预览图/摄影提示词生成器.jpg" alt="摄影提示词生成器" width="45%"/>
+</a>
+</div>
 </td>
 </tr>
 <tr>
@@ -154,18 +185,15 @@
 - <b>双模式切换</b>：支持自定义组合和预设组合模式，通过开关按钮一键切换
 - <b>多维度选择</b>：涵盖主体类型、场景类型、光源类型、光线类型、时间段、景别、构图、镜头焦段、机位角度、镜头类型、色调、运镜方式、人物情绪、运动类型、视觉风格、特效镜头、动作姿势17个专业维度
 - <b>智能扩写</b>：支持多种LLM模型（OpenAI、Claude、DeepSeek、Gemini等）免费在线扩写
+
+<div align="left">
+<a href="预览图/万相视频提示词生成器.jpg" target="_blank">
+<img src="预览图/万相视频提示词生成器.jpg" alt="万相视频提示词生成器" width="45%"/>
+</a>
+</div>
 </td>
 </tr>
-<tr>
-<td><b>提示词优化器</b><br><code>PromptOptimizer</code></td>
-<td>
 
-在线智能扩写和优化用户输入的提示词，无需本地硬件支持。
-
-<b>模式</b>：提供标准、详细和自定义三种扩写模式，满足不同复杂度的需求。
-<b>语言</b>：支持中英文双语输出，适应全球用户。
-</td>
-</tr>
 <tr>
 <td><b>提示词预设 - 单选</b><br><code>PromptPresetOneChoice</code></td>
 <td>提供6个预设选项，用户可以方便地在不同预设之间切换。适合保存常用的提示词模板，快速应用到不同场景。</td>
@@ -180,11 +208,23 @@
 </tr>
 <tr>
 <td><b>系统引导词加载器</b><br><code>SystemPromptLoader</code></td>
-<td>从预设文件夹动态加载系统级引导词（System Prompt），并可选择性地与用户输入合并。适合管理和应用复杂的系统提示模板，提高生成结果的一致性和质量。</td>
+<td>从预设文件夹动态加载系统级引导词（System Prompt），并可选择性地与用户输入合并。适合管理和应用复杂的系统提示模板，提高生成结果的一致性和质量。<br><br>
+<div align="left">
+<a href="预览图/系统引导词加载器.jpg" target="_blank">
+<img src="预览图/系统引导词加载器.jpg" alt="系统引导词加载器" width="45%"/>
+</a>
+</div>
+</td>
 </tr>
 <tr>
 <td><b>系统引导词加载器(基础版)</b><br><code>SystemPromptLoaderBase</code></td>
-<td>从预设文件夹动态加载系统级引导词（System Prompt），简化了节点功能，适合需要纯系统引导词的场景。</td>
+<td>从预设文件夹动态加载系统级引导词（System Prompt），简化了节点功能，适合需要纯系统引导词的场景。<br><br>
+<div align="left">
+<a href="预览图/系统引导词加载器基础版.jpg" target="_blank">
+<img src="预览图/系统引导词加载器基础版.jpg" alt="系统引导词加载器基础版" width="45%"/>
+</a>
+</div>
+</td>
 </tr>
 </table>
 
@@ -223,7 +263,12 @@
 </tr>
 <tr>
 <td><b>额外选项列表</b><br><code>ExtraOptions</code></td>
-<td>一个通用的额外选项列表，类似于 JoyCaption 的设计，设有总开关和独立的引导词输入框。适合添加辅助提示或控制参数，增强工作流的灵活性。</td>
+<td>一个通用的额外选项列表，类似于 JoyCaption 的设计，设有总开关和独立的引导词输入框。适合添加辅助提示或控制参数，增强工作流的灵活性。<br><br>
+<div align="left">
+<a href="预览图/额外引导选项（通用）.jpg" target="_blank">
+<img src="预览图/额外引导选项（通用）.jpg" alt="额外选项列表" width="45%"/>
+</a>
+</div></td>
 </tr>
 <tr>
 <td><b>百度翻译</b><br><code>BaiduTranslateNode</code></td>
@@ -238,6 +283,12 @@
 <b>注意</b>：
 - 需在<a href="https://api.fanyi.baidu.com/">百度翻译开放平台</a>注册并获取密钥
 - 使用此节点需要网络连接
+
+<div align="left">
+<a href="预览图/百度翻译.jpg" target="_blank">
+<img src="预览图/百度翻译.jpg" alt="百度翻译" width="45%"/>
+</a>
+</div>
 </td>
 </tr>
 <tr>
@@ -249,6 +300,12 @@
 <b>特点</b>：
 - <b>免费使用</b>：无需注册或API密钥，开箱即用
 - <b>多模型支持</b>：提供多种AI模型选择（OpenAI、Gemini、DeepSeek等）
+
+<div align="left">
+<a href="预览图/中英文翻译器[beta].jpg" target="_blank">
+<img src="预览图/中英文翻译器[beta].jpg" alt="中英文互译器测试版" width="45%"/>
+</a>
+</div>
 </td>
 </tr>
 </table>
