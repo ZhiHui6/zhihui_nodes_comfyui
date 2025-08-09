@@ -18,7 +18,7 @@ class TextExpander:
         return {
             "required": {
                 "节点开关": ("BOOLEAN", {"default": True}),
-                "字符量控制": ("STRING", {"default": "0", "multiline": False}),
+                "字符量控制": ("STRING", {"default": "", "multiline": False}),
                 "创意温度": ("FLOAT", {"default": 0.7, "min": 0.1, "max": 2.0, "step": 0.1}),
                 "模型品牌": (s.模型选项, {"default": "openai"}),
                 "系统引导词": ("STRING", {"default": "", "multiline": True}),
