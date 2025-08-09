@@ -302,8 +302,8 @@
 - <b>多模型支持</b>：提供多种AI模型选择（OpenAI、Gemini、DeepSeek等）
 
 <div align="left">
-<a href="预览图/中英文翻译器[beta].jpg" target="_blank">
-<img src="预览图/中英文翻译器[beta].jpg" alt="中英文互译器测试版" width="45%"/>
+<a href="预览图/中英文翻译器.jpg" target="_blank">
+<img src="预览图/中英文翻译器.jpg" alt="中英文互译器测试版" width="45%"/>
 </a>
 </div>
 </td>
