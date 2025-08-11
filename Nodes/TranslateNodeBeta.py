@@ -19,7 +19,7 @@ class TranslateNodeBeta:
                 "目标语言": (["中文", "英文"], {
                     "default": "英文"
                 }),
-                "model": (["openai", "mistral", "qwen-coder", "llama"], {
+                "model": (["claude", "deepseek", "gemini", "openai", "mistral", "qwen-coder", "llama", "sur", "unity", "searchgpt", "evil"], {
                     "default": "openai"
                 }),
             }

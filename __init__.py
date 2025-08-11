@@ -22,6 +22,11 @@ from .Nodes.TranslateNodeBeta import TranslateNodeBeta
 from .Nodes.WanPromptGenerator import WanPromptGenerator
 from .Nodes.TextSwitch.AutoTextSwitch import AutoTextSwitch
 from .Nodes.TextExpander import TextExpander
+from .Nodes.MovieTools.LaplacianSharpen import LaplacianSharpen
+from .Nodes.MovieTools.SobelSharpen import SobelSharpen
+from .Nodes.MovieTools.UnsharpSharpen import UnsharpSharpen
+from .Nodes.MovieTools.ColorMatchToReference import ColorMatchToReference
+from .Nodes.MovieTools.FilmGrain import FilmGrain
 
 NODE_CLASS_MAPPINGS = {
     "PromptPresetOneChoice": PromptPresetOneChoice,
@@ -48,6 +53,11 @@ NODE_CLASS_MAPPINGS = {
     "WanPromptGenerator": WanPromptGenerator,
     "AutoTextSwitch": AutoTextSwitch,
     "TextExpander": TextExpander,
+    "LaplacianSharpen": LaplacianSharpen,
+    "SobelSharpen": SobelSharpen,
+    "UnsharpSharpen": UnsharpSharpen,
+    "ColorMatchToReference": ColorMatchToReference,
+    "FilmGrain": FilmGrain,
 }
 
 NODE_DISPLAY_NAME_MAPPINGS = {
@@ -84,6 +94,13 @@ NODE_DISPLAY_NAME_MAPPINGS = {
     ##翻译
     "BaiduTranslateNode": "百度翻译",
     "TranslateNodeBeta": "中英文翻译器[beta]",
+
+    ##视频工具
+    "LaplacianSharpen": "拉普拉斯锐化",
+    "SobelSharpen": "索贝尔锐化",
+    "UnsharpSharpen": "模糊锐化",
+    "ColorMatchToReference": "颜色匹配参考",
+    "FilmGrain": "胶片颗粒",
 }
 
 __all__ = ['NODE_CLASS_MAPPINGS', 'NODE_DISPLAY_NAME_MAPPINGS']

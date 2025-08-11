@@ -5,7 +5,6 @@ import urllib.parse
 class WanPromptGenerator:
     CATEGORY = "zhihui/生成器"
     FUNCTION = "generate_prompt"
-    
     RETURN_TYPES = ("STRING", "STRING")
     RETURN_NAMES = ("源提示词", "提示词输出")
 

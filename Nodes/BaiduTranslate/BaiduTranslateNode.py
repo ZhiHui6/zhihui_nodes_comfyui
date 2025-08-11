@@ -23,7 +23,7 @@ class BaiduTranslateNode:
     RETURN_TYPES = ("STRING",)
     RETURN_NAMES = ("译文结果",)
     FUNCTION = "translate"
-    CATEGORY = "zhihui_nodes_comfyui/Translate"
+    CATEGORY = "zhihui/文本"
 
     def translate(self, 启用翻译, 密钥加载, app_id, api_key, 源语言, 目标语言, text):
         if not 启用翻译:

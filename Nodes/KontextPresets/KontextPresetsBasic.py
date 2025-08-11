@@ -70,7 +70,7 @@ class LoadKontextPresetsBasic:
     RETURN_TYPES = ("STRING",)
     RETURN_NAMES = ("提示词内容",)
     FUNCTION = "get_preset"
-    CATEGORY = "utils"
+    CATEGORY = "zhihui/生成器"
     
     @classmethod
     def get_brief_by_name(cls, name):

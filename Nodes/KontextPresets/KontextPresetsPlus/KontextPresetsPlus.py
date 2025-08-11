@@ -102,7 +102,7 @@ class KontextPresetsPlus:
     RETURN_TYPES = ("STRING",)
     RETURN_NAMES = ("提示词内容",)
     FUNCTION = "get_预设"
-    CATEGORY = "utils"
+    CATEGORY = "zhihui/生成器"
     
     @classmethod
     def get_brief_by_name(cls, display_name):
