@@ -5,7 +5,7 @@ import hashlib
 import comfy.utils
 from comfy.sd import CLIP
 
-class BaiduTranslateNode:
+class BaiduTranslate:
     @classmethod
     def INPUT_TYPES(cls):
         return {

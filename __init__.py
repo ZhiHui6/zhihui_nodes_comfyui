@@ -13,18 +13,18 @@ from .Nodes.ExtraOptions import ExtraOptions
 from .Nodes.SystemPrompt.SystemPromptLoader import SystemPromptLoader
 from .Nodes.SystemPrompt.SystemPromptLoaderBase import SystemPromptLoaderBase
 from .Nodes.ColorRemoval import ColorRemoval
-from .Nodes.BaiduTranslate.BaiduTranslateNode import BaiduTranslateNode
+from .Nodes.Translate.BaiduTranslate import BaiduTranslate
 from .Nodes.ImgSwitch.AutoImageSwitch import AutoImageSwitch
 from .Nodes.TextExtractor import TextExtractor
 from .Nodes.KontextPresets.KontextPresetsPlus.KontextPresetsPlus import KontextPresetsPlus
 from .Nodes.KontextPresets.KontextPresetsBasic import LoadKontextPresetsBasic
-from .Nodes.TranslateNodeBeta import TranslateNodeBeta
+from .Nodes.Translate.FreeTranslate import FreeTranslate
 from .Nodes.WanPromptGenerator import WanPromptGenerator
 from .Nodes.TextSwitch.AutoTextSwitch import AutoTextSwitch
 from .Nodes.TextExpander import TextExpander
 from .Nodes.MovieTools.LaplacianSharpen import LaplacianSharpen
 from .Nodes.MovieTools.SobelSharpen import SobelSharpen
-from .Nodes.MovieTools.UnsharpSharpen import UnsharpSharpen
+from .Nodes.MovieTools.USMSharpen import USMSharpen
 from .Nodes.MovieTools.ColorMatchToReference import ColorMatchToReference
 from .Nodes.MovieTools.FilmGrain import FilmGrain
 
@@ -44,36 +44,33 @@ NODE_CLASS_MAPPINGS = {
     "SystemPromptLoader": SystemPromptLoader,
     "SystemPromptLoaderBase": SystemPromptLoaderBase,
     "ColorRemoval": ColorRemoval,
-    "BaiduTranslateNode": BaiduTranslateNode,
+    "BaiduTranslate": BaiduTranslate,
     "AutoImageSwitch": AutoImageSwitch,
     "TextExtractor": TextExtractor,
     "KontextPresetsPlus": KontextPresetsPlus,
     "LoadKontextPresetsBasic": LoadKontextPresetsBasic,
-    "TranslateNodeBeta": TranslateNodeBeta,
+    "FreeTranslate": FreeTranslate,
     "WanPromptGenerator": WanPromptGenerator,
     "AutoTextSwitch": AutoTextSwitch,
     "TextExpander": TextExpander,
     "LaplacianSharpen": LaplacianSharpen,
     "SobelSharpen": SobelSharpen,
-    "UnsharpSharpen": UnsharpSharpen,
+    "USMSharpen": USMSharpen,
     "ColorMatchToReference": ColorMatchToReference,
     "FilmGrain": FilmGrain,
 }
 
 NODE_DISPLAY_NAME_MAPPINGS = {
-    ##预设工具
     "WanPromptGenerator": "万相视频提示词生成器",
     "PhotographPromptGenerator": "摄影提示词生成器",
     "KontextPresetsPlus": "Kontext预设集(增强版)",
     "LoadKontextPresetsBasic": "Kontext预设集(基础版)",
     
-    ##提示词处理
     "TextExpander": "提示词扩展(通用)",
     "SystemPromptLoader": "系统引导词加载器",
     "SystemPromptLoaderBase": "系统引导词加载器(基础版)",  
     "ExtraOptions": "额外引导选项（通用）",  
     
-    ##文本编辑/处理
     "PromptPresetOneChoice": "单选提示预设(可注释)",
     "PromptPresetMultipleChoice": "多选提示预设(可注释)",
     "TextModifier": "文本修改器",
@@ -84,22 +81,19 @@ NODE_DISPLAY_NAME_MAPPINGS = {
     "TextSwitch": "文本切换器(可注释)",
     "AutoTextSwitch": "自动文本切换",
     
-    ##图像工具
     "ImageSwitch2way": "图像切换器-2路(可注释)",
     "ImageSwitch4way": "图像切换器-4路(可注释)",
     "AutoImageSwitch": "自动图像切换",
     "ImageScaler": "图像缩放器",
     "ColorRemoval": "颜色移除",
     
-    ##翻译
-    "BaiduTranslateNode": "百度翻译",
-    "TranslateNodeBeta": "中英文翻译器[beta]",
+    "BaiduTranslate": "百度翻译",
+    "FreeTranslate": "免费翻译[测试]",
 
-    ##视频工具
     "LaplacianSharpen": "拉普拉斯锐化",
     "SobelSharpen": "索贝尔锐化",
-    "UnsharpSharpen": "模糊锐化",
-    "ColorMatchToReference": "颜色匹配参考",
+    "USMSharpen": "USM锐化",
+    "ColorMatchToReference": "颜色匹配",
     "FilmGrain": "胶片颗粒",
 }
 

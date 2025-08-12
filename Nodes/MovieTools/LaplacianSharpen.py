@@ -8,15 +8,11 @@ class LaplacianSharpen:
     def INPUT_TYPES(cls):
         return {
             "required": {
+                "开关": ("BOOLEAN", {"default": True}),
                 "图像输入": ("IMAGE",),
                 "锐化强度": (
-                    "FLOAT", {
-                        "default": 0.5,
-                        "min": 0.0,
-                        "max": 2.0,
-                        "step": 0.01
-                    }
-                )
+                    "FLOAT", {"default": 0.50, "min": 0.0, "max": 2.0, "step": 0.01, "display": "slider", "round": 0.01}
+                ),
             }
         }
 
@@ -25,7 +21,10 @@ class LaplacianSharpen:
     FUNCTION = "apply_laplacian"
     CATEGORY = "zhihui/后期处理"
 
-    def apply_laplacian(self, 图像输入: torch.Tensor, 锐化强度: float) -> Tuple[torch.Tensor]:
+    def apply_laplacian(self, 图像输入: torch.Tensor, 锐化强度: float, 开关: bool) -> Tuple[torch.Tensor]:
+        if not 开关:
+            return (图像输入,)
+            
         device = comfy.model_management.get_torch_device()
         图像输入 = 图像输入.to(device)
 
@@ -41,7 +40,6 @@ class LaplacianSharpen:
 
         sharpened = x + 锐化强度 * edges
         sharpened = sharpened.clamp(0.0, 1.0)
-
         sharpened = sharpened.permute(0, 2, 3, 1)
         sharpened = sharpened.to(comfy.model_management.intermediate_device())
         return (sharpened,)

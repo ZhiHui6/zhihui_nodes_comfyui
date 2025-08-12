@@ -8,15 +8,11 @@ class SobelSharpen:
     def INPUT_TYPES(cls):
         return {
             "required": {
+                "开关": ("BOOLEAN", {"default": True}),
                 "输入图像": ("IMAGE",),
                 "锐化强度": (
-                    "FLOAT", {
-                        "default": 0.5,
-                        "min": 0.0,
-                        "max": 2.0,
-                        "step": 0.01
-                    }
-                )
+                    "FLOAT", {"default": 0.50, "min": 0.0, "max": 2.0, "step": 0.01, "display": "slider", "round": 0.01}
+                ),
             }
         }
 
@@ -25,7 +21,10 @@ class SobelSharpen:
     FUNCTION = "apply_sobel"
     CATEGORY = "zhihui/后期处理"
 
-    def apply_sobel(self, 输入图像: torch.Tensor, 锐化强度: float) -> Tuple[torch.Tensor]:
+    def apply_sobel(self, 输入图像: torch.Tensor, 锐化强度: float, 开关: bool) -> Tuple[torch.Tensor]:
+        if not 开关:
+            return (输入图像,)
+            
         device = comfy.model_management.get_torch_device()
         输入图像 = 输入图像.to(device)
 
@@ -39,18 +38,16 @@ class SobelSharpen:
 
         sobel_y = torch.tensor(
             [[-1, -2, -1],
-             [ 0,  0,  0],
-             [ 1,  2,  1]], dtype=torch.float32, device=device
+             [0, 0, 0],
+             [1, 2, 1]], dtype=torch.float32, device=device
         ).expand(3, 1, 3, 3)
 
-        grad_x = torch.nn.functional.conv2d(x, sobel_x, padding=1, groups=3)
-        grad_y = torch.nn.functional.conv2d(x, sobel_y, padding=1, groups=3)
-
-        edges = torch.sqrt(grad_x ** 2 + grad_y ** 2 + 1e-6)
+        edges_x = torch.nn.functional.conv2d(x, sobel_x, padding=1, groups=3)
+        edges_y = torch.nn.functional.conv2d(x, sobel_y, padding=1, groups=3)
+        edges = torch.sqrt(edges_x ** 2 + edges_y ** 2)
 
         sharpened = x + 锐化强度 * edges
         sharpened = sharpened.clamp(0.0, 1.0)
-
         sharpened = sharpened.permute(0, 2, 3, 1)
         sharpened = sharpened.to(comfy.model_management.intermediate_device())
         return (sharpened,)

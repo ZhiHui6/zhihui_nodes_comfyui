@@ -2,7 +2,7 @@ import requests
 import time
 import json
 
-class TranslateNodeBeta:
+class FreeTranslate:
 
     @classmethod
     def INPUT_TYPES(cls):

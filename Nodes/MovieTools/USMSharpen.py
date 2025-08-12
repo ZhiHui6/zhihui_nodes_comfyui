@@ -4,20 +4,16 @@ import comfy
 import numpy as np
 from typing import Tuple
 
-class UnsharpSharpen:
+class USMSharpen:
     @classmethod
     def INPUT_TYPES(cls):
         return {
             "required": {
+                "开关": ("BOOLEAN", {"default": True}),
                 "输入图像": ("IMAGE",),
                 "锐化强度": (
-                    "FLOAT", {
-                        "default": 0.5,
-                        "min": 0.0,
-                        "max": 2.0,
-                        "step": 0.01
-                    }
-                )
+                    "FLOAT", {"default": 0.50, "min": 0.0, "max": 2.0, "step": 0.01, "display": "slider", "round": 0.01}
+                ),
             }
         }
 
@@ -26,18 +22,21 @@ class UnsharpSharpen:
     FUNCTION = "apply_unsharp"
     CATEGORY = "zhihui/后期处理"
 
-    def apply_unsharp(self, 输入图像: torch.Tensor, 锐化强度: float) -> Tuple[torch.Tensor]:
+    def apply_unsharp(self, 输入图像: torch.Tensor, 锐化强度: float, 开关: bool) -> Tuple[torch.Tensor]:
+        if not 开关:
+            return (输入图像,)
+            
         device = comfy.model_management.get_torch_device()
         输入图像 = 输入图像.to(device)
 
         x = 输入图像.permute(0, 3, 1, 2)
 
-        blur = F.avg_pool2d(x, kernel_size=3, stride=1, padding=1)
+        kernel = torch.ones(3, 1, 3, 3, dtype=torch.float32, device=device) / 9.0
+        blur = torch.nn.functional.conv2d(x, kernel, padding=1, groups=3)
 
-        sharpened = x + 锐化强度 * (x - blur)
-
+        mask = x - blur
+        sharpened = x + 锐化强度 * mask
         sharpened = sharpened.clamp(0.0, 1.0)
         sharpened = sharpened.permute(0, 2, 3, 1)
         sharpened = sharpened.to(comfy.model_management.intermediate_device())
-
         return (sharpened,)
