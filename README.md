@@ -268,6 +268,12 @@
 - <b>双分布模式</b>：支持高斯分布（自然胶片噪点）和平均分布（数字均匀噪点）
 - <b>饱和度混合</b>：独立控制彩色/单色颗粒比例，实现从彩色胶片到黑白胶片的平滑过渡
 
+<br>
+<div align="left">
+<a href="预览图/胶片颗粒.jpg" target="_blank">
+<img src="预览图/胶片颗粒.jpg" alt="胶片颗粒效果" width="45%"/>
+</a>
+</div>
 </td>
 </tr>
 
@@ -276,6 +282,13 @@
 <td>
 
 基于拉普拉斯算子的边缘锐化工具，通过二阶微分检测图像边缘并增强细节，适合风景和人像的细节增强。
+
+<br>
+<div align="left">
+<a href="预览图/拉普拉斯锐化.jpg" target="_blank">
+<img src="预览图/拉普拉斯锐化.jpg" alt="拉普拉斯锐化" width="45%"/>
+</a>
+</div>
 </td>
 </tr>
 <tr>
@@ -283,20 +296,39 @@
 <td><b>索贝尔锐化</b><br><code>SobelSharpen</code></td>
 <td>
 采用索贝尔算子的方向性锐化工具，通过梯度计算同时增强水平和垂直边缘，适合需要强调纹理的场景。
+
+<br>
+<div align="left">
+<a href="预览图/索贝尔锐化.jpg" target="_blank">
+<img src="预览图/索贝尔锐化.jpg" alt="索贝尔锐化" width="45%"/>
+</a>
+</div>
 </td>
 </tr>
 <tr>
 <td><b>USM锐化</b><br><code>USMSharpen</code></td>
 <td>
-经典USM锐化技术，通过模糊原图创建掩模来增强细节，提供自然的锐化效果。
+使用经典USM锐化技术来增强细节，对目标图像进行自然的锐化处理。
 
+<br>
+<div align="left">
+<a href="预览图/USM锐化.jpg" target="_blank">
+<img src="预览图/USM锐化.jpg" alt="USM锐化" width="45%"/>
+</a>
+</div>
 </td>
 </tr>
 <tr>
 <td><b>色彩匹配</b><br><code>ColorMatchToReference</code></td>
 <td>
-基于 LAB 色彩空间的智能色彩匹配工具，可将参考图像的色调风格应用到目标图像，实现专业级色彩统一。
+智能色彩匹配工具，可将参考图像的色调风格应用到目标图像，实现专业级色彩统一。
 
+<br>
+<div align="left">
+<a href="预览图/颜色匹配.jpg" target="_blank">
+<img src="预览图/颜色匹配.jpg" alt="色彩匹配" width="45%"/>
+</a>
+</div>
 </td>
 </tr>
 </table>

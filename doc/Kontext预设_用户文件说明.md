@@ -25,10 +25,11 @@
 
 ## 使用方法
 
-1. **编辑预设文件**：直接编辑 `user_presets.txt` 文件
+1. **编辑预设文件**：直接编辑 `user_presets.txt` 文件(位于`.../custom_nodes/zhihui_nodes_comfyui/Nodes/KontextPresets/KontextPresetsPlus`目录下)
 2. **添加新预设**：在 `预设集` 数组中添加新的预设对象
 3. **修改现有预设**：直接修改对应预设的 `name` 或 `brief` 字段
 4. **保存文件**：确保文件保存为 UTF-8 编码
+5. **重启 ComfyUI**：修改完成后，需要重启 ComfyUI 才能使新预设生效
 
 ## 显示效果
 
