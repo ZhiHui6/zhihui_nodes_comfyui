@@ -74,18 +74,39 @@
 </tr>
 <tr>
 <td><b>多行文本</b><br><code>MultiLineTextNode</code></td>
-<td>提供一个支持多行输入的文本框，并带有语法高亮和注释功能，支持变量替换。适用于编写复杂提示词或保存多个文本片段。</td>
+<td>提供一个支持多行输入的文本框，并带注释功能。
+
+<br>
+<div align="left">
+<a href="预览图/多行文本.jpg" target="_blank">
+<img src="预览图/多行文本.jpg" alt="多行文本" width="45%"/>
+</a>
+</div></td>
 </tr>
 <tr>
-<td><b>文本组合</b><br><code>TextCombinerNode</code></td>
-<td>合并两个文本输入，并可通过独立的开关控制每个文本的输出。可用于动态组合不同的提示词部分，灵活构建完整提示。</td>
+<td><b>提示词合并器(可注释)</b><br><code>TextCombinerNode</code></td>
+<td>合并两个文本输入，并可通过独立的开关控制每个文本的输出，并带注释功能。可用于动态组合不同的提示词部分，灵活构建完整提示。
+
+<br>
+<div align="left">
+<a href="预览图/提示词合并器.jpg" target="_blank">
+<img src="预览图/提示词合并器.jpg" alt="提示词合并器" width="45%"/>
+</a>
+</div></td>
 </tr>
 <tr>
 <td><b>文本修改器</b><br><code>TextModifier</code></td>
-<td>根据指定的起始和结束标记提取文本内容，并自动去除多余的空白字符。适合从复杂文本中提取特定部分，或进行格式清理。</td>
+<td>根据指定的起始和结束标记提取文本内容，并自动去除多余的空白字符。适合从复杂文本中提取特定部分，或进行格式清理。
+
+<br>
+<div align="left">
+<a href="预览图/文本修改器.jpg" target="_blank">
+<img src="预览图/文本修改器.jpg" alt="文本修改器" width="45%"/>
+</a>
+</div></td>
 </tr>
 <tr>
-<td><b>文本提取器</b><br><code>TextExtractor</code></td>
+<td><b>中英文本提取器</b><br><code>TextExtractor</code></td>
 <td>从混合文本中提取纯中文或纯英文字符，支持标点和数字的提取，并自动清理格式。对于处理双语提示词或分离不同语言内容非常有用。<br><br>
 <div align="left">
 <a href="预览图/中英文本提取器.jpg" target="_blank">
@@ -95,14 +116,30 @@
 </tr>
 <tr>
 <td><b>文本切换器</b><br><code>TextSwitch</code></td>
-<td>在两个文本输入之间进行切换，可通过下拉菜单选择输出，并支持添加注释。便于在不同版本的提示词之间快速切换，进行对比实验。</td>
+<td>在4个文本输入之间进行切换，可通过下拉菜单选择输出，并支持添加注释。便于在不同版本的提示词之间快速切换，进行对比实验。
+
+<br>
+<div align="left">
+<a href="预览图/文本切换器.jpg" target="_blank">
+<img src="预览图/文本切换器.jpg" alt="文本切换器" width="45%"/>
+</a>
+</div>
+</td>
 </tr>
 <tr>
 <td><b>自动文本切换器</b><br><code>AutoTextSwitch</code></td>
-<td>自动检测多个输入端口中哪一个有文本输入，并将其无缝输出到下游节点。简化工作流程设计，减少手动切换操作。<br><b>注意</b>：仅支持单端口有文本输入的场景，多端口同时输入会报错。</td>
+<td>自动检测多个输入端口中哪一个有文本输入，并将其无缝输出到下游节点。简化工作流程设计，减少手动切换操作。<br><b>注意</b>：仅支持单端口有文本输入的场景，多端口同时输入会报错。
+
+<br>
+<div align="left">
+<a href="预览图/自动文本切换.jpg" target="_blank">
+<img src="预览图/自动文本切换.jpg" alt="自动文本切换器" width="45%"/>
+</a>
+</div>
+</td>
 </tr>
 <tr>
-<td><b>文本扩展器</b><br><code>TextExpander</code></td>
+<td><b>提示词扩展(通用)</b><br><code>TextExpander</code></td>
 <td>
 
 使用多种LLM模型对输入文本进行智能扩写和创意增强，支持字符量控制和自定义系统引导词。
@@ -132,7 +169,15 @@
 </tr>
 <tr>
 <td><b>Kontext预设基础版</b><br><code>LoadKontextPresetsBasic</code></td>
-<td>提供专业的图像变换预设库，包含13项专业预设。为图像生成提供风格化指导，帮助用户快速应用常见的艺术风格和效果。</td>
+<td>提供专业的图像变换预设库，包含13项专业预设。为图像生成提供风格化指导，帮助用户快速应用常见的艺术风格和效果。
+
+<br>
+<div align="left">
+<a href="预览图/Kontext预设集基础版.jpg" target="_blank">
+<img src="预览图/Kontext预设集基础版.jpg" alt="Kontext预设基础版" width="45%"/>
+</a>
+</div>
+</td>
 </tr>
 <tr>
 <td><b>Kontext预设增强版</b><br><code>KontextPresetsPlus</code></td>
@@ -195,15 +240,39 @@
 
 <tr>
 <td><b>提示词预设 - 单选</b><br><code>PromptPresetOneChoice</code></td>
-<td>提供6个预设选项，用户可以方便地在不同预设之间切换。适合保存常用的提示词模板，快速应用到不同场景。</td>
+<td>提供6个预设选项，用户可以方便地在不同预设之间切换。适合保存常用的提示词模板，快速应用到不同场景。
+
+<br>
+<div align="left">
+<a href="预览图/单选提示词预设.jpg" target="_blank">
+<img src="预览图/单选提示词预设.jpg" alt="单选提示词预设" width="45%"/>
+</a>
+</div>
+</td>
 </tr>
 <tr>
 <td><b>提示词预设 - 多选</b><br><code>PromptPresetMultipleChoice</code></td>
-<td>支持同时选择多个预设，并将它们合并输出，每个预设都带有独立的开关和注释功能。适合构建复杂的组合提示词，灵活控制各部分的启用状态。</td>
+<td>支持同时选择多个预设，并将它们合并输出，每个预设都带有独立的开关和注释功能。适合构建复杂的组合提示词，灵活控制各部分的启用状态。
+
+<br>
+<div align="left">
+<a href="预览图/多选提示词预设.jpg" target="_blank">
+<img src="预览图/多选提示词预设.jpg" alt="多选提示词预设" width="45%"/>
+</a>
+</div>
+</td>
 </tr>
 <tr>
 <td><b>触发词合并器</b><br><code>TriggerWordMerger</code></td>
-<td>将特定的触发词（Trigger Words）与主文本智能合并，并支持权重控制（例如 <code>(word:1.5)</code>）。适用于添加模型特定的触发词或风格词，并精确控制其影响强度。</td>
+<td>将特定的触发词（Trigger Words）与主文本智能合并，并支持权重控制（例如 <code>(word:1.5)</code>）。适用于添加模型特定的触发词或风格词，并精确控制其影响强度。
+
+<br>
+<div align="left">
+<a href="预览图/触发词合并器.jpg" target="_blank">
+<img src="预览图/触发词合并器.jpg" alt="触发词合并器" width="45%"/>
+</a>
+</div>
+</td>
 </tr>
 <tr>
 <td><b>系统引导词加载器</b><br><code>SystemPromptLoader</code></td>
@@ -236,15 +305,42 @@
 </tr>
 <tr>
 <td><b>图像缩放器</b><br><code>ImageScaler</code></td>
-<td>提供多种插值算法对图像进行缩放，并可选择保持原始宽高比。支持高质量的图像尺寸调整，适用于预处理或后处理阶段。</td>
+<td>提供多种插值算法对图像进行缩放，并可选择保持原始宽高比。支持高质量的图像尺寸调整，适用于预处理或后处理阶段。
+
+<br>
+<div align="left">
+<a href="预览图/图像缩放器.jpg" target="_blank">
+<img src="预览图/图像缩放器.jpg" alt="图像缩放器" width="45%"/>
+</a>
+</div>
+</td>
 </tr>
 <tr>
 <td><b>图像切换器</b><br><code>ImageSwitch</code></td>
-<td>支持在2个或4个图像输入之间进行切换，通过下拉菜单选择输出。便于比较不同生成结果或应用不同的图像处理路径。</td>
+<td>支持在2个或4个图像输入之间进行切换，通过下拉菜单选择输出。便于比较不同生成结果或应用不同的图像处理路径。
+
+<br>
+<div align="left">
+<a href="预览图/图像切换-2路.jpg" target="_blank">
+<img src="预览图/图像切换-2路.jpg" alt="图像切换器2路" width="45%"/>
+</a>
+<a href="预览图/图像切换器-4路.jpg" target="_blank">
+<img src="预览图/图像切换器-4路.jpg" alt="图像切换器4路" width="45%"/>
+</a>
+</div>
+</td>
 </tr>
 <tr>
 <td><b>自动图像切换</b><br><code>AutoImageSwitch</code></td>
-<td>自动检测多个输入端口中哪一个有图像输入，并将其无缝输出到下游节点。简化工作流程设计，减少手动切换操作。<br><b>注意</b>：仅支持单端口有图像输入的场景，多端口同时输入会报错。</td>
+<td>自动检测多个输入端口中哪一个有图像输入，并将其无缝输出到下游节点。简化工作流程设计，减少手动切换操作。<br><b>注意</b>：仅支持单端口有图像输入的场景，多端口同时输入会报错。
+
+<br>
+<div align="left">
+<a href="预览图/自动图像切换.jpg" target="_blank">
+<img src="预览图/自动图像切换.jpg" alt="自动图像切换" width="45%"/>
+</a>
+</div>
+</td>
 </tr>
 <tr>
 <td><b>颜色移除</b><br><code>ColorRemoval</code></td>

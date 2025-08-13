@@ -79,7 +79,7 @@ class LoadKontextPresetsBasic:
                 return preset["brief"]
         return None
 
-    def get_preset(cls, preset):
-        brief = "The Brief:"+cls.get_brief_by_name(preset)
-        fullString = cls.data.get("prefix")+'\n'+brief+'\n'+cls.data.get("suffix")
+    def get_preset(self, 预设):
+        brief = "The Brief:"+LoadKontextPresetsBasic.get_brief_by_name(预设)
+        fullString = self.data.get("prefix")+'\n'+brief+'\n'+self.data.get("suffix")
         return (fullString,)
