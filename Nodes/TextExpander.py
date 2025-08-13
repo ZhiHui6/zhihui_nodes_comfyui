@@ -87,7 +87,6 @@ class TextExpander:
         if not 用户提示词.strip():
             raise ValueError("用户提示词不能为空！请输入需要扩写的提示词内容。")
             
-        # 检查字符量控制参数
         if 字符量控制 and 字符量控制.strip():
             try:
                 char_limit_value = int(字符量控制.strip())
