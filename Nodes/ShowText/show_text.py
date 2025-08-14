@@ -38,3 +38,5 @@ class ShowText:
                     node["widgets_values"] = [文本]
 
         return {"ui": {"文本": 文本}, "result": (文本,)}
+
+WEB_DIRECTORY = "./Nodes/ShowText/web"

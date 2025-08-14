@@ -27,7 +27,7 @@ from .Nodes.MovieTools.SobelSharpen import SobelSharpen
 from .Nodes.MovieTools.USMSharpen import USMSharpen
 from .Nodes.MovieTools.ColorMatchToReference import ColorMatchToReference
 from .Nodes.MovieTools.FilmGrain import FilmGrain
-from .Nodes.ShowText.show_text import ShowText
+from .Nodes.ShowText.show_text import ShowText, WEB_DIRECTORY
 
 NODE_CLASS_MAPPINGS = {
     "PromptPresetOneChoice": PromptPresetOneChoice,
@@ -82,6 +82,7 @@ NODE_DISPLAY_NAME_MAPPINGS = {
     "MultiLineTextNode": "多行文本(可注释)",
     "TextSwitch": "文本切换器(可注释)",
     "AutoTextSwitch": "自动文本切换",
+    "ShowText": "文本显示器",
     
     "ImageSwitch2way": "图像切换器-2路(可注释)",
     "ImageSwitch4way": "图像切换器-4路(可注释)",
@@ -97,10 +98,6 @@ NODE_DISPLAY_NAME_MAPPINGS = {
     "USMSharpen": "USM锐化",
     "ColorMatchToReference": "颜色匹配",
     "FilmGrain": "胶片颗粒",
-	
-	"ShowText": "文本显示器",
 }
 
 __all__ = ['NODE_CLASS_MAPPINGS', 'NODE_DISPLAY_NAME_MAPPINGS', "WEB_DIRECTORY"]
-
-WEB_DIRECTORY = "./Nodes/ShowText/web"
