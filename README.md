@@ -4,7 +4,7 @@
 
 ## 📖 项目介绍
 
-这是一个由<span style="color: red;"> **Binity** </span>精心创建的 ComfyUI 自定义节点工具合集，旨在为用户提供一系列实用、高效的节点，以增强和扩展 ComfyUI 的功能。本节点集包含20+功能，涵盖文本处理、提示词优化、图像处理等多个方面，为您的 AI 创作提供全方位支持。
+这是一个由<span style="color: red;"> **Binity** </span>精心创建的 ComfyUI 自定义节点工具合集，旨在为用户提供一系列实用、高效的节点，以增强和扩展 ComfyUI 的功能。本节点集包含25+功能节点，涵盖文本处理、提示词优化、图像处理、翻译工具、Latent处理等多个方面，为您的 AI 创作提供全方位支持。
 
 ### ✨ 主要特点
 
@@ -27,7 +27,7 @@
 </tr>
 
 <tr>
-<td><b>🎯 Kontext预设增强版</b><br><code>LoadKontextPresetsPlus</code></td>
+<td><b>🎯 Kontext预设增强版</b><br><code>KontextPresetsPlus</code></td>
 <td>提示词处理</td>
 <td>内置20+创意预设的Kontext图像编辑预设工具，支持用户自定义预设扩展，集成多种LLM模型免费在线智能扩写。</td>
 </tr>
@@ -35,7 +35,7 @@
 <tr>
 <td><b>🎬 万相视频提示词生成器</b><br><code>WanPromptGenerator</code></td>
 <td>提示词处理</td>
-<td>基于万相2.2官方文档编写的全能型提示词生成器，支持自定义和预设两种组合方法，涵盖运镜、场景、光线、构图等16个维度的专业视频提示词生成。</td>
+<td>基于万相2.2官方文档编写的全能型提示词生成器，支持自定义和预设两种组合方法，涵盖运镜、场景、光线、构图等17个维度的专业视频提示词生成。</td>
 </tr>
 
 <tr>
@@ -63,7 +63,7 @@
 
 ## 🛠️ 节点功能说明
 
-本节点集包含 20 个功能各异的节点，分为以下几个主要类别：
+本节点集包含众多功能各异的节点，分为以下几个主要类别：
 
 ### 📝 文本处理类节点
 
@@ -115,25 +115,13 @@
 </div></td>
 </tr>
 <tr>
-<td><b>文本切换器</b><br><code>TextSwitch</code></td>
-<td>在4个文本输入之间进行切换，可通过下拉菜单选择输出，并支持添加注释。便于在不同版本的提示词之间快速切换，进行对比实验。
+<td><b>文本切换器(双模式)</b><br><code>TextSwitchDualMode</code></td>
+<td>支持4个文本输入的双模式切换器，可通过下拉菜单手动选择输出，或启用自动模式智能检测单个有效输入。便于在不同版本的提示词之间快速切换，进行对比实验。
 
 <br>
 <div align="left">
 <a href="预览图/文本切换器.jpg" target="_blank">
 <img src="预览图/文本切换器.jpg" alt="文本切换器" width="45%"/>
-</a>
-</div>
-</td>
-</tr>
-<tr>
-<td><b>自动文本切换器</b><br><code>AutoTextSwitch</code></td>
-<td>自动检测多个输入端口中哪一个有文本输入，并将其无缝输出到下游节点。简化工作流程设计，减少手动切换操作。<br><b>注意</b>：仅支持单端口有文本输入的场景，多端口同时输入会报错。
-
-<br>
-<div align="left">
-<a href="预览图/自动文本切换.jpg" target="_blank">
-<img src="预览图/自动文本切换.jpg" alt="自动文本切换器" width="45%"/>
 </a>
 </div>
 </td>
@@ -154,6 +142,18 @@
 <div align="left">
 <a href="预览图/提示词扩展(通用).jpg" target="_blank">
 <img src="预览图/提示词扩展(通用).jpg" alt="文本扩展器" width="45%"/>
+</a>
+</div>
+</td>
+</tr>
+<tr>
+<td><b>文本显示器</b><br><code>ShowText</code></td>
+<td>用于在ComfyUI界面中显示文本内容的节点，支持多行文本展示，可实时显示上游节点传递的文本信息，便于调试和查看中间结果。
+
+<br>
+<div align="left">
+<a href="预览图/文本显示器.jpg" target="_blank">
+<img src="预览图/文本显示器.jpg" alt="文本显示" width="45%"/>
 </a>
 </div>
 </td>
@@ -316,28 +316,13 @@
 </td>
 </tr>
 <tr>
-<td><b>图像切换器</b><br><code>ImageSwitch</code></td>
-<td>支持在2个或4个图像输入之间进行切换，通过下拉菜单选择输出。便于比较不同生成结果或应用不同的图像处理路径。
+<td><b>图像切换器(双模式)</b><br><code>ImageSwitchDualMode</code></td>
+<td>支持在2个或4个图像输入之间进行切换的双模式切换器，可通过下拉菜单手动选择输出，或启用自动模式智能检测单个有效输入。便于比较不同生成结果或应用不同的图像处理路径。
 
 <br>
 <div align="left">
-<a href="预览图/图像切换-2路.jpg" target="_blank">
-<img src="预览图/图像切换-2路.jpg" alt="图像切换器2路" width="45%"/>
-</a>
-<a href="预览图/图像切换器-4路.jpg" target="_blank">
-<img src="预览图/图像切换器-4路.jpg" alt="图像切换器4路" width="45%"/>
-</a>
-</div>
-</td>
-</tr>
-<tr>
-<td><b>自动图像切换</b><br><code>AutoImageSwitch</code></td>
-<td>自动检测多个输入端口中哪一个有图像输入，并将其无缝输出到下游节点。简化工作流程设计，减少手动切换操作。<br><b>注意</b>：仅支持单端口有图像输入的场景，多端口同时输入会报错。
-
-<br>
-<div align="left">
-<a href="预览图/自动图像切换.jpg" target="_blank">
-<img src="预览图/自动图像切换.jpg" alt="自动图像切换" width="45%"/>
+<a href="预览图/图像切换器.jpg" target="_blank">
+<img src="预览图/图像切换器.jpg" alt="图像切换器2路" width="45%"/>
 </a>
 </div>
 </td>
@@ -346,6 +331,21 @@
 <td><b>颜色移除</b><br><code>ColorRemoval</code></td>
 <td>从图像中移除彩色，输出灰度图像。适用于创建黑白效果或作为特定图像处理流程的预处理步骤。<br><br>
 <a href="预览图/去色节点展示.png" target="_blank"><img src="预览图/去色节点展示.png" alt="颜色移除节点展示" width="400"/></a></td>
+</tr>
+<tr>
+<td><b>优先级图像切换</b><br><code>PriorityImageSwitch</code></td>
+<td>智能优先级图像切换节点，当同时接入图像A和图像B端口时，优先输出B端口的内容；如果B端口无输入，则输出图像A端口的内容；如果两个端口都无输入，则弹出提示要求至少连接一个输入端口。
+
+<b>特点</b>：
+- <b>优先级控制</b>：图像B端口优先级高于图像A端口
+- <b>智能切换</b>：自动检测输入状态，无缝切换输出，减少手动切换操作
+
+<br>
+<div align="left">
+<a href="预览图/优先级图像切换.jpg" target="_blank">
+<img src="预览图/优先级图像切换.jpg" alt="优先级图像切换" width="45%"/>
+</a>
+</div></td>
 </tr>
 </table>
 
@@ -446,7 +446,7 @@
 </div></td>
 </tr>
 <tr>
-<td><b>百度翻译</b><br><code>BaiduTranslateNode</code></td>
+<td><b>百度翻译</b><br><code>BaiduTranslate</code></td>
 <td>
 
 提供在线翻译服务，支持中英文互译和源语言自动检测。
@@ -467,19 +467,29 @@
 </td>
 </tr>
 <tr>
-<td><b>中英文互译器 测试版</b><br><code>TranslateNodeBeta</code></td>
+<td><b>免费在线翻译</b><br><code>FreeTranslate</code></td>
 <td>
 
 免费在线翻译服务，支持中英文双向翻译和自动语言检测。
 
 <b>特点</b>：
 - <b>免费使用</b>：无需注册或API密钥，开箱即用
-- <b>多模型支持</b>：提供多种AI模型选择（OpenAI、Gemini、DeepSeek等）
+- <b>多模型支持</b>：提供11种AI模型选择（OpenAI、Claude、DeepSeek、Gemini等）
 
 <div align="left">
 <a href="预览图/中英文翻译器.jpg" target="_blank">
-<img src="预览图/中英文翻译器.jpg" alt="中英文互译器测试版" width="45%"/>
+<img src="预览图/中英文翻译器.jpg" alt="免费在线翻译" width="45%"/>
 </a>
+</div>
+</td>
+</tr>
+<tr>
+<td><b>Latent切换器</b><br><code>LatentSwitch</code></td>
+<td>支持3个Latent输入的双模式切换器，可通过下拉菜单手动选择输出，或启用自动模式智能检测单个有效输入。适用于在ComfyUI中管理和切换不同的Latent表示，便于对比实验和工作流优化。
+
+<br>
+<div align="left">
+该节点为Latent专用切换工具，暂无预览图
 </div>
 </td>
 </tr>
