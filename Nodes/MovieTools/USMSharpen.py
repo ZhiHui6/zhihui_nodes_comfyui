@@ -8,9 +8,9 @@ class USMSharpen:
     @classmethod
     def INPUT_TYPES(cls):
         return {
-            "required": {
+            "optional": {
                 "开关": ("BOOLEAN", {"default": True}),
-                "输入图像": ("IMAGE",),
+                "输入图像": ("IMAGE", {}),
                 "锐化强度": (
                     "FLOAT", {"default": 0.50, "min": 0.0, "max": 2.0, "step": 0.01, "display": "slider", "round": 0.01}
                 ),

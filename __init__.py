@@ -26,7 +26,7 @@ from .Nodes.MovieTools.SobelSharpen import SobelSharpen
 from .Nodes.MovieTools.USMSharpen import USMSharpen
 from .Nodes.MovieTools.ColorMatchToReference import ColorMatchToReference
 from .Nodes.MovieTools.FilmGrain import FilmGrain
-from .Nodes.LatentSwitch import LatentSwitch
+from .Nodes.LatentSwitchDualMode import LatentSwitchDualMode
 
 NODE_CLASS_MAPPINGS = {
     "PromptPresetOneChoice": PromptPresetOneChoice,
@@ -57,7 +57,7 @@ NODE_CLASS_MAPPINGS = {
     "USMSharpen": USMSharpen,
     "ColorMatchToReference": ColorMatchToReference,
     "FilmGrain": FilmGrain,
-    "LatentSwitch": LatentSwitch,
+    "LatentSwitchDualMode": LatentSwitchDualMode,
 }
 
 NODE_DISPLAY_NAME_MAPPINGS = {
@@ -89,7 +89,7 @@ NODE_DISPLAY_NAME_MAPPINGS = {
     "USMSharpen": "USM锐化",
     "ColorMatchToReference": "颜色匹配",
     "FilmGrain": "胶片颗粒",
-    "LatentSwitch": "Latent切换器-3路",
+    "LatentSwitchDualMode": "Latent切换器(双模式)",
 }
 
 __all__ = ['NODE_CLASS_MAPPINGS', 'NODE_DISPLAY_NAME_MAPPINGS', "WEB_DIRECTORY"]

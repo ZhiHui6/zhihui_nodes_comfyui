@@ -45,16 +45,14 @@ class ImageSwitchDualMode:
                 for i, img in enumerate(images):
                     if img is not None:
                         return (img,)
-                empty_image = torch.zeros(1, 64, 64, 3, dtype=torch.float32)
-                return (empty_image,)
+                return (None,)
         
         else:
             connected_indices = [i+1 for i, img in enumerate(images) if img is not None]
             connected_count = len(connected_indices)
             
             if connected_count == 0:
-                empty_image = torch.zeros(1, 64, 64, 3, dtype=torch.float32)
-                return (empty_image,)
+                return (None,)
             elif connected_count >= 2:
                 if connected_count == 2:
                     ports = f"图像{connected_indices[0]}和图像{connected_indices[1]}"

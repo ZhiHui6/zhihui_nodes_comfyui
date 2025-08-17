@@ -1,6 +1,7 @@
 import torch
 
-class LatentSwitch:
+class LatentSwitchDualMode:
+
     
     def __init__(self):
         pass

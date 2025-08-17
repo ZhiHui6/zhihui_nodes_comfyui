@@ -7,9 +7,9 @@ class SobelSharpen:
     @classmethod
     def INPUT_TYPES(cls):
         return {
-            "required": {
+            "optional": {
                 "开关": ("BOOLEAN", {"default": True}),
-                "输入图像": ("IMAGE",),
+                "输入图像": ("IMAGE", {}),
                 "锐化强度": (
                     "FLOAT", {"default": 0.50, "min": 0.0, "max": 2.0, "step": 0.01, "display": "slider", "round": 0.01}
                 ),
@@ -21,9 +21,12 @@ class SobelSharpen:
     FUNCTION = "apply_sobel"
     CATEGORY = "zhihui/后期处理"
 
-    def apply_sobel(self, 输入图像: torch.Tensor, 锐化强度: float, 开关: bool) -> Tuple[torch.Tensor]:
+    def apply_sobel(self, 输入图像: torch.Tensor = None, 锐化强度: float = 0.5, 开关: bool = True) -> Tuple[torch.Tensor]:
         if not 开关:
             return (输入图像,)
+            
+        if 输入图像 is None:
+            return (None,)
             
         device = comfy.model_management.get_torch_device()
         输入图像 = 输入图像.to(device)

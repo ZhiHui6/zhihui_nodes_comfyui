@@ -14,7 +14,7 @@ class PriorityImageSwitch:
     @classmethod
     def INPUT_TYPES(cls):
         return {
-            "required": {  
+            "optional": {  
                 "图像A": ("IMAGE", {}),
                 "图像B": ("IMAGE", {}),
                 "图像A_注释": ("STRING", {"multiline": False, "default": "", "placeholder": "图像A的用途或说明"}),
@@ -28,4 +28,4 @@ class PriorityImageSwitch:
         elif 图像A is not None:
             return (图像A,)
         else:
-            raise ValueError("请至少连接一个图像输入端口（图像A或图像B）")
+            return (None,)

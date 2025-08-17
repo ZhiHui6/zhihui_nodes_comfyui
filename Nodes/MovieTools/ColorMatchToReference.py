@@ -7,10 +7,10 @@ class ColorMatchToReference:
     @classmethod
     def INPUT_TYPES(cls):
         return {
-            "required": {
+            "optional": {
                 "开关": ("BOOLEAN", {"default": True}),
-                "参考图像": ("IMAGE",),
-                "输入图像": ("IMAGE",),
+                "参考图像": ("IMAGE", {}),
+                "输入图像": ("IMAGE", {}),
                 "匹配强度": (
                     "FLOAT", {"default": 1.00, "min": 0.0, "max": 1.0, "step": 0.01, "display": "slider", "round": 0.01}
                 ),
@@ -22,8 +22,11 @@ class ColorMatchToReference:
     FUNCTION = "match_color"
     CATEGORY = "zhihui/后期处理"
 
-    def match_color(self, 输入图像: torch.Tensor, 参考图像: torch.Tensor, 匹配强度: float, 开关: bool) -> Tuple[torch.Tensor]:
-        if not 开关:
+    def match_color(self, 输入图像: torch.Tensor = None, 参考图像: torch.Tensor = None, 匹配强度: float = 1.0, 开关: bool = True) -> Tuple[torch.Tensor]:
+        if not 开关 or 输入图像 is None:
+            return (输入图像,) if 输入图像 is not None else (None,)
+        
+        if 参考图像 is None:
             return (输入图像,)
             
         device = comfy.model_management.get_torch_device()

@@ -7,9 +7,9 @@ class FilmGrain:
     @classmethod
     def INPUT_TYPES(cls):
         return {
-            "required": {
+            "optional": {
                 "开关": ("BOOLEAN", {"default": True}),
-                "输入图像": ("IMAGE",),
+                "输入图像": ("IMAGE", {}),
                 "颗粒强度": (
                     "FLOAT", {"default": 0.04, "min": 0.01, "max": 1.0, "step": 0.01, "display": "slider", "round": 0.01}
                 ),
@@ -27,9 +27,15 @@ class FilmGrain:
     FUNCTION = "apply_grain"
     CATEGORY = "zhihui/后期处理"
 
-    def apply_grain(self, 输入图像, 颗粒强度, 饱和度混合, 颗粒分布, 开关):
+    def apply_grain(self, 输入图像=None, 颗粒强度=0.04, 饱和度混合=0.5, 颗粒分布=None, 开关=True):
         if not 开关:
             return (输入图像,)
+            
+        if 输入图像 is None:
+            return (None,)
+            
+        if 颗粒分布 is None:
+            颗粒分布 = "高斯分布"
             
         device = comfy.model_management.get_torch_device()
         输入图像 = 输入图像.to(device)

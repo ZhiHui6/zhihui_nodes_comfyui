@@ -485,7 +485,7 @@
 </tr>
 <tr>
 <td><b>Latent切换器</b><br><code>LatentSwitch</code></td>
-<td>支持3个Latent输入的双模式切换器，可通过下拉菜单手动选择输出，或启用自动模式智能检测单个有效输入。适用于在ComfyUI中管理和切换不同的Latent表示，便于对比实验和工作流优化。
+<td>支持3个Latent输入的双模式切换器，可通过下拉菜单手动选择输出，或启用自动模式智能检测单个有效输入。
 
 <br>
 <div align="left">
@@ -536,6 +536,5 @@ pip install -r requirements.txt
 <div align="left">
 [🔴报告问题和提出建议] | [💡提交功能请求] | [📚改进文档] | [💻提交代码贡献]
 </div>
-
 
 如果您有任何想法或建议，请随时提出 Issue 或 Pull Request。
