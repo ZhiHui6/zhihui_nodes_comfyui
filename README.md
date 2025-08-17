@@ -114,18 +114,7 @@
 </a>
 </div></td>
 </tr>
-<tr>
-<td><b>文本切换器(双模式)</b><br><code>TextSwitchDualMode</code></td>
-<td>支持4个文本输入的双模式切换器，可通过下拉菜单手动选择输出，或启用自动模式智能检测单个有效输入。便于在不同版本的提示词之间快速切换，进行对比实验。
 
-<br>
-<div align="left">
-<a href="预览图/文本切换器.jpg" target="_blank">
-<img src="预览图/文本切换器.jpg" alt="文本切换器" width="45%"/>
-</a>
-</div>
-</td>
-</tr>
 <tr>
 <td><b>提示词扩展(通用)</b><br><code>TextExpander</code></td>
 <td>
@@ -294,6 +283,15 @@
 </div>
 </td>
 </tr>
+<tr>
+<td><b>额外选项列表</b><br><code>ExtraOptions</code></td>
+<td>一个通用的额外选项列表，类似于 JoyCaption 的设计，设有总开关和独立的引导词输入框。适合添加辅助提示或控制参数，增强工作流的灵活性。<br><br>
+<div align="left">
+<a href="预览图/额外引导选项（通用）.jpg" target="_blank">
+<img src="预览图/额外引导选项（通用）.jpg" alt="额外选项列表" width="45%"/>
+</a>
+</div></td>
+</tr>
 </table>
 
 ### 🖼️ 图像处理类节点
@@ -316,36 +314,9 @@
 </td>
 </tr>
 <tr>
-<td><b>图像切换器(双模式)</b><br><code>ImageSwitchDualMode</code></td>
-<td>支持在2个或4个图像输入之间进行切换的双模式切换器，可通过下拉菜单手动选择输出，或启用自动模式智能检测单个有效输入。便于比较不同生成结果或应用不同的图像处理路径。
-
-<br>
-<div align="left">
-<a href="预览图/图像切换器.jpg" target="_blank">
-<img src="预览图/图像切换器.jpg" alt="图像切换器2路" width="45%"/>
-</a>
-</div>
-</td>
-</tr>
-<tr>
 <td><b>颜色移除</b><br><code>ColorRemoval</code></td>
 <td>从图像中移除彩色，输出灰度图像。适用于创建黑白效果或作为特定图像处理流程的预处理步骤。<br><br>
 <a href="预览图/去色节点展示.png" target="_blank"><img src="预览图/去色节点展示.png" alt="颜色移除节点展示" width="400"/></a></td>
-</tr>
-<tr>
-<td><b>优先级图像切换</b><br><code>PriorityImageSwitch</code></td>
-<td>智能优先级图像切换节点，当同时接入图像A和图像B端口时，优先输出B端口的内容；如果B端口无输入，则输出图像A端口的内容；如果两个端口都无输入，则弹出提示要求至少连接一个输入端口。
-
-<b>特点</b>：
-- <b>优先级控制</b>：图像B端口优先级高于图像A端口
-- <b>智能切换</b>：自动检测输入状态，无缝切换输出，减少手动切换操作
-
-<br>
-<div align="left">
-<a href="预览图/优先级图像切换.jpg" target="_blank">
-<img src="预览图/优先级图像切换.jpg" alt="优先级图像切换" width="45%"/>
-</a>
-</div></td>
 </tr>
 </table>
 
@@ -437,11 +408,53 @@
 <th>功能描述</th>
 </tr>
 <tr>
-<td><b>额外选项列表</b><br><code>ExtraOptions</code></td>
-<td>一个通用的额外选项列表，类似于 JoyCaption 的设计，设有总开关和独立的引导词输入框。适合添加辅助提示或控制参数，增强工作流的灵活性。<br><br>
+<td><b>Latent切换器(双模式)</b><br><code>LatentSwitch</code></td>
+<td>支持3个Latent输入的双模式切换器，可通过下拉菜单手动选择输出，或启用自动模式智能检测单个有效输入。
+
+<br>
 <div align="left">
-<a href="预览图/额外引导选项（通用）.jpg" target="_blank">
-<img src="预览图/额外引导选项（通用）.jpg" alt="额外选项列表" width="45%"/>
+<a href="预览图/Latent切换器.jpg" target="_blank">
+<img src="预览图/Latent切换器.jpg" alt="Latent切换器" width="45%"/>
+</a>
+</div>
+</td>
+</tr>
+<tr>
+<td><b>文本切换器(双模式)</b><br><code>TextSwitchDualMode</code></td>
+<td>支持4个文本输入的双模式切换器，可通过下拉菜单手动选择输出，或启用自动模式智能检测单个有效输入。便于在不同版本的提示词之间快速切换，进行对比实验。
+
+<br>
+<div align="left">
+<a href="预览图/文本切换器.jpg" target="_blank">
+<img src="预览图/文本切换器.jpg" alt="文本切换器" width="45%"/>
+</a>
+</div>
+</td>
+</tr>
+<tr>
+<td><b>图像切换器(双模式)</b><br><code>ImageSwitchDualMode</code></td>
+<td>支持在2个或4个图像输入之间进行切换的双模式切换器，可通过下拉菜单手动选择输出，或启用自动模式智能检测单个有效输入。便于比较不同生成结果或应用不同的图像处理路径。
+
+<br>
+<div align="left">
+<a href="预览图/图像切换器.jpg" target="_blank">
+<img src="预览图/图像切换器.jpg" alt="图像切换器2路" width="45%"/>
+</a>
+</div>
+</td>
+</tr>
+<tr>
+<td><b>优先级图像切换</b><br><code>PriorityImageSwitch</code></td>
+<td>智能优先级图像切换节点，当同时接入图像A和图像B端口时，优先输出B端口的内容；如果B端口无输入，则输出图像A端口的内容；如果两个端口都无输入，则弹出提示要求至少连接一个输入端口。
+
+<b>特点</b>：
+- <b>优先级控制</b>：图像B端口优先级高于图像A端口
+- <b>智能切换</b>：自动检测输入状态，无缝切换输出，减少手动切换操作
+
+<br>
+<div align="left">
+<a href="预览图/优先级图像切换.jpg" target="_blank">
+<img src="预览图/优先级图像切换.jpg" alt="优先级图像切换" width="45%"/>
 </a>
 </div></td>
 </tr>
@@ -480,16 +493,6 @@
 <a href="预览图/中英文翻译器.jpg" target="_blank">
 <img src="预览图/中英文翻译器.jpg" alt="免费在线翻译" width="45%"/>
 </a>
-</div>
-</td>
-</tr>
-<tr>
-<td><b>Latent切换器</b><br><code>LatentSwitch</code></td>
-<td>支持3个Latent输入的双模式切换器，可通过下拉菜单手动选择输出，或启用自动模式智能检测单个有效输入。
-
-<br>
-<div align="left">
-该节点为Latent专用切换工具，暂无预览图
 </div>
 </td>
 </tr>
