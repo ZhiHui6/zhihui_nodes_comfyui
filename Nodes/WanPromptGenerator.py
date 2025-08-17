@@ -219,7 +219,7 @@ class WanPromptGenerator:
             if 启用扩写 and original_prompt:
                 expanded_prompt = self._call_llm_api(original_prompt, 模型品牌, 自定义引导词)
             
-            return (expanded_prompt, original_prompt)
+            return (original_prompt, expanded_prompt)
         
         processed_args = {}
         processed_args['主体类型'] = self._process_option(kwargs.get('主体类型'), self.主体类型选项)
@@ -300,7 +300,7 @@ class WanPromptGenerator:
         if 启用扩写 and original_prompt:
             expanded_prompt = self._call_llm_api(original_prompt, 模型品牌, 自定义引导词)
         
-        return (expanded_prompt, original_prompt)
+        return (original_prompt, expanded_prompt)
     
     @classmethod
     def IS_CHANGED(cls, **kwargs):
