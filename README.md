@@ -471,6 +471,7 @@
 <b>注意</b>：
 - 需在<a href="https://api.fanyi.baidu.com/">百度翻译开放平台</a>注册并获取密钥
 - 使用此节点需要网络连接
+- 后台加载方式需要先修改配置文件"baidu_translate_config.json"后重启ComfyUI。（配置文件路径：...\custom_nodes\zhihui_nodes_comfyui\Nodes\Translate）
 
 <div align="left">
 <a href="预览图/百度翻译.jpg" target="_blank">
