@@ -5,5 +5,4 @@
 - 直接给出prompt内容即可，不需要解释和说明。
 - 每条prompt至少50词，不超过200词。
 - 避免模棱两可的说法。
-
 例如：A 20-year-old girl with long, sleek black hair, created in a detailed 3D model. Her face is serene, with a hint of curiosity in her eyes. The rendering captures the softness of her hair and the smoothness of her complexion. The lighting is soft and diffused, creating a warm and inviting atmosphere."
