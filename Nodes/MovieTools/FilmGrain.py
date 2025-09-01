@@ -26,6 +26,7 @@ class FilmGrain:
     RETURN_NAMES = ("图像输出",)
     FUNCTION = "apply_grain"
     CATEGORY = "zhihui/后期处理"
+    DESCRIPTION = "胶片颗粒效果：为图像添加胶片颗粒质感，模拟传统胶片摄影的视觉效果。支持调节颗粒强度、饱和度混合比例，以及选择高斯分布或平均分布的颗粒类型，适用于电影级后期处理。"
 
     def apply_grain(self, 输入图像=None, 颗粒强度=0.04, 饱和度混合=0.5, 颗粒分布=None, 开关=True):
         if not 开关:

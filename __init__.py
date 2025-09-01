@@ -1,3 +1,5 @@
+import os
+
 from .Nodes.PromptPreset.PromptPresetOneChoice import PromptPresetOneChoice
 from .Nodes.PromptPreset.PromptPresetMultipleChoice import PromptPresetMultipleChoice
 from .Nodes.KontextPresets.KontextPresetsBasic import LoadKontextPresetsBasic
@@ -12,7 +14,7 @@ from .Nodes.TextModifier import TextModifier
 from .Nodes.TextExtractor import TextExtractor
 from .Nodes.TriggerWordMerger import TriggerWordMerger
 from .Nodes.TextSwitchDualMode import TextSwitchDualMode
-from .Nodes.ShowText.show_text import ShowText, WEB_DIRECTORY
+from .Nodes.ShowText.show_text import ShowText
 from .Nodes.Translate.BaiduTranslate import BaiduTranslate
 from .Nodes.Translate.FreeTranslate import FreeTranslate
 from .Nodes.PhotographPromptGen.PhotographPromptGenerator import PhotographPromptGenerator
@@ -27,6 +29,7 @@ from .Nodes.MovieTools.USMSharpen import USMSharpen
 from .Nodes.MovieTools.ColorMatchToReference import ColorMatchToReference
 from .Nodes.MovieTools.FilmGrain import FilmGrain
 from .Nodes.LatentSwitchDualMode import LatentSwitchDualMode
+from .Nodes.LocalFileGallery.LocalFileGallery import LocalFileGallery
 
 NODE_CLASS_MAPPINGS = {
     "PromptPresetOneChoice": PromptPresetOneChoice,
@@ -58,6 +61,7 @@ NODE_CLASS_MAPPINGS = {
     "ColorMatchToReference": ColorMatchToReference,
     "FilmGrain": FilmGrain,
     "LatentSwitchDualMode": LatentSwitchDualMode,
+    "LocalFileGallery": LocalFileGallery,
 }
 
 NODE_DISPLAY_NAME_MAPPINGS = {
@@ -90,6 +94,9 @@ NODE_DISPLAY_NAME_MAPPINGS = {
     "ColorMatchToReference": "颜色匹配",
     "FilmGrain": "胶片颗粒",
     "LatentSwitchDualMode": "Latent切换器(双模式)",
+    "LocalFileGallery": "本地文件画廊",
 }
+
+WEB_DIRECTORY = os.path.dirname(os.path.abspath(__file__))
 
 __all__ = ['NODE_CLASS_MAPPINGS', 'NODE_DISPLAY_NAME_MAPPINGS', "WEB_DIRECTORY"]

@@ -497,6 +497,30 @@
 </div>
 </td>
 </tr>
+<tr>
+<td><b>本地文件画廊</b><br><code>LocalFileGallery</code></td>
+<td>
+
+本地文件浏览和选择工具，提供直观的文件管理界面，支持图片和文本文件的预览与选择。
+
+<b>支持格式</b>：
+- <b>图片格式</b>：jpg, jpeg, png, bmp, gif, webp
+- <b>文本格式</b>：txt, json, js
+
+<b>特点</b>：
+- <b>可视化界面</b>：提供友好的文件浏览器界面
+- <b>双输出模式</b>：同时输出选中的图片（IMAGE类型）和文本内容（STRING类型）
+- <b>安全验证</b>：内置路径安全检查和文件格式验证
+- <b>缓存优化</b>：LRU缓存机制提升文件加载性能
+- <b>缩略图支持</b>：快速预览图片内容
+
+<div align="left">
+<a href="预览图/本地文件画廊.jpg" target="_blank">
+<img src="预览图/本地文件画廊.jpg" alt="本地文件画廊" width="45%"/>
+</a>
+</div>
+</td>
+</tr>
 </table>
 
 ---

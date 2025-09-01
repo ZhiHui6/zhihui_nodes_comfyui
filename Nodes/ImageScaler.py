@@ -23,6 +23,7 @@ class ImageScaler:
     RETURN_NAMES = ("图像输出",)
     FUNCTION = "scale_image"
     CATEGORY = "zhihui/图像"
+    DESCRIPTION = "图像缩放器：根据长边或短边智能缩放图像到指定尺寸。支持多种插值方式（最近邻、双线性、双三次等），保持图像比例的同时调整尺寸，适用于图像预处理、尺寸标准化和批量处理。"
 
     def scale_image(self, 图像输入, 缩放依据, 目标尺寸, 插值方式):
         B, H, W, C = 图像输入.shape

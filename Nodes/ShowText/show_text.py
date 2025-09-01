@@ -18,6 +18,7 @@ class ShowText:
     RETURN_TYPES = ("字符串",)
     FUNCTION = "notify"
     CATEGORY = "zhihui/文本"
+    DESCRIPTION = "文本显示器：用于在ComfyUI界面中显示文本内容。可以接收任何文本输入并在节点界面上直观显示，便于调试和查看文本处理结果。"
 
     def notify(self, 文本, unique_id=None, extra_pnginfo=None):
         if unique_id is not None and extra_pnginfo is not None:
@@ -38,5 +39,3 @@ class ShowText:
                     node["widgets_values"] = [文本]
 
         return {"ui": {"文本": 文本}, "result": (文本,)}
-
-WEB_DIRECTORY = "./Nodes/ShowText/web"

@@ -21,6 +21,7 @@ class ColorMatchToReference:
     RETURN_NAMES = ("图像输出",)
     FUNCTION = "match_color"
     CATEGORY = "zhihui/后期处理"
+    DESCRIPTION = "颜色匹配节点：将输入图像的颜色调整为与参考图像相匹配。通过分析参考图像的色彩分布，自动调整输入图像的色调、饱和度和亮度，支持匹配强度调节，适用于电影级调色和色彩统一处理。"
 
     def match_color(self, 输入图像: torch.Tensor = None, 参考图像: torch.Tensor = None, 匹配强度: float = 1.0, 开关: bool = True) -> Tuple[torch.Tensor]:
         if not 开关 or 输入图像 is None:

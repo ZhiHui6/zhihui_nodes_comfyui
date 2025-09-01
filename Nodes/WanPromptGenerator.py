@@ -7,6 +7,7 @@ class WanPromptGenerator:
     FUNCTION = "generate_prompt"
     RETURN_TYPES = ("STRING", "STRING")
     RETURN_NAMES = ("源提示词", "提示词输出")
+    DESCRIPTION = "万能提示词生成器，通过丰富的参数选项生成专业的图像提示词。支持主体类型、情绪、动作、场景、光线、构图等多维度设置，内置电影场景预设，支持AI扩写功能，适用于各种创意图像生成需求。"
 
     主体类型选项 = [
         "关闭", "随机", 

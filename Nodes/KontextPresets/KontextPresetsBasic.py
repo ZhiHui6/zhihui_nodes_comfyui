@@ -71,6 +71,7 @@ class LoadKontextPresetsBasic:
     RETURN_NAMES = ("提示词内容",)
     FUNCTION = "get_preset"
     CATEGORY = "zhihui/生成器"
+    DESCRIPTION = "Kontext预设基础版：提供多种图像编辑和变换的预设指令，包括场景传送、移动镜头、重新布光、产品摄影等功能。适用于图像风格转换和创意编辑。"
     
     @classmethod
     def get_brief_by_name(cls, name):

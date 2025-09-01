@@ -27,6 +27,7 @@ class LatentSwitchDualMode:
     RETURN_NAMES = ("输出Latent",)
     FUNCTION = "execute"
     CATEGORY = "zhihui/Latent"
+    DESCRIPTION = "Latent切换器：支持手动和自动模式的多通道Latent切换器。可在3个Latent输入间切换，支持注释标记便于管理，自动模式下智能选择非空输入，适用于工作流中的条件分支和动态切换。"
 
     def execute(self, 模式, 选择通道, Latent_1=None, Latent_2=None, Latent_3=None, 
                 Latent_1_注释="", Latent_2_注释="", Latent_3_注释=""):

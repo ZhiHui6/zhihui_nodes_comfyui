@@ -29,6 +29,7 @@ class FreeTranslate:
     RETURN_NAMES = ("翻译结果",)
     FUNCTION = "translate_text"
     CATEGORY = "utils"
+    DESCRIPTION = "免费翻译：使用多种AI模型进行文本翻译的免费解决方案。支持中英文互译，自动语言检测，提供多种AI模型选择包括Claude、GPT、Gemini等。无需API密钥，适用于快速翻译和多语言内容处理。"
     
     def detect_language(self, text):
         chinese_chars = sum(1 for char in text if '\u4e00' <= char <= '\u9fff')

@@ -86,6 +86,7 @@ class ExtraOptions:
     RETURN_NAMES = ("引导输出",)
     FUNCTION = "execute"
     CATEGORY = "zhihui/文本"
+    DESCRIPTION = "额外选项节点：为图像反推提供详细的引导选项配置。支持多种反推类型（描述性、训练提示词、MidJourney提示词等），并提供丰富的可选参数来控制输出内容的细节，如灯光信息、摄像机角度、构图风格等，适用于精确的图像描述和提示词生成。"
 
     def execute(self, 引导词, 反推类型, 选项总开关, 不要包含不可更改的人物角色信息_如种族_性别等_但仍然包含可更改的属性_如发型=False, 包含灯光信息=False, 包含摄像机角度信息=False, 包含是否有水印的信息=False, 包括是否有JPEG伪影的信息=False, 如果是照片_必须包含可能使用的相机信息以及光圈_快门速度_ISO等详细信息=False, 不要包含任何性内容_保持PG=False, 不要提及图像的分辨率=False, 必须包含有关图像主观审美质量的信息_从低到高=False, 包括有关图像构图风格的信息_如引导线_三分法或对称=False, 不要提及图片中的任何文字=False, 指定景深和背景是对焦还是模糊=False, 如果适用_请提及可能使用的人工或自然光源=False, 不要使用任何模棱两可的语言=False, 包括图片是sfw_暗示性还是nsfw=False, 只描述图片中最重要的元素=False, 不包括艺术家的名字或头衔=False, 识别图像方向=False, 使用粗俗的俚语和脏话=False, 不要使用礼貌的委婉语=False, 包括角色年龄=False, 包括相机拍摄类型=False, 排除情绪感受=False, 包括相机有利高度=False, 提到水印=False, 避免使用元描述性短语=False, 顶部文本=""):
         if 反推类型 == "自定义引导" and not 引导词.strip():

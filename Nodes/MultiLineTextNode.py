@@ -3,6 +3,7 @@ from typing import Optional
 class MultiLineTextNode:
     CATEGORY = "zhihui/文本"
     OUTPUT_NODE = True
+    DESCRIPTION = "多行文本节点：用于输入和处理多行文本内容。支持启用/禁用功能，可添加注释说明，适用于长文本内容的输入和传递。"
         
     @classmethod
     def INPUT_TYPES(cls):

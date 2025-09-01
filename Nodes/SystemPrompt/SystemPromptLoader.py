@@ -53,6 +53,7 @@ class SystemPromptLoader:
     FUNCTION = "load_preset"
     CATEGORY = "zhihui/文本"
     OUTPUT_NODE = True
+    DESCRIPTION = "系统引导词加载器：从预设文件中加载系统引导词模板，支持多种场景的引导词预设，包括图片反推、文本扩写、生图扩写、生视频扩写、视频反推等。可以将用户提示词嵌入到系统引导词中，适用于AI模型的提示词工程。"
 
     def load_preset(self, 用户提示词, 引导预设, 用户词写入引导词中, 启用节点):
         if not 启用节点:

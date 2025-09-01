@@ -20,6 +20,7 @@ class LaplacianSharpen:
     RETURN_NAMES = ("图像输出",)
     FUNCTION = "apply_laplacian"
     CATEGORY = "zhihui/后期处理"
+    DESCRIPTION = "拉普拉斯锐化：使用拉普拉斯算子对图像进行锐化处理，增强图像的边缘和细节。支持锐化强度调节，适用于提升图像清晰度和细节表现，常用于电影后期制作和图像增强。"
 
     def apply_laplacian(self, 图像输入: torch.Tensor = None, 锐化强度: float = 0.5, 开关: bool = True) -> Tuple[torch.Tensor]:
         if not 开关:

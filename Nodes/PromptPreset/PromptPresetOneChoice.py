@@ -39,6 +39,7 @@ class PromptPresetOneChoice:
     RETURN_NAMES = ("prompt",)
     FUNCTION = "execute"
     CATEGORY = "zhihui/文本"
+    DESCRIPTION = "单选提示词预设：提供6个预设提示词选项，用户可以选择其中一个输出。每个提示词都可以添加注释说明，方便管理和识别不同的提示词内容。"
 
     def execute(self, 提示词1_注释, 提示词2_注释, 提示词3_注释, 提示词4_注释, 提示词5_注释, 提示词6_注释, 提示词1, 提示词2, 提示词3, 提示词4, 提示词5, 提示词6, 选择提示词):
         # 更新缓存

@@ -29,6 +29,7 @@ class TextCombinerNode:
     RETURN_TYPES = ("STRING",)
     RETURN_NAMES = ("文本输出",)
     FUNCTION = "execute"
+    DESCRIPTION = "文本合并器：将两个文本输入按指定分隔符合并成一个文本输出。每个文本都可以独立启用或禁用，支持自定义分隔符，适用于提示词组合和文本拼接。"
     
     def execute(self, 提示词1_注释: str, 提示词1: str, 提示词2_注释: str, 提示词2: str, 分隔符: str, 启用提示词1: bool, 启用提示词2: bool) -> tuple:
         self.提示词1 = 提示词1 if 启用提示词1 else ""

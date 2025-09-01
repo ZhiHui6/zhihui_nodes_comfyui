@@ -7,6 +7,7 @@ class TextExpander:
     
     RETURN_TYPES = ("STRING",)
     RETURN_NAMES = ("文本输出",)
+    DESCRIPTION = "文本扩展器：使用AI模型对输入的提示词进行智能扩写。支持多种AI模型，可调节创意温度，设置字符数量限制，并支持自定义系统引导词来控制扩写风格和方向。"
 
     模型选项 = [
         "claude", "deepseek", "gemini", "openai", "mistral", 

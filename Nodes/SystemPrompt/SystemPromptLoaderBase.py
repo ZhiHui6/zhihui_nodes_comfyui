@@ -50,6 +50,7 @@ class SystemPromptLoaderBase:
     FUNCTION = "load_preset"
     CATEGORY = "zhihui/文本"
     OUTPUT_NODE = True
+    DESCRIPTION = "系统引导词加载器基础版：简化版的系统引导词加载器，直接从预设文件中加载系统引导词模板。支持多种场景的引导词预设，适用于需要纯系统引导词输出的场景，不包含用户提示词处理功能。"
 
     def load_preset(self, 引导预设):
         system_prompt_content = ""

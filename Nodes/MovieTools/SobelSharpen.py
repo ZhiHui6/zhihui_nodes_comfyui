@@ -20,6 +20,7 @@ class SobelSharpen:
     RETURN_NAMES = ("图像输出",)
     FUNCTION = "apply_sobel"
     CATEGORY = "zhihui/后期处理"
+    DESCRIPTION = "索贝尔锐化：使用Sobel算子进行边缘检测和锐化处理，通过计算图像梯度来增强边缘信息。支持锐化强度调节，特别适用于突出图像轮廓和边缘细节，常用于图像预处理和艺术效果制作。"
 
     def apply_sobel(self, 输入图像: torch.Tensor = None, 锐化强度: float = 0.5, 开关: bool = True) -> Tuple[torch.Tensor]:
         if not 开关:

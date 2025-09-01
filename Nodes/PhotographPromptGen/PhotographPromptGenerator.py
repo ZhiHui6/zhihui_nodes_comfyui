@@ -48,6 +48,7 @@ class PhotographPromptGenerator:
     RETURN_NAMES =("模版","标签","帮助")
     FUNCTION = "generate_text"
     CATEGORY ="zhihui/生成器"
+    DESCRIPTION = "摄影提示词生成器：根据预设的摄影参数组合生成专业的摄影提示词。包含相机、镜头、灯光、姿势、服装等多个维度的选项，支持自定义模板输出格式。"
 
     def random_choice(self, selected_option, options):
         if selected_option == "随机 (Random)":

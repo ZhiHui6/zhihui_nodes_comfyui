@@ -16,6 +16,7 @@ class TextModifier:
     FUNCTION = "substr"
     OUTPUT_NODE = False 
     CATEGORY = "zhihui/文本"
+    DESCRIPTION = "文本修改器：通过指定起始文本和末尾文本来提取中间部分的文本内容。可以删除指定字符串及其前方或后方的所有文本，实现精确的文本截取功能。"
     
     def __init__(self):
         self.起始文本 = ""

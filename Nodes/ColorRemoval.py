@@ -12,6 +12,7 @@ class ColorRemoval:
         }
 
     CATEGORY = "zhihui/图像"
+    DESCRIPTION = "去色节点：将彩色图像转换为灰度图像，移除所有颜色信息保留亮度信息。适用于创建黑白效果、图像预处理、艺术风格转换等场景。"
 
     RETURN_TYPES = ("IMAGE",)
     RETURN_NAMES = ("图像输出",)

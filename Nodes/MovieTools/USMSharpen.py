@@ -21,6 +21,7 @@ class USMSharpen:
     RETURN_NAMES = ("图像输出",)
     FUNCTION = "apply_unsharp"
     CATEGORY = "zhihui/后期处理"
+    DESCRIPTION = "USM锐化：使用反锐化掩模(Unsharp Mask)技术进行图像锐化，这是专业图像处理中最常用的锐化方法。通过创建模糊版本并与原图对比来增强细节，支持锐化强度调节，适用于高质量图像后期处理。"
 
     def apply_unsharp(self, 输入图像: torch.Tensor, 锐化强度: float, 开关: bool) -> Tuple[torch.Tensor]:
         if not 开关:

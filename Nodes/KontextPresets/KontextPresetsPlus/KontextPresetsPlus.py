@@ -103,6 +103,7 @@ class KontextPresetsPlus:
     RETURN_NAMES = ("提示词内容",)
     FUNCTION = "get_预设"
     CATEGORY = "zhihui/生成器"
+    DESCRIPTION = "Kontext预设增强版：提供分类管理的预设库，支持完整信息输出、内置AI扩写功能，以及自定义内容输入。适用于高级图像编辑和创意生成工作流。"
     
     @classmethod
     def get_brief_by_name(cls, display_name):

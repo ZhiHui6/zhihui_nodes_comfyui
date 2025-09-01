@@ -24,6 +24,7 @@ class BaiduTranslate:
     RETURN_NAMES = ("译文结果",)
     FUNCTION = "translate"
     CATEGORY = "zhihui/文本"
+    DESCRIPTION = "百度翻译：使用百度翻译API进行文本翻译。支持中英文互译，自动检测源语言，提供明文和后台两种密钥加载方式。适用于多语言提示词处理和国际化内容创作。"
 
     def translate(self, 启用翻译, 密钥加载, app_id, api_key, 源语言, 目标语言, text):
         if not 启用翻译:
