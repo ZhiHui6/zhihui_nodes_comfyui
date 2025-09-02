@@ -17,6 +17,7 @@ class TextExtractor:
     RETURN_NAMES = ("文本输出",)
     FUNCTION = "extract_text"
     CATEGORY = "zhihui/text"
+    DESCRIPTION = "文本提取器：根据选择的提取类型从文本中提取特定内容。支持中文提取（提取所有中文字符、标点和数字）和英文提取（提取所有英文字符、标点和数字），适用于多语言文本处理和内容分离。"
 
     def extract_text(self, 文本输入, 提取类型):
         if 提取类型 == "中文":

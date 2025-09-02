@@ -28,6 +28,7 @@ class ImageSwitchDualMode:
     RETURN_NAMES = ("输出图像",)
     FUNCTION = "execute"
     CATEGORY = "zhihui/图像"
+    DESCRIPTION = "图像切换器：根据布尔开关在两个图像输入之间进行选择。当开关为True时输出图像A，为False时输出图像B，适用于条件性图像选择和工作流程的分支控制。"
 
     def execute(self, 模式, 选择图像, 图像1=None, 图像2=None, 图像3=None, 图像4=None,
                 图像1_注释="", 图像2_注释="", 图像3_注释="", 图像4_注释=""):

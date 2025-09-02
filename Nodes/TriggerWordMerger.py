@@ -21,6 +21,7 @@ class TriggerWordMerger:
     RETURN_NAMES = ("文本输出",)
     FUNCTION = "merge_text"
     CATEGORY = "zhihui/文本"
+    DESCRIPTION = "触发词合并器：将触发词和文本输入进行智能合并。支持添加权重控制，可以在触发词周围添加括号和权重值，适用于AI绘图提示词的精确控制和文本内容的组合处理。"
 
     def merge_text(self, 触发词, 文本输入=None, 添加权重=False, 权重值=1.0):
 

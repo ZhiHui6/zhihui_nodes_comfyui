@@ -26,6 +26,7 @@ class TextSwitchDualMode:
     RETURN_NAMES = ("输出文本",)
     FUNCTION = "execute"
     CATEGORY = "zhihui/文本"
+    DESCRIPTION = "文本切换器：根据布尔开关在两个文本输入之间进行选择。当开关为True时输出文本A，为False时输出文本B，适用于条件性文本选择和工作流程的分支控制。"
 
     def execute(self, 模式, 选择文本, 文本1_注释, 文本2_注释, 文本3_注释, 文本4_注释,
                 文本1="", 文本2="", 文本3="", 文本4=""):
