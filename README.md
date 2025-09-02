@@ -18,7 +18,7 @@ This is a ComfyUI custom node collection carefully created by <span style="color
 
 - 🖼️ **实用图像工具**：支持多算法图像缩放、智能切换、颜色移除等等。<br>**Practical Image Tools**: Supports multi-algorithm image scaling, intelligent switching, color removal, and more.
 
-如果这个项目对您有帮助，请给我们一个 ⭐**Star**！您的支持是我们持续改进的动力。
+如果这个项目对您有帮助，请给我们一个 ⭐**Star**！您的支持是我们持续改进的动力。<br>
 If this project helps you, please give us a ⭐**Star**! Your support is our motivation for continuous improvement.
 
 ## ⭐ 明星节点 | Featured Nodes
