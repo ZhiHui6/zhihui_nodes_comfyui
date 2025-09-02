@@ -65,8 +65,8 @@ If this project helps you, please give us a ⭐**Star**! Your support is our mot
 </tr>
 </table>
 
-> 💡 **使用建议**：新用户建议从 **摄影提示词生成器** 和 **万相视频提示词生成器** 开始体验，这两个节点能够快速提升您的创作效率和作品质量。
-> **Usage Recommendation**: New users are recommended to start with **Photography Prompt Generator** and **Wan Prompt Generator**, these two nodes can quickly improve your creative efficiency and work quality.
+💡 **使用建议**：新用户建议从 **摄影提示词生成器** 和 **万相视频提示词生成器** 开始体验，这两个节点能够快速提升您的创作效率和作品质量。
+**Usage Recommendation**: New users are recommended to start with **Photography Prompt Generator** and **Wan Prompt Generator**, these two nodes can quickly improve your creative efficiency and work quality.
 
 ---
 
