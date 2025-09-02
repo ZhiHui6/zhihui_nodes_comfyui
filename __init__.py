@@ -30,6 +30,7 @@ from .Nodes.MovieTools.ColorMatchToReference import ColorMatchToReference
 from .Nodes.MovieTools.FilmGrain import FilmGrain
 from .Nodes.LatentSwitchDualMode import LatentSwitchDualMode
 from .Nodes.LocalFileGallery.LocalFileGallery import LocalFileGallery
+from .Nodes.ImageAspectRatio import ImageAspectRatio
 
 NODE_CLASS_MAPPINGS = {
     "PromptPresetOneChoice": PromptPresetOneChoice,
@@ -62,6 +63,7 @@ NODE_CLASS_MAPPINGS = {
     "FilmGrain": FilmGrain,
     "LatentSwitchDualMode": LatentSwitchDualMode,
     "LocalFileGallery": LocalFileGallery,
+    "ImageAspectRatio": ImageAspectRatio,
 }
 
 NODE_DISPLAY_NAME_MAPPINGS = {
@@ -95,6 +97,7 @@ NODE_DISPLAY_NAME_MAPPINGS = {
     "FilmGrain": "胶片颗粒",
     "LatentSwitchDualMode": "Latent切换器(双模式)",
     "LocalFileGallery": "本地文件画廊",
+    "ImageAspectRatio": "图像宽高比设置",
 }
 
 WEB_DIRECTORY = os.path.dirname(os.path.abspath(__file__))

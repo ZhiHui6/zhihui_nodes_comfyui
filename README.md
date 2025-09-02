@@ -78,8 +78,8 @@
 
 <br>
 <div align="left">
-<a href="预览图/多行文本.jpg" target="_blank">
-<img src="预览图/多行文本.jpg" alt="多行文本" width="45%"/>
+<a href="images/多行文本.jpg" target="_blank">
+<img src="images/多行文本.jpg" alt="多行文本" width="45%"/>
 </a>
 </div></td>
 </tr>
@@ -89,8 +89,8 @@
 
 <br>
 <div align="left">
-<a href="预览图/提示词合并器.jpg" target="_blank">
-<img src="预览图/提示词合并器.jpg" alt="提示词合并器" width="45%"/>
+<a href="images/提示词合并器.jpg" target="_blank">
+<img src="images/提示词合并器.jpg" alt="提示词合并器" width="45%"/>
 </a>
 </div></td>
 </tr>
@@ -100,8 +100,8 @@
 
 <br>
 <div align="left">
-<a href="预览图/文本修改器.jpg" target="_blank">
-<img src="预览图/文本修改器.jpg" alt="文本修改器" width="45%"/>
+<a href="images/文本修改器.jpg" target="_blank">
+<img src="images/文本修改器.jpg" alt="文本修改器" width="45%"/>
 </a>
 </div></td>
 </tr>
@@ -109,8 +109,8 @@
 <td><b>中英文本提取器</b><br><code>TextExtractor</code></td>
 <td>从混合文本中提取纯中文或纯英文字符，支持标点和数字的提取，并自动清理格式。对于处理双语提示词或分离不同语言内容非常有用。<br><br>
 <div align="left">
-<a href="预览图/中英文本提取器.jpg" target="_blank">
-<img src="预览图/中英文本提取器.jpg" alt="文本提取器" width="45%"/>
+<a href="images/中英文本提取器.jpg" target="_blank">
+<img src="images/中英文本提取器.jpg" alt="文本提取器" width="45%"/>
 </a>
 </div></td>
 </tr>
@@ -129,8 +129,8 @@
 - <b>灵活输入</b>：支持直接输入系统引导词或通过外部节点加载
 
 <div align="left">
-<a href="预览图/提示词扩展(通用).jpg" target="_blank">
-<img src="预览图/提示词扩展(通用).jpg" alt="文本扩展器" width="45%"/>
+<a href="images/提示词扩展(通用).jpg" target="_blank">
+<img src="images/提示词扩展(通用).jpg" alt="文本扩展器" width="45%"/>
 </a>
 </div>
 </td>
@@ -141,8 +141,8 @@
 
 <br>
 <div align="left">
-<a href="预览图/文本显示器.jpg" target="_blank">
-<img src="预览图/文本显示器.jpg" alt="文本显示" width="45%"/>
+<a href="images/文本显示器.jpg" target="_blank">
+<img src="images/文本显示器.jpg" alt="文本显示" width="45%"/>
 </a>
 </div>
 </td>
@@ -162,8 +162,8 @@
 
 <br>
 <div align="left">
-<a href="预览图/Kontext预设集基础版.jpg" target="_blank">
-<img src="预览图/Kontext预设集基础版.jpg" alt="Kontext预设基础版" width="45%"/>
+<a href="images/Kontext预设集基础版.jpg" target="_blank">
+<img src="images/Kontext预设集基础版.jpg" alt="Kontext预设基础版" width="45%"/>
 </a>
 </div>
 </td>
@@ -181,11 +181,11 @@
 - <b>灵活输出</b>：支持输出原始预设内容、完整信息或AI扩写后的内容
 
 <div align="left">
-<a href="预览图/Kontext预设增强版节点展示.jpg" target="_blank">
-<img src="预览图/Kontext预设增强版节点展示.jpg" alt="节点展示" width="45%" style="margin-right:5%"/>
+<a href="images/Kontext预设增强版节点展示.jpg" target="_blank">
+<img src="images/Kontext预设增强版节点展示.jpg" alt="节点展示" width="45%" style="margin-right:5%"/>
 </a>
-<a href="预览图/Kontext预设增强版效果预览.jpg" target="_blank">
-<img src="预览图/Kontext预设增强版效果预览.jpg" alt="效果展示" width="45%"/>
+<a href="images/Kontext预设增强版效果预览.jpg" target="_blank">
+<img src="images/Kontext预设增强版效果预览.jpg" alt="效果展示" width="45%"/>
 </a>
 </div>
 </td>
@@ -202,8 +202,8 @@
 - 输出模板可自定义，适应不同的摄影风格需求
 
 <div align="left">
-<a href="预览图/摄影提示词生成器.jpg" target="_blank">
-<img src="预览图/摄影提示词生成器.jpg" alt="摄影提示词生成器" width="45%"/>
+<a href="images/摄影提示词生成器.jpg" target="_blank">
+<img src="images/摄影提示词生成器.jpg" alt="摄影提示词生成器" width="45%"/>
 </a>
 </div>
 </td>
@@ -220,8 +220,8 @@
 - <b>智能扩写</b>：支持多种LLM模型（OpenAI、Claude、DeepSeek、Gemini等）免费在线扩写
 
 <div align="left">
-<a href="预览图/万相视频提示词生成器.jpg" target="_blank">
-<img src="预览图/万相视频提示词生成器.jpg" alt="万相视频提示词生成器" width="45%"/>
+<a href="images/万相视频提示词生成器.jpg" target="_blank">
+<img src="images/万相视频提示词生成器.jpg" alt="万相视频提示词生成器" width="45%"/>
 </a>
 </div>
 </td>
@@ -233,8 +233,8 @@
 
 <br>
 <div align="left">
-<a href="预览图/单选提示词预设.jpg" target="_blank">
-<img src="预览图/单选提示词预设.jpg" alt="单选提示词预设" width="45%"/>
+<a href="images/单选提示词预设.jpg" target="_blank">
+<img src="images/单选提示词预设.jpg" alt="单选提示词预设" width="45%"/>
 </a>
 </div>
 </td>
@@ -245,8 +245,8 @@
 
 <br>
 <div align="left">
-<a href="预览图/多选提示词预设.jpg" target="_blank">
-<img src="预览图/多选提示词预设.jpg" alt="多选提示词预设" width="45%"/>
+<a href="images/多选提示词预设.jpg" target="_blank">
+<img src="images/多选提示词预设.jpg" alt="多选提示词预设" width="45%"/>
 </a>
 </div>
 </td>
@@ -257,8 +257,8 @@
 
 <br>
 <div align="left">
-<a href="预览图/触发词合并器.jpg" target="_blank">
-<img src="预览图/触发词合并器.jpg" alt="触发词合并器" width="45%"/>
+<a href="images/触发词合并器.jpg" target="_blank">
+<img src="images/触发词合并器.jpg" alt="触发词合并器" width="45%"/>
 </a>
 </div>
 </td>
@@ -267,8 +267,8 @@
 <td><b>系统引导词加载器</b><br><code>SystemPromptLoader</code></td>
 <td>从预设文件夹动态加载系统级引导词（System Prompt），并可选择性地与用户输入合并。适合管理和应用复杂的系统提示模板，提高生成结果的一致性和质量。<br><br>
 <div align="left">
-<a href="预览图/系统引导词加载器.jpg" target="_blank">
-<img src="预览图/系统引导词加载器.jpg" alt="系统引导词加载器" width="45%"/>
+<a href="images/系统引导词加载器.jpg" target="_blank">
+<img src="images/系统引导词加载器.jpg" alt="系统引导词加载器" width="45%"/>
 </a>
 </div>
 </td>
@@ -277,8 +277,8 @@
 <td><b>系统引导词加载器(基础版)</b><br><code>SystemPromptLoaderBase</code></td>
 <td>从预设文件夹动态加载系统级引导词（System Prompt），简化了节点功能，适合需要纯系统引导词的场景。<br><br>
 <div align="left">
-<a href="预览图/系统引导词加载器基础版.jpg" target="_blank">
-<img src="预览图/系统引导词加载器基础版.jpg" alt="系统引导词加载器基础版" width="45%"/>
+<a href="images/系统引导词加载器基础版.jpg" target="_blank">
+<img src="images/系统引导词加载器基础版.jpg" alt="系统引导词加载器基础版" width="45%"/>
 </a>
 </div>
 </td>
@@ -287,8 +287,8 @@
 <td><b>额外选项列表</b><br><code>ExtraOptions</code></td>
 <td>一个通用的额外选项列表，类似于 JoyCaption 的设计，设有总开关和独立的引导词输入框。适合添加辅助提示或控制参数，增强工作流的灵活性。<br><br>
 <div align="left">
-<a href="预览图/额外引导选项（通用）.jpg" target="_blank">
-<img src="预览图/额外引导选项（通用）.jpg" alt="额外选项列表" width="45%"/>
+<a href="images/额外引导选项（通用）.jpg" target="_blank">
+<img src="images/额外引导选项（通用）.jpg" alt="额外选项列表" width="45%"/>
 </a>
 </div></td>
 </tr>
@@ -302,13 +302,37 @@
 <th>功能描述</th>
 </tr>
 <tr>
+<td><b>图像宽高比设置</b><br><code>ImageAspectRatio</code></td>
+<td>智能图像宽高比设置工具，支持多种预设模式和自定义尺寸配置。
+
+<b>特点</b>：
+- <b>多预设支持</b>：内置Qwen、Flux、Wan、SDXL等主流模型的专用宽高比预设
+- <b>自定义模式</b>：支持完全自定义的宽度和高度设置
+- <b>宽高比锁定</b>：提供宽高比锁定功能，修改一个维度时自动调整另一个维度
+- <b>智能切换</b>：根据选择的预设模式自动显示对应的宽高比选项
+
+<br>
+<div align="left">
+<a href="images/图像宽高比设置1.jpg" target="_blank">
+<img src="images/图像宽高比设置1.jpg" alt="图像宽高比设置1" width="30%"/>
+</a>
+<a href="images/图像宽高比设置2.jpg" target="_blank">
+<img src="images/图像宽高比设置2.jpg" alt="图像宽高比设置2" width="30%"/>
+</a>
+<a href="images/图像宽高比设置3.jpg" target="_blank">
+<img src="images/图像宽高比设置3.jpg" alt="图像宽高比设置3" width="30%"/>
+</a>
+</div>
+</td>
+</tr>
+<tr>
 <td><b>图像缩放器</b><br><code>ImageScaler</code></td>
 <td>提供多种插值算法对图像进行缩放，并可选择保持原始宽高比。支持高质量的图像尺寸调整，适用于预处理或后处理阶段。
 
 <br>
 <div align="left">
-<a href="预览图/图像缩放器.jpg" target="_blank">
-<img src="预览图/图像缩放器.jpg" alt="图像缩放器" width="45%"/>
+<a href="images/图像缩放器.jpg" target="_blank">
+<img src="images/图像缩放器.jpg" alt="图像缩放器" width="45%"/>
 </a>
 </div>
 </td>
@@ -316,7 +340,7 @@
 <tr>
 <td><b>颜色移除</b><br><code>ColorRemoval</code></td>
 <td>从图像中移除彩色，输出灰度图像。适用于创建黑白效果或作为特定图像处理流程的预处理步骤。<br><br>
-<a href="预览图/去色节点展示.png" target="_blank"><img src="预览图/去色节点展示.png" alt="颜色移除节点展示" width="400"/></a></td>
+<a href="images/去色节点展示.png" target="_blank"><img src="images/去色节点展示.png" alt="颜色移除节点展示" width="400"/></a></td>
 </tr>
 </table>
 
@@ -337,8 +361,8 @@
 
 <br>
 <div align="left">
-<a href="预览图/胶片颗粒.jpg" target="_blank">
-<img src="预览图/胶片颗粒.jpg" alt="胶片颗粒效果" width="45%"/>
+<a href="images/胶片颗粒.jpg" target="_blank">
+<img src="images/胶片颗粒.jpg" alt="胶片颗粒效果" width="45%"/>
 </a>
 </div>
 </td>
@@ -352,8 +376,8 @@
 
 <br>
 <div align="left">
-<a href="预览图/拉普拉斯锐化.jpg" target="_blank">
-<img src="预览图/拉普拉斯锐化.jpg" alt="拉普拉斯锐化" width="45%"/>
+<a href="images/拉普拉斯锐化.jpg" target="_blank">
+<img src="images/拉普拉斯锐化.jpg" alt="拉普拉斯锐化" width="45%"/>
 </a>
 </div>
 </td>
@@ -366,8 +390,8 @@
 
 <br>
 <div align="left">
-<a href="预览图/索贝尔锐化.jpg" target="_blank">
-<img src="预览图/索贝尔锐化.jpg" alt="索贝尔锐化" width="45%"/>
+<a href="images/索贝尔锐化.jpg" target="_blank">
+<img src="images/索贝尔锐化.jpg" alt="索贝尔锐化" width="45%"/>
 </a>
 </div>
 </td>
@@ -379,8 +403,8 @@
 
 <br>
 <div align="left">
-<a href="预览图/USM锐化.jpg" target="_blank">
-<img src="预览图/USM锐化.jpg" alt="USM锐化" width="45%"/>
+<a href="images/USM锐化.jpg" target="_blank">
+<img src="images/USM锐化.jpg" alt="USM锐化" width="45%"/>
 </a>
 </div>
 </td>
@@ -392,8 +416,8 @@
 
 <br>
 <div align="left">
-<a href="预览图/颜色匹配.jpg" target="_blank">
-<img src="预览图/颜色匹配.jpg" alt="色彩匹配" width="45%"/>
+<a href="images/颜色匹配.jpg" target="_blank">
+<img src="images/颜色匹配.jpg" alt="色彩匹配" width="45%"/>
 </a>
 </div>
 </td>
@@ -413,8 +437,8 @@
 
 <br>
 <div align="left">
-<a href="预览图/Latent切换器.jpg" target="_blank">
-<img src="预览图/Latent切换器.jpg" alt="Latent切换器" width="45%"/>
+<a href="images/Latent切换器.jpg" target="_blank">
+<img src="images/Latent切换器.jpg" alt="Latent切换器" width="45%"/>
 </a>
 </div>
 </td>
@@ -425,8 +449,8 @@
 
 <br>
 <div align="left">
-<a href="预览图/文本切换器.jpg" target="_blank">
-<img src="预览图/文本切换器.jpg" alt="文本切换器" width="45%"/>
+<a href="images/文本切换器.jpg" target="_blank">
+<img src="images/文本切换器.jpg" alt="文本切换器" width="45%"/>
 </a>
 </div>
 </td>
@@ -437,8 +461,8 @@
 
 <br>
 <div align="left">
-<a href="预览图/图像切换器.jpg" target="_blank">
-<img src="预览图/图像切换器.jpg" alt="图像切换器2路" width="45%"/>
+<a href="images/图像切换器.jpg" target="_blank">
+<img src="images/图像切换器.jpg" alt="图像切换器2路" width="45%"/>
 </a>
 </div>
 </td>
@@ -453,8 +477,8 @@
 
 <br>
 <div align="left">
-<a href="预览图/优先级图像切换.jpg" target="_blank">
-<img src="预览图/优先级图像切换.jpg" alt="优先级图像切换" width="45%"/>
+<a href="images/优先级图像切换.jpg" target="_blank">
+<img src="images/优先级图像切换.jpg" alt="优先级图像切换" width="45%"/>
 </a>
 </div></td>
 </tr>
@@ -474,8 +498,8 @@
 - 后台加载方式需要先修改配置文件"baidu_translate_config.json"后重启ComfyUI。（配置文件路径：...\custom_nodes\zhihui_nodes_comfyui\Nodes\Translate）
 
 <div align="left">
-<a href="预览图/百度翻译.jpg" target="_blank">
-<img src="预览图/百度翻译.jpg" alt="百度翻译" width="45%"/>
+<a href="images/百度翻译.jpg" target="_blank">
+<img src="images/百度翻译.jpg" alt="百度翻译" width="45%"/>
 </a>
 </div>
 </td>
@@ -491,8 +515,8 @@
 - <b>多模型支持</b>：提供11种AI模型选择（OpenAI、Claude、DeepSeek、Gemini等）
 
 <div align="left">
-<a href="预览图/中英文翻译器.jpg" target="_blank">
-<img src="预览图/中英文翻译器.jpg" alt="免费在线翻译" width="45%"/>
+<a href="images/中英文翻译器.jpg" target="_blank">
+<img src="images/中英文翻译器.jpg" alt="免费在线翻译" width="45%"/>
 </a>
 </div>
 </td>
@@ -515,8 +539,8 @@
 - <b>缩略图支持</b>：快速预览图片内容
 
 <div align="left">
-<a href="预览图/本地文件画廊.jpg" target="_blank">
-<img src="预览图/本地文件画廊.jpg" alt="本地文件画廊" width="45%"/>
+<a href="images/本地文件画廊.jpg" target="_blank">
+<img src="images/本地文件画廊.jpg" alt="本地文件画廊" width="45%"/>
 </a>
 </div>
 </td>

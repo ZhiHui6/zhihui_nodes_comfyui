@@ -129,7 +129,7 @@ class LocalFileGallery:
     RETURN_TYPES = ("IMAGE", "STRING")
     RETURN_NAMES = ("image_output", "text_content")
     FUNCTION = "get_media_outputs"
-    CATEGORY = "zhihui"
+    CATEGORY = "zhihui/Toolkit"
     DESCRIPTION = "本地文件画廊节点：用于浏览和选择本地图片和文本文件。支持图片格式：jpg, jpeg, png, bmp, gif, webp；支持文本格式：txt, json, js。选择的图片将输出为IMAGE类型，文本内容将输出为STRING类型。"
 
     def get_media_outputs(self):
