@@ -12,38 +12,38 @@ class ImageScaler:
     def INPUT_TYPES(cls):
         return {
             "required": {
-                "图像输入": ("IMAGE",),
-                "缩放依据": (["长边", "短边"], {"default": "长边"}),
-                "目标尺寸": ("INT", {"default": 1024, "min": 1, "max": 99999, "step": 1}),
-                "插值方式": (["nearest", "bilinear", "bicubic", "nearest exact", "area"], {"default": "bilinear"}),
+                "image_input": ("IMAGE",),
+                "scale_basis": (["Long Side", "Short Side"], {"default": "Long Side"}),
+                "target_size": ("INT", {"default": 1024, "min": 1, "max": 99999, "step": 1}),
+                "interpolation_method": (["nearest", "bilinear", "bicubic", "nearest exact", "area"], {"default": "bilinear"}),
             }
         }
 
     RETURN_TYPES = ("IMAGE",)
-    RETURN_NAMES = ("图像输出",)
+    RETURN_NAMES = ("image_output",)
     FUNCTION = "scale_image"
-    CATEGORY = "zhihui/图像"
-    DESCRIPTION = "图像缩放器：根据长边或短边智能缩放图像到指定尺寸。支持多种插值方式（最近邻、双线性、双三次等），保持图像比例的同时调整尺寸，适用于图像预处理、尺寸标准化和批量处理。"
+    CATEGORY = "zhihui/image"
+    DESCRIPTION = "Image Scaler: Intelligently scales images to specified dimensions based on long side or short side. Supports multiple interpolation methods (nearest neighbor, bilinear, bicubic, etc.), adjusting size while maintaining image proportions. Suitable for image preprocessing, size standardization and batch processing."
 
-    def scale_image(self, 图像输入, 缩放依据, 目标尺寸, 插值方式):
-        B, H, W, C = 图像输入.shape
+    def scale_image(self, image_input, scale_basis, target_size, interpolation_method):
+        B, H, W, C = image_input.shape
         
-        if 缩放依据 == "长边":
-            ratio = 目标尺寸 / max(W, H)
+        if scale_basis == "Long Side":
+            ratio = target_size / max(W, H)
         else:
-            ratio = 目标尺寸 / min(W, H)
+            ratio = target_size / min(W, H)
         
         new_width = int(W * ratio)
         new_height = int(H * ratio)
 
-        image = 图像输入.permute(0, 3, 1, 2)
+        image = image_input.permute(0, 3, 1, 2)
         mode = {
             "nearest": "nearest",
             "bilinear": "bilinear",
             "bicubic": "bicubic",
             "nearest exact": "nearest-exact",
             "area": "area"
-        }[插值方式]
+        }[interpolation_method]
 
         scaled_image = F.interpolate(
             image,

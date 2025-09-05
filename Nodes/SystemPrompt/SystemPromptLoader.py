@@ -1,5 +1,4 @@
 import os
-import json
 
 current_dir = os.path.dirname(os.path.realpath(__file__))
 PRESETS_DIR = os.path.join(current_dir, "prompt_preset_flies")
@@ -9,24 +8,38 @@ if not os.path.exists(PRESETS_DIR):
 
 def get_all_preset_options():
     if not os.path.isdir(PRESETS_DIR):
-        return ["未找到预设文件夹"]
+        return ["Preset folder not found"]
     
     options = []
-    for folder in os.listdir(PRESETS_DIR):
-        folder_path = os.path.join(PRESETS_DIR, folder)
-        if os.path.isdir(folder_path):
-            for file in os.listdir(folder_path):
-                if file.endswith('.txt'):
-                    file_name = file.replace('.txt', '')
-                    options.append(f"{folder}/{file_name}")
     
-    return options if options else ["未找到预设文件"]
+    def scan_directory(base_path, prefix=""):
+        items = []
+        try:
+            for item in sorted(os.listdir(base_path)):
+                item_path = os.path.join(base_path, item)
+                if os.path.isdir(item_path):
+                    sub_items = scan_directory(item_path, f"{prefix}{item}/")
+                    items.extend(sub_items)
+                elif item.endswith('.txt'):
+                    file_name = item.replace('.txt', '')
+                    items.append(f"{prefix}{file_name}")
+        except PermissionError:
+            pass
+        return items
+    
+    options = scan_directory(PRESETS_DIR)
+    return options if options else ["No preset files found"]
 
 def parse_preset_path(preset_path):
     if '/' not in preset_path:
         return None, None
-    parts = preset_path.split('/', 1)
-    return parts[0], parts[1]
+    
+    parts = preset_path.rsplit('/', 1)
+    if len(parts) == 2:
+        folder_path = parts[0]
+        filename = parts[1]
+        return folder_path, filename
+    return None, None
 
 class SystemPromptLoader:
     def __init__(self):
@@ -38,47 +51,41 @@ class SystemPromptLoader:
         
         return {
             "required": {
-                "启用节点": ("BOOLEAN", {"default": True}),
-                "用户提示词": ("STRING", {"multiline": True, "default": ""}),
-                "引导预设": (preset_options, ),
-                "用户词写入引导词中": ("BOOLEAN", {"default": False}),
+                "system_preset": (preset_options, ),
             },
             }
 
     @classmethod
     def OUTPUT_TYPES(cls):
-        return ("用户提示词", "系统引导词",)
-    RETURN_TYPES = ("STRING", "STRING",)
-    RETURN_NAMES = ("用户提示词", "系统引导词",)
+        return ("system_prompt",)
+    RETURN_TYPES = ("STRING",)
+    RETURN_NAMES = ("system_prompt",)
     FUNCTION = "load_preset"
-    CATEGORY = "zhihui/文本"
+    CATEGORY = "zhihui/Text"
     OUTPUT_NODE = True
-    DESCRIPTION = "系统引导词加载器：从预设文件中加载系统引导词模板，支持多种场景的引导词预设，包括图片反推、文本扩写、生图扩写、生视频扩写、视频反推等。可以将用户提示词嵌入到系统引导词中，适用于AI模型的提示词工程。"
+    DESCRIPTION = "System Prompt Loader: A simplified system prompt loader that loads system prompt templates directly from preset files. Supports various scenario presets, suitable for scenarios that require pure system prompt output without user prompt processing functionality."
 
-    def load_preset(self, 用户提示词, 引导预设, 用户词写入引导词中, 启用节点):
-        if not 启用节点:
-            return (用户提示词, "",)
-            
+    def load_preset(self, system_preset):
         system_prompt_content = ""
         
-        if 引导预设 in ["未找到预设文件夹", "未找到预设文件"]:
-            system_prompt_content = "未选择有效的预设文件。"
+        if system_preset in ["Preset folder not found", "No preset files found"]:
+            system_prompt_content = "No valid preset file selected."
         else:
-            folder, filename = parse_preset_path(引导预设)
-            if folder and filename:
-                file_path = os.path.join(PRESETS_DIR, folder, filename + '.txt')
+            folder_path, filename = parse_preset_path(system_preset)
+            if folder_path and filename:
+                file_path = os.path.join(PRESETS_DIR, folder_path, filename + '.txt')
                 try:
                     with open(file_path, 'r', encoding='utf-8') as f:
                         system_prompt_content = f.read()
                 except Exception as e:
-                    print(f"加载预设文件 {引导预设}.txt 时出错: {e}")
-                    system_prompt_content = f"加载预设时出错: {e}"
+                    print(f"Error loading preset file {system_preset}.txt: {e}")
+                    system_prompt_content = f"Error loading preset: {e}"
             else:
-                system_prompt_content = "预设路径格式错误。"
+                system_prompt_content = "Invalid preset path format."
 
-        if 用户词写入引导词中 and 用户提示词:
-            final_system_prompt = f"{system_prompt_content}\n{用户提示词}"
-        else:
-            final_system_prompt = system_prompt_content
-
-        return (用户提示词, final_system_prompt,)
+        return (system_prompt_content,)
+        
+    @classmethod
+    def IS_CHANGED(cls, **kwargs):
+        import time
+        return time.time()

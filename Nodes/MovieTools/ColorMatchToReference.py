@@ -8,41 +8,41 @@ class ColorMatchToReference:
     def INPUT_TYPES(cls):
         return {
             "optional": {
-                "开关": ("BOOLEAN", {"default": True}),
-                "参考图像": ("IMAGE", {}),
-                "输入图像": ("IMAGE", {}),
-                "匹配强度": (
+                "switch": ("BOOLEAN", {"default": True}),
+                "reference_image": ("IMAGE", {}),
+                "input_image": ("IMAGE", {}),
+                "match_strength": (
                     "FLOAT", {"default": 1.00, "min": 0.0, "max": 1.0, "step": 0.01, "display": "slider", "round": 0.01}
                 ),
             }
         }
 
     RETURN_TYPES = ("IMAGE",)
-    RETURN_NAMES = ("图像输出",)
+    RETURN_NAMES = ("image_output",)
     FUNCTION = "match_color"
-    CATEGORY = "zhihui/后期处理"
-    DESCRIPTION = "颜色匹配节点：将输入图像的颜色调整为与参考图像相匹配。通过分析参考图像的色彩分布，自动调整输入图像的色调、饱和度和亮度，支持匹配强度调节，适用于电影级调色和色彩统一处理。"
+    CATEGORY = "zhihui/post_processing"
+    DESCRIPTION = "Color Match to Reference: Adjusts the color of the input image to match the reference image. Analyzes the color distribution of the reference image and automatically adjusts the hue, saturation, and brightness of the input image. Supports match strength adjustment, suitable for cinematic color grading and color consistency processing."
 
-    def match_color(self, 输入图像: torch.Tensor = None, 参考图像: torch.Tensor = None, 匹配强度: float = 1.0, 开关: bool = True) -> Tuple[torch.Tensor]:
-        if not 开关 or 输入图像 is None:
-            return (输入图像,) if 输入图像 is not None else (None,)
+    def match_color(self, input_image: torch.Tensor = None, reference_image: torch.Tensor = None, match_strength: float = 1.0, switch: bool = True) -> Tuple[torch.Tensor]:
+        if not switch or input_image is None:
+            return (input_image,) if input_image is not None else (None,)
         
-        if 参考图像 is None:
-            return (输入图像,)
+        if reference_image is None:
+            return (input_image,)
             
         device = comfy.model_management.get_torch_device()
-        输入图像 = 输入图像.to(device)
-        参考图像 = 参考图像.to(device)
+        input_image = input_image.to(device)
+        reference_image = reference_image.to(device)
 
         try:
             from skimage.color import rgb2lab, lab2rgb
         except ImportError:
-            return (输入图像,)
+            return (input_image,)
 
-        if 输入图像.shape[1:] != 参考图像.shape[1:]:
-            参考图像 = torch.nn.functional.interpolate(
-                参考图像.permute(0, 3, 1, 2),
-                size=(输入图像.shape[1], 输入图像.shape[2]),
+        if input_image.shape[1:] != reference_image.shape[1:]:
+            reference_image = torch.nn.functional.interpolate(
+                reference_image.permute(0, 3, 1, 2),
+                size=(input_image.shape[1], input_image.shape[2]),
                 mode='bilinear',
                 align_corners=False
             ).permute(0, 2, 3, 1)
@@ -81,8 +81,8 @@ class ColorMatchToReference:
                 
             return torch.tensor(rgb, device=device, dtype=torch.float32)
 
-        input_lab = rgb_to_lab(输入图像)
-        ref_lab = rgb_to_lab(参考图像)
+        input_lab = rgb_to_lab(input_image)
+        ref_lab = rgb_to_lab(reference_image)
 
         input_mean = torch.mean(input_lab, dim=(1, 2), keepdim=True)
         input_std = torch.std(input_lab, dim=(1, 2), keepdim=True)
@@ -93,7 +93,7 @@ class ColorMatchToReference:
 
         output = lab_to_rgb(matched_lab)
         
-        output = 输入图像 * (1 - 匹配强度) + output * 匹配强度
+        output = input_image * (1 - match_strength) + output * match_strength
         output = output.clamp(0.0, 1.0)
         output = output.to(comfy.model_management.intermediate_device())
         

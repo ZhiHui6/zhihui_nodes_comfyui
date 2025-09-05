@@ -7,12 +7,12 @@ class ExtraOptions:
     
     def __init__(self):
         self.style_presets = {
-            "描述性的": "Write a detailed description for this image.",
-            "直截了当的":"Write a straightforward caption for this image. Begin with the main subject and medium. Mention pivotal elements—people, objects, scenery—using confident, definite language. Focus on concrete details like color, shape, texture, and spatial relationships. Show how elements interact. Omit mood and speculative wording. If text is present, quote it exactly. Note any watermarks, signatures, or compression artifacts. Never mention what's absent, resolution, or unobservable details. Vary your sentence structure and keep the description concise, without starting with “This image is…” or similar phrasing.",
-            "训练提示词": "Write a stable diffusion prompt for this image.",
-            "MidJourney提示词": "Write a MidJourney prompt for this image.",
-            "Booru标签列表": "Write a list of Booru tags for this image.",
-            "自定义引导": "", 
+            "Descriptive": "Write a detailed description for this image.",
+            "Straightforward": """Write a straightforward caption for this image. Begin with the main subject and medium. Mention pivotal elements—people, objects, scenery—using confident, definite language. Focus on concrete details like color, shape, texture, and spatial relationships. Show how elements interact. Omit mood and speculative wording. If text is present, quote it exactly. Note any watermarks, signatures, or compression artifacts. Never mention what's absent, resolution, or unobservable details. Vary your sentence structure and keep the description concise, without starting with "This image is..." or similar phrasing.""",
+            "Training Prompt": "Write a stable diffusion prompt for this image.",
+            "MidJourney Prompt": "Write a MidJourney prompt for this image.",
+            "Booru Tags": "Write a list of Booru tags for this image.",
+            "Custom Guide": "",
 
         }
         self.preset_texts = {
@@ -48,80 +48,80 @@ class ExtraOptions:
     def INPUT_TYPES(cls):
         return {
             "required": {
-                "引导词": ("STRING", {"multiline": True, "default": "Describe this image in detail."}),
-                "反推类型": (["描述性的", "直截了当的", "训练提示词", "MidJourney提示词", "Booru标签列表", "自定义引导"], {"default": "描述性的"}),
-                "选项总开关": ("BOOLEAN", {"default": True})
+                "guide_text": ("STRING", {"multiline": True, "default": "Describe this image in detail."}),
+                "reverse_type": (["Descriptive", "Straightforward", "Training Prompt", "MidJourney Prompt", "Booru Tags", "Custom Guide"], {"default": "Descriptive"}),
+                "options_master_switch": ("BOOLEAN", {"default": True})
             },
             "optional": {
-                "不要包含不可更改的人物角色信息_如种族_性别等_但仍然包含可更改的属性_如发型": ("BOOLEAN", {"default": False}),
-                "包含灯光信息": ("BOOLEAN", {"default": False}),
-                "包含摄像机角度信息": ("BOOLEAN", {"default": False}),
-                "包含是否有水印的信息": ("BOOLEAN", {"default": False}),
-                "包括是否有JPEG伪影的信息": ("BOOLEAN", {"default": False}),
-                "如果是照片_必须包含可能使用的相机信息以及光圈_快门速度_ISO等详细信息": ("BOOLEAN", {"default": False}),
-                "不要包含任何性内容_保持PG": ("BOOLEAN", {"default": False}),
-                "不要提及图像的分辨率": ("BOOLEAN", {"default": False}),
-                "必须包含有关图像主观审美质量的信息_从低到高": ("BOOLEAN", {"default": False}),
-                "包括有关图像构图风格的信息_如引导线_三分法或对称": ("BOOLEAN", {"default": False}),
-                "不要提及图片中的任何文字": ("BOOLEAN", {"default": False}),
-                "指定景深和背景是对焦还是模糊": ("BOOLEAN", {"default": False}),
-                "如果适用_请提及可能使用的人工或自然光源": ("BOOLEAN", {"default": False}),
-                "不要使用任何模棱两可的语言": ("BOOLEAN", {"default": False}),
-                "包括图片是sfw_暗示性还是nsfw": ("BOOLEAN", {"default": False}),
-                "只描述图片中最重要的元素": ("BOOLEAN", {"default": False}),
-                "不包括艺术家的名字或头衔": ("BOOLEAN", {"default": False}),
-                "识别图像方向": ("BOOLEAN", {"default": False}),
-                "使用粗俗的俚语和脏话": ("BOOLEAN", {"default": False}),
-                "不要使用礼貌的委婉语": ("BOOLEAN", {"default": False}),
-                "包括角色年龄": ("BOOLEAN", {"default": False}),
-                "包括相机拍摄类型": ("BOOLEAN", {"default": False}),
-                "排除情绪感受": ("BOOLEAN", {"default": False}),
-                "包括相机有利高度": ("BOOLEAN", {"default": False}),
-                "提到水印": ("BOOLEAN", {"default": False}),
-                "避免使用元描述性短语": ("BOOLEAN", {"default": False}),
+                "exclude_unchangeable_character_info_but_include_changeable_attributes": ("BOOLEAN", {"default": False}),
+                "include_lighting_info": ("BOOLEAN", {"default": False}),
+                "include_camera_angle_info": ("BOOLEAN", {"default": False}),
+                "include_watermark_info": ("BOOLEAN", {"default": False}),
+                "include_jpeg_artifacts_info": ("BOOLEAN", {"default": False}),
+                "include_camera_details_for_photos": ("BOOLEAN", {"default": False}),
+                "exclude_sexual_content_keep_pg": ("BOOLEAN", {"default": False}),
+                "exclude_image_resolution": ("BOOLEAN", {"default": False}),
+                "include_subjective_aesthetic_quality": ("BOOLEAN", {"default": False}),
+                "include_composition_style_info": ("BOOLEAN", {"default": False}),
+                "exclude_text_in_image": ("BOOLEAN", {"default": False}),
+                "specify_depth_of_field": ("BOOLEAN", {"default": False}),
+                "mention_lighting_sources": ("BOOLEAN", {"default": False}),
+                "avoid_ambiguous_language": ("BOOLEAN", {"default": False}),
+                "include_content_rating": ("BOOLEAN", {"default": False}),
+                "describe_only_important_elements": ("BOOLEAN", {"default": False}),
+                "exclude_artist_name_and_title": ("BOOLEAN", {"default": False}),
+                "identify_image_orientation": ("BOOLEAN", {"default": False}),
+                "use_vulgar_slang": ("BOOLEAN", {"default": False}),
+                "avoid_polite_euphemisms": ("BOOLEAN", {"default": False}),
+                "include_character_ages": ("BOOLEAN", {"default": False}),
+                "include_camera_shot_types": ("BOOLEAN", {"default": False}),
+                "exclude_mood_feelings": ("BOOLEAN", {"default": False}),
+                "include_camera_vantage_height": ("BOOLEAN", {"default": False}),
+                "mention_watermarks": ("BOOLEAN", {"default": False}),
+                "avoid_meta_descriptive_phrases": ("BOOLEAN", {"default": False}),
             }
         }
 
     RETURN_TYPES = ("STRING",)
-    RETURN_NAMES = ("引导输出",)
+    RETURN_NAMES = ("guide_output",)
     FUNCTION = "execute"
-    CATEGORY = "zhihui/文本"
-    DESCRIPTION = "额外选项节点：为图像反推提供详细的引导选项配置。支持多种反推类型（描述性、训练提示词、MidJourney提示词等），并提供丰富的可选参数来控制输出内容的细节，如灯光信息、摄像机角度、构图风格等，适用于精确的图像描述和提示词生成。"
+    CATEGORY = "zhihui/text"
+    DESCRIPTION = "Extra Options Node: Provides detailed guidance option configuration for image reverse engineering. Supports multiple reverse types (descriptive, training prompts, MidJourney prompts, etc.), and provides rich optional parameters to control output content details, such as lighting information, camera angles, composition styles, etc., suitable for precise image description and prompt generation."
 
-    def execute(self, 引导词, 反推类型, 选项总开关, 不要包含不可更改的人物角色信息_如种族_性别等_但仍然包含可更改的属性_如发型=False, 包含灯光信息=False, 包含摄像机角度信息=False, 包含是否有水印的信息=False, 包括是否有JPEG伪影的信息=False, 如果是照片_必须包含可能使用的相机信息以及光圈_快门速度_ISO等详细信息=False, 不要包含任何性内容_保持PG=False, 不要提及图像的分辨率=False, 必须包含有关图像主观审美质量的信息_从低到高=False, 包括有关图像构图风格的信息_如引导线_三分法或对称=False, 不要提及图片中的任何文字=False, 指定景深和背景是对焦还是模糊=False, 如果适用_请提及可能使用的人工或自然光源=False, 不要使用任何模棱两可的语言=False, 包括图片是sfw_暗示性还是nsfw=False, 只描述图片中最重要的元素=False, 不包括艺术家的名字或头衔=False, 识别图像方向=False, 使用粗俗的俚语和脏话=False, 不要使用礼貌的委婉语=False, 包括角色年龄=False, 包括相机拍摄类型=False, 排除情绪感受=False, 包括相机有利高度=False, 提到水印=False, 避免使用元描述性短语=False, 顶部文本=""):
-        if 反推类型 == "自定义引导" and not 引导词.strip():
-            raise ValueError("当选择'自定义引导'时，必须在引导词框中输入内容")
+    def execute(self, guide_text, reverse_type, options_master_switch, exclude_unchangeable_character_info_but_include_changeable_attributes=False, include_lighting_info=False, include_camera_angle_info=False, include_watermark_info=False, include_jpeg_artifacts_info=False, include_camera_details_for_photos=False, exclude_sexual_content_keep_pg=False, exclude_image_resolution=False, include_subjective_aesthetic_quality=False, include_composition_style_info=False, exclude_text_in_image=False, specify_depth_of_field=False, mention_lighting_sources=False, avoid_ambiguous_language=False, include_content_rating=False, describe_only_important_elements=False, exclude_artist_name_and_title=False, identify_image_orientation=False, use_vulgar_slang=False, avoid_polite_euphemisms=False, include_character_ages=False, include_camera_shot_types=False, exclude_mood_feelings=False, include_camera_vantage_height=False, mention_watermarks=False, avoid_meta_descriptive_phrases=False):
+        if reverse_type == "Custom Guide" and not guide_text.strip():
+            raise ValueError("When selecting 'Custom Guide', you must enter content in the guide text box")
         enabled_texts = []
-        if 反推类型 == "自定义引导" and 引导词:
-            enabled_texts.append(引导词)
-        elif 反推类型 and 反推类型 != "自定义引导":
-            enabled_texts.append(self.style_presets[反推类型])
+        if reverse_type == "Custom Guide" and guide_text:
+            enabled_texts.append(guide_text)
+        elif reverse_type and reverse_type != "Custom Guide":
+            enabled_texts.append(self.style_presets[reverse_type])
         
-        if 选项总开关:
-            if 不要包含不可更改的人物角色信息_如种族_性别等_但仍然包含可更改的属性_如发型: enabled_texts.append(self.preset_texts["text1"])
-            if 包含灯光信息: enabled_texts.append(self.preset_texts["text2"])
-            if 包含摄像机角度信息: enabled_texts.append(self.preset_texts["text3"])
-            if 包含是否有水印的信息: enabled_texts.append(self.preset_texts["text4"])
-            if 包括是否有JPEG伪影的信息: enabled_texts.append(self.preset_texts["text5"])
-            if 如果是照片_必须包含可能使用的相机信息以及光圈_快门速度_ISO等详细信息: enabled_texts.append(self.preset_texts["text6"])
-            if 不要包含任何性内容_保持PG: enabled_texts.append(self.preset_texts["text7"])
-            if 不要提及图像的分辨率: enabled_texts.append(self.preset_texts["text8"])
-            if 必须包含有关图像主观审美质量的信息_从低到高: enabled_texts.append(self.preset_texts["text9"])
-            if 包括有关图像构图风格的信息_如引导线_三分法或对称: enabled_texts.append(self.preset_texts["text10"])
-            if 不要提及图片中的任何文字: enabled_texts.append(self.preset_texts["text11"])
-            if 指定景深和背景是对焦还是模糊: enabled_texts.append(self.preset_texts["text12"])
-            if 如果适用_请提及可能使用的人工或自然光源: enabled_texts.append(self.preset_texts["text13"])
-            if 不要使用任何模棱两可的语言: enabled_texts.append(self.preset_texts["text14"])
-            if 包括图片是sfw_暗示性还是nsfw: enabled_texts.append(self.preset_texts["text15"])
-            if 只描述图片中最重要的元素: enabled_texts.append(self.preset_texts["text16"])
-            if 不包括艺术家的名字或头衔: enabled_texts.append(self.preset_texts["text17"])
-            if 识别图像方向: enabled_texts.append(self.preset_texts["text18"])
-            if 使用粗俗的俚语和脏话: enabled_texts.append(self.preset_texts["text19"])
-            if 不要使用礼貌的委婉语: enabled_texts.append(self.preset_texts["text20"])
-            if 包括角色年龄: enabled_texts.append(self.preset_texts["text21"])
-            if 包括相机拍摄类型: enabled_texts.append(self.preset_texts["text22"])
-            if 排除情绪感受: enabled_texts.append(self.preset_texts["text23"])
-            if 包括相机有利高度: enabled_texts.append(self.preset_texts["text24"])
-            if 提到水印: enabled_texts.append(self.preset_texts["text25"])
-            if 避免使用元描述性短语: enabled_texts.append(self.preset_texts["text26"])
+        if options_master_switch:
+            if exclude_unchangeable_character_info_but_include_changeable_attributes: enabled_texts.append(self.preset_texts["text1"])
+            if include_lighting_info: enabled_texts.append(self.preset_texts["text2"])
+            if include_camera_angle_info: enabled_texts.append(self.preset_texts["text3"])
+            if include_watermark_info: enabled_texts.append(self.preset_texts["text4"])
+            if include_jpeg_artifacts_info: enabled_texts.append(self.preset_texts["text5"])
+            if include_camera_details_for_photos: enabled_texts.append(self.preset_texts["text6"])
+            if exclude_sexual_content_keep_pg: enabled_texts.append(self.preset_texts["text7"])
+            if exclude_image_resolution: enabled_texts.append(self.preset_texts["text8"])
+            if include_subjective_aesthetic_quality: enabled_texts.append(self.preset_texts["text9"])
+            if include_composition_style_info: enabled_texts.append(self.preset_texts["text10"])
+            if exclude_text_in_image: enabled_texts.append(self.preset_texts["text11"])
+            if specify_depth_of_field: enabled_texts.append(self.preset_texts["text12"])
+            if mention_lighting_sources: enabled_texts.append(self.preset_texts["text13"])
+            if avoid_ambiguous_language: enabled_texts.append(self.preset_texts["text14"])
+            if include_content_rating: enabled_texts.append(self.preset_texts["text15"])
+            if describe_only_important_elements: enabled_texts.append(self.preset_texts["text16"])
+            if exclude_artist_name_and_title: enabled_texts.append(self.preset_texts["text17"])
+            if identify_image_orientation: enabled_texts.append(self.preset_texts["text18"])
+            if use_vulgar_slang: enabled_texts.append(self.preset_texts["text19"])
+            if avoid_polite_euphemisms: enabled_texts.append(self.preset_texts["text20"])
+            if include_character_ages: enabled_texts.append(self.preset_texts["text21"])
+            if include_camera_shot_types: enabled_texts.append(self.preset_texts["text22"])
+            if exclude_mood_feelings: enabled_texts.append(self.preset_texts["text23"])
+            if include_camera_vantage_height: enabled_texts.append(self.preset_texts["text24"])
+            if mention_watermarks: enabled_texts.append(self.preset_texts["text25"])
+            if avoid_meta_descriptive_phrases: enabled_texts.append(self.preset_texts["text26"])
         return ("\n".join(filter(None, enabled_texts)),)

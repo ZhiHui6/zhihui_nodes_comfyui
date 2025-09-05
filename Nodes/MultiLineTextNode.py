@@ -1,25 +1,25 @@
 from typing import Optional
 
 class MultiLineTextNode:
-    CATEGORY = "zhihui/文本"
+    CATEGORY = "zhihui/Text"
     OUTPUT_NODE = True
-    DESCRIPTION = "多行文本节点：用于输入和处理多行文本内容。支持启用/禁用功能，可添加注释说明，适用于长文本内容的输入和传递。"
+    DESCRIPTION = "Multi-line Text Node: Used for inputting and processing multi-line text content. Supports enable/disable functionality, allows adding comments, suitable for long text content input and transmission."
         
     @classmethod
     def INPUT_TYPES(cls):
         return {
             "required": {
-                "启用节点": ("BOOLEAN", {"default": True}),
-                "注释": ("STRING", {"default": "", "multiline": False}),
-                "文本": ("STRING", {"default": "", "multiline": True}),
+                "enable_node": ("BOOLEAN", {"default": True}),
+                "comment": ("STRING", {"default": "", "multiline": False}),
+                "text_content": ("STRING", {"default": "", "multiline": True}),
             }
         }
      
     RETURN_TYPES = ("STRING",)
-    RETURN_NAMES = ("文本输出",)
+    RETURN_NAMES = ("text_output",)
     FUNCTION = "execute"
     
-    def execute(self, 启用节点: bool, 注释: str, 文本: str) -> tuple:
-        if not 启用节点:
+    def execute(self, enable_node: bool, comment: str, text_content: str) -> tuple:
+        if not enable_node:
             return ("",)
-        return (文本,)
+        return (text_content,)

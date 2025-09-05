@@ -18,6 +18,10 @@ This is a ComfyUI custom node collection carefully created by <span style="color
 
 - 🖼️ **实用图像工具**：支持多算法图像缩放、智能切换、颜色移除等等。<br>**Practical Image Tools**: Supports multi-algorithm image scaling, intelligent switching, color removal, and more.
 
+- 🌐 **完整汉化支持**：提供专门的中文汉化文件，配合 ComfyUI-DD-Translation 扩展使用，让中文用户能够更便捷地使用各个节点功能。详细说明请参考 [Localization_Guide.md](doc/Localization_Guide.md)。<br>**Complete Chinese Localization**: Provides dedicated Chinese localization files that work with ComfyUI-DD-Translation extension, allowing Chinese users to use node functions more conveniently. For detailed instructions, please refer to [Localization_Guide.md](doc/Localization_Guide.md).
+
+如果这个项目对您有帮助，请给我们一个 ⭐**Star**！您的支持是我们持续改进的动力。
+
 如果这个项目对您有帮助，请给我们一个 ⭐**Star**！您的支持是我们持续改进的动力。<br>
 If this project helps you, please give us a ⭐**Star**! Your support is our motivation for continuous improvement.
 
@@ -188,7 +192,7 @@ This node collection contains numerous nodes with different functions, divided i
 <b>特点 | Features</b>：
 - <b>丰富预设库 | Rich Preset Library</b>：包含20余项专业预设<br>Contains 20+ professional presets
 
-- <b>双预设库 | Dual Preset Libraries</b>：支持默认预设和用户自定义预设，用户可自由新增更多创意预设，通过分类标识区分预设来源。<a href="doc/Kontext预设_用户文件说明.md" style="font-weight:bold;color:yellow;">用户预设使用说明</a><br>Supports both default presets and user-defined presets, users can freely add more creative presets, distinguished by category identifiers. <a href="doc/Kontext预设_用户文件说明.md" style="font-weight:bold;color:yellow;">User Preset Usage Guide</a>
+- <b>双预设库 | Dual Preset Libraries</b>：支持默认预设和用户自定义预设，用户可自由新增更多创意预设，通过分类标识区分预设来源。<a href="doc/Kontext_Presets_User_File_Instructions.md" style="font-weight:bold;color:yellow;">用户预设使用说明</a><br>Supports both default presets and user-defined presets, users can freely add more creative presets, distinguished by category identifiers. <a href="doc/Kontext_Presets_User_File_Instructions.md" style="font-weight:bold;color:yellow;">User Preset Usage Guide</a>
 - <b>智能扩写 | Intelligent Expansion</b>：支持多种LLM模型（OpenAI、Mistral、Qwen等）对预设内容进行创意扩写<br>Supports multiple LLM models (OpenAI, Mistral, Qwen, etc.) for creative expansion of preset content
 - <b>灵活输出 | Flexible Output</b>：支持输出原始预设内容、完整信息或AI扩写后的内容<br>Supports output of original preset content, complete information, or AI-expanded content
 

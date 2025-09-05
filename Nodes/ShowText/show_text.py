@@ -3,7 +3,7 @@ class ShowText:
     def INPUT_TYPES(s):
         return {
             "required": {
-                "文本": ("STRING", {"forceInput": True}),
+                "text": ("STRING", {"forceInput": True}),
             },
             "hidden": {
                 "unique_id": "UNIQUE_ID",
@@ -15,20 +15,20 @@ class ShowText:
     OUTPUT_NODE = True
     OUTPUT_IS_LIST = (True,)
     
-    RETURN_TYPES = ("字符串",)
+    RETURN_TYPES = ("STRING",)
     FUNCTION = "notify"
-    CATEGORY = "zhihui/文本"
-    DESCRIPTION = "文本显示器：用于在ComfyUI界面中显示文本内容。可以接收任何文本输入并在节点界面上直观显示，便于调试和查看文本处理结果。"
+    CATEGORY = "zhihui/text"
+    DESCRIPTION = "Text Display: Used to display text content in the ComfyUI interface. Can receive any text input and display it visually on the node interface, convenient for debugging and viewing text processing results."
 
-    def notify(self, 文本, unique_id=None, extra_pnginfo=None):
+    def notify(self, text, unique_id=None, extra_pnginfo=None):
         if unique_id is not None and extra_pnginfo is not None:
             if not isinstance(extra_pnginfo, list):
-                print("错误: extra_pnginfo 不是列表")
+                print("Error: extra_pnginfo is not a list")
             elif (
                 not isinstance(extra_pnginfo[0], dict)
                 or "workflow" not in extra_pnginfo[0]
             ):
-                print("错误: extra_pnginfo[0] 不是字典或者缺少 'workflow' 键")
+                print("Error: extra_pnginfo[0] is not a dictionary or missing 'workflow' key")
             else:
                 workflow = extra_pnginfo[0]["workflow"]
                 node = next(
@@ -36,6 +36,6 @@ class ShowText:
                     None,
                 )
                 if node:
-                    node["widgets_values"] = [文本]
+                    node["widgets_values"] = [text]
 
-        return {"ui": {"文本": 文本}, "result": (文本,)}
+        return {"ui": {"text": text}, "result": (text,)}

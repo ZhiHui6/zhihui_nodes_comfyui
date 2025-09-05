@@ -5,3 +5,4 @@ kornia
 requests
 Pillow
 aiohttp
+watchdog

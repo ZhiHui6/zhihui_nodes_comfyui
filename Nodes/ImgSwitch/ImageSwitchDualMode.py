@@ -9,34 +9,34 @@ class ImageSwitchDualMode:
     def INPUT_TYPES(cls):
         return {
             "required": {
-                "模式": (["手动", "自动"], {"default": "手动"}),
-                "选择图像": (["1", "2", "3", "4"], {"default": "1"}),
+                "mode": (["manual", "auto"], {"default": "manual"}),
+                "select_image": (["1", "2", "3", "4"], {"default": "1"}),
             },
             "optional": {
-                "图像1": ("IMAGE", {}),
-                "图像2": ("IMAGE", {}),
-                "图像3": ("IMAGE", {}),
-                "图像4": ("IMAGE", {}),
-                "图像1_注释": ("STRING", {"multiline": False, "default": "", "placeholder": "图像1说明"}),
-                "图像2_注释": ("STRING", {"multiline": False, "default": "", "placeholder": "图像2说明"}),
-                "图像3_注释": ("STRING", {"multiline": False, "default": "", "placeholder": "图像3说明"}),
-                "图像4_注释": ("STRING", {"multiline": False, "default": "", "placeholder": "图像4说明"}),
+                "image1": ("IMAGE", {}),
+                "image2": ("IMAGE", {}),
+                "image3": ("IMAGE", {}),
+                "image4": ("IMAGE", {}),
+                "image1_note": ("STRING", {"multiline": False, "default": "", "placeholder": "Image 1 description"}),
+                "image2_note": ("STRING", {"multiline": False, "default": "", "placeholder": "Image 2 description"}),
+                "image3_note": ("STRING", {"multiline": False, "default": "", "placeholder": "Image 3 description"}),
+                "image4_note": ("STRING", {"multiline": False, "default": "", "placeholder": "Image 4 description"}),
             }
         }
 
     RETURN_TYPES = ("IMAGE",)
-    RETURN_NAMES = ("输出图像",)
+    RETURN_NAMES = ("output_image",)
     FUNCTION = "execute"
-    CATEGORY = "zhihui/图像"
-    DESCRIPTION = "图像切换器：根据布尔开关在两个图像输入之间进行选择。当开关为True时输出图像A，为False时输出图像B，适用于条件性图像选择和工作流程的分支控制。"
+    CATEGORY = "zhihui/image"
+    DESCRIPTION = "Image Switch: Select between multiple image inputs based on mode. In manual mode, select specific image by index. In auto mode, automatically output the only connected image. Suitable for conditional image selection and workflow branching control."
 
-    def execute(self, 模式, 选择图像, 图像1=None, 图像2=None, 图像3=None, 图像4=None,
-                图像1_注释="", 图像2_注释="", 图像3_注释="", 图像4_注释=""):
+    def execute(self, mode, select_image, image1=None, image2=None, image3=None, image4=None,
+                image1_note="", image2_note="", image3_note="", image4_note=""):
         
-        images = [图像1, 图像2, 图像3, 图像4]
+        images = [image1, image2, image3, image4]
         
-        if 模式 == "手动":
-            idx = int(选择图像) - 1
+        if mode == "manual":
+            idx = int(select_image) - 1
             if idx < 0 or idx > 3:
                 idx = 0
             
@@ -56,17 +56,17 @@ class ImageSwitchDualMode:
                 return (None,)
             elif connected_count >= 2:
                 if connected_count == 2:
-                    ports = f"图像{connected_indices[0]}和图像{connected_indices[1]}"
+                    ports = f"image{connected_indices[0]} and image{connected_indices[1]}"
                 elif connected_count == 3:
-                    ports = f"图像{connected_indices[0]}、图像{connected_indices[1]}、图像{connected_indices[2]}"
+                    ports = f"image{connected_indices[0]}, image{connected_indices[1]}, image{connected_indices[2]}"
                 else:
-                    ports = f"图像{connected_indices[0]}、图像{connected_indices[1]}、图像{connected_indices[2]}、图像{connected_indices[3]}"
+                    ports = f"image{connected_indices[0]}, image{connected_indices[1]}, image{connected_indices[2]}, image{connected_indices[3]}"
                 
                 raise ValueError(
-                    f"自动模式错误：检测到{ports}同时有输入。\n"
-                    f"解决方案：\n"
-                    f"1. 禁用其他上游节点的输出，仅保留一个图像输入\n"
-                    f"2. 切换到手动模式，选择要输出的图像\n"
+                    f"Auto mode error: Detected {ports} with simultaneous inputs.\n"
+                    f"Solutions:\n"
+                    f"1. Disable other upstream node outputs, keep only one image input\n"
+                    f"2. Switch to manual mode and select the image to output\n"
                 )
             
             for i, img in enumerate(images):

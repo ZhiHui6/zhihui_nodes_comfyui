@@ -89,23 +89,23 @@ app.registerExtension({
                     </style>
                     <div class="local-gallery-container-wrapper">
                          <div class="local-gallery-controls">
-                            <label>Path:</label>
-                            <input type="text" placeholder="Enter full path to media folder"> 
-                            <button class="up-button" title="Return to the previous directory" disabled>⬆️Up</button>
-                            <button class="folder-selector-button" title="Browse folders">📁Browse</button>
+                            <label>路径 / Path:</label>
+                            <input type="text" placeholder="输入媒体文件夹的完整路径 / Enter full path to media folder"> 
+                            <button class="up-button" title="Return to the previous directory" disabled>⬆️上级 / Up</button>
+                            <button class="folder-selector-button" title="Browse folders">📁浏览 / Browse</button>
                         </div>
                         <div class="path-navigation"></div>
                         <div class="local-gallery-controls" style="gap: 15px;">
-                            <div style="display: flex; align-items: center; gap: 2px;"><label>Display Mode:</label> <select class="display-mode"> <option value="manual">Manual</option> <option value="auto">Auto Scan</option> </select></div>
-                            <div style="display: flex; align-items: center; gap: 2px;"><label>Sort by:</label> <select class="sort-by"> <option value="name">Name</option> <option value="date">Date</option> </select></div>
-                            <div style="display: flex; align-items: center; gap: 2px;"><label>Order:</label> <select class="sort-order"> <option value="asc">Ascending</option> <option value="desc">Descending</option> </select></div>
+                            <div style="display: flex; align-items: center; gap: 2px;"><label>显示模式 / Display Mode:</label> <select class="display-mode"> <option value="manual">手动 / Manual</option> <option value="auto">自动扫描 / Auto Scan</option> </select></div>
+                            <div style="display: flex; align-items: center; gap: 2px;"><label>排序方式 / Sort by:</label> <select class="sort-by"> <option value="name">名称 / Name</option> <option value="date">日期 / Date</option> </select></div>
+                            <div style="display: flex; align-items: center; gap: 2px;"><label>排序 / Order:</label> <select class="sort-order"> <option value="asc">升序 / Ascending</option> <option value="desc">降序 / Descending</option> </select></div>
                             <div style="margin-left: auto; display: flex; align-items: center; gap: 5px;">
-                <label>Show:</label>
-                <input type="checkbox" class="show-images" checked><label>🖼️Images</label>
-                <input type="checkbox" class="show-text"><label>📄Text</label>
+                <label>显示 / Show:</label>
+                <input type="checkbox" class="show-images" checked><label>🖼️图像 / Images</label>
+                <input type="checkbox" class="show-text"><label>📄文本 / Text</label>
                             </div>
                         </div>
-                        <div class="image-cardholder"><p>Enter folder path to view media files.</p></div>
+                        <div class="image-cardholder"><p>输入文件夹路径以查看媒体文件 / Enter folder path to view media files.</p></div>
                     </div>
                 `;
                 this.addDOMWidget("local_file_gallery", "div", galleryContainer, {});
@@ -183,7 +183,7 @@ app.registerExtension({
                     if (!append) {
                         cardholder.style.opacity = 0;
                         await new Promise(resolve => setTimeout(resolve, 200));
-                        cardholder.innerHTML = "<p>Loading...</p>";
+                        cardholder.innerHTML = "<p>加载中... / Loading...</p>";
                         currentPage = 1;
                     }
                     const directory = pathInput.value;
@@ -205,7 +205,7 @@ app.registerExtension({
                                     cardholder.appendChild(card);
                                 });
                             } else {
-                                cardholder.innerHTML = "<p>No accessible drives found.</p>";
+                                cardholder.innerHTML = "<p>未找到可访问的驱动器 / No accessible drives found.</p>";
                             }
                             updatePathNavigation('');
                             upButton.disabled = true;
@@ -215,7 +215,7 @@ app.registerExtension({
                             return;
                         } catch (error) {
                             console.error('Error loading root directories:', error);
-                            cardholder.innerHTML = "<p>Enter folder path to view media files.</p>"; 
+                            cardholder.innerHTML = "<p>输入文件夹路径以查看媒体文件 / Enter folder path to view media files.</p>"; 
                             cardholder.style.opacity = 1;
                             isLoading = false; 
                             return;
@@ -257,7 +257,7 @@ app.registerExtension({
                             }
                             cardholder.appendChild(card);
                         });
-                        if (items.length === 0 && !append) cardholder.innerHTML = "<p>The folder is empty.</p>";
+                        if (items.length === 0 && !append) cardholder.innerHTML = "<p>文件夹为空 / The folder is empty.</p>";
                         requestAnimationFrame(debouncedLayout); 
                         currentPage = page;
                     } catch (error) { 
@@ -301,29 +301,29 @@ app.registerExtension({
                     const infoOverlay = document.createElement('div');
                     infoOverlay.className = 'info-overlay';
                     let infoContent = `<div class="info-title">${fileName}</div>`;
-                    infoContent += `<div class="info-details">Type: ${type}</div>`;
+                    infoContent += `<div class="info-details">类型 / Type: ${type}</div>`;
                     if (type === 'image') {
                         try {
                             const response = await fetch(`/local_file_gallery/image_info?path=${encodeURIComponent(path)}`);
                             if (response.ok) {
                                 const imageInfo = await response.json();
-                                infoContent += `<div class="info-details">Size: ${imageInfo.width} × ${imageInfo.height}</div>`;
-                                infoContent += `<div class="info-details">Color: ${imageInfo.color_type}</div>`;
+                                infoContent += `<div class="info-details">尺寸 / Size: ${imageInfo.width} × ${imageInfo.height}</div>`;
+                                infoContent += `<div class="info-details">颜色 / Color: ${imageInfo.color_type}</div>`;
                             } else {
                                 const existingImg = card.querySelector('img');
                                 if (existingImg && existingImg.naturalWidth > 0) {
-                                    infoContent += `<div class="info-details">Size: ${existingImg.naturalWidth} × ${existingImg.naturalHeight}</div>`;
+                                    infoContent += `<div class="info-details">尺寸 / Size: ${existingImg.naturalWidth} × ${existingImg.naturalHeight}</div>`;
                                 }
                             }
                         } catch (error) {
                             console.error('Failed to get image info:', error);
                             const existingImg = card.querySelector('img');
                             if (existingImg && existingImg.naturalWidth > 0) {
-                                infoContent += `<div class="info-details">Size: ${existingImg.naturalWidth} × ${existingImg.naturalHeight}</div>`;
+                                infoContent += `<div class="info-details">尺寸 / Size: ${existingImg.naturalWidth} × ${existingImg.naturalHeight}</div>`;
                             }
                         }
                     } else if (type === 'text') {
-                        infoContent += `<div class="info-details">Text File</div>`;
+                        infoContent += `<div class="info-details">文本文件 / Text File</div>`;
                     }
                     infoOverlay.innerHTML = infoContent;
                     card.appendChild(infoOverlay);
@@ -364,7 +364,7 @@ app.registerExtension({
                                 lightboxText.textContent = text;
                             })
                             .catch(error => {
-                                lightboxText.textContent = 'Error loading text file: ' + error.message;
+                                lightboxText.textContent = '加载文本文件错误 / Error loading text file: ' + error.message;
                             });
                     }
                     prevButton.disabled = currentMediaIndex === 0;

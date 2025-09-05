@@ -8,31 +8,31 @@ class LaplacianSharpen:
     def INPUT_TYPES(cls):
         return {
             "optional": {
-                "开关": ("BOOLEAN", {"default": True}),
-                "图像输入": ("IMAGE", {}),
-                "锐化强度": (
+                "switch": ("BOOLEAN", {"default": True}),
+                "image_input": ("IMAGE", {}),
+                "sharpen_strength": (
                     "FLOAT", {"default": 0.50, "min": 0.0, "max": 2.0, "step": 0.01, "display": "slider", "round": 0.01}
                 ),
             }
         }
 
     RETURN_TYPES = ("IMAGE",)
-    RETURN_NAMES = ("图像输出",)
+    RETURN_NAMES = ("image_output",)
     FUNCTION = "apply_laplacian"
-    CATEGORY = "zhihui/后期处理"
-    DESCRIPTION = "拉普拉斯锐化：使用拉普拉斯算子对图像进行锐化处理，增强图像的边缘和细节。支持锐化强度调节，适用于提升图像清晰度和细节表现，常用于电影后期制作和图像增强。"
+    CATEGORY = "zhihui/post_processing"
+    DESCRIPTION = "Laplacian Sharpen: Uses Laplacian operator to sharpen images, enhancing edges and details. Supports sharpen strength adjustment, suitable for improving image clarity and detail performance. Commonly used in film post-production and image enhancement."
 
-    def apply_laplacian(self, 图像输入: torch.Tensor = None, 锐化强度: float = 0.5, 开关: bool = True) -> Tuple[torch.Tensor]:
-        if not 开关:
-            return (图像输入,)
+    def apply_laplacian(self, image_input: torch.Tensor = None, sharpen_strength: float = 0.5, switch: bool = True) -> Tuple[torch.Tensor]:
+        if not switch:
+            return (image_input,)
             
-        if 图像输入 is None:
+        if image_input is None:
             return (None,)
             
         device = comfy.model_management.get_torch_device()
-        图像输入 = 图像输入.to(device)
+        image_input = image_input.to(device)
 
-        x = 图像输入.permute(0, 3, 1, 2)
+        x = image_input.permute(0, 3, 1, 2)
 
         kernel = torch.tensor(
             [[0, -1, 0],
@@ -42,7 +42,7 @@ class LaplacianSharpen:
 
         edges = torch.nn.functional.conv2d(x, kernel, padding=1, groups=3)
 
-        sharpened = x + 锐化强度 * edges
+        sharpened = x + sharpen_strength * edges
         sharpened = sharpened.clamp(0.0, 1.0)
         sharpened = sharpened.permute(0, 2, 3, 1)
         sharpened = sharpened.to(comfy.model_management.intermediate_device())

@@ -49,7 +49,7 @@ class ImageAspectRatio:
                      list(s.PRESETS_SD.keys()))
         return {
             "required": {
-                "preset_mode": (["Qwen image", "Flux", "Wan", "SDXL", "Custom"], {"default": "Qwen image"}),
+                "preset_mode": (["Qwen image", "Flux", "Wan", "SDXL", "Custom Size"], {"default": "Qwen image"}),
                 "aspect_ratio": (ratio_list, {"default": "1:1(1328x1328)"}),
             },
             "optional": {
@@ -63,7 +63,7 @@ class ImageAspectRatio:
     RETURN_NAMES = ("width", "height")
     FUNCTION = "get_dimensions"
     CATEGORY = "zhihui/Toolkit"
-    DESCRIPTION = "智能图像尺寸比例设置节点，支持Qwen、Flux、Wan、SDXL等多种模型的预设尺寸，可快速选择常用比例或自定义尺寸"
+    DESCRIPTION = "Smart image aspect ratio setting node, supporting preset dimensions for multiple models like Qwen, Flux, Wan, SDXL, with quick selection of common ratios or custom sizes"
 
     def get_dimensions(self, preset_mode, aspect_ratio, custom_width=1328, custom_height=1328, aspect_lock=False):
         if custom_width is None:
@@ -71,7 +71,7 @@ class ImageAspectRatio:
         if custom_height is None:
             custom_height = 1328
             
-        if preset_mode == "Custom":
+        if preset_mode == "Custom Size":
             width = custom_width
             height = custom_height
         else:

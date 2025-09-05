@@ -4,7 +4,6 @@ from .Nodes.PromptPreset.PromptPresetOneChoice import PromptPresetOneChoice
 from .Nodes.PromptPreset.PromptPresetMultipleChoice import PromptPresetMultipleChoice
 from .Nodes.KontextPresets.KontextPresetsBasic import LoadKontextPresetsBasic
 from .Nodes.KontextPresets.KontextPresetsPlus.KontextPresetsPlus import KontextPresetsPlus
-from .Nodes.SystemPrompt.SystemPromptLoaderBase import SystemPromptLoaderBase
 from .Nodes.SystemPrompt.SystemPromptLoader import SystemPromptLoader
 from .Nodes.TextExpander import TextExpander
 from .Nodes.ExtraOptions import ExtraOptions
@@ -15,8 +14,8 @@ from .Nodes.TextExtractor import TextExtractor
 from .Nodes.TriggerWordMerger import TriggerWordMerger
 from .Nodes.TextSwitchDualMode import TextSwitchDualMode
 from .Nodes.ShowText.show_text import ShowText
-from .Nodes.Translate.BaiduTranslate import BaiduTranslate
-from .Nodes.Translate.FreeTranslate import FreeTranslate
+from .Nodes.TranslateNodes.BaiduTranslate import BaiduTranslate
+from .Nodes.TranslateNodes.FreeTranslate import FreeTranslate
 from .Nodes.PhotographPromptGen.PhotographPromptGenerator import PhotographPromptGenerator
 from .Nodes.WanPromptGenerator import WanPromptGenerator
 from .Nodes.ImageScaler import ImageScaler
@@ -37,7 +36,6 @@ NODE_CLASS_MAPPINGS = {
     "PromptPresetMultipleChoice": PromptPresetMultipleChoice,
     "LoadKontextPresetsBasic": LoadKontextPresetsBasic,
     "KontextPresetsPlus": KontextPresetsPlus,
-    "SystemPromptLoaderBase": SystemPromptLoaderBase,
     "SystemPromptLoader": SystemPromptLoader,
     "TextExpander": TextExpander,
     "ExtraOptions": ExtraOptions,
@@ -67,37 +65,36 @@ NODE_CLASS_MAPPINGS = {
 }
 
 NODE_DISPLAY_NAME_MAPPINGS = {
-    "PromptPresetOneChoice": "单选提示预设(可注释)",
-    "PromptPresetMultipleChoice": "多选提示预设(可注释)",
-    "LoadKontextPresetsBasic": "Kontext预设集(基础版)",
-    "KontextPresetsPlus": "Kontext预设集(增强版)",
-    "SystemPromptLoaderBase": "系统引导词加载器(基础版)",
-    "SystemPromptLoader": "系统引导词加载器",
-    "TextExpander": "提示词扩展(通用)",
-    "ExtraOptions": "额外引导选项（通用）",
-    "MultiLineTextNode": "多行文本(可注释)",
-    "TextCombinerNode": "提示词合并器(可注释)",
-    "TextModifier": "文本修改器",
-    "TextExtractor": "中英文本提取器",
-    "TriggerWordMerger": "触发词合并器",
-    "TextSwitchDualMode": "文本切换器(双模式)",
-    "ShowText": "文本显示器",
-    "BaiduTranslate": "百度翻译",
-    "FreeTranslate": "免费翻译[测试]",
-    "PhotographPromptGenerator": "摄影提示词生成器",
-    "WanPromptGenerator": "万相视频提示词生成器",
-    "ImageScaler": "图像缩放器",
-    "ImageSwitchDualMode": "图像切换器(双模式)",
-    "PriorityImageSwitch": "优先级图像切换",
-    "ColorRemoval": "颜色移除",
-    "LaplacianSharpen": "拉普拉斯锐化",
-    "SobelSharpen": "索贝尔锐化",
-    "USMSharpen": "USM锐化",
-    "ColorMatchToReference": "颜色匹配",
-    "FilmGrain": "胶片颗粒",
-    "LatentSwitchDualMode": "Latent切换器(双模式)",
-    "LocalFileGallery": "本地文件画廊",
-    "ImageAspectRatio": "图像宽高比设置",
+    "PromptPresetOneChoice": "Prompt Preset One Choice",
+    "PromptPresetMultipleChoice": "Prompt Preset Multiple Choice",
+    "LoadKontextPresetsBasic": "Load Kontext Presets Basic",
+    "KontextPresetsPlus": "Kontext Presets Plus",
+    "SystemPromptLoader": "System Prompt Loader",
+    "TextExpander": "Text Expander",
+    "ExtraOptions": "Extra Options",
+    "MultiLineTextNode": "Multi Line Text Node",
+    "TextCombinerNode": "Text Combiner Node",
+    "TextModifier": "Text Modifier",
+    "TextExtractor": "Text Extractor",
+    "TriggerWordMerger": "Trigger Word Merger",
+    "TextSwitchDualMode": "Text Switch Dual Mode",
+    "ShowText": "Show Text",
+    "BaiduTranslate": "Baidu Translate",
+    "FreeTranslate": "Free Translate",
+    "PhotographPromptGenerator": "Photograph Prompt Generator",
+    "WanPromptGenerator": "Wan Prompt Generator",
+    "ImageScaler": "Image Scaler",
+    "ImageSwitchDualMode": "Image Switch Dual Mode",
+    "PriorityImageSwitch": "Priority Image Switch",
+    "ColorRemoval": "Color Removal",
+    "LaplacianSharpen": "Laplacian Sharpen",
+    "SobelSharpen": "Sobel Sharpen",
+    "USMSharpen": "USM Sharpen",
+    "ColorMatchToReference": "Color Match To Reference",
+    "FilmGrain": "Film Grain",
+    "LatentSwitchDualMode": "Latent Switch Dual Mode",
+    "LocalFileGallery": "Local File Gallery",
+    "ImageAspectRatio": "Image Aspect Ratio",
 }
 
 WEB_DIRECTORY = os.path.dirname(os.path.abspath(__file__))

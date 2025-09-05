@@ -5,43 +5,43 @@ class TextModifier:
     def INPUT_TYPES(s):
         return {
             "required": {
-                "文本输入": ("STRING", {"forceInput": True, "multiline": True, "default": ""}),
-                "起始文本": ("STRING", {"default": "", "multiline": False}),
-                "末尾文本": ("STRING", {"default": "", "multiline": False}),
+                "text_input": ("STRING", {"forceInput": True, "multiline": True, "default": ""}),
+                "start_text": ("STRING", {"default": "", "multiline": False}),
+                "end_text": ("STRING", {"default": "", "multiline": False}),
             },
         }
 
     RETURN_TYPES = ("STRING", "STRING")  
-    RETURN_NAMES = ("文本输出", "帮助") 
+    RETURN_NAMES = ("text_output", "help") 
     FUNCTION = "substr"
     OUTPUT_NODE = False 
-    CATEGORY = "zhihui/文本"
-    DESCRIPTION = "文本修改器：通过指定起始文本和末尾文本来提取中间部分的文本内容。可以删除指定字符串及其前方或后方的所有文本，实现精确的文本截取功能。"
+    CATEGORY = "zhihui/Text"
+    DESCRIPTION = "Text Modifier: Extracts text content between specified start and end text. Can delete specified strings and all text before or after them, enabling precise text extraction functionality."
     
     def __init__(self):
-        self.起始文本 = ""
-        self.末尾文本 = ""
+        self.start_text = ""
+        self.end_text = ""
 
-    def substr(self, 文本输入, 起始文本="", 末尾文本=""):
-        help_text = "【节点功能】\n通过输入指定删除的字符，根据起始文本和末尾文本来提取剩余的文本。\n·起始文本: 在原文中删除指定的字符串以及其前方所有文本。\n·末尾文本: 在原文中删除指定的字符串以及其后方所有文本。\n \n【示例用法】\n如“起始文本”键入your，“末尾文本”键入who。\n原文：Save your heart for someone who cares.\n输出：heart for someone"
+    def substr(self, text_input, start_text="", end_text=""):
+        help_text = "【Node Function】\nExtracts remaining text by specifying characters to delete based on start text and end text.\n·Start text: Deletes the specified string and all text before it in the original text.\n·End text: Deletes the specified string and all text after it in the original text.\n \n【Example Usage】\nIf 'start_text' is 'your' and 'end_text' is 'who'.\nOriginal: Save your heart for someone who cares.\nOutput: heart for someone"
                
-        if 文本输入 == "" or 文本输入 is None:
+        if text_input == "" or text_input is None:
             return (None, help_text)
         
-        if 起始文本 == "" and 末尾文本 == "":
-            out = 文本输入
+        if start_text == "" and end_text == "":
+            out = text_input
         
-        elif 起始文本 == "":
-            end_index = 文本输入.find(末尾文本)
-            out = 文本输入[:end_index]
+        elif start_text == "":
+            end_index = text_input.find(end_text)
+            out = text_input[:end_index]
         
-        elif 末尾文本 == "":
-            start_index = 文本输入.find(起始文本) + len(起始文本)
-            out = 文本输入[start_index:]
+        elif end_text == "":
+            start_index = text_input.find(start_text) + len(start_text)
+            out = text_input[start_index:]
         
         else:
-            start_index = 文本输入.find(起始文本) + len(起始文本)
-            end_index = 文本输入.find(末尾文本, start_index)
-            out = 文本输入[start_index:end_index]
+            start_index = text_input.find(start_text) + len(start_text)
+            end_index = text_input.find(end_text, start_index)
+            out = text_input[start_index:end_index]
         out = out.strip()
         return (out, help_text)

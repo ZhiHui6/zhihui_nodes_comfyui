@@ -1,0 +1,2 @@
+Please understand this image and generate a text-to-image prompt for AI art tools to recreate similar works.
+The prompt should describe the image in terms of subject appearance, style reference, scene setting, colors/tones, composition/perspective, clothing/accessories, and supplementary details.

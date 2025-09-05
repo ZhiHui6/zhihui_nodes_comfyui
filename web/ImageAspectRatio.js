@@ -79,7 +79,7 @@ app.registerExtension({
                         case "SDXL":
                             presets = SD_PRESETS;
                             break;
-                        case "Custom":
+                        case "Custom Size":
                             presets = [];
                             break;
                         case "Qwen image":
@@ -112,7 +112,7 @@ app.registerExtension({
                     
                     applyAspectOptionsByMode(modeWidget.value, aspectRatioWidget);
 
-                    const isCustom = modeWidget.value === "Custom";
+                    const isCustom = modeWidget.value === "Custom Size";
                     
                     aspectRatioWidget.hidden = isCustom;
                     widthWidget.hidden = !isCustom;
@@ -190,7 +190,7 @@ app.registerExtension({
                         };
                         
                         this.aspectRatioTimer = setInterval(() => {
-                            if (lockWidget.value && modeWidget.value === "Custom") {
+                            if (lockWidget.value && modeWidget.value === "Custom Size") {
                                 const currentWidth = parseInt(widthWidget.value) || 0;
                                 const currentHeight = parseInt(heightWidget.value) || 0;
                                 

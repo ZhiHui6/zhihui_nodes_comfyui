@@ -1,12 +1,12 @@
 import torch
 
 class PriorityImageSwitch:
-    DESCRIPTION = "优先级图像切换节点：当同时接入图像A和图像B端口，优先输出B端口的内容；如果B端口无输入，则输出图像A端口的内容；如果两个端口都无输入，则弹出提示要求至少连接一个输入端口。"
+    DESCRIPTION = "Priority Image Switch: When both image A and image B ports are connected, prioritize output from port B; if port B has no input, output from image A port; if both ports have no input, prompt to connect at least one input port."
     
     RETURN_TYPES = ("IMAGE",)
-    RETURN_NAMES = ("输出图像",)
+    RETURN_NAMES = ("output_image",)
     FUNCTION = "execute"
-    CATEGORY = "zhihui/图像"
+    CATEGORY = "zhihui/image"
 
     def __init__(self):
         pass
@@ -15,17 +15,17 @@ class PriorityImageSwitch:
     def INPUT_TYPES(cls):
         return {
             "optional": {  
-                "图像A": ("IMAGE", {}),
-                "图像B": ("IMAGE", {}),
-                "图像A_注释": ("STRING", {"multiline": False, "default": "", "placeholder": "图像A的用途或说明"}),
-                "图像B_注释": ("STRING", {"multiline": False, "default": "", "placeholder": "图像B的用途或说明"}),
+                "imageA": ("IMAGE", {}),
+                "imageB": ("IMAGE", {}),
+                "imageA_note": ("STRING", {"multiline": False, "default": "", "placeholder": "Purpose or description of image A"}),
+                "imageB_note": ("STRING", {"multiline": False, "default": "", "placeholder": "Purpose or description of image B"}),
             },
         }
 
-    def execute(self, 图像A=None, 图像A_注释="", 图像B=None, 图像B_注释=""):
-        if 图像B is not None:
-            return (图像B,)
-        elif 图像A is not None:
-            return (图像A,)
+    def execute(self, imageA=None, imageA_note="", imageB=None, imageB_note=""):
+        if imageB is not None:
+            return (imageB,)
+        elif imageA is not None:
+            return (imageA,)
         else:
             return (None,)

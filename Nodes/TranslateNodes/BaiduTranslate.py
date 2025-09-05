@@ -10,29 +10,29 @@ class BaiduTranslate:
     def INPUT_TYPES(cls):
         return {
             "required": {
-                "启用翻译": ("BOOLEAN", {"default": True}),
-                "密钥加载": (["明文加载", "后台加载"],),
+                "enable_translate": ("BOOLEAN", {"default": True}),
+                "key_loading": (["Plain text", "Background"],),
                 "app_id": ("STRING", {"default": "", "multiline": False}),
                 "api_key": ("STRING", {"default": "", "multiline": False}),
-                "源语言": (["auto", "zh", "en"], {"default": "auto"}),
-                "目标语言": (["zh", "en"], {"default": "en"}),
-                "text": ("STRING", {"default": "", "multiline": True}),
+                "source_language": (["auto", "zh", "en"], {"default": "auto"}),
+                "target_language": (["zh", "en"], {"default": "en"}),
+                "your_text": ("STRING", {"default": "", "multiline": True}),
             }
         }
 
     RETURN_TYPES = ("STRING",)
-    RETURN_NAMES = ("译文结果",)
+    RETURN_NAMES = ("translation_result",)
     FUNCTION = "translate"
-    CATEGORY = "zhihui/文本"
-    DESCRIPTION = "百度翻译：使用百度翻译API进行文本翻译。支持中英文互译，自动检测源语言，提供明文和后台两种密钥加载方式。适用于多语言提示词处理和国际化内容创作。"
+    CATEGORY = "zhihui/text"
+    DESCRIPTION = "Baidu Translate: Use Baidu Translate API for text translation. Supports Chinese-English mutual translation, automatic source language detection, and provides both plain text and background key loading methods. Suitable for multilingual prompt processing and internationalized content creation."
 
-    def translate(self, 启用翻译, 密钥加载, app_id, api_key, 源语言, 目标语言, text):
-        if not 启用翻译:
-            return (text,)
+    def translate(self, enable_translate, key_loading, app_id, api_key, source_language, target_language, your_text):
+        if not enable_translate:
+            return (your_text,)
 
-        if 密钥加载 == "明文加载":
+        if key_loading == "Plain text":
             if not app_id or not api_key:
-                raise ValueError("明文加载模式下必须填写APP_ID和API_KEY")
+                raise ValueError("APP_ID and API_KEY must be filled in plain text loading mode")
             baidu_app_id = app_id
             baidu_api_key = api_key
         else:
@@ -43,22 +43,22 @@ class BaiduTranslate:
                     baidu_app_id = config.get("app_id", "")
                     baidu_api_key = config.get("api_key", "")
                     if not baidu_app_id or not baidu_api_key:
-                        raise ValueError("后台加载模式下配置文件必须填写APP_ID和API_KEY")
+                        raise ValueError("Configuration file must contain APP_ID and API_KEY in background loading mode")
             except Exception as e:
-                raise ValueError(f"加载配置文件失败: {str(e)}")
+                raise ValueError(f"Failed to load configuration file: {str(e)}")
 
         if not baidu_app_id or not baidu_api_key:
-            return (text,)
+            return (your_text,)
 
         url = "https://fanyi-api.baidu.com/api/trans/vip/translate"
         salt = "12345678"
-        sign = baidu_app_id + text + salt + baidu_api_key
+        sign = baidu_app_id + your_text + salt + baidu_api_key
         sign = hashlib.md5(sign.encode()).hexdigest()
         
         params = {
-            "q": text,
-            "from": 源语言,
-            "to": 目标语言,
+            "q": your_text,
+            "from": source_language,
+            "to": target_language,
             "appid": baidu_app_id,
             "salt": salt,
             "sign": sign
@@ -72,4 +72,4 @@ class BaiduTranslate:
         except:
             pass
             
-        return (text,)
+        return (your_text,)

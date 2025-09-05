@@ -7,12 +7,12 @@ class PromptPresetMultipleChoice:
     
     def __init__(self):
         self.prompt_cache = {
-            "提示词1": "", "提示词1_注释": "",
-            "提示词2": "", "提示词2_注释": "",
-            "提示词3": "", "提示词3_注释": "",
-            "提示词4": "", "提示词4_注释": "",
-            "提示词5": "", "提示词5_注释": "",
-            "提示词6": "", "提示词6_注释": "",
+            "prompt1": "", "prompt1_comment": "",
+            "prompt2": "", "prompt2_comment": "",
+            "prompt3": "", "prompt3_comment": "",
+            "prompt4": "", "prompt4_comment": "",
+            "prompt5": "", "prompt5_comment": "",
+            "prompt6": "", "prompt6_comment": "",
         }
 
     @classmethod
@@ -20,59 +20,59 @@ class PromptPresetMultipleChoice:
         
         return {
             "required": {
-                "总开关": ("BOOLEAN", {"default": False})
+                "master_switch": ("BOOLEAN", {"default": False})
             },
             "optional": {
-                "并联文本": ("STRING", {"multiline": True, "default": "", "forceInput": True}),
-                "提示词1_开关": ("BOOLEAN", {"default": False}),
-                "提示词1_注释": ("STRING", {"multiline": False, "default": "", "placeholder": ""}),
-                "提示词1": ("STRING", {"multiline": True, "default": ""}),
-                "提示词2_开关": ("BOOLEAN", {"default": False}),
-                "提示词2_注释": ("STRING", {"multiline": False, "default": "", "placeholder": ""}),
-                "提示词2": ("STRING", {"multiline": True, "default": ""}),
-                "提示词3_开关": ("BOOLEAN", {"default": False}),
-                "提示词3_注释": ("STRING", {"multiline": False, "default": "", "placeholder": ""}),
-                "提示词3": ("STRING", {"multiline": True, "default": ""}),
-                "提示词4_开关": ("BOOLEAN", {"default": False}),
-                "提示词4_注释": ("STRING", {"multiline": False, "default": "", "placeholder": ""}),
-                "提示词4": ("STRING", {"multiline": True, "default": ""}),
-                "提示词5_开关": ("BOOLEAN", {"default": False}),
-                "提示词5_注释": ("STRING", {"multiline": False, "default": "", "placeholder": ""}),
-                "提示词5": ("STRING", {"multiline": True, "default": ""}),
-                "提示词6_开关": ("BOOLEAN", {"default": False}),
-                "提示词6_注释": ("STRING", {"multiline": False, "default": "", "placeholder": ""}),
-                "提示词6": ("STRING", {"multiline": True, "default": ""}),
+                "parallel_text": ("STRING", {"multiline": True, "default": "", "forceInput": True}),
+                "prompt1_switch": ("BOOLEAN", {"default": False}),
+                "prompt1_comment": ("STRING", {"multiline": False, "default": "", "placeholder": ""}),
+                "prompt1": ("STRING", {"multiline": True, "default": ""}),
+                "prompt2_switch": ("BOOLEAN", {"default": False}),
+                "prompt2_comment": ("STRING", {"multiline": False, "default": "", "placeholder": ""}),
+                "prompt2": ("STRING", {"multiline": True, "default": ""}),
+                "prompt3_switch": ("BOOLEAN", {"default": False}),
+                "prompt3_comment": ("STRING", {"multiline": False, "default": "", "placeholder": ""}),
+                "prompt3": ("STRING", {"multiline": True, "default": ""}),
+                "prompt4_switch": ("BOOLEAN", {"default": False}),
+                "prompt4_comment": ("STRING", {"multiline": False, "default": "", "placeholder": ""}),
+                "prompt4": ("STRING", {"multiline": True, "default": ""}),
+                "prompt5_switch": ("BOOLEAN", {"default": False}),
+                "prompt5_comment": ("STRING", {"multiline": False, "default": "", "placeholder": ""}),
+                "prompt5": ("STRING", {"multiline": True, "default": ""}),
+                "prompt6_switch": ("BOOLEAN", {"default": False}),
+                "prompt6_comment": ("STRING", {"multiline": False, "default": "", "placeholder": ""}),
+                "prompt6": ("STRING", {"multiline": True, "default": ""}),
             }
         }
 
     RETURN_TYPES = ("STRING",)
-    RETURN_NAMES = ("输出文本",)
+    RETURN_NAMES = ("output_text",)
     FUNCTION = "execute"
-    CATEGORY = "zhihui/文本"
-    DESCRIPTION = "多选提示词预设：提供6个预设提示词选项，每个都可以独立启用或禁用。支持总开关控制，可以同时选择多个提示词进行组合输出，还支持外部文本并联输入。"
+    CATEGORY = "zhihui/text"
+    DESCRIPTION = "Multiple Choice Prompt Preset: Provides 6 preset prompt options, each can be independently enabled or disabled. Supports master switch control, allows selecting multiple prompts for combined output, and supports external text parallel input."
 
-    def execute(self, 总开关, 提示词1_开关, 提示词1_注释, 提示词1, 提示词2_开关, 提示词2_注释, 提示词2, 提示词3_开关, 提示词3_注释, 提示词3, 提示词4_开关, 提示词4_注释, 提示词4, 提示词5_开关, 提示词5_注释, 提示词5, 提示词6_开关, 提示词6_注释, 提示词6, 并联文本=""):
+    def execute(self, master_switch, prompt1_switch, prompt1_comment, prompt1, prompt2_switch, prompt2_comment, prompt2, prompt3_switch, prompt3_comment, prompt3, prompt4_switch, prompt4_comment, prompt4, prompt5_switch, prompt5_comment, prompt5, prompt6_switch, prompt6_comment, prompt6, parallel_text=""):
         
-        self.prompt_cache["提示词1"] = 提示词1
-        self.prompt_cache["提示词1_注释"] = 提示词1_注释
-        self.prompt_cache["提示词2"] = 提示词2
-        self.prompt_cache["提示词2_注释"] = 提示词2_注释
-        self.prompt_cache["提示词3"] = 提示词3
-        self.prompt_cache["提示词3_注释"] = 提示词3_注释
-        self.prompt_cache["提示词4"] = 提示词4
-        self.prompt_cache["提示词4_注释"] = 提示词4_注释
-        self.prompt_cache["提示词5"] = 提示词5
-        self.prompt_cache["提示词5_注释"] = 提示词5_注释
-        self.prompt_cache["提示词6"] = 提示词6
-        self.prompt_cache["提示词6_注释"] = 提示词6_注释
+        self.prompt_cache["prompt1"] = prompt1
+        self.prompt_cache["prompt1_comment"] = prompt1_comment
+        self.prompt_cache["prompt2"] = prompt2
+        self.prompt_cache["prompt2_comment"] = prompt2_comment
+        self.prompt_cache["prompt3"] = prompt3
+        self.prompt_cache["prompt3_comment"] = prompt3_comment
+        self.prompt_cache["prompt4"] = prompt4
+        self.prompt_cache["prompt4_comment"] = prompt4_comment
+        self.prompt_cache["prompt5"] = prompt5
+        self.prompt_cache["prompt5_comment"] = prompt5_comment
+        self.prompt_cache["prompt6"] = prompt6
+        self.prompt_cache["prompt6_comment"] = prompt6_comment
         
-        enabled_prompts = [并联文本] if 并联文本 else []
-        if 总开关:
-            if 提示词1_开关 and 提示词1: enabled_prompts.append(提示词1)
-            if 提示词2_开关 and 提示词2: enabled_prompts.append(提示词2)
-            if 提示词3_开关 and 提示词3: enabled_prompts.append(提示词3)
-            if 提示词4_开关 and 提示词4: enabled_prompts.append(提示词4)
-            if 提示词5_开关 and 提示词5: enabled_prompts.append(提示词5)
-            if 提示词6_开关 and 提示词6: enabled_prompts.append(提示词6)
+        enabled_prompts = [parallel_text] if parallel_text else []
+        if master_switch:
+            if prompt1_switch and prompt1: enabled_prompts.append(prompt1)
+            if prompt2_switch and prompt2: enabled_prompts.append(prompt2)
+            if prompt3_switch and prompt3: enabled_prompts.append(prompt3)
+            if prompt4_switch and prompt4: enabled_prompts.append(prompt4)
+            if prompt5_switch and prompt5: enabled_prompts.append(prompt5)
+            if prompt6_switch and prompt6: enabled_prompts.append(prompt6)
             
         return ("\n".join(filter(None, enabled_prompts)),)

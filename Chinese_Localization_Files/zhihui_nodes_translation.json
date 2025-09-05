@@ -1,0 +1,511 @@
+{
+    "ShowText": {
+        "title": "显示文本",
+        "description": "显示文本节点：用于在界面中显示文本内容，支持多行文本显示，可用于调试、预览文本内容或作为工作流程中的文本输出节点。",
+        "inputs": {
+            "text": "文本"
+        },
+        "outputs": {
+            "STRING": "字符串"
+        }
+    },
+    "MultiLineTextNode": {
+        "title": "多行文本节点",
+        "description": "多行文本节点：用于输入和处理多行文本内容。支持启用/禁用功能，允许添加注释，适用于长文本内容输入和传输。",
+        "inputs": {
+            "enable_node": "启用节点",
+            "comment": "注释",
+            "text_content": "文本内容"
+        },
+        "outputs": {
+            "text_output": "文本输出"
+        }
+    },
+    "TextCombinerNode": {
+        "title": "文本组合器",
+        "description": "文本组合器：将两个文本输入通过指定分隔符组合成单个文本输出。每个文本可以独立启用或禁用，支持自定义分隔符，适用于提示词组合和文本拼接。",
+        "widgets": {
+            "prompt1_comment": "提示词1注释",
+            "enable_prompt1": "启用提示词1",
+            "prompt2_comment": "提示词2注释",
+            "enable_prompt2": "启用提示词2",
+            "separator": "分隔符"
+        },
+        "outputs": {
+            "text_output": "文本输出"
+        }
+    },
+    "TextModifier": {
+        "title": "文本修改器",
+        "description": "文本修改器：提取指定起始文本和结束文本之间的文本内容。可以删除指定字符串及其前后的所有文本，实现精确的文本提取功能。",
+        "inputs": {
+            "text_input": "文本输入"
+        },
+        "widgets": {
+            "delete_text": "删除文本",
+            "start_text": "起始文本",
+            "end_text": "结束文本"
+        },
+        "outputs": {
+            "text_output": "文本输出",
+            "help": "帮助信息"
+        }
+    },
+    "TextExtractor": {
+        "title": "文本提取器",
+        "description": "文本提取器：根据选择的提取类型从文本中提取特定内容。支持中文提取（提取所有中文字符、标点和数字）和英文提取（提取所有英文字符、标点和数字），适用于多语言文本处理和内容分离。",
+        "inputs": {
+            "text_input": "文本输入"
+        },
+        "outputs": {
+            "text_output": "文本输出"
+        },
+        "widgets": {
+            "extraction_type": "提取类型"
+        }
+    },
+    "TriggerWordMerger": {
+        "title": "触发词合并器",
+        "description": "触发词合并器：智能合并触发词与文本输入。支持权重控制，通过在触发词周围添加括号和权重值，适用于AI绘画提示词的精确控制和文本内容组合处理。",
+        "inputs": {
+            "text_input": "文本输入"
+        },
+        "widgets": {
+            "trigger_word": "触发词",
+            "add_weight": "添加权重",
+            "weight_value": "权重值"
+        },
+        "outputs": {
+            "text_output": "文本输出"
+        }
+    },
+    "TextSwitchDualMode": {
+        "title": "文本切换器",
+        "description": "文本切换器：根据模式在多个文本输入之间进行选择。手动模式下按索引选择特定文本，自动模式下自动输出唯一连接的文本。适用于条件文本选择和工作流分支控制。",
+        "inputs": {
+            "text1": "文本1",
+            "text2": "文本2",
+            "text3": "文本3",
+            "text4": "文本4"
+        },
+        "widgets": {
+            "mode": "模式",
+            "select_text": "选择文本",
+            "text1_comment": "文本1注释",
+            "text2_comment": "文本2注释",
+            "text3_comment": "文本3注释",
+            "text4_comment": "文本4注释"
+        },
+        "outputs": {
+            "output_text": "输出文本"
+        }
+    },
+    "ImageAspectRatio": {
+        "title": "图像宽高比",
+        "description": "智能图像宽高比设置节点，支持Qwen、Flux、Wan、SDXL等多种模型的预设尺寸，可快速选择常用比例或自定义尺寸",
+        "widgets": {
+            "preset_mode": "预设模式",
+            "aspect_ratio": "宽高比",
+            "custom_width": "自定义宽度",
+            "custom_height": "自定义高度",
+            "aspect_lock": "宽高比锁定"
+        },
+        "outputs": {
+            "width": "宽度",
+            "height": "高度"
+        }
+    },
+    "ImageScaler": {
+        "title": "图像缩放器",
+        "description": "图像缩放器：根据长边或短边智能缩放图像到指定尺寸。支持多种插值方法（最近邻、双线性、双三次等），在调整尺寸的同时保持图像比例。适用于图像预处理、尺寸标准化和批量处理。",
+        "inputs": {
+            "image_input": "图像输入"
+        },
+        "outputs": {
+            "image_output": "图像输出"
+        },
+        "widgets": {
+            "scale_basis": "缩放基准",
+            "target_size": "目标尺寸",
+            "interpolation_method": "插值方法"
+        }
+    },
+    "ImageSwitchDualMode": {
+        "title": "图像切换器",
+        "description": "图像切换器：根据模式在多个图像输入之间进行选择。手动模式下按索引选择特定图像，自动模式下自动输出唯一连接的图像。适用于条件图像选择和工作流分支控制。",
+        "inputs": {
+            "select_image": "选择图像",
+            "image1": "图像1",
+            "image2": "图像2",
+            "image3": "图像3",
+            "image4": "图像4"
+        },
+        "widgets": {
+            "mode": "模式",
+            "select_image": "选择图像",
+            "image1_note": "图像1备注",
+            "image2_note": "图像2备注",
+            "image3_note": "图像3备注",
+            "image4_note": "图像4备注"
+        },
+        "outputs": {
+            "output_image": "输出图像"
+        }
+    },
+    "PriorityImageSwitch": {
+        "title": "优先级图像切换器",
+        "description": "优先级图像切换器：当图像A和图像B端口都连接时，优先输出B端口；如果B端口无输入，则输出图像A端口；如果两个端口都无输入，则提示连接至少一个输入端口。",
+        "inputs": {
+            "imageA": "图像A",
+            "imageB": "图像B"
+        },
+        "widgets": {
+            "mode": "模式",
+            "imageA_note": "图像A备注",
+            "imageB_note": "图像B备注"
+        },
+        "outputs": {
+            "output_image": "输出图像"
+        }
+    },
+    "LatentSwitchDualMode": {
+        "title": "潜在空间切换器",
+        "description": "潜在空间切换器：支持手动和自动模式的多通道潜在空间切换器。可在3个潜在空间输入之间切换，支持注释标签便于管理，自动模式下智能选择非空输入，适用于工作流中的条件分支和动态切换。",
+        "inputs": {
+            "mode": "模式",
+            "select_channel": "选择通道",
+            "Latent_1": "潜在空间1",
+            "Latent_2": "潜在空间2",
+            "Latent_3": "潜在空间3"
+        },
+        "outputs": {
+            "output_latent": "输出潜在空间"
+        },
+        "widgets": {
+            "mode": "模式",
+            "select_channel": "选择通道",
+            "Latent_1_comment": "潜在空间1注释",
+            "Latent_2_comment": "潜在空间2注释",
+            "Latent_3_comment": "潜在空间3注释"
+        }
+    },
+    "ColorRemoval": {
+        "title": "颜色移除",
+        "description": "颜色移除节点：将彩色图像转换为灰度图像，移除所有颜色信息同时保留亮度信息。适用于创建黑白效果、图像预处理、艺术风格转换等场景。",
+        "inputs": {
+            "input_image": "输入图像"
+        },
+        "outputs": {
+            "image_output": "图像输出"
+        }
+    },
+    "FreeTranslate": {
+        "title": "免费翻译",
+        "description": "免费翻译：使用各种AI模型的免费文本翻译解决方案。支持中英文互译、自动语言检测，提供Claude、GPT、Gemini等多种AI模型选择。无需API密钥，适用于快速翻译和多语言内容处理。",
+        "outputs": {
+            "translation_result": "翻译结果"
+        },
+        "widgets": {
+            "source_language": "源语言",
+            "target_language": "目标语言",
+            "model": "模型"
+        }
+    },
+    "BaiduTranslate": {
+        "title": "百度翻译",
+        "description": "百度翻译：使用百度翻译API进行文本翻译。支持中英文互译、自动源语言检测，提供明文和后台两种密钥加载方式。适用于多语言提示词处理和国际化内容创作。",       
+        "inputs": {
+            "key_loading": "密钥加载",
+            "source_language": "源语言",
+            "target_language": "目标语言"
+        },
+        "outputs": {
+            "translation_result": "翻译结果"
+        },
+        "widgets": {
+            "enable_translate": "启用翻译",
+            "app_id": "应用ID",
+            "api_key": "API密钥",
+            "key_loading": "密钥加载",
+            "source_language": "源语言",
+            "target_language": "目标语言"
+        }
+    },
+    "PromptPresetOneChoice": {
+        "title": "单选提示词预设",
+        "description": "单选提示词预设：提供6个预设提示词选项，用户可选择其中一个输出。每个提示词可添加注释标注，便于管理和识别不同提示词内容。",
+        "inputs": {
+            "select_prompt": "选择提示词"
+        },
+        "outputs": {
+            "prompt": "提示词"
+        },
+        "widgets": {
+            "prompt1_comment": "提示词1注释",
+            "prompt2_comment": "提示词2注释",
+            "prompt3_comment": "提示词3注释",
+            "prompt4_comment": "提示词4注释",
+            "prompt5_comment": "提示词5注释",
+            "prompt6_comment": "提示词6注释",
+            "select_prompt": "选择提示词"
+        }
+    },
+    "SystemPromptLoader": {
+        "title": "系统提示词加载器",
+        "description": "系统提示词加载器：简化的系统提示词加载器，直接从预设文件加载系统提示词模板。支持各种场景预设，适用于需要纯系统提示词输出而无需用户提示词处理功能的场景。",
+        "widgets": {
+            "system_preset": "系统预设"
+        },
+        "outputs": {
+            "system_prompt": "系统提示词"
+        }
+    },
+    "USMSharpen": {
+        "title": "USM锐化",
+        "description": "USM锐化：使用反锐化掩模技术进行图像锐化，这是专业图像处理中最常用的锐化方法。通过创建模糊版本并与原图比较来增强细节。支持锐化强度调节，适用于高质量图像后处理。",
+        "inputs": {
+            "input_image": "输入图像"
+        },
+        "outputs": {
+            "image_output": "图像输出"
+        },
+        "widgets": {
+            "switch": "开关",
+            "sharpen_strength": "锐化强度"
+        }
+    },
+    "SobelSharpen": {
+        "title": "Sobel锐化",
+        "description": "Sobel锐化：使用Sobel算子进行图像锐化处理。通过计算图像梯度来增强边缘细节，提供锐化强度调节，适用于图像后期处理和细节增强。",
+        "inputs": {
+            "input_image": "输入图像"
+        },
+        "outputs": {
+            "image_output": "图像输出"
+        },
+        "widgets": {
+            "switch": "开关",
+            "sharpen_strength": "锐化强度"
+        }
+    },
+    "TextExpander": {
+        "title": "文本扩展器",
+        "description": "文本扩展器：通过AI模型扩展和优化输入文本。支持多种AI模型选择，可以对文本进行扩写、改写和优化，适用于提示词生成和文本创作。",
+        "inputs": {
+            "load_system_prompt": "加载系统提示词"
+        },
+        "outputs": {
+            "text_output": "文本输出"
+        },
+        "widgets": {
+            "node_switch": "节点开关",
+            "character_limit": "字符限制",
+            "creativity_temperature": "创意温度",
+            "model_brand": "模型品牌"
+        }
+    },
+    "ExtraOptions": {
+        "title": "额外引导选项（通用）",
+        "description": "额外引导选项节点：为图像反向工程提供详细的引导选项配置。支持多种反向类型（描述性、训练提示词、MidJourney提示词等），并提供丰富的可选参数来控制输出内容细节，如光照信息、相机角度、构图风格等，适用于精确的图像描述和提示词生成。",
+        "widgets": {
+            "guide_text": "引导文本",
+            "reverse_type": "反推类型",
+            "options_master_switch": "选项主开关",
+            "exclude_unchangeable_character_info_but_include_changeable_attributes": "排除不可变角色信息但包含可变属性",
+            "include_lighting_info": "包含光照信息",
+            "include_camera_angle_info": "包含相机角度信息",
+            "include_watermark_info": "包含水印信息",
+            "include_jpeg_artifacts_info": "包含JPEG伪影信息",
+            "include_camera_details_for_photos": "为照片包含相机详细信息",
+            "exclude_sexual_content_keep_pg": "排除色情内容保持PG级",
+            "exclude_image_resolution": "排除图像分辨率",
+            "include_subjective_aesthetic_quality": "包含主观美学质量",
+            "include_composition_style_info": "包含构图风格信息",
+            "exclude_text_in_image": "排除图像中的文本",
+            "specify_depth_of_field": "指定景深",
+            "mention_lighting_sources": "提及光源",
+            "avoid_ambiguous_language": "避免模糊语言",
+            "include_content_rating": "包含内容评级",
+            "describe_only_important_elements": "仅描述重要元素",
+            "exclude_artist_name_and_title": "排除艺术家姓名和作品标题",
+            "identify_image_orientation": "识别图像方向",
+            "use_vulgar_slang": "使用粗俗俚语",
+            "avoid_polite_euphemisms": "避免礼貌委婉语",
+            "include_character_ages": "包含角色年龄",
+            "include_camera_shot_types": "包含相机拍摄类型",
+            "exclude_mood_feelings": "排除情绪感受",
+            "include_camera_vantage_height": "包含相机视角高度",
+            "mention_watermarks": "提及水印",
+            "avoid_meta_descriptive_phrases": "避免元描述性短语"
+        },
+        "outputs": {
+            "guide_output": "引导输出"
+        }
+    },
+    "LaplacianSharpen": {
+        "title": "拉普拉斯锐化",
+        "description": "拉普拉斯锐化：使用拉普拉斯算子进行图像锐化处理。通过二阶导数检测边缘并增强图像细节，提供锐化强度调节，适用于电影后期处理和图像增强。",
+        "widgets": {
+            "switch": "开关",
+            "sharpen_strength": "锐化强度"
+        },
+        "inputs": {
+            "image_input": "输入图像"
+        },
+        "outputs": {
+            "image_output": "图像输出"
+        }
+    },
+    "FilmGrain": {
+        "title": "胶片颗粒",
+        "description": "胶片颗粒效果：为图像添加胶片颗粒纹理，模拟传统胶片摄影的视觉效果。支持调节颗粒强度、饱和度混合比例，以及选择高斯或均匀颗粒分布类型，适用于电影后期处理。",
+        "inputs": {
+            "input_image": "输入图像"
+        },
+        "widgets": {
+            "switch": "开关",
+            "grain_strength": "颗粒强度",
+            "saturation_blend": "饱和度混合",
+            "grain_distribution": "颗粒分布"
+        },
+        "outputs": {
+            "image_output": "图像输出"
+        }
+    },
+    "ColorMatchToReference": {
+        "title": "颜色匹配参考",
+        "description": "颜色匹配参考：将输入图像的颜色调整为与参考图像匹配。分析参考图像的颜色分布，自动调整输入图像的色调、饱和度和亮度。支持匹配强度调节，适用于电影调色和颜色一致性处理。",
+        "inputs": { 
+            "reference_image": "参考图像",
+            "input_image": "输入图像"
+        },
+        "outputs": {
+            "image_output": "图像输出"
+        },
+        "widgets": {
+            "switch": "开关",
+            "match_strength": "匹配强度"
+        }
+    },
+    "PhotographPromptGenerator": {
+        "title": "摄影提示词生成器",
+        "description": "摄影提示词生成器：基于预设摄影参数生成专业摄影提示词。包含相机、镜头、光照、姿势、服装等选项，支持自定义模板输出格式。",
+        "outputs": {
+            "template": "模板",
+            "tags": "标签",
+            "help": "帮助"
+        },
+        "widgets": {
+            "character": "角色",
+            "gender": "性别",
+            "pose": "姿势",
+            "movement": "动作",
+            "orientation": "朝向",
+            "top": "上装",
+            "bottom": "下装",
+            "boots": "鞋子",
+            "accessories": "配饰",
+            "camera": "相机",
+            "lens": "镜头",
+            "lighting": "光照",
+            "perspective": "视角",
+            "location": "地点",
+            "weather": "天气",
+            "season": "季节"
+        }
+    },
+    "PromptPresetMultipleChoice": {
+        "title": "多选提示词预设",
+        "description": "多选提示词预设：提供6个预设提示词选项，每个都可以独立启用或禁用。支持主开关控制，允许选择多个提示词进行组合输出，并支持外部文本并行输入。",
+        "inputs": {
+            "parallel_text": "并行文本"
+        },
+        "outputs": {
+            "output_text": "输出文本"
+        },
+        "widgets": {
+            "master_switch": "主开关",
+            "prompt1_switch": "提示词1开关",
+            "prompt1_comment": "提示词1注释",
+            "prompt2_switch": "提示词2开关",
+            "prompt2_comment": "提示词2注释",
+            "prompt3_switch": "提示词3开关",
+            "prompt3_comment": "提示词3注释",
+            "prompt4_switch": "提示词4开关",
+            "prompt4_comment": "提示词4注释",
+            "prompt5_switch": "提示词5开关",
+            "prompt5_comment": "提示词5注释",
+            "prompt6_switch": "提示词6开关",
+            "prompt6_comment": "提示词6注释"
+        }
+    },
+    "LoadKontextPresetsBasic": {
+        "title": "Kontext预设基础版",
+        "description": "Kontext预设基础版：提供各种图像编辑和变换的预设指令，包括场景传送、相机移动、重新打光、产品摄影等。适用于图像风格转换和创意编辑。",
+        "widgets": {
+            "preset": "预设"
+        },
+        "outputs": {
+            "prompt_content": "提示词内容"
+        }
+    },
+    "KontextPresetsPlus": {
+        "title": "Kontext预设增强版",
+        "description": "Kontext预设增强版：提供分类管理的预设库，支持完整信息输出、内置AI扩写功能，以及自定义内容输入。适用于高级图像编辑和创意生成工作流。",
+        "widgets": {    
+            "preset": "预设",
+            "output_full_info": "输出完整信息",
+            "enable_builtin_expansion": "启用内置扩写",
+            "expansion_model": "扩写模型",
+            "custom_content": "自定义内容"
+        },
+        "outputs": {
+            "prompt_content": "提示词内容"
+        }
+    },
+    "WanPromptGenerator": {
+        "title": "万相视频提示词生成器",
+        "description": "万相视频提示词生成器：基于万相2.2官方文档编写的全能型提示词生成器，支持自定义和预设两种组合方法，涵盖运镜、场景、光线、构图等17个维度的专业视频提示词生成。内置电影级画面、记录风格、动作风格等预设组合，支持AI扩写功能。",
+        "inputs": {
+            "custom_system_prompt": "自定义系统提示"
+        },
+        "widgets": {
+            "enable_node": "启用节点",
+            "subject_type": "主体类型",
+            "character_emotion": "角色情感",
+            "action_pose": "动作姿态",
+            "scene_type": "场景类型",
+            "light_source": "光源",
+            "light_type": "光线类型",
+            "time_period": "时间段",
+            "shot_type": "镜头类型",
+            "composition": "构图",
+            "lens_focal_length": "镜头焦距",
+            "camera_angle": "相机角度",
+            "lens_type": "镜头类型",
+            "color_tone": "色调",
+            "camera_movement": "相机运动",
+            "motion_type": "运动类型",
+            "visual_style": "视觉风格",
+            "special_effect": "特殊效果",
+            "preset_combination": "预设组合",
+            "add_prefix": "添加前缀",
+            "enable_expansion": "启用扩写",
+            "model_brand": "模型品牌",
+            "supplementary_text": "补充文本"
+        },
+        "outputs": {
+            "source_prompt": "源提示词",
+            "prompt_output": "提示词输出"
+        }
+    },
+    "LocalFileGallery": {
+        "title": "本地文件画廊",
+        "description": "本地文件画廊节点：用于浏览和选择本地图像和文本文件。支持的图像格式：jpg、jpeg、png、bmp、gif、webp；支持的文本格式：txt、json、js。选中的图像将以IMAGE类型输出，文本内容将以STRING类型输出。",
+        "inputs": {},
+        "outputs": {
+            "image_output": "图像输出",
+            "text_content": "文本内容"
+        }
+    }
+}

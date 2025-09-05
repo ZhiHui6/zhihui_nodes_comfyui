@@ -130,7 +130,7 @@ class LocalFileGallery:
     RETURN_NAMES = ("image_output", "text_content")
     FUNCTION = "get_media_outputs"
     CATEGORY = "zhihui/Toolkit"
-    DESCRIPTION = "本地文件画廊节点：用于浏览和选择本地图片和文本文件。支持图片格式：jpg, jpeg, png, bmp, gif, webp；支持文本格式：txt, json, js。选择的图片将输出为IMAGE类型，文本内容将输出为STRING类型。"
+    DESCRIPTION = "Local File Gallery Node: Used for browsing and selecting local image and text files. Supported image formats: jpg, jpeg, png, bmp, gif, webp; Supported text formats: txt, json, js. Selected images will be output as IMAGE type, text content will be output as STRING type."
 
     def get_media_outputs(self):
         default_image = torch.zeros(1, 1, 1, 4)

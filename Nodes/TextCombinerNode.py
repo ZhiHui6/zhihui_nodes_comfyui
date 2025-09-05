@@ -2,48 +2,48 @@ from typing import Optional
 from comfy import utils
 
 class TextCombinerNode:
-    CATEGORY = "zhihui/文本"
+    CATEGORY = "zhihui/Text"
     OUTPUT_NODE = True
     
     def __init__(self):
-        self.提示词1 = ""
-        self.提示词2 = ""
-        self.分隔符 = ", "
-        self.提示词1_注释 = ""
-        self.提示词2_注释 = ""
+        self.prompt1 = ""
+        self.prompt2 = ""
+        self.separator = ", "
+        self.prompt1_comment = ""
+        self.prompt2_comment = ""
         
     @classmethod
     def INPUT_TYPES(cls):
         return {
             "required": {
-                "提示词1_注释": ("STRING", {"default": cls().提示词1_注释, "multiline": False}),
-                "启用提示词1": ("BOOLEAN", {"default": True}), 
-                "提示词1": ("STRING", {"default": cls().提示词1, "multiline": True}),
-                "提示词2_注释": ("STRING", {"default": cls().提示词2_注释, "multiline": False}),
-                "启用提示词2": ("BOOLEAN", {"default": True}), 
-                "提示词2": ("STRING", {"default": cls().提示词2, "multiline": True}),
-                "分隔符": ("STRING", {"default": cls().分隔符, "multiline": False}),
+                "prompt1_comment": ("STRING", {"default": "", "multiline": False}),
+                 "enable_prompt1": ("BOOLEAN", {"default": True}), 
+                 "prompt1": ("STRING", {"default": "", "multiline": True}),
+                 "prompt2_comment": ("STRING", {"default": "", "multiline": False}),
+                 "enable_prompt2": ("BOOLEAN", {"default": True}), 
+                 "prompt2": ("STRING", {"default": "", "multiline": True}),
+                 "separator": ("STRING", {"default": ", ", "multiline": False}),
             }
         }
      
     RETURN_TYPES = ("STRING",)
-    RETURN_NAMES = ("文本输出",)
+    RETURN_NAMES = ("text_output",)
     FUNCTION = "execute"
-    DESCRIPTION = "文本合并器：将两个文本输入按指定分隔符合并成一个文本输出。每个文本都可以独立启用或禁用，支持自定义分隔符，适用于提示词组合和文本拼接。"
+    DESCRIPTION = "Text Combiner: Combines two text inputs with a specified separator into a single text output. Each text can be independently enabled or disabled, supports custom separators, suitable for prompt combination and text concatenation."
     
-    def execute(self, 提示词1_注释: str, 提示词1: str, 提示词2_注释: str, 提示词2: str, 分隔符: str, 启用提示词1: bool, 启用提示词2: bool) -> tuple:
-        self.提示词1 = 提示词1 if 启用提示词1 else ""
-        self.提示词2 = 提示词2 if 启用提示词2 else ""
-        self.提示词1_注释 = 提示词1_注释
-        self.提示词2_注释 = 提示词2_注释
-        self.分隔符 = 分隔符
-        len1 = len(self.提示词1)
-        len2 = len(self.提示词2)
-        combined = ""
-        if len1 > 0 and len2 > 0:
-            combined = self.提示词1 + 分隔符 + self.提示词2
-        elif len1 > 0:
-            combined = self.提示词1
-        elif len2 > 0:
-            combined = self.提示词2
-        return (combined,)
+    def execute(self, prompt1_comment: str, prompt1: str, prompt2_comment: str, prompt2: str, separator: str, enable_prompt1: bool, enable_prompt2: bool) -> tuple:
+         self.prompt1 = prompt1 if enable_prompt1 else ""
+         self.prompt2 = prompt2 if enable_prompt2 else ""
+         self.prompt1_comment = prompt1_comment
+         self.prompt2_comment = prompt2_comment
+         self.separator = separator
+         len1 = len(self.prompt1)
+         len2 = len(self.prompt2)
+         combined = ""
+         if len1 > 0 and len2 > 0:
+             combined = self.prompt1 + separator + self.prompt2
+         elif len1 > 0:
+             combined = self.prompt1
+         elif len2 > 0:
+             combined = self.prompt2
+         return (combined,)

@@ -22,7 +22,6 @@ class KontextPresetsPlus:
         default_presets_file = os.path.join(current_dir, "presets.txt")
         user_presets_file = os.path.join(current_dir, "user_presets.txt")
         
-
         default_presets = []
         try:
             with open(default_presets_file, 'r', encoding='utf-8') as f:
@@ -32,22 +31,20 @@ class KontextPresetsPlus:
 
                 if isinstance(default_data, list):
                     default_presets = default_data
-                elif isinstance(default_data, dict) and "预设集" in default_data:
-                    default_presets = default_data["预设集"]
+                elif isinstance(default_data, dict) and "presets" in default_data:
+                    default_presets = default_data["presets"]
                 else:
                     default_presets = []
 
                 for preset in default_presets:
-                    preset["category"] = "默认"
-            print(f"✅ 成功加载默认预设文件: {default_presets_file}")
+                    preset["category"] = "默认 / Default"
         except FileNotFoundError:
-            print(f"❌ 默认预设文件未找到: {default_presets_file}")
+            pass
         except json.JSONDecodeError as e:
-            print(f"❌ 默认预设文件格式错误: {e}")
+            pass
         except Exception as e:
-            print(f"❌ 加载默认预设文件时发生错误: {e}")
+            pass
         
-
         user_presets = []
         try:
             with open(user_presets_file, 'r', encoding='utf-8') as f:
@@ -57,24 +54,22 @@ class KontextPresetsPlus:
 
                 if isinstance(user_data, list):
                     user_presets = user_data
-                elif isinstance(user_data, dict) and "预设集" in user_data:
-                    user_presets = user_data["预设集"]
+                elif isinstance(user_data, dict) and "presets" in user_data:
+                    user_presets = user_data["presets"]
                 else:
                     user_presets = []
 
                 for preset in user_presets:
-                    preset["category"] = "用户"
-            print(f"✅ 成功加载用户预设文件: {user_presets_file}")
+                    preset["category"] = "用户 / User"
         except FileNotFoundError:
-            print(f"ℹ️ 用户预设文件未找到，将跳过: {user_presets_file}")
+            pass
         except json.JSONDecodeError as e:
-            print(f"❌ 用户预设文件格式错误: {e}")
+            pass
         except Exception as e:
-            print(f"❌ 加载用户预设文件时发生错误: {e}")
+            pass
         
-
         all_presets = default_presets + user_presets
-        cls.data = {"预设集": all_presets}
+        cls.data = {"presets": all_presets}
             
         return cls.data
 
@@ -82,56 +77,52 @@ class KontextPresetsPlus:
     def INPUT_TYPES(cls):
         data = cls.load_presets()
         preset_names = []
-        for 预设 in data.get("预设集", []):
-            category = 预设.get("category", "默认")
-            name = 预设["name"]
+        for preset in data.get("presets", []):
+            category = preset.get("category", "默认 / Default")
+            name = preset["name"]
             display_name = f"[{category}] {name}"
             preset_names.append(display_name)
         return {
             "required": {
-                "预设": (preset_names, {"default": preset_names[0] if preset_names else "无预设"}),
-                "输出完整信息": ("BOOLEAN", {"default": False}),
-                "扩写模型": (["deepseek", "gemini", "openai", "mistral", "qwen-coder", "llama", "sur", "unity", "searchgpt", "evil"], {"default": "openai"}),
-                "启用内置扩写": ("BOOLEAN", {"default": False}),
-
+                "preset": (preset_names, {"default": preset_names[0] if preset_names else "No presets"}),
+                "output_full_info": ("BOOLEAN", {"default": False}),
+                "expansion_model": (["deepseek", "gemini", "openai", "mistral", "qwen-coder", "llama", "sur", "unity", "searchgpt", "evil"], {"default": "openai"}),
+                "enable_builtin_expansion": ("BOOLEAN", {"default": False}),
             },
             "optional": {
-                "自定义内容": ("STRING", {"multiline": True, "default": "", "placeholder": "当选择'自定义'预设时，请在此输入您的自定义内容..."}),
+                "custom_content": ("STRING", {"multiline": True, "default": "", "placeholder": "When selecting 'Custom' preset, please enter your custom content here..."}),
             }
         }
     RETURN_TYPES = ("STRING",)
-    RETURN_NAMES = ("提示词内容",)
-    FUNCTION = "get_预设"
-    CATEGORY = "zhihui/生成器"
-    DESCRIPTION = "Kontext预设增强版：提供分类管理的预设库，支持完整信息输出、内置AI扩写功能，以及自定义内容输入。适用于高级图像编辑和创意生成工作流。"
+    RETURN_NAMES = ("prompt_content",)
+    FUNCTION = "get_preset"
+    CATEGORY = "zhihui/generator"
+    DESCRIPTION = "Kontext Presets Plus: Provides a categorized preset library with complete information output, built-in AI expansion functionality, and custom content input. Suitable for advanced image editing and creative generation workflows."
     
     @classmethod
     def get_brief_by_name(cls, display_name):
-
         if display_name.startswith("[") and "] " in display_name:
             actual_name = display_name.split("] ", 1)[1]
         else:
             actual_name = display_name
             
         data = cls.load_presets()
-        for 预设 in data.get("预设集", []):
-            if 预设["name"] == actual_name:
-                return 预设["brief"]
+        for preset in data.get("presets", []):
+            if preset["name"] == actual_name:
+                return preset["brief"]
         return None
     
     def _handle_error(self, error_type, error_msg, model, prompt):
-        print(f"❌ {error_msg} | 模型: {model}")
-        return f"[{error_type}] {error_msg}\n\n原始提示词:\n{prompt}"
+        return f"[{error_type}] {error_msg}\n\nOriginal prompt:\n{prompt}"
     
-    def call_llm_api(self, prompt, 扩写模型=""):
+    def call_llm_api(self, prompt, expansion_model=""):
         try:
             api_url = "https://text.pollinations.ai/"
             random_seed = int(time.time() * 1000000) % 0xffffffffffffffff
-            print(f"🎲 API调用随机种子: {random_seed}")
             
             payload = {
                 "messages": [{"role": "user", "content": prompt}],
-                "扩写模型": 扩写模型,
+                "expansion_model": expansion_model,
                 "seed": random_seed,
                 "timestamp": int(time.time())
             }
@@ -144,50 +135,49 @@ class KontextPresetsPlus:
                 return response.text.strip()
             else:
                 error_messages = {
-                    400: "请求参数错误", 401: "API认证失败", 403: "访问被拒绝",
-                    404: "API端点未找到", 429: "请求过于频繁", 500: "服务器内部错误",
-                    502: "网关错误", 503: "服务不可用", 504: "网关超时"
+                    400: "Request parameter error", 401: "API authentication failed", 403: "Access denied",
+                    404: "API endpoint not found", 429: "Too many requests", 500: "Internal server error",
+                    502: "Gateway error", 503: "Service unavailable", 504: "Gateway timeout"
                 }
-                error_msg = error_messages.get(response.status_code, f"HTTP错误: {response.status_code}")
-                return self._handle_error("API错误", error_msg, 扩写模型, prompt)
+                error_msg = error_messages.get(response.status_code, f"HTTP error: {response.status_code}")
+                return self._handle_error("API Error", error_msg, expansion_model, prompt)
                 
         except requests.exceptions.Timeout:
-            return self._handle_error("超时错误", "请求超时", 扩写模型, prompt)
+            return self._handle_error("Timeout Error", "Request timeout", expansion_model, prompt)
         except requests.exceptions.ConnectionError:
-            return self._handle_error("连接错误", "网络连接失败", 扩写模型, prompt)
+            return self._handle_error("Connection Error", "Network connection failed", expansion_model, prompt)
         except requests.exceptions.RequestException as e:
-            return self._handle_error("网络错误", f"请求异常: {str(e)}", 扩写模型, prompt)
+            return self._handle_error("Network Error", f"Request exception: {str(e)}", expansion_model, prompt)
         except json.JSONDecodeError:
-            return self._handle_error("格式错误", "响应数据格式错误", 扩写模型, prompt)
+            return self._handle_error("Format Error", "Response data format error", expansion_model, prompt)
         except Exception as e:
-            return self._handle_error("系统错误", f"未知异常: {str(e)}", 扩写模型, prompt)
+            return self._handle_error("System Error", f"Unknown exception: {str(e)}", expansion_model, prompt)
 
-    def _process_with_llm(self, brief_content, prefix, suffix, 扩写模型):
+    def _process_with_llm(self, brief_content, prefix, suffix, expansion_model):
         brief = "The Brief:" + brief_content
         full_prompt = prefix + "\n" + brief + "\n" + suffix
-        return self.call_llm_api(full_prompt, 扩写模型)
+        return self.call_llm_api(full_prompt, expansion_model)
     
-    def get_预设(self, 预设, 输出完整信息, 启用内置扩写, 扩写模型, 自定义内容=""):
+    def get_preset(self, preset, output_full_info, enable_builtin_expansion, expansion_model, custom_content=""):
         data = self.load_presets()
         prefix = "You are a creative prompt engineer. Analyze the provided brief and transform it into a detailed, creative prompt that captures the essence and style described. Focus on visual elements, artistic techniques, mood, and atmosphere."
         suffix = "Your response must consist of concise instruction ready for the image editing AI. Do not add any conversational text, explanations, or deviations; only the instructions."
-              
-
-        if 预设.startswith("[") and "] " in 预设:
-            actual_preset_name = 预设.split("] ", 1)[1]
-        else:
-            actual_preset_name = 预设
-            
-        if actual_preset_name == "自定义":
-            brief_content = 自定义内容 if 自定义内容.strip() else ""
-        else:
-            brief_content = self.get_brief_by_name(预设)
         
-        if 启用内置扩写:
-            processed_string = self._process_with_llm(brief_content, prefix, suffix, 扩写模型)
+        if preset.startswith("[") and "] " in preset:
+            actual_preset_name = preset.split("] ", 1)[1]
+        else:
+            actual_preset_name = preset
+            
+        if actual_preset_name == "Custom":
+            brief_content = custom_content if custom_content.strip() else ""
+        else:
+            brief_content = self.get_brief_by_name(preset)
+        
+        if enable_builtin_expansion:
+            processed_string = self._process_with_llm(brief_content, prefix, suffix, expansion_model)
             return (processed_string,)
         
-        if 输出完整信息:
+        if output_full_info:
             full_info = f"{prefix}\n\n{brief_content}\n\n{suffix}"
             return (full_info,)
         else:

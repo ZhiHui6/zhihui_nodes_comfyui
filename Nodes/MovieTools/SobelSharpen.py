@@ -8,31 +8,31 @@ class SobelSharpen:
     def INPUT_TYPES(cls):
         return {
             "optional": {
-                "开关": ("BOOLEAN", {"default": True}),
-                "输入图像": ("IMAGE", {}),
-                "锐化强度": (
+                "switch": ("BOOLEAN", {"default": True}),
+                "input_image": ("IMAGE", {}),
+                "sharpen_strength": (
                     "FLOAT", {"default": 0.50, "min": 0.0, "max": 2.0, "step": 0.01, "display": "slider", "round": 0.01}
                 ),
             }
         }
 
     RETURN_TYPES = ("IMAGE",)
-    RETURN_NAMES = ("图像输出",)
+    RETURN_NAMES = ("image_output",)
     FUNCTION = "apply_sobel"
-    CATEGORY = "zhihui/后期处理"
-    DESCRIPTION = "索贝尔锐化：使用Sobel算子进行边缘检测和锐化处理，通过计算图像梯度来增强边缘信息。支持锐化强度调节，特别适用于突出图像轮廓和边缘细节，常用于图像预处理和艺术效果制作。"
+    CATEGORY = "zhihui/post_processing"
+    DESCRIPTION = "Sobel Sharpen: Uses Sobel operator for edge detection and sharpening, enhancing edge information by calculating image gradients. Supports sharpen strength adjustment, particularly suitable for highlighting image contours and edge details. Commonly used in image preprocessing and artistic effect creation."
 
-    def apply_sobel(self, 输入图像: torch.Tensor = None, 锐化强度: float = 0.5, 开关: bool = True) -> Tuple[torch.Tensor]:
-        if not 开关:
-            return (输入图像,)
+    def apply_sobel(self, input_image: torch.Tensor = None, sharpen_strength: float = 0.5, switch: bool = True) -> Tuple[torch.Tensor]:
+        if not switch:
+            return (input_image,)
             
-        if 输入图像 is None:
+        if input_image is None:
             return (None,)
             
         device = comfy.model_management.get_torch_device()
-        输入图像 = 输入图像.to(device)
+        input_image = input_image.to(device)
 
-        x = 输入图像.permute(0, 3, 1, 2)
+        x = input_image.permute(0, 3, 1, 2)
 
         sobel_x = torch.tensor(
             [[-1, 0, 1],
@@ -50,7 +50,7 @@ class SobelSharpen:
         edges_y = torch.nn.functional.conv2d(x, sobel_y, padding=1, groups=3)
         edges = torch.sqrt(edges_x ** 2 + edges_y ** 2)
 
-        sharpened = x + 锐化强度 * edges
+        sharpened = x + sharpen_strength * edges
         sharpened = sharpened.clamp(0.0, 1.0)
         sharpened = sharpened.permute(0, 2, 3, 1)
         sharpened = sharpened.to(comfy.model_management.intermediate_device())

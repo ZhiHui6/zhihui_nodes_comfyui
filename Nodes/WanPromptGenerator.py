@@ -3,24 +3,24 @@ import requests
 import urllib.parse
 
 class WanPromptGenerator:
-    CATEGORY = "zhihui/生成器"
+    CATEGORY = "zhihui/Generator"
     FUNCTION = "generate_prompt"
     RETURN_TYPES = ("STRING", "STRING")
-    RETURN_NAMES = ("源提示词", "提示词输出")
-    DESCRIPTION = "万能提示词生成器，通过丰富的参数选项生成专业的图像提示词。支持主体类型、情绪、动作、场景、光线、构图等多维度设置，内置电影场景预设，支持AI扩写功能，适用于各种创意图像生成需求。"
+    RETURN_NAMES = ("source_prompt", "prompt_output")
+    DESCRIPTION = "Universal Prompt Generator: Generates professional image prompts through rich parameter options. Supports multi-dimensional settings such as subject type, emotion, action, scene, lighting, composition, etc. Built-in movie scene presets, supports AI expansion, suitable for various creative image generation needs."
 
-    主体类型选项 = [
+    subject_type_options = [
         "关闭", "随机", 
         "[人物]年轻漂亮的女人", "[人物]时尚女孩", "[人物]青春少女", "[人物]儿童女孩", "[人物]中年女性", "[人物]老年女性", "[人物]年轻帅气的男人", "[人物]健美男子", "[人物]阳光男孩", "[人物]儿童男孩", "[人物]中年男性", "[人物]老年男性", 
         "[人物]婴儿", "[人物]职业人士", "[人物]运动员", "[人物]艺术家", "[人物]科学家", "[人物]教师", "[人物]医生", "[人物]警察", "[人物]消防员", "[人物]军人", "[人物]厨师", "[人物]学生",
         "[动物]猫", "[动物]狗", "[动物]马", "[动物]鸟", "[动物]鱼", "[动物]兔子", "[动物]鹿", "[动物]熊", "[动物]狼", "[动物]狐狸", "[动物]大象", "[动物]老虎", "[动物]狮子", "[动物]熊猫", "[动物]海豚", "[动物]蝴蝶", "[动物]蜜蜂", "[动物]恐龙", "[动物]龙", "[动物]凤凰"  
     ]
 
-    人物情绪选项 = [
+    character_emotion_options = [
         "关闭", "随机", "愤怒", "恐惧", "高兴", "悲伤", "惊讶", "忧虑", "困惑", "欣慰", "狂喜", "绝望", "平静", "期待", "羞涩", "厌恶", "自豪"
     ]
     
-    动作姿势选项 = [
+    action_pose_options = [
         "关闭", "随机", 
         "站立", "坐姿", "侧身", "转身", "蹲姿", "躺姿", "行走", "挥手", "拥抱", "握手", "敬礼", "鞠躬", "跳舞", "唱歌", "读书", "写字", "打电话", "拍照", "开车", "做饭", "打扫", "购物", "工作", "睡觉", "冥想", "祈祷", "战斗姿态",
         "荡秋千", "坐过山车", "追逐", "跳跃障碍", "奔跑", "跳跃", "爬行", "进食", "饮水", "玩耍", "打斗", "警戒",
@@ -28,7 +28,7 @@ class WanPromptGenerator:
         "[动物]趴卧", "[动物]飞翔", "[动物]捕猎", "[动物]求偶", "[动物]觅食", "[动物]筑巢", "[动物]迁徙", "[动物]挖洞", "[动物]冬眠", "[动物]蜕皮", "[动物]变色", "[动物]喷墨", "[动物]放电", "[动物]发光", "[动物]伪装", "[动物]群体迁徙", "[动物]筑坝"
     ]
     
-    场景类型选项 = [
+    scene_type_options = [
         "关闭", "随机",
         "[自然]田野", "[自然]森林", "[自然]山脉", "[自然]草原", "[自然]湖泊", "[自然]河流", "[自然]海洋", "[自然]沙漠", "[自然]雪山", "[自然]雨林", "[自然]花园", "[自然]果园", "[自然]湿地", "[自然]峡谷", "[自然]瀑布", "[自然]火山", "[自然]极光", "[自然]冰川", "[自然]洞穴", "[自然]悬崖",
         "[城市]街道", "[城市]室内", "[城市]建筑", "[城市]公园", "[城市]广场", "[城市]商场", "[城市]地铁站", "[城市]咖啡馆", "[城市]图书馆", "[城市]博物馆", "[城市]剧院", "[城市]体育场", "[城市]游乐场", "[城市]天桥", "[城市]屋顶", "[城市]地下通道", "[城市]停车场", "[城市]写字楼", "[城市]住宅区", "[城市]工业区",
@@ -40,65 +40,65 @@ class WanPromptGenerator:
         "[电影]夺宝奇兵埃及神庙", "[电影]侏罗纪世界火山", "[电影]变形金刚废墟星球", "[电影]速度与激情多米尼加", "[电影]碟中谍伦敦威斯敏斯特", "[电影]007阿尔卑斯山", "[电影]蝙蝠侠泛美大厦", "[电影]超人肯特农场", "[电影]神奇女侠博物馆", "[电影]银河护卫队星球", "[电影]雷神简的公寓", "[电影]蚁人旧金山", "[电影]黑豹联合国总部", "[电影]美国队长博物馆", "[电影]绿巨人伯克利实验室", "[电影]死侍红门酒吧", "[电影]X战警白宫", "[电影]蜘蛛侠布鲁克林", "[电影]钢铁侠阿富汗", "[电影]木乃伊开罗"
     ]
 
-    光源类型选项 = [
+    light_source_options = [
         "关闭", "随机", "日光", "人工光", "月光", "实用光", "火光", "荧光", "阴天光", "混合光", "晴天光"
     ]
     
-    光线类型选项 = [
+    light_type_options = [
         "关闭", "随机", "柔光", "硬光", "顶光", "侧光", "背光", "底光", "边缘光", "剪影", "低对比度", "高对比度",
     ]
     
-    时间段选项 = [
+    time_period_options = [
         "关闭", "随机", "白天", "夜晚", "黄昏", "日落", "日出", "黎明"
     ]
     
-    景别选项 = [
+    shot_type_options = [
         "关闭", "随机", "特写", "近景", "中景", "中近景", "中全景", "全景", "广角"
     ]
     
-    构图选项 = [
+    composition_options = [
         "关闭", "随机", "中心构图", "平衡构图", "右侧重构图", "左侧重构图", "对称构图", "短边构图"
     ]
     
-    镜头焦段选项 = [
+    lens_focal_length_options = [
         "关闭", "随机", "中焦距", "广角", "长焦", "望远", "超广角-鱼眼"
     ]
     
-    机位角度选项 = [
+    camera_angle_options = [
         "关闭", "随机", "平视角度拍摄", "过肩镜头角度拍摄", "高角度拍摄", "低角度拍摄", "倾斜角度", "航拍", "俯视角度拍摄"
     ]
     
-    镜头类型选项 = [
+    lens_type_options = [
         "关闭", "随机", "干净的单人镜头", "双人镜头", "三人镜头", "群像镜头", "定场镜头"
     ]
     
-    色调选项 = [
+    color_tone_options = [
         "关闭", "随机", "暖色调", "冷色调", "高饱和度", "低饱和度", "混合色调"
     ]
     
-    运镜方式选项 = [
+    camera_movement_options = [
         "关闭", "随机", "[基础]镜头推进", "[基础]镜头拉远", "[基础]镜头向右移动", "[基础]镜头向左移动", "[基础]镜头上摇", "[基础]镜头下摇", "[高级]手持镜头", "[高级]跟随镜头", "[高级]环绕运镜", "[高级]复合运镜",
         "[测试]慢动作推轨镜头", "[测试]无人机环绕拉升", "[测试]焦点转移", "[测试]手持肩扛式跟拍", "[测试]穿越镜头", "[测试]第一人称视角", "[测试]高速旋转镜头", "[测试]水下镜头", "[测试]反射镜头", "[测试]剪影镜头", "[测试]长焦压缩镜头", "[测试]荷兰角", "[测试]弧形滑轨镜头", "[测试]由下至上摇摄"
     ]
     
-    运动类型选项 = [
+    motion_type_options = [
         "关闭", "随机", "跑步", "滑滑板", "踢足球", "网球", "乒乓球", "滑雪", "篮球", "橄榄球", "顶碗舞", "侧手翻", "滑板", "骑自行车", "游泳", "跳舞", "瑜伽", "举重", "拳击", "攀岩", "冲浪", "潜水",
         "滑冰", "打篮球", "打网球", "打羽毛球", "打乒乓球", "打高尔夫", "射箭", "跳伞", "蹦极", "街舞", "芭蕾舞", "肚皮舞", "探戈舞", "爵士舞", "嘻哈舞", "打太极",
     ]
     
-    视觉风格选项 = [
+    visual_style_options = [
         "关闭", "随机", "赛博朋克", "勾线插画", "废土风格", "毛毡风格", "3D卡通", "像素风格", "木偶动画", "水彩画", "3D游戏", "黏土风格", "二次元", "黑白动画", "油画风格"
     ]
     
-    特效镜头选项 = [
+    special_effect_options = [
         "关闭", "随机", "移轴摄影", "延时拍摄"
     ]
 
-    预设组合选项 = [
+    preset_combination_options = [
         "不使用预设", "电影级画面", "记录风格", "动作风格", "浪漫风格", "恐怖风格"
     ]
 
-    预设组合映射 = {
+    preset_combination_mapping = {
         "电影级画面": "黄昏，柔光，侧光，边缘光，中景，中心构图，暖色调，低饱和度，干净的单人镜头",
         "记录风格": "日光，自然光，平拍，中景，手持镜头，跟随镜头，写实风格",
         "动作风格": "硬光，高对比度，低角度拍摄，快速剪辑，动态模糊，运动镜头",
@@ -110,30 +110,30 @@ class WanPromptGenerator:
     def INPUT_TYPES(s):
         return {
             "optional": {
-                "启用节点": ("BOOLEAN", {"default": True}),
-                "主体类型": (s.主体类型选项, {"default": "随机"}),
-                "人物情绪": (s.人物情绪选项, {"default": "随机"}),
-                "动作姿势": (s.动作姿势选项, {"default": "随机"}),
-                "场景类型": (s.场景类型选项, {"default": "随机"}),          
-                "光源类型": (s.光源类型选项, {"default": "随机"}),
-                "光线类型": (s.光线类型选项, {"default": "随机"}),
-                "时间段": (s.时间段选项, {"default": "随机"}),
-                "景别": (s.景别选项, {"default": "随机"}),
-                "构图": (s.构图选项, {"default": "随机"}),
-                "镜头焦段": (s.镜头焦段选项, {"default": "随机"}),
-                "机位角度": (s.机位角度选项, {"default": "随机"}),
-                "镜头类型": (s.镜头类型选项, {"default": "随机"}),
-                "色调": (s.色调选项, {"default": "随机"}),
-                "运镜方式": (s.运镜方式选项, {"default": "随机"}),
-                "运动类型": (s.运动类型选项, {"default": "随机"}),
-                "视觉风格": (s.视觉风格选项, {"default": "随机"}),
-                "特效镜头": (s.特效镜头选项, {"default": "随机"}),
-                "预设组合": (s.预设组合选项, {"default": "不使用预设"}),
-                "添加前缀": ("BOOLEAN", {"default": False}),
-                "启用扩写": ("BOOLEAN", {"default": False}),
-                "模型品牌": (["claude","deepseek", "gemini", "openai", "mistral", "qwen-coder", "llama", "sur", "unity", "searchgpt", "evil"], {"default": "openai"}), 
-                "请输入您的补充文本": ("STRING", {"default": "", "multiline": True}),
-                "自定系统引导词": ("STRING", {"default": "", "multiline": True, "forceInput": True}),
+                "enable_node": ("BOOLEAN", {"default": True}),
+                "subject_type": (s.subject_type_options, {"default": "随机"}),
+                "character_emotion": (s.character_emotion_options, {"default": "随机"}),
+                "action_pose": (s.action_pose_options, {"default": "随机"}),
+                "scene_type": (s.scene_type_options, {"default": "随机"}),          
+                "light_source": (s.light_source_options, {"default": "随机"}),
+                "light_type": (s.light_type_options, {"default": "随机"}),
+                "time_period": (s.time_period_options, {"default": "随机"}),
+                "shot_type": (s.shot_type_options, {"default": "随机"}),
+                "composition": (s.composition_options, {"default": "随机"}),
+                "lens_focal_length": (s.lens_focal_length_options, {"default": "随机"}),
+                "camera_angle": (s.camera_angle_options, {"default": "随机"}),
+                "lens_type": (s.lens_type_options, {"default": "随机"}),
+                "color_tone": (s.color_tone_options, {"default": "随机"}),
+                "camera_movement": (s.camera_movement_options, {"default": "随机"}),
+                "motion_type": (s.motion_type_options, {"default": "随机"}),
+                "visual_style": (s.visual_style_options, {"default": "随机"}),
+                "special_effect": (s.special_effect_options, {"default": "随机"}),
+                "preset_combination": (s.preset_combination_options, {"default": "不使用预设"}),
+                "add_prefix": ("BOOLEAN", {"default": False}),
+                "enable_expansion": ("BOOLEAN", {"default": False}),
+                "model_brand": (["claude","deepseek", "gemini", "openai", "mistral", "qwen-coder", "llama", "sur", "unity", "searchgpt", "evil"], {"default": "openai"}), 
+                "supplementary_text": ("STRING", {"default": "", "multiline": True}),
+                "custom_system_prompt": ("STRING", {"default": "", "multiline": True, "forceInput": True}),
             }
         }
 
@@ -198,108 +198,108 @@ class WanPromptGenerator:
             response.raise_for_status()
             return response.text.strip()
         except requests.exceptions.RequestException as e:
-            error_message = f"API请求失败: {e}"
+            error_message = f"API request failed: {e}"
             if 'response' in locals() and response is not None:
-                error_message += f" | 服务器响应: {response.text}"
+                error_message += f" | Server response: {response.text}"
             print(error_message)
             return text
     
-    def generate_prompt(self, 启用扩写, 启用节点=True, 模型品牌="openai", 添加前缀=False, 预设组合="不使用预设", 请输入您的补充文本="", 自定义引导词="", **kwargs):
+    def generate_prompt(self, enable_expansion, enable_node=True, model_brand="openai", add_prefix=False, preset_combination="不使用预设", supplementary_text="", custom_system_prompt="", **kwargs):
         
-        if not 启用节点:
+        if not enable_node:
             return ("", "")
         
-        if 预设组合 != "不使用预设":
-            original_prompt = self.预设组合映射.get(预设组合, "")
-            if 请输入您的补充文本.strip():
-                original_prompt = f"{original_prompt}，{请输入您的补充文本.strip()}" if original_prompt else 请输入您的补充文本.strip()
-            if 添加前缀 and original_prompt:
+        if preset_combination != "不使用预设":
+            original_prompt = self.preset_combination_mapping.get(preset_combination, "")
+            if supplementary_text.strip():
+                original_prompt = f"{original_prompt}，{supplementary_text.strip()}" if original_prompt else supplementary_text.strip()
+            if add_prefix and original_prompt:
                 original_prompt = f"画面采用{original_prompt}"
             
             expanded_prompt = original_prompt
-            if 启用扩写 and original_prompt:
-                expanded_prompt = self._call_llm_api(original_prompt, 模型品牌, 自定义引导词)
+            if enable_expansion and original_prompt:
+                expanded_prompt = self._call_llm_api(original_prompt, model_brand, custom_system_prompt)
             
             return (original_prompt, expanded_prompt)
         
         processed_args = {}
-        processed_args['主体类型'] = self._process_option(kwargs.get('主体类型'), self.主体类型选项)
-        processed_args['场景类型'] = self._process_option(kwargs.get('场景类型'), self.场景类型选项)
-        processed_args['运镜方式'] = self._process_option(kwargs.get('运镜方式'), self.运镜方式选项)
+        processed_args['subject_type'] = self._process_option(kwargs.get('subject_type'), self.subject_type_options)
+        processed_args['scene_type'] = self._process_option(kwargs.get('scene_type'), self.scene_type_options)
+        processed_args['camera_movement'] = self._process_option(kwargs.get('camera_movement'), self.camera_movement_options)
 
         option_map = {
-            '光源类型': self.光源类型选项,
-            '光线类型': self.光线类型选项,
-            '时间段': self.时间段选项,
-            '景别': self.景别选项,
-            '构图': self.构图选项,
-            '镜头焦段': self.镜头焦段选项,
-            '机位角度': self.机位角度选项,
-            '镜头类型': self.镜头类型选项,
-            '色调': self.色调选项,
-            '人物情绪': self.人物情绪选项,
-            '运动类型': self.运动类型选项,
-            '视觉风格': self.视觉风格选项,
-            '特效镜头': self.特效镜头选项,
-            '动作姿势': self.动作姿势选项,
+            'light_source': self.light_source_options,
+            'light_type': self.light_type_options,
+            'time_period': self.time_period_options,
+            'shot_type': self.shot_type_options,
+            'composition': self.composition_options,
+            'lens_focal_length': self.lens_focal_length_options,
+            'camera_angle': self.camera_angle_options,
+            'lens_type': self.lens_type_options,
+            'color_tone': self.color_tone_options,
+            'character_emotion': self.character_emotion_options,
+            'motion_type': self.motion_type_options,
+            'visual_style': self.visual_style_options,
+            'special_effect': self.special_effect_options,
+            'action_pose': self.action_pose_options,
         }
 
         for key, options in option_map.items():
             processed_args[key] = self._process_option(kwargs.get(key), options)
 
         elements = [
-            processed_args.get('视觉风格'),
-            processed_args.get('光源类型'),
-            processed_args.get('光线类型'),
-            processed_args.get('镜头类型'),
-            processed_args.get('色调'),
-            processed_args.get('特效镜头'),
-            processed_args.get('时间段'),
-            processed_args.get('景别'),
-            processed_args.get('构图'),
-            processed_args.get('镜头焦段'),
-            processed_args.get('机位角度'),
-            processed_args.get('运镜方式'),
-            processed_args.get('动作姿势')
+            processed_args.get('visual_style'),
+            processed_args.get('light_source'),
+            processed_args.get('light_type'),
+            processed_args.get('lens_type'),
+            processed_args.get('color_tone'),
+            processed_args.get('special_effect'),
+            processed_args.get('time_period'),
+            processed_args.get('shot_type'),
+            processed_args.get('composition'),
+            processed_args.get('lens_focal_length'),
+            processed_args.get('camera_angle'),
+            processed_args.get('camera_movement'),
+            processed_args.get('action_pose')
         ]
 
         prompt_parts = [e for e in elements if e]
         prompt = "，".join(prompt_parts) if prompt_parts else ""
         
-        if 添加前缀:
+        if add_prefix:
             end_elements = []
-            if processed_args.get('主体类型'):
-                end_elements.append(processed_args.get('主体类型'))
-            if processed_args.get('场景类型'):
-                end_elements.append(processed_args.get('场景类型'))
-            if processed_args.get('人物情绪'):
-                end_elements.append(processed_args.get('人物情绪'))
+            if processed_args.get('subject_type'):
+                end_elements.append(processed_args.get('subject_type'))
+            if processed_args.get('scene_type'):
+                end_elements.append(processed_args.get('scene_type'))
+            if processed_args.get('character_emotion'):
+                end_elements.append(processed_args.get('character_emotion'))
             
             if end_elements:
                 prompt = f"{prompt}，{ '，'.join(end_elements) }" if prompt else '，'.join(end_elements)
         else:
             front_elements = []
-            if processed_args.get('主体类型'):
-                front_elements.append(processed_args.get('主体类型'))
-            if processed_args.get('场景类型'):
-                front_elements.append(processed_args.get('场景类型'))
+            if processed_args.get('subject_type'):
+                front_elements.append(processed_args.get('subject_type'))
+            if processed_args.get('scene_type'):
+                front_elements.append(processed_args.get('scene_type'))
             
             if front_elements:
                 prompt = f"{ '，'.join(front_elements) }，{prompt}" if prompt else '，'.join(front_elements)
         
-        if processed_args.get('人物情绪') and not 添加前缀:
-            prompt = f"{prompt}，{processed_args.get('人物情绪')}" if prompt else processed_args.get('人物情绪')
+        if processed_args.get('character_emotion') and not add_prefix:
+            prompt = f"{prompt}，{processed_args.get('character_emotion')}" if prompt else processed_args.get('character_emotion')
         
-        if 请输入您的补充文本.strip():
-             prompt = f"{prompt}，{请输入您的补充文本.strip()}" if prompt else 请输入您的补充文本.strip()
+        if supplementary_text.strip():
+             prompt = f"{prompt}，{supplementary_text.strip()}" if prompt else supplementary_text.strip()
 
         original_prompt = prompt
-        if 添加前缀 and original_prompt:
+        if add_prefix and original_prompt:
             original_prompt = f"画面采用{original_prompt}"
         
         expanded_prompt = original_prompt
-        if 启用扩写 and original_prompt:
-            expanded_prompt = self._call_llm_api(original_prompt, 模型品牌, 自定义引导词)
+        if enable_expansion and original_prompt:
+            expanded_prompt = self._call_llm_api(original_prompt, model_brand, custom_system_prompt)
         
         return (original_prompt, expanded_prompt)
     
