@@ -16,6 +16,7 @@ from .Nodes.TextSwitchDualMode import TextSwitchDualMode
 from .Nodes.ShowText.show_text import ShowText
 from .Nodes.TranslateNodes.BaiduTranslate import BaiduTranslate
 from .Nodes.TranslateNodes.FreeTranslate import FreeTranslate
+from .Nodes.TranslateNodes.TencentTranslater import TencentTranslater
 from .Nodes.PhotographPromptGen.PhotographPromptGenerator import PhotographPromptGenerator
 from .Nodes.WanPromptGenerator import WanPromptGenerator
 from .Nodes.ImageScaler import ImageScaler
@@ -30,6 +31,7 @@ from .Nodes.MovieTools.FilmGrain import FilmGrain
 from .Nodes.LatentSwitchDualMode import LatentSwitchDualMode
 from .Nodes.LocalFileGallery.LocalFileGallery import LocalFileGallery
 from .Nodes.ImageAspectRatio import ImageAspectRatio
+from .Nodes.Preview_or_Compare_Images import PreviewOrCompareImages
 
 NODE_CLASS_MAPPINGS = {
     "PromptPresetOneChoice": PromptPresetOneChoice,
@@ -48,6 +50,7 @@ NODE_CLASS_MAPPINGS = {
     "ShowText": ShowText,
     "BaiduTranslate": BaiduTranslate,
     "FreeTranslate": FreeTranslate,
+    "TencentTranslater": TencentTranslater,
     "PhotographPromptGenerator": PhotographPromptGenerator,
     "WanPromptGenerator": WanPromptGenerator,
     "ImageScaler": ImageScaler,
@@ -62,6 +65,7 @@ NODE_CLASS_MAPPINGS = {
     "LatentSwitchDualMode": LatentSwitchDualMode,
     "LocalFileGallery": LocalFileGallery,
     "ImageAspectRatio": ImageAspectRatio,
+    "PreviewOrCompareImages": PreviewOrCompareImages,
 }
 
 NODE_DISPLAY_NAME_MAPPINGS = {
@@ -81,6 +85,7 @@ NODE_DISPLAY_NAME_MAPPINGS = {
     "ShowText": "Show Text",
     "BaiduTranslate": "Baidu Translate",
     "FreeTranslate": "Free Translate",
+    "TencentTranslater": "Tencent Translater",
     "PhotographPromptGenerator": "Photograph Prompt Generator",
     "WanPromptGenerator": "Wan Prompt Generator",
     "ImageScaler": "Image Scaler",
@@ -95,6 +100,7 @@ NODE_DISPLAY_NAME_MAPPINGS = {
     "LatentSwitchDualMode": "Latent Switch Dual Mode",
     "LocalFileGallery": "Local File Gallery",
     "ImageAspectRatio": "Image Aspect Ratio",
+    "PreviewOrCompareImages": "Preview or Compare Images",
 }
 
 WEB_DIRECTORY = os.path.dirname(os.path.abspath(__file__))

@@ -27,8 +27,8 @@ class FreeTranslate:
     
     RETURN_TYPES = ("STRING",)
     RETURN_NAMES = ("translation_result",)
-    FUNCTION = "translate_text"
-    CATEGORY = "utils"
+    FUNCTION = "translate"
+    CATEGORY = "zhihui/Translate"
     DESCRIPTION = "Free Translate: A free solution for text translation using various AI models. Supports Chinese-English mutual translation, automatic language detection, and provides multiple AI model choices including Claude, GPT, Gemini, etc. No API key required, suitable for quick translation and multilingual content processing."
     
     def detect_language(self, text):

@@ -231,6 +231,21 @@
             "target_language": "目标语言"
         }
     },
+    "TencentTranslater": {
+        "title": "腾讯翻译",
+        "description": "腾讯翻译：使用腾讯云翻译API进行文本翻译。支持自动语言检测中和英文互译，提供高质量的机器翻译服务。适用于多语言内容处理和国际化应用开发。",
+        "inputs": {
+            "Text": "文本输入"
+        },
+        "outputs": {
+            "Translation_Result": "翻译结果"
+        },
+        "widgets": {
+            "Translate_Enable": "启用翻译",
+            "From": "源语言",
+            "To": "目标语言"
+            }
+    },
     "PromptPresetOneChoice": {
         "title": "单选提示词预设",
         "description": "单选提示词预设：提供6个预设提示词选项，用户可选择其中一个输出。每个提示词可添加注释标注，便于管理和识别不同提示词内容。",
@@ -506,6 +521,14 @@
         "outputs": {
             "image_output": "图像输出",
             "text_content": "文本内容"
+        }
+    },
+    "PreviewOrCompareImages": {
+        "title": "图像预览/对比",
+        "description": "多功能图像预览和对比节点：支持单张图像预览或两张图像的并排对比显示。image_1为必需输入，image_2为可选输入，当提供两张图像时自动启用对比模式。鼠标悬停时显示交互式滑动分割线进行直观对比。",
+        "inputs": {
+            "image_1": "主要图像（必需）",
+            "image_2": "次要图像（可选）"
         }
     }
 }

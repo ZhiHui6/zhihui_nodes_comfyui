@@ -21,5 +21,11 @@
     "Hairstyle Change":"发型变换",
     "Bodybuilding":"健美塑形",
     "Remove Furniture":"移除家具",
-    "Interior Design":"室内设计"
+    "Interior Design":"室内设计",
+    "Descriptive":"描述性",
+    "Straightforward":"直接描述",
+    "Training Prompt":"训练提示词",
+    "MidJourney Prompt":"MidJourney提示词",
+    "Booru Tags":"Booru标签",
+    "Custom Guide":"自定义引导"
 }

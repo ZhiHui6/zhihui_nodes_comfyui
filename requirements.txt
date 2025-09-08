@@ -1,8 +1,6 @@
 opencv-python
 torch
 numpy
-kornia
 requests
 Pillow
 aiohttp
-watchdog

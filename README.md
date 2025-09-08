@@ -355,7 +355,23 @@ This node collection contains numerous nodes with different functions, divided i
 <tr>
 <td><b>颜色移除</b><br><b>Color Removal</b><br><code>ColorRemoval</code></td>
 <td>从图像中移除彩色，输出灰度图像。适用于创建黑白效果或作为特定图像处理流程的预处理步骤。<br>Removes color from images and outputs grayscale images. Suitable for creating black and white effects or as a preprocessing step for specific image processing workflows.<br><br>
-<a href="images/去色节点展示.png" target="_blank"><img src="images/去色节点展示.png" alt="颜色移除节点展示" width="400"/></a></td>
+<a href="images/颜色移除节点展示.jpg" target="_blank"><img src="images/颜色移除节点展示.jpg" alt="颜色移除节点展示" width="400"/></a></td>
+</tr>
+<tr>
+<td><b>图像预览/对比</b><br><b>Preview or Compare Images</b><br><code>PreviewOrCompareImages</code></td>
+<td>多功能图像预览和对比节点，支持单张图像预览或两张图像的并排对比显示。image_1为必需输入，image_2为可选输入，当提供两张图像时自动启用对比模式。<br>Multi-functional image preview and comparison node that supports single image preview or side-by-side comparison of two images. image_1 is required input, image_2 is optional input, automatically enables comparison mode when two images are provided.
+
+<b>特点 | Features</b>：
+- <b>双模式智能切换 | Dual-mode Smart Switching</b>：根据输入单图或双图自动切换预览或对比模式<br>Automatically switches between preview or comparison mode based on single or dual image inputs
+- <b>交互式对比 | Interactive Comparison</b>：鼠标悬停时显示滑动分割线进行直观对比<br>Shows sliding divider for intuitive comparison when mouse hovers over the node
+
+<br>
+<div align="left">
+<a href="images/图像对比.jpg" target="_blank">
+<img src="images/图像对比.jpg" alt="图像预览对比" width="45%"/>
+</a>
+</div>
+</td>
 </tr>
 </table>
 
@@ -531,10 +547,31 @@ This node collection contains numerous nodes with different functions, divided i
 - <b>免费使用 | Free to Use</b>：无需注册或API密钥，开箱即用<br>No registration or API key required, ready to use out of the box
 
 - <b>多模型支持 | Multi-model Support</b>：提供11种AI模型选择（OpenAI、Claude、DeepSeek、Gemini等）<br>Provides 11 AI model options (OpenAI, Claude, DeepSeek, Gemini, etc.)
+- <b>注意 | Note</b>：使用此节点需要网络连接<br>Network connection required for this node
 
 <div align="left">
 <a href="images/中英文翻译器.jpg" target="_blank">
 <img src="images/中英文翻译器.jpg" alt="免费在线翻译" width="45%"/>
+</a>
+</div>
+</td>
+</tr>
+<tr>
+<td><b>腾讯翻译</b><br><b>Tencent Translater</b><br><code>TencentTranslater</code></td>
+<td>
+
+使用腾讯云翻译API进行文本翻译，支持自动语言检测和中英文互译。<br>Uses Tencent Cloud Translation API for text translation, supporting automatic language detection and bidirectional Chinese-English translation.
+
+<b>特点 | Features</b>：
+- <b>高质量翻译 | High-Quality Translation</b>：基于腾讯云专业翻译引擎，提供准确可靠的翻译结果<br>Based on Tencent Cloud professional translation engine, providing accurate and reliable translation results
+
+- <b>简单易用 | Easy to Use</b>：无需配置API密钥，开箱即用<br>No API key configuration required, ready to use out of the box
+
+- <b>注意 | Note</b>：使用此节点需要网络连接<br>Network connection required for this node
+
+<div align="left">
+<a href="images/腾讯翻译.jpg" target="_blank">
+<img src="images/腾讯翻译.jpg" alt="腾讯翻译" width="45%"/>
 </a>
 </div>
 </td>
@@ -551,10 +588,6 @@ This node collection contains numerous nodes with different functions, divided i
 
 <b>特点 | Features</b>：
 - <b>可视化界面 | Visual Interface</b>：提供友好的文件浏览器界面<br>Provides a user-friendly file browser interface
-
-- <b>双输出模式 | Dual Output Mode</b>：同时输出选中的图片（IMAGE类型）和文本内容（STRING类型）<br>Simultaneously outputs selected images (IMAGE type) and text content (STRING type)
-- <b>安全验证 | Security Validation</b>：内置路径安全检查和文件格式验证<br>Built-in path security checks and file format validation
-- <b>缓存优化 | Cache Optimization</b>：LRU缓存机制提升文件加载性能<br>LRU cache mechanism improves file loading performance
 - <b>缩略图支持 | Thumbnail Support</b>：快速预览图片内容<br>Quick preview of image content
 
 <div align="left">
