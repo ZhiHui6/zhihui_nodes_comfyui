@@ -13,7 +13,7 @@ from .Nodes.TextModifier import TextModifier
 from .Nodes.TextExtractor import TextExtractor
 from .Nodes.TriggerWordMerger import TriggerWordMerger
 from .Nodes.TextSwitchDualMode import TextSwitchDualMode
-from .Nodes.ShowText.show_text import ShowText
+from .Nodes.show_text import ShowText
 from .Nodes.TranslateNodes.BaiduTranslate import BaiduTranslate
 from .Nodes.TranslateNodes.FreeTranslate import FreeTranslate
 from .Nodes.TranslateNodes.TencentTranslater import TencentTranslater

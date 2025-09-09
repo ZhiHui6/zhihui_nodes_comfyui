@@ -5,7 +5,7 @@ app.registerExtension({
 	name: "ShowText",
 	async beforeRegisterNodeDef(nodeType, nodeData, app) {
 		if (nodeData.name === "ShowText") {
-			function populate(文本) {
+			function populate(text) {
 				if (this.widgets) {
 					const isConvertedWidget = +!!this.inputs?.[0].widget;
 					for (let i = isConvertedWidget; i < this.widgets.length; i++) {
@@ -14,14 +14,14 @@ app.registerExtension({
 					this.widgets.length = isConvertedWidget;
 				}
 
-				const v = [...文本];
+				const v = [...text];
 				if (!v[0]) {
 					v.shift();
 				}
 				for (let list of v) {
 					if (!(list instanceof Array)) list = [list];
 					for (const l of list) {
-						const w = ComfyWidgets["STRING"](this, "文本_" + this.widgets?.length ?? 0, ["STRING", { multiline: true }], app).widget;
+						const w = ComfyWidgets["STRING"](this, "text_" + this.widgets?.length ?? 0, ["STRING", { multiline: true }], app).widget;
 						w.inputEl.readOnly = true;
 						w.inputEl.style.opacity = 0.6;
 						w.value = l;
@@ -44,7 +44,7 @@ app.registerExtension({
 			const onExecuted = nodeType.prototype.onExecuted;
 			nodeType.prototype.onExecuted = function (message) {
 				onExecuted?.apply(this, arguments);
-				populate.call(this, message.文本);
+				populate.call(this, message.text);
 			};
 
 			const VALUES = Symbol();
