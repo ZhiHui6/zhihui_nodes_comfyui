@@ -530,5 +530,15 @@
             "image_1": "主要图像（必需）",
             "image_2": "次要图像（可选）"
         }
+    },
+    "PauseWorkflow": {
+        "title": "暂停工作流",
+        "description": "暂停工作流执行并等待用户交互以继续或取消。",
+        "inputs": {
+            "any": "任意输入"
+        },
+        "outputs": {
+            "any": "任意输出"
+        }
     }
 }

@@ -8,11 +8,12 @@ app.registerExtension({
   name: "zhihui_PauseWorkflow",
   nodeCreated(node) {
     if (node.comfyClass === "PauseWorkflow") {
-      node.addWidget("button", "▶️Continue", "CONTINUE", () => {
+      
+      node.addWidget("button", "▶️Continue / 继续", "CONTINUE", () => {
         postContinue(node.id);
       });
 
-      node.addWidget("button", "⏹️Cancel", "CANCEL", () => {
+      node.addWidget("button", "⏹️Stop / 取消", "CANCEL", () => {
         postCancel();
       });
     }

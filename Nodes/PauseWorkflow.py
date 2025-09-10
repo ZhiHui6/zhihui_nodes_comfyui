@@ -29,7 +29,8 @@ class PauseWorkflow:
     RETURN_TYPES = (any_type,)
     RETURN_NAMES = ("any",)
     FUNCTION = "execute"
-    CATEGORY = "utils"
+    CATEGORY = "zhihui/Toolkit"
+    DESCRIPTION = "Pauses workflow execution and waits for user interaction to continue or cancel."
     OUTPUT_NODE = True
 
     def execute(self, any=None, id=None):
