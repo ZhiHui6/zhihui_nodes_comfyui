@@ -31,6 +31,7 @@ from .Nodes.LocalFileGallery.LocalFileGallery import LocalFileGallery
 from .Nodes.ImageAspectRatio import ImageAspectRatio
 from .Nodes.Preview_or_Compare_Images import PreviewOrCompareImages
 from .Nodes.PauseWorkflow import PauseWorkflow
+from .Nodes.TextEditorWithContinue import TextEditorWithContinue
 
 import os
 
@@ -68,6 +69,7 @@ NODE_CLASS_MAPPINGS = {
     "ImageAspectRatio": ImageAspectRatio,
     "PreviewOrCompareImages": PreviewOrCompareImages,
     "PauseWorkflow": PauseWorkflow,
+    "TextEditorWithContinue": TextEditorWithContinue,
 }
 
 NODE_DISPLAY_NAME_MAPPINGS = {
@@ -104,6 +106,7 @@ NODE_DISPLAY_NAME_MAPPINGS = {
     "ImageAspectRatio": "Image Aspect Ratio",
     "PreviewOrCompareImages": "Preview or Compare Images",
     "PauseWorkflow": "Pause Workflow",
+    "TextEditorWithContinue": "Text Editor with Continue",
 }
 
 WEB_DIRECTORY = os.path.dirname(os.path.abspath(__file__))

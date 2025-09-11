@@ -531,6 +531,20 @@
             "image_2": "次要图像（可选）"
         }
     },
+    "TextEditorWithContinue": {
+        "title": "文本编辑器（继续运行）",
+        "description": "文本编辑器（手动同步）：暂停工作流执行，提供手动文本同步和可编辑文本区域，用户点击继续按钮时恢复执行。",
+        "inputs": {
+            "text": "文本"
+        },
+        "widgets": {
+            "editable_text": "可编辑文本"
+        },
+        "outputs": {
+            "text_output": "文本输出",
+            "help_info": "帮助信息"
+        }
+    },
     "PauseWorkflow": {
         "title": "暂停工作流",
         "description": "暂停工作流执行并等待用户交互以继续或取消。",

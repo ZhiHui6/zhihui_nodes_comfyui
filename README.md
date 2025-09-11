@@ -161,6 +161,27 @@ This node collection contains numerous nodes with different functions, divided i
 </div>
 </td>
 </tr>
+<tr>
+<td><b>文本编辑器（继续运行）</b><br><b>Text Editor with Continue</b><br><code>TextEditorWithContinue</code></td>
+<td>交互式文本编辑节点，暂停工作流执行并提供可编辑文本区域，用户可在运行时修改文本内容，点击继续按钮恢复工作流执行。<br>Interactive text editing node that pauses workflow execution and provides an editable text area, allowing users to modify text content at runtime and resume workflow execution by clicking the continue button.
+
+<b>特点 | Features</b>：
+- <b>工作流暂停 | Workflow Pause</b>：自动暂停工作流执行，等待用户交互<br>Automatically pauses workflow execution, waiting for user interaction
+- <b>实时编辑 | Real-time Editing</b>：提供可编辑文本区域，支持多行文本编辑<br>Provides editable text area with multi-line text editing support
+- <b>手动同步 | Manual Sync</b>：编辑后需手动点击同步按钮更新内容<br>Requires manual sync button click to update content after editing
+
+<b>使用场景 | Use Cases</b>：
+- 工作流中需要人工干预和文本调整的场景<br>Scenarios requiring manual intervention and text adjustment in workflows
+- 提示词的实时优化和调试<br>Real-time optimization and debugging of prompts
+
+<br>
+<div align="left">
+<a href="images/Text Editor with Continue.jpg" target="_blank">
+<img src="images/Text Editor with Continue.jpg" alt="Text Editor with Continue" width="45%"/>
+</a>
+</div>
+</td>
+</tr>
 </table>
 
 ### 🎯 提示词处理类节点 | Prompt Processing Nodes
