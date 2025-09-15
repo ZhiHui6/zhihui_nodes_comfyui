@@ -32,6 +32,7 @@ from .Nodes.ImageAspectRatio import ImageAspectRatio
 from .Nodes.Preview_or_Compare_Images import PreviewOrCompareImages
 from .Nodes.PauseWorkflow import PauseWorkflow
 from .Nodes.TextEditorWithContinue import TextEditorWithContinue
+from .Nodes.TagSelector.TagSelector import TagSelector
 
 import os
 
@@ -70,6 +71,7 @@ NODE_CLASS_MAPPINGS = {
     "PreviewOrCompareImages": PreviewOrCompareImages,
     "PauseWorkflow": PauseWorkflow,
     "TextEditorWithContinue": TextEditorWithContinue,
+    "TagSelector": TagSelector,
 }
 
 NODE_DISPLAY_NAME_MAPPINGS = {
@@ -107,6 +109,7 @@ NODE_DISPLAY_NAME_MAPPINGS = {
     "PreviewOrCompareImages": "Preview or Compare Images",
     "PauseWorkflow": "Pause Workflow",
     "TextEditorWithContinue": "Text Editor with Continue",
+    "TagSelector": "Tag Selector",
 }
 
 WEB_DIRECTORY = os.path.dirname(os.path.abspath(__file__))

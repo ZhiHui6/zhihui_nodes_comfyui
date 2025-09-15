@@ -10,7 +10,7 @@ This is a ComfyUI custom node collection carefully created by <span style="color
 
 ### ✨ 主要特点 | Key Features
 
-- 🔄 **双语翻译工具**：配有百度翻译和免费在线翻译节点，支持中英文双向转换。<br>**Bilingual Translation Tools**: Equipped with Baidu Translate and free online translation nodes, supporting bidirectional Chinese-English conversion.
+- 🔄 **智能翻译系统**：集成百度翻译+腾讯翻译+免费在线翻译三引擎，支持中英双向实时转换与批量处理。<br>**Smart Translation System**: Triple-engine integration with Baidu, Tencent and free online translation, supporting real-time bidirectional Chinese-English conversion and batch processing.
 
 - 📝 **全面文本处理**：提供多行文本编辑、文本合并分离、内容提取修改、语言过滤等5类文本操作节点。<br>**Comprehensive Text Processing**: Provides 5 categories of text operation nodes including multi-line text editing, text merging and separation, content extraction and modification, language filtering, etc.
 
@@ -21,8 +21,6 @@ This is a ComfyUI custom node collection carefully created by <span style="color
 - 🌐 **完整汉化支持**：提供专门的中文汉化文件，配合 ComfyUI-DD-Translation 扩展使用，让中文用户能够更便捷地使用各个节点功能。详细说明请参考 [Localization_Guide.md](doc/Localization_Guide.md)。<br>**Complete Chinese Localization**: Provides dedicated Chinese localization files that work with ComfyUI-DD-Translation extension, allowing Chinese users to use node functions more conveniently. For detailed instructions, please refer to [Localization_Guide.md](doc/Localization_Guide.md).
 
 如果这个项目对您有帮助，请给我们一个 ⭐**Star**！您的支持是我们持续改进的动力。
-
-如果这个项目对您有帮助，请给我们一个 ⭐**Star**！您的支持是我们持续改进的动力。<br>
 If this project helps you, please give us a ⭐**Star**! Your support is our motivation for continuous improvement.
 
 ## ⭐ 明星节点 | Featured Nodes
@@ -67,6 +65,7 @@ If this project helps you, please give us a ⭐**Star**! Your support is our mot
 <td>提示词处理<br>Prompt Processing</td>
 <td>类似JoyCaption额外选项的通用式图像反推辅助，集成了5种反推类型，提供26个精细化选项开关。<br>Universal image reverse engineering assistant similar to JoyCaption extra options, integrating 5 reverse engineering types with 26 fine-grained option switches.</td>
 </tr>
+
 </table>
 
 💡 **使用建议**：新用户建议从 **摄影提示词生成器** 和 **万相视频提示词生成器** 开始体验，这两个节点能够快速提升您的创作效率和作品质量。
@@ -616,6 +615,23 @@ This node collection contains numerous nodes with different functions, divided i
 <img src="images/本地文件画廊.jpg" alt="本地文件画廊" width="45%"/>
 </a>
 </div>
+</td>
+</tr>
+<tr>
+<td><b>🏷️TAG标签选择器</b><br><b>Tag Selector</b><br><code>TagSelector</code></td>
+<td>
+
+专业的可视化标签选择工具，提供直观的多级分类导航界面，支持海量标签的快速选择和管理。<br>Professional visual tag selection tool, providing an intuitive multi-level category navigation interface, supporting rapid selection and management of massive tags.
+
+<b>特点 | Features</b>：
+- <b>多级分类导航 | Multi-level Category Navigation</b>：支持三级/四级分类结构，清晰的层级导航<br>Supports 3/4-level category structure with clear hierarchical navigation
+- <b>可视化标签选择 | Visual Tag Selection</b>：直观的标签展示界面，支持中英文双语显示<br>Intuitive tag display interface with bilingual Chinese-English support
+- <b>已选标签管理 | Selected Tags Management</b>：实时显示已选标签数量和列表，支持快速移除<br>Real-time display of selected tag count and list with quick removal support
+
+<b>使用场景 | Use Cases</b>：
+- 提示词标签的快速选择和组合<br>Quick selection and combination of prompt tags
+
+
 </td>
 </tr>
 </table>
