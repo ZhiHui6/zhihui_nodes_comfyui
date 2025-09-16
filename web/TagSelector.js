@@ -83,40 +83,26 @@ async function loadTagsData() {
 
 // 转换tags.json格式为界面所需格式
 function convertTagsFormat(rawData) {
-    const converted = {};
-    
-    for (const [mainCategory, subCategories] of Object.entries(rawData)) {
-        converted[mainCategory] = {};
-        
-        for (const [subCategory, content] of Object.entries(subCategories)) {
-            // 检查是否还有更深层的嵌套
-            if (hasDeepNesting(content)) {
-                // 四级嵌套：主分类->子分类->子子分类->标签
-                converted[mainCategory][subCategory] = {};
-                for (const [subSubCategory, tags] of Object.entries(content)) {
-                    converted[mainCategory][subCategory][subSubCategory] = [];
-                    for (const [chineseName, englishValue] of Object.entries(tags)) {
-                        const tagObj = {
-                            display: chineseName,
-                            value: englishValue
-                        };
-                        converted[mainCategory][subCategory][subSubCategory].push(tagObj);
-                    }
-                }
-            } else {
-                // 三级嵌套：主分类->子分类->标签
-                converted[mainCategory][subCategory] = [];
-                for (const [chineseName, englishValue] of Object.entries(content)) {
-                    const tagObj = {
-                        display: chineseName,
-                        value: englishValue
-                    };
-                    converted[mainCategory][subCategory].push(tagObj);
-                }
+    // 递归将任意层对象转换：叶子->数组[{display,value}]，中间层->对象
+    const convertNode = (node) => {
+        if (node && typeof node === 'object') {
+            const values = Object.values(node);
+            const allString = values.every(v => typeof v === 'string');
+            if (allString) {
+                return Object.entries(node).map(([chineseName, englishValue]) => ({ display: chineseName, value: englishValue }));
             }
+            const result = {};
+            for (const [k, v] of Object.entries(node)) {
+                result[k] = convertNode(v);
+            }
+            return result;
         }
+        return node;
+    };
+    const converted = {};
+    for (const [mainCategory, subCategories] of Object.entries(rawData)) {
+        converted[mainCategory] = convertNode(subCategories);
     }
-    
     return converted;
 }
 
@@ -210,8 +196,8 @@ function createTagSelectorDialog() {
         font-weight: bold;
         cursor: pointer;
         padding: 0;
-        width: 28px;
-        height: 28px;
+        width: 21px;
+        height: 21px;
         display: flex;
         align-items: center;
         justify-content: center;
@@ -266,7 +252,7 @@ function createTagSelectorDialog() {
     
     const overviewTitle = document.createElement('div');
     overviewTitle.style.cssText = `
-        padding: 12px 20px;
+        padding: 8px 16px;
         font-weight: 600;
         color: #e2e8f0;
         display: flex;
@@ -276,7 +262,11 @@ function createTagSelectorDialog() {
     `;
     
     const overviewTitleText = document.createElement('span');
-    overviewTitleText.textContent = '已选择的标签：';
+    overviewTitleText.innerHTML = '已选择的标签 / Selected Tags:';
+    overviewTitleText.style.cssText = `
+        text-align: left;
+        line-height: 1.2;
+    `;
     
     // 创建提示语元素
     const hintText = document.createElement('span');
@@ -367,6 +357,18 @@ function createTagSelectorDialog() {
         margin-top: 2px;
     `;
     
+    // 新增：创建子子子分类标签栏 | 四级分类
+    const subSubSubCategoryTabs = document.createElement('div');
+    subSubSubCategoryTabs.style.cssText = `
+        background: linear-gradient(135deg, #334155 0%, #1e293b 100%);
+        border-bottom: 1px solid rgba(71, 85, 105, 0.8);
+        display: none;
+        overflow-x: auto;     
+        min-height: 2px;
+        backdrop-filter: blur(10px);
+        margin-top: 2px;
+    `;
+    
     // 创建标签内容区
     const tagContent = document.createElement('div');
     tagContent.style.cssText = `
@@ -391,19 +393,19 @@ function createTagSelectorDialog() {
     `;
     
     const clearBtn = document.createElement('button');
-    clearBtn.textContent = '清空选择';
+    clearBtn.innerHTML = '<span style="font-size: 16px; display: block;">清空选择</span><span style="font-size: 12px; display: block; margin-top: 2px;">Clear Selection</span>';
     clearBtn.style.cssText = `
         background: linear-gradient(135deg, #dc2626 0%, #b91c1c 100%);
         border: 1px solid rgba(220, 38, 38, 0.8);
         color: #ffffff;
-        padding: 10px 20px;
+        padding: 8px 16px;
         border-radius: 8px;
         cursor: pointer;
-        font-size: 14px;
         font-weight: 500;
         transition: all 0.2s ease;
         backdrop-filter: blur(10px);
         box-shadow: 0 2px 4px rgba(220, 38, 38, 0.3);
+        line-height: 1.2;
     `;
     clearBtn.addEventListener('mouseenter', () => {
         clearBtn.style.background = 'linear-gradient(135deg, #f87171 0%, #ef4444 100%)';
@@ -450,6 +452,8 @@ function createTagSelectorDialog() {
     // 组装对话框
     rightPanel.appendChild(subCategoryTabs);
     rightPanel.appendChild(subSubCategoryTabs);
+    // 新增：挂载四级分类栏
+    rightPanel.appendChild(subSubSubCategoryTabs);
     rightPanel.appendChild(tagContent);
     content.appendChild(categoryList);
     content.appendChild(rightPanel);
@@ -465,6 +469,8 @@ function createTagSelectorDialog() {
     tagSelectorDialog.categoryList = categoryList;
     tagSelectorDialog.subCategoryTabs = subCategoryTabs;
     tagSelectorDialog.subSubCategoryTabs = subSubCategoryTabs;
+    // 新增：持久化四级分类栏引用
+    tagSelectorDialog.subSubSubCategoryTabs = subSubSubCategoryTabs;
     tagSelectorDialog.tagContent = tagContent;
     tagSelectorDialog.selectedOverview = selectedOverview;
     tagSelectorDialog.selectedCount = selectedCount;
@@ -639,7 +645,16 @@ function initializeCategoryList() {
 function showSubCategories(category) {
     const subCategoryTabs = tagSelectorDialog.subCategoryTabs;
     subCategoryTabs.innerHTML = '';
-    
+
+    // 切换二级分类时，隐藏并清空三级、四级分类栏
+    if (tagSelectorDialog.subSubCategoryTabs) {
+        tagSelectorDialog.subSubCategoryTabs.style.display = 'none';
+        tagSelectorDialog.subSubCategoryTabs.innerHTML = '';
+    }
+    if (tagSelectorDialog.subSubSubCategoryTabs) {
+        tagSelectorDialog.subSubSubCategoryTabs.style.display = 'none';
+        tagSelectorDialog.subSubSubCategoryTabs.innerHTML = '';
+    }
     const subCategories = tagsData[category];
     Object.keys(subCategories).forEach((subCategory, index) => {
         const tab = document.createElement('div');
@@ -714,6 +729,12 @@ function showSubSubCategories(category, subCategory) {
     subSubCategoryTabs.innerHTML = '';
     subSubCategoryTabs.style.display = 'flex';
     
+    // 切换三级分类时，隐藏并清空四级分类栏
+    if (tagSelectorDialog.subSubSubCategoryTabs) {
+        tagSelectorDialog.subSubSubCategoryTabs.style.display = 'none';
+        tagSelectorDialog.subSubSubCategoryTabs.innerHTML = '';
+    }
+    
     const subSubCategories = tagsData[category][subCategory];
     Object.keys(subSubCategories).forEach((subSubCategory, index) => {
         const tab = document.createElement('div');
@@ -733,15 +754,15 @@ function showSubSubCategories(category, subCategory) {
         // 三级分类悬停效果颜色配置
         tab.onmouseenter = () => {
             if (!tab.classList.contains('active')) {
-                tab.style.backgroundColor = 'rgb(49, 84, 136)'; // 悬停背景色：低透明度藏青色
-                tab.style.color = '#fff'; // 悬停文字色：白色
+                tab.style.backgroundColor = 'rgb(49, 84, 136)';
+                tab.style.color = '#fff';
             }
         };
         tab.onmouseleave = () => {
             if (!tab.classList.contains('active')) {
-                tab.style.backgroundColor = 'transparent'; // 恢复默认背景色：透明
+                tab.style.backgroundColor = 'transparent';
                 tab.style.boxShadow = 'none';
-                tab.style.color = '#ccc'; // 恢复默认文字色：浅灰色
+                tab.style.color = '#ccc';
             }
         };
         
@@ -761,8 +782,18 @@ function showSubSubCategories(category, subCategory) {
             tab.style.backgroundColor = '#3b82f6';
             tab.style.color = '#fff';
             
-            // 显示标签
-            showTagsFromSubSub(category, subCategory, subSubCategory);
+            const subSubCategoryData = tagsData[category][subCategory][subSubCategory];
+            if (Array.isArray(subSubCategoryData)) {
+                // 无更深层，直接显示标签
+                if (tagSelectorDialog.subSubSubCategoryTabs) {
+                    tagSelectorDialog.subSubSubCategoryTabs.style.display = 'none';
+                    tagSelectorDialog.subSubSubCategoryTabs.innerHTML = '';
+                }
+                showTagsFromSubSub(category, subCategory, subSubCategory);
+            } else {
+                // 还有更深层（四级分类）
+                showSubSubSubCategories(category, subCategory, subSubCategory);
+            }
         };
         
         subSubCategoryTabs.appendChild(tab);
@@ -774,12 +805,90 @@ function showSubSubCategories(category, subCategory) {
     });
 }
 
+// 新增：显示子子子分类（四级）
+function showSubSubSubCategories(category, subCategory, subSubCategory) {
+    const el = tagSelectorDialog.subSubSubCategoryTabs;
+    if (!el) return;
+
+    // 清空并显示四级分类栏
+    el.innerHTML = '';
+    el.style.display = 'flex';
+
+    const map = tagsData?.[category]?.[subCategory]?.[subSubCategory];
+    if (!map) {
+        el.style.display = 'none';
+        return;
+    }
+
+    // 如果是叶子数组，直接显示标签并隐藏四级栏
+    if (Array.isArray(map)) {
+        el.style.display = 'none';
+        showTagsFromSubSub(category, subCategory, subSubCategory);
+        return;
+    }
+
+    // 构建四级分类 tabs
+    Object.keys(map).forEach((name, index) => {
+        const tab = document.createElement('div');
+        tab.style.cssText = `
+            padding: 6px 10px;
+            color: #ccc;
+            cursor: pointer;
+            border-right: 1px solid rgba(71, 85, 105, 0.8);
+            white-space: nowrap;
+            transition: background-color 0.2s;
+            min-width: 50px;
+            text-align: center;
+            font-size: 12px;
+        `;
+        tab.textContent = name;
+
+        tab.onmouseenter = () => {
+            if (!tab.classList.contains('active')) {
+                tab.style.backgroundColor = 'rgb(49, 84, 136)';
+                tab.style.color = '#fff';
+            }
+        };
+        tab.onmouseleave = () => {
+            if (!tab.classList.contains('active')) {
+                tab.style.backgroundColor = 'transparent';
+                tab.style.boxShadow = 'none';
+                tab.style.color = '#ccc';
+            }
+        };
+
+        tab.onclick = () => {
+            el.querySelectorAll('.active').forEach(item => {
+                item.classList.remove('active');
+                item.style.backgroundColor = 'transparent';
+                item.style.color = '#ccc';
+                item.style.borderTop = 'none';
+                item.style.borderLeft = 'none';
+                item.style.borderBottom = 'none';
+            });
+            tab.classList.add('active');
+            tab.style.backgroundColor = '#3b82f6';
+            tab.style.color = '#fff';
+
+            showTagsFromSubSubSub(category, subCategory, subSubCategory, name);
+        };
+
+        el.appendChild(tab);
+        if (index === 0) tab.click();
+    });
+}
+
 // 显示标签（三级结构）
 function showTags(category, subCategory) {
     // 隐藏子子分类栏
     const subSubCategoryTabs = tagSelectorDialog.subSubCategoryTabs;
     subSubCategoryTabs.style.display = 'none';
-    
+    // 同时隐藏四级分类栏
+    if (tagSelectorDialog.subSubSubCategoryTabs) {
+        tagSelectorDialog.subSubSubCategoryTabs.style.display = 'none';
+        tagSelectorDialog.subSubSubCategoryTabs.innerHTML = '';
+    }
+
     const tagContent = tagSelectorDialog.tagContent;
     tagContent.innerHTML = '';
     
@@ -840,47 +949,33 @@ function showTags(category, subCategory) {
         
         let tooltip = null;
         
-        // 添加悬停提示显示英文值
-        // tagElement.title = tagObj.value; // 替换为自定义提示框
-        
-        // 添加鼠标悬停效果 - 二级分类标签悬停配色和自定义提示框
         tagElement.onmouseenter = (e) => {
             if (!isTagSelected(tagObj.value)) {
-                tagElement.style.backgroundColor = 'rgb(49, 84, 136)'; // 标签悬停背景色：低透明度藏青色
-                tagElement.style.borderColor = '#1e293b'; // 标签悬停边框色：藏青色
-                tagElement.style.color = '#fff'; // 标签悬停文字色：白色
-                tagElement.style.borderWidth = '1px'; /* 1像素边框 */
+                tagElement.style.backgroundColor = 'rgb(49, 84, 136)';
+                tagElement.style.borderColor = '#1e293b';
+                tagElement.style.color = '#fff';
+                tagElement.style.borderWidth = '1px';
             }
-            
-            // 清除之前的提示框避免残留
             if (tooltip && tooltip.parentNode) {
                 tooltip.parentNode.removeChild(tooltip);
                 tooltip = null;
             }
-            
-            // 显示自定义提示框
             tooltip = createCustomTooltip();
             document.body.appendChild(tooltip);
-            
             const rect = tagElement.getBoundingClientRect();
             tooltip.style.left = rect.left + (rect.width / 2) - (tooltip.offsetWidth / 2) + 'px';
             tooltip.style.top = rect.top + 'px';
-            
-            setTimeout(() => {
-                if (tooltip) tooltip.style.opacity = '1';
-            }, 10);
+            setTimeout(() => { if (tooltip) tooltip.style.opacity = '1'; }, 10);
         };
         
         tagElement.onmouseleave = () => {
             if (!isTagSelected(tagObj.value)) {
-                tagElement.style.backgroundColor = '#444'; // 标签默认背景色：深灰色
-                tagElement.style.borderColor = '#555'; // 标签默认边框色：深灰色
-                tagElement.style.color = '#ccc'; // 标签默认文字色：浅灰色
-                tagElement.style.borderWidth = '1px'; /* 恢复1像素边框 */
+                tagElement.style.backgroundColor = '#444';
+                tagElement.style.borderColor = '#555';
+                tagElement.style.color = '#ccc';
+                tagElement.style.borderWidth = '1px';
                 tagElement.style.boxShadow = 'none';
             }
-            
-            // 隐藏自定义提示框
             if (tooltip) {
                 tooltip.style.opacity = '0';
                 setTimeout(() => {
@@ -902,6 +997,11 @@ function showTags(category, subCategory) {
 
 // 显示标签（四级结构）
 function showTagsFromSubSub(category, subCategory, subSubCategory) {
+    // 切到四级标签或更深时，先隐藏四级分类栏（由更深函数决定是否显示）
+    if (tagSelectorDialog.subSubSubCategoryTabs) {
+        // 保持现状，不强制隐藏，交给上层控制
+    }
+
     const tagContent = tagSelectorDialog.tagContent;
     tagContent.innerHTML = '';
     
@@ -954,7 +1054,6 @@ function showTagsFromSubSub(category, subCategory, subSubCategory) {
                 transform: translateY(-100%) translateY(-8px);
                 max-width: 300px;
                 word-wrap: break-word;
-                line-height: 1.4;
             `;
             tooltip.textContent = tagObj.value;
             return tooltip;
@@ -962,47 +1061,30 @@ function showTagsFromSubSub(category, subCategory, subSubCategory) {
         
         let tooltip = null;
         
-        // 添加悬停提示显示英文值
-        // tagElement.title = tagObj.value; // 替换为自定义提示框
-        
-        // 添加鼠标悬停效果 - 三级分类标签悬停配色和自定义提示框
         tagElement.onmouseenter = (e) => {
             if (!isTagSelected(tagObj.value)) {
-                tagElement.style.backgroundColor = 'rgb(49, 84, 136)'; // 标签悬停背景色：低透明度藏青色
-                tagElement.style.borderColor = '#1e293b'; // 标签悬停边框色：藏青色
-                tagElement.style.color = '#fff'; // 标签悬停文字色：白色
-                tagElement.style.borderWidth = '1px'; /* 1像素边框 */
+                tagElement.style.backgroundColor = 'rgb(49, 84, 136)';
+                tagElement.style.borderColor = '#1e293b';
+                tagElement.style.color = '#fff';
             }
-            
-            // 清除之前的提示框避免残留
             if (tooltip && tooltip.parentNode) {
                 tooltip.parentNode.removeChild(tooltip);
                 tooltip = null;
             }
-            
-            // 显示自定义提示框
             tooltip = createCustomTooltip();
             document.body.appendChild(tooltip);
-            
             const rect = tagElement.getBoundingClientRect();
             tooltip.style.left = rect.left + (rect.width / 2) - (tooltip.offsetWidth / 2) + 'px';
             tooltip.style.top = rect.top + 'px';
-            
-            setTimeout(() => {
-                if (tooltip) tooltip.style.opacity = '1';
-            }, 10);
+            setTimeout(() => { if (tooltip) tooltip.style.opacity = '1'; }, 10);
         };
         
         tagElement.onmouseleave = () => {
             if (!isTagSelected(tagObj.value)) {
-                tagElement.style.backgroundColor = '#444'; // 标签默认背景色：深灰色
-                tagElement.style.borderColor = 'rgba(71, 85, 105, 0.8)'; // 标签默认边框色：半透明灰色
-                tagElement.style.color = '#ccc'; // 标签默认文字色：浅灰色
-                tagElement.style.borderWidth = '1px'; /* 恢复1像素边框 */
-                tagElement.style.boxShadow = 'none';
+                tagElement.style.backgroundColor = '#444';
+                tagElement.style.borderColor = '#555';
+                tagElement.style.color = '#ccc';
             }
-            
-            // 隐藏自定义提示框
             if (tooltip) {
                 tooltip.style.opacity = '0';
                 setTimeout(() => {
@@ -1018,6 +1100,105 @@ function showTagsFromSubSub(category, subCategory, subSubCategory) {
             toggleTag(tagObj.value, tagElement);
         };
         
+        tagContent.appendChild(tagElement);
+    });
+}
+
+// 显示标签（五级结构：四级分类下的标签）
+function showTagsFromSubSubSub(category, subCategory, subSubCategory, subSubSubCategory) {
+    const tagContent = tagSelectorDialog.tagContent;
+    tagContent.innerHTML = '';
+
+    const tags = tagsData[category][subCategory][subSubCategory][subSubSubCategory];
+    tags.forEach(tagObj => {
+        const tagElement = document.createElement('span');
+        tagElement.style.cssText = `
+            display: inline-block;
+            padding: 6px 12px;
+            margin: 4px;
+            background: #444;
+            color: #ccc;
+            border-radius: 16px;
+            cursor: pointer;
+            transition: all 0.2s;
+            border: 1px solid rgba(71, 85, 105, 0.8);
+            font-size: 14px;
+            position: relative;
+        `;
+
+        tagElement.textContent = tagObj.display;
+        tagElement.dataset.value = tagObj.value;
+
+        if (isTagSelected(tagObj.value)) {
+            tagElement.style.backgroundColor = '#22c55e';
+            tagElement.style.color = '#fff';
+            tagElement.style.borderColor = '#22c55e';
+        }
+
+        let tooltip = null;
+        const createCustomTooltip = () => {
+            const tooltip = document.createElement('div');
+            tooltip.style.cssText = `
+                position: absolute;
+                background: linear-gradient(135deg, #1e293b 0%, #334155 100%);
+                color: #fff;
+                padding: 8px 12px;
+                border-radius: 6px;
+                font-size: 12px;
+                white-space: pre-wrap;
+                z-index: 10000;
+                border: 1px solid #3b82f6;
+                box-shadow: 0 4px 12px rgba(59, 130, 246, 0.3);
+                pointer-events: none;
+                opacity: 0;
+                transition: opacity 0.2s ease;
+                transform: translateY(-100%) translateY(-8px);
+                max-width: 300px;
+                word-wrap: break-word;
+            `;
+            tooltip.textContent = tagObj.value;
+            return tooltip;
+        };
+
+        tagElement.onmouseenter = (e) => {
+            if (!isTagSelected(tagObj.value)) {
+                tagElement.style.backgroundColor = 'rgb(49, 84, 136)';
+                tagElement.style.borderColor = '#1e293b';
+                tagElement.style.color = '#fff';
+            }
+            if (tooltip && tooltip.parentNode) {
+                tooltip.parentNode.removeChild(tooltip);
+                tooltip = null;
+            }
+            tooltip = createCustomTooltip();
+            document.body.appendChild(tooltip);
+            const rect = tagElement.getBoundingClientRect();
+            tooltip.style.left = rect.left + (rect.width / 2) - (tooltip.offsetWidth / 2) + 'px';
+            tooltip.style.top = rect.top + 'px';
+            setTimeout(() => { if (tooltip) tooltip.style.opacity = '1'; }, 10);
+        };
+
+        tagElement.onmouseleave = () => {
+            if (!isTagSelected(tagObj.value)) {
+                tagElement.style.backgroundColor = '#444';
+                tagElement.style.borderColor = '#555';
+                tagElement.style.color = '#ccc';
+            }
+            if (tooltip) {
+                tooltip.style.opacity = '0';
+                setTimeout(() => {
+                    if (tooltip && tooltip.parentNode) {
+                        tooltip.parentNode.removeChild(tooltip);
+                    }
+                    tooltip = null;
+                }, 200);
+            }
+        };
+
+        tagElement.onclick = () => {
+            toggleTag(tagObj.value, tagElement);
+        };
+
         tagContent.appendChild(tagElement);
     });
 }
@@ -1144,6 +1325,7 @@ function removeSelectedTag(tag) {
     });
     
     updateSelectedTags();
+    updateSelectedTagsOverview();
 }
 
 // 从节点加载已有的标签选择

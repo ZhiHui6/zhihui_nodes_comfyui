@@ -15,7 +15,7 @@ class TagSelector:
                 "tag_edit": ("STRING", {
                     "multiline": True,
                     "default": "",
-                    "placeholder": "选择的标签将显示在这里... / Selected tags will be displayed here..."
+                    "placeholder": "选择的标签将显示在这里。\nSelected tags will be displayed here."
                 }),
             },
             "hidden": {
