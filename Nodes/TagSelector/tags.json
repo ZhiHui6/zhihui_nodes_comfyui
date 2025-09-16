@@ -1672,12 +1672,6 @@
             "台球桌": "billiard",
             "地牢": "dungeon",
             "坟墓": "grave",
-            "明石海峡大桥": "Akashi_Kaikyo_Bridge",
-            "东京天空树": "Skytree",
-            "东京塔": "Tokyo_Tower",
-            "伏见稻荷": "fushimi_inari",
-            "希腊_圣托里尼": "santorini",
-            "意大利_威尼斯": "venice",
             "铁路": "railway"
         },
         "城市": {
@@ -1900,7 +1894,13 @@
             "尼亚加拉瀑布": "niagara falls",
             "肯辛顿宫": "kensington palace",
             "伦敦塔桥": "tower bridge",
-            "圣马可广场": "st. mark's square"
+            "圣马可广场": "st. mark's square",
+            "明石海峡大桥": "Akashi_Kaikyo_Bridge",
+            "东京天空树": "Skytree",
+            "东京塔": "Tokyo_Tower",
+            "伏见稻荷": "fushimi_inari",
+            "希腊_圣托里尼": "santorini",
+            "意大利_威尼斯": "venice"
         },
         "光线环境": {
             "伦勃朗光": "Rembrandt lighting",
