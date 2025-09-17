@@ -7,15 +7,14 @@ app.registerExtension({
     nodeCreated(node) {
         if (node.comfyClass === "TagSelector") {
             // 添加激活按钮
-            const button = node.addWidget("button", "🏷️ 打开标签选择器 | Open Tag Selector", "open_selector", () => {
+            const button = node.addWidget("button", "🏷️打开标签选择器 | Open Tag Selector", "open_selector", () => {
                 openTagSelector(node);
             });
-            button.serialize = false; // 防止按钮被序列化
+            button.serialize = false;
         }
     }
 });
 
-// 全局变量
 let tagSelectorDialog = null;
 let currentNode = null;
 let tagsData = null;
@@ -190,35 +189,38 @@ function createTagSelectorDialog() {
     closeBtn.textContent = '×';
     closeBtn.style.cssText = `
         background: linear-gradient(135deg, #ef4444 0%, #dc2626 100%);
-        border: 2px solid #ef4444;
+        border: 1px solid #ef4444; /* 更细边框以配合方形 */
         color: #ffffff;
-        font-size: 20px;
-        font-weight: bold;
+        font-size: 16px; /* × 缩小 */
+        font-weight: 700;
         cursor: pointer;
         padding: 0;
-        width: 21px;
-        height: 21px;
+        width: 22px; /* 圆角正方形尺寸稍大，便于点击 */
+        height: 22px;
         display: flex;
         align-items: center;
         justify-content: center;
-        border-radius: 50%;
+        border-radius: 6px; /* 圆角正方形 */
         transition: all 0.2s ease;
         box-shadow: 0 2px 8px rgba(239, 68, 68, 0.4);
         backdrop-filter: blur(10px);
+        line-height: 1; /* 避免基线偏移 */
     `;
     closeBtn.addEventListener('mouseenter', () => {
         closeBtn.style.background = 'linear-gradient(135deg, #dc2626 0%, #b91c1c 100%)';
         closeBtn.style.color = '#ffffff';
         closeBtn.style.borderColor = '#dc2626';
         closeBtn.style.boxShadow = '0 4px 12px rgba(239, 68, 68, 0.6)';
-        closeBtn.style.transform = 'scale(1.1)';
+        closeBtn.style.transform = 'translateY(-1px)';
+        closeBtn.style.borderRadius = '6px';
     });
     closeBtn.addEventListener('mouseleave', () => {
         closeBtn.style.background = 'linear-gradient(135deg, #ef4444 0%, #dc2626 100%)';
         closeBtn.style.color = '#ffffff';
         closeBtn.style.borderColor = '#ef4444';
         closeBtn.style.boxShadow = '0 2px 8px rgba(239, 68, 68, 0.4)';
-        closeBtn.style.transform = 'scale(1)';
+        closeBtn.style.transform = 'translateY(0)';
+        closeBtn.style.borderRadius = '6px';
     });
     closeBtn.onclick = () => {
         overlay.style.display = 'none';
@@ -234,10 +236,149 @@ function createTagSelectorDialog() {
         display: flex;
         align-items: center;
         margin-left: auto;
+        gap: 150px; /* 搜索框与关闭按钮之间更大的间隔 */
     `;
     
+    // 新增：标题栏搜索框（带彩色图标）
+    const searchContainer = document.createElement('div');
+    searchContainer.style.cssText = `
+        display: flex;
+        align-items: center;
+        gap: 8px; /* 增大内部间距 */
+        background: linear-gradient(135deg, rgba(59,130,246,0.25) 0%, rgba(14,165,233,0.25) 100%);
+        border: 2px solid rgba(59,130,246,0.5);
+        padding: 4px 12px; /* 减小内边距以降低高度 */
+        border-radius: 9999px;
+        box-shadow: 0 4px 12px rgba(59, 130, 246, 0.4);
+        min-width: 180px; /* 增大最小宽度 */
+        max-width: 250px; /* 增大最大宽度 */
+        transition: all 0.3s ease; /* 添加过渡效果 */
+    `;
+    const iconWrapper = document.createElement('div');
+    iconWrapper.style.cssText = `width: 20px; height: 20px; display: flex; align-items: center; justify-content: center; pointer-events: none;`;
+    iconWrapper.innerHTML = `
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <defs>
+                <linearGradient id="searchGrad" x1="0" y1="0" x2="24" y2="24" gradientUnits="userSpaceOnUse">
+                    <stop stop-color="#60A5FA"/>
+                    <stop offset="1" stop-color="#06B6D4"/>
+                </linearGradient>
+            </defs>
+            <path d="M15.5 14h-.79l-.28-.27A6.471 6.471 0 0016 9.5 6.5 6.5 0 109.5 16c1.61 0 3.09-.59 4.23-1.57l.27.28v.79L20 21.5 21.5 20 15.5 14zM9.5 14C7.01 14 5 11.99 5 9.5S7.01 5 9.5 5 14 7.01 14 9.5 11.99 14 9.5 14z" fill="url(#searchGrad)"/>
+        </svg>
+    `;
+    const searchInput = document.createElement('input');
+    searchInput.type = 'text';
+    searchInput.setAttribute('data-role', 'tag-search');
+    searchInput.placeholder = '搜索标签 / Search Tags';
+    searchInput.style.cssText = `
+        flex: 1;
+        background: transparent;
+        border: none;
+        outline: none;
+        color:rgb(255, 255, 255);
+        font-size: 12px; /* 保持字体大小不变 */
+        width: 100%;
+        min-width: 80px; /* 保持最小宽度 */
+        font-weight: 500; /* 保持字重 */
+        height: 16px; /* 设置固定高度 */
+    `;
+    // 占位符样式更显眼
+    (function injectTagSearchPlaceholderStyle(){
+        const styleId = 'zs-tag-search-placeholder-style';
+        if (!document.getElementById(styleId)) {
+            const styleEl = document.createElement('style');
+            styleEl.id = styleId;
+            styleEl.textContent = `
+                [data-role="tag-search"]::placeholder {
+                    color:rgb(160, 200, 255); /* 提高亮度 */
+                    opacity: 1;
+                    font-weight: 600;
+                    letter-spacing: 0.3px; /* 增加字间距 */
+                    text-shadow: 0 0 4px rgba(96, 165, 250, 0.5); /* 添加文字阴影 */
+                    transition: all 0.2s ease; /* 增强过渡效果 */
+                }
+                [data-role="tag-search"].hide-placeholder::placeholder {
+                    opacity: 0; /* 选中时隐藏提示文字 */
+                }
+            `;
+            document.head.appendChild(styleEl);
+        }
+    })();
+    const clearSearchBtn = document.createElement('button');
+    clearSearchBtn.textContent = '×';
+    clearSearchBtn.title = '清除搜索 / Clear Search';
+    clearSearchBtn.style.cssText = `
+        background: rgba(255, 191, 191, 0.15); /* 淡红色背景 */
+        color: #fecaca; /* 字体淡红 */
+        border: 1px solid rgba(239,68,68,0.35); /* 淡红描边 */
+        width: 16px;
+        height: 16px;
+        border-radius: 50%;
+        cursor: pointer;
+        display: none;
+        padding: 0;
+        /* 使用 inline-flex 确保图标垂直水平居中 */
+        align-items: center;
+        justify-content: center;
+        line-height: 1;
+        font-weight: 800;
+        font-size: 12px;
+    `;
+    // 清除按钮悬停态（微微加深）
+    clearSearchBtn.addEventListener('mouseenter', () => {
+        clearSearchBtn.style.background = 'rgba(239,68,68,0.25)';
+        clearSearchBtn.style.borderColor = 'rgba(239,68,68,0.5)';
+        clearSearchBtn.style.color = '#ffb4b4';
+    });
+    clearSearchBtn.addEventListener('mouseleave', () => {
+        clearSearchBtn.style.background = 'rgba(239,68,68,0.15)';
+        clearSearchBtn.style.borderColor = 'rgba(239,68,68,0.35)';
+        clearSearchBtn.style.color = '#fecaca';
+    });
+    // 点击容器也能聚焦输入框
+    searchContainer.addEventListener('click', () => searchInput.focus());
+    // 聚焦时高亮整个搜索容器
+    const baseBoxShadow = '0 4px 12px rgba(59, 130, 246, 0.4)';
+    const baseBorder = '2px solid rgba(59,130,246,0.5)';
+    searchInput.addEventListener('focus', () => {
+        searchContainer.style.border = '2px solid #93c5fd'; // 增强边框
+        searchContainer.style.boxShadow = '0 0 0 3px rgba(59,130,246,0.4), 0 8px 20px rgba(59,130,246,0.5)'; // 强化外部发光效果
+        searchContainer.style.background = 'linear-gradient(135deg, rgba(59,130,246,0.35) 0%, rgba(14,165,233,0.35) 100%)'; // 增强背景透明度
+        searchContainer.style.transform = 'scale(1.05)'; // 轻微放大效果
+        searchInput.classList.add('hide-placeholder');
+    });
+    searchInput.addEventListener('blur', () => {
+        searchContainer.style.border = baseBorder;
+        searchContainer.style.boxShadow = baseBoxShadow;
+        searchContainer.style.background = 'linear-gradient(135deg, rgba(59,130,246,0.25) 0%, rgba(14,165,233,0.25) 100%)';
+        searchContainer.style.transform = 'scale(1)'; // 恢复正常尺寸
+        searchInput.classList.remove('hide-placeholder');
+    });
+    // 防止拖拽干扰输入
+    [searchContainer, searchInput, clearSearchBtn].forEach(el => {
+        el.addEventListener('mousedown', e => e.stopPropagation());
+        el.addEventListener('click', e => e.stopPropagation());
+    });
+    clearSearchBtn.onclick = (e) => {
+        e.stopPropagation();
+        searchInput.value = '';
+        clearSearchBtn.style.display = 'none';
+        handleSearch('');
+        searchInput.focus();
+    };
+    searchInput.addEventListener('input', debounce(() => {
+        const q = searchInput.value.trim();
+        clearSearchBtn.style.display = q ? 'inline-flex' : 'none'; // 用 inline-flex 保证居中对齐
+        handleSearch(q);
+    }, 200));
+    searchContainer.appendChild(iconWrapper);
+    searchContainer.appendChild(searchInput);
+    searchContainer.appendChild(clearSearchBtn);
+
+    rightContainer.appendChild(searchContainer);
     rightContainer.appendChild(closeBtn);
-    
+
     header.appendChild(title);
     header.appendChild(rightContainer);
     
@@ -262,7 +403,7 @@ function createTagSelectorDialog() {
     `;
     
     const overviewTitleText = document.createElement('span');
-    overviewTitleText.innerHTML = '已选择的标签 / Selected Tags:';
+    overviewTitleText.innerHTML = '已选标签(Selected Tags):';
     overviewTitleText.style.cssText = `
         text-align: left;
         line-height: 1.2;
@@ -276,7 +417,7 @@ function createTagSelectorDialog() {
         font-weight: 400;
         font-style: normal;
     `;
-    hintText.textContent = '请选择TAG标签 / Please Select TAG';
+    hintText.textContent = '请选择TAG标签(Please Select TAG)';
     
     const selectedCount = document.createElement('span');
     selectedCount.style.cssText = `
@@ -390,15 +531,16 @@ function createTagSelectorDialog() {
         align-items: center;
         backdrop-filter: blur(10px);
         border-radius: 0 0 16px 16px;
+        column-gap: 12px;
     `;
     
     const clearBtn = document.createElement('button');
-    clearBtn.innerHTML = '<span style="font-size: 16px; display: block;">清空选择</span><span style="font-size: 12px; display: block; margin-top: 2px;">Clear Selection</span>';
+    clearBtn.innerHTML = '<span style="font-size: 14px; display: block;">清空选择</span><span style="font-size: 11px; display: block; margin-top: 2px; opacity: 0.9;">Clear Selection</span>';
     clearBtn.style.cssText = `
         background: linear-gradient(135deg, #dc2626 0%, #b91c1c 100%);
         border: 1px solid rgba(220, 38, 38, 0.8);
         color: #ffffff;
-        padding: 8px 16px;
+        padding: 6px 12px; /* 按钮长度减少 */
         border-radius: 8px;
         cursor: pointer;
         font-weight: 500;
@@ -406,6 +548,7 @@ function createTagSelectorDialog() {
         backdrop-filter: blur(10px);
         box-shadow: 0 2px 4px rgba(220, 38, 38, 0.3);
         line-height: 1.2;
+        margin-right: 28px; /* 向左移动更多，远离右下角把手 */
     `;
     clearBtn.addEventListener('mouseenter', () => {
         clearBtn.style.background = 'linear-gradient(135deg, #f87171 0%, #ef4444 100%)';
@@ -473,6 +616,16 @@ function createTagSelectorDialog() {
     tagSelectorDialog.subSubSubCategoryTabs = subSubSubCategoryTabs;
     tagSelectorDialog.tagContent = tagContent;
     tagSelectorDialog.selectedOverview = selectedOverview;
+    tagSelectorDialog.selectedCount = selectedCount;
+    tagSelectorDialog.selectedTagsList = selectedTagsList;
+    tagSelectorDialog.hintText = hintText;
+    // 新增：存储搜索引用与激活路径状态
+    tagSelectorDialog.searchInput = searchInput;
+    tagSelectorDialog.searchContainer = searchContainer;
+    tagSelectorDialog.activeCategory = null;
+    tagSelectorDialog.activeSubCategory = null;
+    tagSelectorDialog.activeSubSubCategory = null;
+    tagSelectorDialog.activeSubSubSubCategory = null;
     tagSelectorDialog.selectedCount = selectedCount;
     tagSelectorDialog.selectedTagsList = selectedTagsList;
     tagSelectorDialog.hintText = hintText;
@@ -628,6 +781,12 @@ function initializeCategoryList() {
             categoryItem.style.backgroundColor = '#1d4ed8';
             categoryItem.style.color = '#fff';
             
+            // 新增：记录激活路径（重置更深层）
+            tagSelectorDialog.activeCategory = category;
+            tagSelectorDialog.activeSubCategory = null;
+            tagSelectorDialog.activeSubSubCategory = null;
+            tagSelectorDialog.activeSubSubSubCategory = null;
+            
             // 显示子分类
             showSubCategories(category);
         };
@@ -702,6 +861,11 @@ function showSubCategories(category) {
             tab.classList.add('active');
             tab.style.backgroundColor = '#3b82f6';
             tab.style.color = '#fff';
+            
+            // 新增：记录激活路径（重置更深层）
+            tagSelectorDialog.activeSubCategory = subCategory;
+            tagSelectorDialog.activeSubSubCategory = null;
+            tagSelectorDialog.activeSubSubSubCategory = null;
             
             // 检查是否有子子分类
             const subCategoryData = tagsData[category][subCategory];
@@ -781,6 +945,10 @@ function showSubSubCategories(category, subCategory) {
             tab.classList.add('active');
             tab.style.backgroundColor = '#3b82f6';
             tab.style.color = '#fff';
+            
+            // 记录激活路径：三级分类
+            tagSelectorDialog.activeSubSubCategory = subSubCategory;
+            tagSelectorDialog.activeSubSubSubCategory = null;
             
             const subSubCategoryData = tagsData[category][subCategory][subSubCategory];
             if (Array.isArray(subSubCategoryData)) {
@@ -869,6 +1037,9 @@ function showSubSubSubCategories(category, subCategory, subSubCategory) {
             tab.classList.add('active');
             tab.style.backgroundColor = '#3b82f6';
             tab.style.color = '#fff';
+
+            // 记录激活路径：四级分类
+            tagSelectorDialog.activeSubSubSubCategory = name;
 
             showTagsFromSubSubSub(category, subCategory, subSubCategory, name);
         };
@@ -1369,4 +1540,157 @@ function applySelectedTags() {
             document.removeEventListener('keydown', tagSelectorDialog.keydownHandler);
         }
     }
+}
+
+// 新增：搜索与结果渲染辅助函数
+function debounce(fn, wait) {
+    let t = null;
+    return function(...args) {
+        clearTimeout(t);
+        t = setTimeout(() => fn.apply(this, args), wait);
+    };
+}
+
+function handleSearch(query) {
+    if (!tagSelectorDialog) return;
+    const q = (query || '').trim();
+    if (!q) {
+        // 恢复到当前激活视图
+        restoreActiveView();
+        return;
+    }
+    const results = searchTags(q);
+    showSearchResults(results, q);
+}
+
+function restoreActiveView() {
+    const a = tagSelectorDialog;
+    if (a.activeCategory && a.activeSubCategory && a.activeSubSubCategory && a.activeSubSubSubCategory) {
+        showTagsFromSubSubSub(a.activeCategory, a.activeSubCategory, a.activeSubSubCategory, a.activeSubSubSubCategory);
+    } else if (a.activeCategory && a.activeSubCategory && a.activeSubSubCategory) {
+        showTagsFromSubSub(a.activeCategory, a.activeSubCategory, a.activeSubSubCategory);
+    } else if (a.activeCategory && a.activeSubCategory) {
+        showTags(a.activeCategory, a.activeSubCategory);
+    } else if (a.activeCategory) {
+        showSubCategories(a.activeCategory);
+    } else {
+        initializeCategoryList();
+    }
+}
+
+function searchTags(query) {
+    const q = query.toLowerCase();
+    const results = [];
+    const walk = (node, pathArr) => {
+        if (Array.isArray(node)) {
+            node.forEach(t => {
+                const c = (t.display || '').toLowerCase();
+                const e = (t.value || '').toLowerCase();
+                if (c.includes(q) || e.includes(q)) {
+                    results.push({ ...t, path: [...pathArr] });
+                }
+            });
+        } else if (node && typeof node === 'object') {
+            Object.entries(node).forEach(([k, v]) => walk(v, [...pathArr, k]));
+        }
+    };
+    Object.entries(tagsData || {}).forEach(([k, v]) => walk(v, [k]));
+    return results;
+}
+
+function showSearchResults(results, q) {
+    const container = tagSelectorDialog.tagContent;
+    container.innerHTML = '';
+
+    // 顶部提示条
+    const infoBar = document.createElement('div');
+    infoBar.style.cssText = `
+        margin: 6px 4px 12px 4px;
+        padding: 8px 12px;
+        border-radius: 8px;
+        background: rgba(59,130,246,0.12);
+        color: #93c5fd;
+        border: 1px solid rgba(59,130,246,0.35);
+        font-size: 12px;
+    `;
+    infoBar.textContent = `搜索 “${q}” ，共 ${results.length} 个结果`;
+    container.appendChild(infoBar);
+
+    results.forEach(tagObj => {
+        const tagElement = document.createElement('span');
+        tagElement.style.cssText = `
+            display: inline-block;
+            padding: 6px 12px;
+            margin: 4px;
+            background: #444;
+            color: #ccc;
+            border-radius: 16px;
+            cursor: pointer;
+            transition: all 0.2s;
+            border: 1px solid rgba(71, 85, 105, 0.8);
+            font-size: 14px;
+            position: relative;
+        `;
+        
+        tagElement.textContent = tagObj.display;
+        tagElement.dataset.value = tagObj.value;
+        if (isTagSelected(tagObj.value)) {
+            tagElement.style.backgroundColor = '#22c55e';
+            tagElement.style.color = '#fff';
+            tagElement.style.borderColor = '#22c55e';
+        }
+        let tooltip = null;
+        const createCustomTooltip = () => {
+            const tooltip = document.createElement('div');
+            tooltip.style.cssText = `
+                position: absolute;
+                background: linear-gradient(135deg, #1e293b 0%, #334155 100%);
+                color: #fff;
+                padding: 8px 12px;
+                border-radius: 6px;
+                font-size: 12px;
+                white-space: pre-wrap;
+                z-index: 10000;
+                border: 1px solid #3b82f6;
+                box-shadow: 0 4px 12px rgba(59, 130, 246, 0.3);
+                pointer-events: none;
+                opacity: 0;
+                transition: opacity 0.2s ease;
+                transform: translateY(-100%) translateY(-8px);
+                max-width: 320px;
+                word-wrap: break-word;
+                line-height: 1.4;
+            `;
+            const pathStr = (tagObj.path || []).join(' > ');
+            tooltip.textContent = `${tagObj.value}${pathStr ? `\n路径: ${pathStr}` : ''}`;
+            return tooltip;
+        };
+        tagElement.onmouseenter = () => {
+            if (!isTagSelected(tagObj.value)) {
+                tagElement.style.backgroundColor = 'rgb(49, 84, 136)';
+                tagElement.style.borderColor = '#1e293b';
+                tagElement.style.color = '#fff';
+            }
+            if (tooltip && tooltip.parentNode) tooltip.parentNode.removeChild(tooltip);
+            tooltip = createCustomTooltip();
+            document.body.appendChild(tooltip);
+            const rect = tagElement.getBoundingClientRect();
+            tooltip.style.left = rect.left + (rect.width / 2) - (tooltip.offsetWidth / 2) + 'px';
+            tooltip.style.top = rect.top + 'px';
+            setTimeout(() => { if (tooltip) tooltip.style.opacity = '1'; }, 10);
+        };
+        tagElement.onmouseleave = () => {
+            if (!isTagSelected(tagObj.value)) {
+                tagElement.style.backgroundColor = '#444';
+                tagElement.style.borderColor = '#555';
+                tagElement.style.color = '#ccc';
+            }
+            if (tooltip) {
+                tooltip.style.opacity = '0';
+                setTimeout(() => { if (tooltip && tooltip.parentNode) tooltip.parentNode.removeChild(tooltip); tooltip = null; }, 200);
+            }
+        };
+        tagElement.onclick = () => toggleTag(tagObj.value, tagElement);
+        container.appendChild(tagElement);
+    });
 }
