@@ -5,6 +5,8 @@ from aiohttp import web
 from server import PromptServer
 
 class TagSelector:
+    DESCRIPTION = "Provides a visual tag selection interface, allowing users to select tags from preset categories. Supports hierarchical browsing, search functionality, and automatic deduplication. Selected tags are output as comma-separated strings."
+    
     def __init__(self):
         self.selected_tags = ""
         

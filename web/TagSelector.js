@@ -1,7 +1,6 @@
 import { app } from "/scripts/app.js";
 import { api } from "/scripts/api.js";
 
-// 标签选择器扩展
 app.registerExtension({
     name: "zhihui.TagSelector",
     nodeCreated(node) {
@@ -23,22 +22,18 @@ let tagsData = null;
 async function openTagSelector(node) {
     currentNode = node;
     
-    // 加载标签数据
     if (!tagsData) {
         await loadTagsData();
     }
     
-    // 创建或显示对话框
     if (!tagSelectorDialog) {
         createTagSelectorDialog();
     }
     
-    // 初始化分类列表（确保数据加载后显示）
     if (tagsData && Object.keys(tagsData).length > 0) {
         initializeCategoryList();
     }
     
-    // 加载已有的标签选择
     loadExistingTags();
     
     // 重置对话框位置到屏幕中央

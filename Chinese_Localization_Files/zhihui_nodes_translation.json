@@ -100,6 +100,16 @@
             "output_text": "输出文本"
         }
     },
+    "TagSelector": {
+        "title": "标签选择器",
+        "description": "提供可视化标签选择界面，允许用户从预设分类中选择标签。支持层级浏览、搜索功能和自动去重，选中的标签以逗号分隔字符串输出。",
+        "inputs": {
+            "tag_edit": "标签编辑"
+        },
+        "outputs": {
+            "tags": "标签"
+        }
+    },
     "ImageAspectRatio": {
         "title": "图像宽高比",
         "description": "智能图像宽高比设置节点，支持Qwen、Flux、Wan、SDXL等多种模型的预设尺寸，可快速选择常用比例或自定义尺寸",
