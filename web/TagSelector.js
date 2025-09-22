@@ -147,8 +147,8 @@ function createTagSelectorDialog() {
         transform: translate(-50%, -50%);
         width: 1067px;
         height: 600px;
-        min-width: 640px;
-        min-height: 360px;
+        min-width: 854px; /* 16:9 比例的最佳最小宽度 */
+        min-height: 480px; /* 16:9 比例的最佳最小高度 */
         background: linear-gradient(135deg, #1e293b 0%, #0f172a 100%);
         border: none;
         border-radius: 16px;
@@ -524,7 +524,7 @@ function createTagSelectorDialog() {
     const footer = document.createElement('div');
     footer.style.cssText = `
         background: linear-gradient(135deg, #334155 0%, #1e293b 100%);
-        padding: 8px 16px;
+        padding: 0 16px;
         border-top: 1px solid rgba(71, 85, 105, 0.8);
         display: flex;
         justify-content: flex-start;
@@ -549,8 +549,10 @@ function createTagSelectorDialog() {
         min-width: 280px;
         width: auto;
         flex-shrink: 1;
-        flex: 0.8;
+        flex: none; /* 移除弹性比例，确保固定位置 */
         justify-content: center;
+        align-items: center;
+        height: 100%;
     `;
     
     // 单行布局容器 - 包含标题和输入框
@@ -563,7 +565,6 @@ function createTagSelectorDialog() {
         border-radius: 8px;
         box-shadow: 0 4px 15px rgba(37, 99, 235, 0.2), 0 2px 6px rgba(0, 0, 0, 0.15);
         padding: 8px 12px;
-        margin-bottom: 8px;
         position: relative;
         overflow: hidden;
         border: 1px solid rgba(59, 130, 246, 0.3);
@@ -1025,8 +1026,8 @@ function createTagSelectorDialog() {
         if (isResizing) {
             const deltaX = e.clientX - resizeStartX;
             const deltaY = e.clientY - resizeStartY;
-            const newWidth = Math.max(600, dialogStartWidth + deltaX);
-            const newHeight = Math.max(400, dialogStartHeight + deltaY);
+            const newWidth = Math.max(854, dialogStartWidth + deltaX); // 与CSS中16:9比例的最小宽度保持一致
+            const newHeight = Math.max(480, dialogStartHeight + deltaY); // 与CSS中16:9比例的最小高度保持一致
             dialog.style.width = newWidth + 'px';
             dialog.style.height = newHeight + 'px';
         }
