@@ -27,5 +27,8 @@
     "Training Prompt":"训练提示词",
     "MidJourney Prompt":"MidJourney提示词",
     "Booru Tags":"Booru标签",
-    "Custom Guide":"自定义引导"
+    "Custom Guide":"自定义引导",
+    "Disabled":"禁用",
+    "Tag Style":"标签风格",
+    "Natural Language":"自然语言"
 }

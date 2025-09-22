@@ -21,8 +21,8 @@ class TagSelector:
                     "default": "",
                     "placeholder": "选择的标签将显示在这里。\nSelected tags will be displayed here."
                 }),
-                "expand_mode": (["禁用", "标签式", "自然语言式"], {
-                    "default": "禁用"
+                "expand_mode": (["Disabled", "Tag Style", "Natural Language"], {
+                    "default": "Disabled"
                 }),
             },
             "hidden": {
@@ -39,7 +39,7 @@ class TagSelector:
     def process_tags(self, tag_edit, expand_mode, unique_id=None, extra_pnginfo=None):
         processed_tags = self.clean_tags(tag_edit)
         
-        if expand_mode != "禁用" and processed_tags.strip():
+        if expand_mode != "Disabled" and processed_tags.strip():
             expanded_tags = self._expand_tags_with_llm(processed_tags, expand_mode)
             return (expanded_tags,)
         
@@ -62,7 +62,7 @@ class TagSelector:
     
     def _expand_tags_with_llm(self, tags_text: str, expand_mode: str) -> str:
         try:
-            if expand_mode == "标签式":
+            if expand_mode == "Tag Style":
                 system_prompt = """你是一个专业的AI绘画提示词扩写助手。请将用户提供的简单标签扩写成更详细、更丰富的标签形式。
 
 要求：
@@ -77,7 +77,7 @@ class TagSelector:
 输入：girl, cat, garden
 输出：beautiful girl, cute girl, detailed face, expressive eyes, adorable cat, fluffy cat, cat ears, lush garden, blooming flowers, natural lighting, high quality, masterpiece, detailed, 8k resolution"""
             
-            elif expand_mode == "自然语言式":
+            elif expand_mode == "Natural Language":
                 system_prompt = """你是一个专业的AI绘画提示词扩写助手。请将用户提供的标签转换成自然流畅的句子。
 
 要求：
