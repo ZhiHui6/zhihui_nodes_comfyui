@@ -6,7 +6,7 @@ app.registerExtension({
     nodeCreated(node) {
         if (node.comfyClass === "TagSelector") {
             // 添加激活按钮
-            const button = node.addWidget("button", "🏷️打开标签选择器 | Open Tag Selector", "open_selector", () => {
+            const button = node.addWidget("button", "🏷️打开标签选择器", "open_selector", () => {
                 openTagSelector(node);
             });
             button.serialize = false;
@@ -78,16 +78,22 @@ async function loadTagsData() {
 // 转换tags.json格式为界面所需格式
 function convertTagsFormat(rawData) {
     // 递归将任意层对象转换：叶子->数组[{display,value}]，中间层->对象
-    const convertNode = (node) => {
+    const convertNode = (node, isCustomCategory = false) => {
         if (node && typeof node === 'object') {
             const values = Object.values(node);
             const allString = values.every(v => typeof v === 'string');
             if (allString) {
+                // 对于自定义标签，保持原始对象格式 {name: content}
+                if (isCustomCategory) {
+                    return node;
+                }
+                // 对于普通标签，转换为数组格式 [{display, value}]
                 return Object.entries(node).map(([chineseName, englishValue]) => ({ display: chineseName, value: englishValue }));
             }
             const result = {};
             for (const [k, v] of Object.entries(node)) {
-                result[k] = convertNode(v);
+                // 传递自定义分类标识
+                result[k] = convertNode(v, isCustomCategory);
             }
             return result;
         }
@@ -95,7 +101,9 @@ function convertTagsFormat(rawData) {
     };
     const converted = {};
     for (const [mainCategory, subCategories] of Object.entries(rawData)) {
-        converted[mainCategory] = convertNode(subCategories);
+        // 检查是否为自定义分类
+        const isCustom = mainCategory === '自定义';
+        converted[mainCategory] = convertNode(subCategories, isCustom);
     }
     return converted;
 }
@@ -137,10 +145,10 @@ function createTagSelectorDialog() {
         top: 50%;
         left: 50%;
         transform: translate(-50%, -50%);
-        width: 1600px;
-        height: 900px;
-        min-width: 960px;
-        min-height: 540px;
+        width: 1067px;
+        height: 600px;
+        min-width: 640px;
+        min-height: 360px;
         background: linear-gradient(135deg, #1e293b 0%, #0f172a 100%);
         border: none;
         border-radius: 16px;
@@ -169,7 +177,7 @@ function createTagSelectorDialog() {
     `;
     
     const title = document.createElement('span');
-    title.innerHTML = '🏷️ 标签选择器 | Tag Selector';
+    title.innerHTML = '🏷️ 标签选择器';
     title.style.cssText = `
         color: #f1f5f9;
         font-size: 18px;
@@ -241,7 +249,7 @@ function createTagSelectorDialog() {
         align-items: center;
         gap: 8px; /* 增大内部间距 */
         background: linear-gradient(135deg, rgba(59,130,246,0.25) 0%, rgba(14,165,233,0.25) 100%);
-        border: 2px solid rgba(59,130,246,0.5);
+        border: none;
         padding: 4px 12px; /* 减小内边距以降低高度 */
         border-radius: 9999px;
         box-shadow: 0 4px 12px rgba(59, 130, 246, 0.4);
@@ -265,7 +273,7 @@ function createTagSelectorDialog() {
     const searchInput = document.createElement('input');
     searchInput.type = 'text';
     searchInput.setAttribute('data-role', 'tag-search');
-    searchInput.placeholder = '搜索标签 / Search Tags';
+    searchInput.placeholder = '搜索标签';
     searchInput.style.cssText = `
         flex: 1;
         background: transparent;
@@ -302,7 +310,7 @@ function createTagSelectorDialog() {
     })();
     const clearSearchBtn = document.createElement('button');
     clearSearchBtn.textContent = '×';
-    clearSearchBtn.title = '清除搜索 / Clear Search';
+    clearSearchBtn.title = '清除搜索';
     clearSearchBtn.style.cssText = `
         background: rgba(255, 191, 191, 0.15); /* 淡红色背景 */
         color: #fecaca; /* 字体淡红 */
@@ -398,7 +406,7 @@ function createTagSelectorDialog() {
     `;
     
     const overviewTitleText = document.createElement('span');
-    overviewTitleText.innerHTML = '已选标签(Selected Tags):';
+    overviewTitleText.innerHTML = '已选标签:';
     overviewTitleText.style.cssText = `
         text-align: left;
         line-height: 1.2;
@@ -412,7 +420,7 @@ function createTagSelectorDialog() {
         font-weight: 400;
         font-style: normal;
     `;
-    hintText.textContent = '请选择TAG标签(Please Select TAG)';
+    hintText.textContent = '请选择TAG标签';
     
     const selectedCount = document.createElement('span');
     selectedCount.style.cssText = `
@@ -519,31 +527,317 @@ function createTagSelectorDialog() {
     const footer = document.createElement('div');
     footer.style.cssText = `
         background: linear-gradient(135deg, #334155 0%, #1e293b 100%);
-        padding: 18px 20px;
+        padding: 8px 16px;
         border-top: 1px solid rgba(71, 85, 105, 0.8);
         display: flex;
-        justify-content: flex-end;
+        justify-content: flex-start;
         align-items: center;
         backdrop-filter: blur(10px);
         border-radius: 0 0 16px 16px;
-        column-gap: 12px;
+        column-gap: 24px;
+    `;
+    
+    // 创建自定义标签功能区（左侧）
+    const customTagsSection = document.createElement('div');
+    customTagsSection.style.cssText = `
+        border: none;
+        padding: 0;
+        background: none;
+        display: flex;
+        flex-direction: column;
+        min-width: 320px;
+        width: auto;
+        flex-shrink: 1;
+    `;
+    
+    // 单行布局容器 - 包含标题和输入框
+    const singleLineContainer = document.createElement('div');
+    singleLineContainer.style.cssText = `
+        display: flex;
+        gap: 3px;
+        align-items: center;
+        background: rgba(37, 99, 235, 0.3);
+        border-radius: 8px;
+        box-shadow: 0 4px 15px rgba(37, 99, 235, 0.2), 0 2px 6px rgba(0, 0, 0, 0.15);
+        padding: 8px 12px;
+        margin-bottom: 8px;
+        position: relative;
+        overflow: hidden;
+        border: 1px solid rgba(59, 130, 246, 0.3);
+        backdrop-filter: blur(8px);
+    `;
+    
+    // 自定义标签区域标题
+    const customTagsTitle = document.createElement('div');
+    customTagsTitle.style.cssText = `
+        color: #38bdf8;
+        font-size: 15px;
+        font-weight: 700;
+        text-align: left;
+        letter-spacing: 0.3px;
+        white-space: nowrap;
+        flex-shrink: 0;
+        padding-right: 2px;
+        margin-right: 2px;
+        text-shadow: 0 1px 2px rgba(0, 0, 0, 0.3);
+    `;
+    customTagsTitle.textContent = '自定义标签';
+    
+    // 竖向分隔线
+    const verticalSeparator = document.createElement('div');
+    verticalSeparator.style.cssText = `
+        width: 1px;
+        height: 25px;
+        background: linear-gradient(to bottom, transparent, rgb(62, 178, 255), transparent);
+        margin: 0 8px;
+        flex-shrink: 0;
+    `;
+    
+    // 输入表单容器 - 横向布局
+    const inputForm = document.createElement('div');
+    inputForm.style.cssText = `
+        display: flex;
+        gap: 15px; /* 控制名称输入框和内容输入框之间的间距 */
+        align-items: center;
+        flex-wrap: nowrap;
+        flex: 1;
+    `;
+    
+    // 名称输入框 - 横向布局
+    const nameInputContainer = document.createElement('div');
+    nameInputContainer.style.cssText = `
+        display: flex;
+        align-items: center;
+        gap: 0px; /* 控制"名称"标签和输入框之间的间距 */
+        flex: 1;
+        min-width: 140px;
+        margin: 0;
+        padding: 0;
+    `;
+    
+    const nameLabel = document.createElement('label');
+    nameLabel.style.cssText = `
+        color: #f1f5f9;
+        font-size: 14px;
+        font-weight: 600;
+        white-space: nowrap;
+        min-width: 0;
+        width: fit-content;
+        margin: 0;
+        padding: 0;
+        text-shadow: 0 1px 2px rgba(0, 0, 0, 0.4);
+    `;
+    nameLabel.textContent = '名称：';
+    
+    const nameInput = document.createElement('input');
+    nameInput.type = 'text';
+    nameInput.placeholder = '输入标签名称';
+    nameInput.style.cssText = `
+        background: rgba(15, 23, 42, 0.3);
+        border: 1px solid rgba(59, 130, 246, 0.4);
+        border-radius: 6px;
+        padding: 6px 8px;
+        color: #f8fafc;
+        font-size: 11px;
+        outline: none;
+        transition: all 0.3s ease;
+        flex: 1;
+        min-width: 90px;
+        height: 24px;
+        margin: 0;
+        box-shadow: inset 0 1px 2px rgba(0, 0, 0, 0.2), 0 1px 2px rgba(59, 130, 246, 0.1);
+    `;
+    nameInput.addEventListener('focus', () => {
+        nameInput.style.borderColor = '#38bdf8';
+        nameInput.style.boxShadow = '0 0 0 2px rgba(56, 189, 248, 0.2), inset 0 1px 2px rgba(0, 0, 0, 0.2)';
+        nameInput.style.background = 'rgba(15, 23, 42, 0.4)';
+    });
+    nameInput.addEventListener('blur', () => {
+        nameInput.style.borderColor = 'rgba(59, 130, 246, 0.4)';
+        nameInput.style.boxShadow = 'inset 0 1px 2px rgba(0, 0, 0, 0.2), 0 1px 2px rgba(59, 130, 246, 0.1)';
+        nameInput.style.background = 'rgba(15, 23, 42, 0.3)';
+    });
+    
+    nameInputContainer.appendChild(nameLabel);
+    nameInputContainer.appendChild(nameInput);
+    
+    // 内容输入框 - 横向布局
+    const contentInputContainer = document.createElement('div');
+    contentInputContainer.style.cssText = `
+        display: flex;
+        align-items: center;
+        gap: 0px; /* 控制"内容"标签和输入框之间的间距 */
+        flex: 2;
+        min-width: 170px;
+        margin: 0;
+        padding: 0;
+    `;
+    
+    const contentLabel = document.createElement('label');
+    contentLabel.style.cssText = `
+        color: #f1f5f9;
+        font-size: 14px;
+        font-weight: 600;
+        white-space: nowrap;
+        min-width: 0;
+        width: fit-content;
+        margin: 0;
+        padding: 0;
+        text-shadow: 0 1px 2px rgba(0, 0, 0, 0.4);
+    `;
+    contentLabel.textContent = '内容：';
+    
+    const contentInput = document.createElement('input');
+    contentInput.type = 'text';
+    contentInput.placeholder = '输入标签内容';
+    contentInput.style.cssText = `
+        background: rgba(15, 23, 42, 0.3);
+        border: 1px solid rgba(59, 130, 246, 0.4);
+        border-radius: 6px;
+        padding: 6px 8px;
+        color: #f8fafc;
+        font-size: 11px;
+        outline: none;
+        transition: all 0.3s ease;
+        flex: 1;
+        min-width: 130px;
+        height: 24px;
+        margin: 0;
+        box-shadow: inset 0 1px 2px rgba(0, 0, 0, 0.2), 0 1px 2px rgba(59, 130, 246, 0.1);
+    `;
+    contentInput.addEventListener('focus', () => {
+        contentInput.style.borderColor = '#38bdf8';
+        contentInput.style.boxShadow = '0 0 0 2px rgba(56, 189, 248, 0.2), inset 0 1px 2px rgba(0, 0, 0, 0.2)';
+        contentInput.style.background = 'rgba(15, 23, 42, 0.4)';
+    });
+    contentInput.addEventListener('blur', () => {
+        contentInput.style.borderColor = 'rgba(59, 130, 246, 0.4)';
+        contentInput.style.boxShadow = 'inset 0 1px 2px rgba(0, 0, 0, 0.2), 0 1px 2px rgba(59, 130, 246, 0.1)';
+        contentInput.style.background = 'rgba(15, 23, 42, 0.3)';
+    });
+    
+    contentInputContainer.appendChild(contentLabel);
+    contentInputContainer.appendChild(contentInput);
+    
+    // 添加按钮 - 加大宽度，文字横排，双语显示
+    const addButton = document.createElement('button');
+    addButton.textContent = '添加标签';
+    addButton.style.cssText = `
+        background: linear-gradient(135deg, #3b82f6 0%, #2563eb 50%, #1d4ed8 100%);
+        border: 1px solid rgba(59, 130, 246, 0.5);
+        color: #ffffff;
+        padding: 4px 8px;
+        border-radius: 6px;
+        cursor: pointer;
+        font-size: 12px;
+        font-weight: 600;
+        transition: all 0.3s ease;
+        height: 26px;
+        width: auto;
+        min-width: 70px;
+        white-space: nowrap;
+        box-shadow: 0 2px 4px rgba(59, 130, 246, 0.2), 0 1px 2px rgba(0, 0, 0, 0.1);
+        text-shadow: 0 1px 1px rgba(0, 0, 0, 0.3);
+    `;
+    addButton.addEventListener('mouseenter', () => {
+        addButton.style.background = 'linear-gradient(135deg, #2563eb 0%, #1d4ed8 50%, #1e40af 100%)';
+        addButton.style.transform = 'translateY(-1px)';
+        addButton.style.boxShadow = '0 4px 8px rgba(59, 130, 246, 0.3), 0 1px 3px rgba(0, 0, 0, 0.2)';
+        addButton.style.borderColor = 'rgba(59, 130, 246, 0.7)';
+    });
+    addButton.addEventListener('mouseleave', () => {
+        addButton.style.background = 'linear-gradient(135deg, #3b82f6 0%, #2563eb 50%, #1d4ed8 100%)';
+        addButton.style.transform = 'translateY(0)';
+        addButton.style.boxShadow = '0 2px 4px rgba(59, 130, 246, 0.2), 0 1px 2px rgba(0, 0, 0, 0.1)';
+        addButton.style.borderColor = 'rgba(59, 130, 246, 0.5)';
+    });
+    
+    // 添加标签功能
+    addButton.onclick = async () => {
+        const name = nameInput.value.trim();
+        const content = contentInput.value.trim();
+        
+        if (!name || !content) {
+            alert('请填写完整的名称和标签内容');
+            return;
+        }
+        
+        try {
+            const response = await fetch('/zhihui/user_tags', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({ name, content })
+            });
+            
+            const result = await response.json();
+            
+            if (response.ok) {
+                // 清空输入框
+                nameInput.value = '';
+                contentInput.value = '';
+                
+                // 重新加载标签数据
+                await loadTagsData();
+                
+                // 重新初始化分类列表
+                initializeCategoryList();
+                
+                // 如果当前显示的是自定义分类，刷新显示
+                if (tagSelectorDialog.activeCategory === '自定义') {
+                    showSubCategories('自定义');
+                }
+                
+                alert('标签添加成功！');
+            } else {
+                alert(result.error || '添加失败');
+            }
+        } catch (error) {
+            console.error('Error adding custom tag:', error);
+            alert('添加失败，请重试');
+        }
+    };
+    
+    inputForm.appendChild(nameInputContainer);
+    inputForm.appendChild(contentInputContainer);
+    inputForm.appendChild(addButton);
+    
+    // 组装单行布局
+    singleLineContainer.appendChild(customTagsTitle);
+    singleLineContainer.appendChild(verticalSeparator);
+    singleLineContainer.appendChild(inputForm);
+    
+    customTagsSection.appendChild(singleLineContainer);
+    
+    // 右侧按钮区域
+    const rightButtonsSection = document.createElement('div');
+    rightButtonsSection.style.cssText = `
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        margin-left: auto;
     `;
     
     const clearBtn = document.createElement('button');
-    clearBtn.innerHTML = '<span style="font-size: 14px; display: block;">清空选择</span><span style="font-size: 11px; display: block; margin-top: 2px; opacity: 0.9;">Clear Selection</span>';
+    clearBtn.innerHTML = '<span style="font-size: 14px; font-weight: 600; display: block;">清空选择</span>';
     clearBtn.style.cssText = `
         background: linear-gradient(135deg, #dc2626 0%, #b91c1c 100%);
         border: 1px solid rgba(220, 38, 38, 0.8);
         color: #ffffff;
-        padding: 6px 12px; /* 按钮长度减少 */
-        border-radius: 8px;
+        padding: 6px 12px;
+        border-radius: 4px;
         cursor: pointer;
-        font-weight: 500;
+        font-weight: 600;
         transition: all 0.2s ease;
         backdrop-filter: blur(10px);
         box-shadow: 0 2px 4px rgba(220, 38, 38, 0.3);
         line-height: 1.2;
-        margin-right: 28px; /* 向左移动更多，远离右下角把手 */
+        height: 32px;
+        width: auto;
+        min-width: 80px;
+        white-space: nowrap;
+        font-size: 14px;
     `;
     clearBtn.addEventListener('mouseenter', () => {
         clearBtn.style.background = 'linear-gradient(135deg, #f87171 0%, #ef4444 100%)';
@@ -563,7 +857,10 @@ function createTagSelectorDialog() {
         clearSelectedTags();
     };
     
-    footer.appendChild(clearBtn);
+    rightButtonsSection.appendChild(clearBtn);
+    
+    footer.appendChild(customTagsSection);
+    footer.appendChild(rightButtonsSection);
     
     // 创建调整大小手柄
     const resizeHandle = document.createElement('div');
@@ -864,11 +1161,16 @@ function showSubCategories(category) {
             
             // 检查是否有子子分类
             const subCategoryData = tagsData[category][subCategory];
-            if (Array.isArray(subCategoryData)) {
-                // 直接显示标签
+            
+            // 特殊处理自定义分类
+            if (category === '自定义') {
+                // 自定义分类直接显示标签，不需要进一步分类
+                showTags(category, subCategory);
+            } else if (Array.isArray(subCategoryData)) {
+                // 普通标签：数组格式直接显示标签
                 showTags(category, subCategory);
             } else {
-                // 显示子子分类
+                // 普通标签：对象格式显示子子分类
                 showSubSubCategories(category, subCategory);
             }
         };
@@ -1059,12 +1361,49 @@ function showTags(category, subCategory) {
     tagContent.innerHTML = '';
     
     const tags = tagsData[category][subCategory];
-    tags.forEach(tagObj => {
+    const isCustomCategory = category === '自定义';
+    
+    // 如果是自定义分类且没有标签，显示提示信息
+    if (isCustomCategory && (!tags || Object.keys(tags).length === 0)) {
+        const emptyMessage = document.createElement('div');
+        emptyMessage.style.cssText = `
+            text-align: center;
+            color: #94a3b8;
+            font-size: 16px;
+            margin-top: 50px;
+            padding: 20px;
+        `;
+        emptyMessage.textContent = '暂无自定义标签，请在底部添加';
+        tagContent.appendChild(emptyMessage);
+        return;
+    }
+    
+    // 处理自定义标签（对象格式）和普通标签（数组或对象格式）
+    let tagEntries;
+    if (isCustomCategory) {
+        // 自定义标签是对象格式 {name: content}
+        tagEntries = Object.entries(tags);
+    } else if (Array.isArray(tags)) {
+        // 普通标签是数组格式 [{display: "name", value: "content"}]
+        tagEntries = tags.map(tagObj => [tagObj.display, tagObj.value]);
+    } else {
+        // 普通标签也可能是对象格式 {display: value}
+        tagEntries = Object.entries(tags);
+    }
+    
+    tagEntries.forEach(([display, value]) => {
+        const tagContainer = document.createElement('div');
+        tagContainer.style.cssText = `
+            display: inline-block;
+            position: relative;
+            margin: 4px;
+        `;
+        
         const tagElement = document.createElement('span');
         tagElement.style.cssText = `
             display: inline-block;
             padding: 6px 12px;
-            margin: 4px;
+            ${isCustomCategory ? 'padding-right: 30px;' : ''}
             background: #444;
             color: #ccc;
             border-radius: 16px;
@@ -1075,19 +1414,19 @@ function showTags(category, subCategory) {
             position: relative;
         `;
         
-        // 显示中文名称
-        tagElement.textContent = tagObj.display;
-        // 存储英文值用于选择
-        tagElement.dataset.value = tagObj.value;
+        // 显示名称
+        tagElement.textContent = display;
+        // 存储值用于选择
+        tagElement.dataset.value = value;
         
-        // 检查是否已选择（基于英文值）
-        if (isTagSelected(tagObj.value)) {
+        // 检查是否已选择
+        if (isTagSelected(value)) {
             tagElement.style.backgroundColor = '#22c55e';
             tagElement.style.color = '#fff';
             tagElement.style.borderColor = '#22c55e';
         }
         
-        // 创建自定义提示框 - 精美的带外框线矩形框提示
+        // 创建自定义提示框
         const createCustomTooltip = () => {
             const tooltip = document.createElement('div');
             tooltip.style.cssText = `
@@ -1109,14 +1448,14 @@ function showTags(category, subCategory) {
                 word-wrap: break-word;
                 line-height: 1.4;
             `;
-            tooltip.textContent = tagObj.value;
+            tooltip.textContent = value;
             return tooltip;
         };
         
         let tooltip = null;
         
         tagElement.onmouseenter = (e) => {
-            if (!isTagSelected(tagObj.value)) {
+            if (!isTagSelected(value)) {
                 tagElement.style.backgroundColor = 'rgb(49, 84, 136)';
                 tagElement.style.borderColor = '#1e293b';
                 tagElement.style.color = '#fff';
@@ -1135,7 +1474,7 @@ function showTags(category, subCategory) {
         };
         
         tagElement.onmouseleave = () => {
-            if (!isTagSelected(tagObj.value)) {
+            if (!isTagSelected(value)) {
                 tagElement.style.backgroundColor = '#444';
                 tagElement.style.borderColor = '#555';
                 tagElement.style.color = '#ccc';
@@ -1154,10 +1493,96 @@ function showTags(category, subCategory) {
         };
         
         tagElement.onclick = () => {
-            toggleTag(tagObj.value, tagElement);
+            toggleTag(value, tagElement);
         };
         
-        tagContent.appendChild(tagElement);
+        tagContainer.appendChild(tagElement);
+        
+        // 为自定义标签添加删除按钮
+        if (isCustomCategory) {
+            const deleteBtn = document.createElement('button');
+            deleteBtn.innerHTML = '×';
+            deleteBtn.style.cssText = `
+                position: absolute;
+                top: -2px;
+                right: 2px;
+                width: 18px;
+                height: 18px;
+                border-radius: 50%;
+                background: linear-gradient(135deg, #ef4444 0%, #dc2626 100%);
+                border: 1px solid #ef4444;
+                color: #ffffff;
+                font-size: 12px;
+                font-weight: 700;
+                cursor: pointer;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                transition: all 0.2s ease;
+                box-shadow: 0 2px 4px rgba(239, 68, 68, 0.3);
+                z-index: 1;
+            `;
+            
+            deleteBtn.addEventListener('mouseenter', () => {
+                deleteBtn.style.background = 'linear-gradient(135deg, #dc2626 0%, #b91c1c 100%)';
+                deleteBtn.style.transform = 'scale(1.1)';
+                deleteBtn.style.boxShadow = '0 4px 8px rgba(239, 68, 68, 0.5)';
+            });
+            
+            deleteBtn.addEventListener('mouseleave', () => {
+                deleteBtn.style.background = 'linear-gradient(135deg, #ef4444 0%, #dc2626 100%)';
+                deleteBtn.style.transform = 'scale(1)';
+                deleteBtn.style.boxShadow = '0 2px 4px rgba(239, 68, 68, 0.3)';
+            });
+            
+            deleteBtn.onclick = async (e) => {
+                e.stopPropagation();
+                
+                if (confirm(`确定要删除自定义标签 "${display}" 吗？`)) {
+                    try {
+                        const response = await fetch('/zhihui/user_tags', {
+                            method: 'DELETE',
+                            headers: {
+                                'Content-Type': 'application/json',
+                            },
+                            body: JSON.stringify({ name: display })
+                        });
+                        
+                        const result = await response.json();
+                        
+                        if (response.ok) {
+                            // 如果该标签已被选中，从选中列表中移除
+                            if (isTagSelected(value)) {
+                                selectedTags.delete(value);
+                                updateSelectedTagsOverview();
+                            }
+                            
+                            // 重新加载标签数据
+                            await loadTagsData();
+                            
+                            // 重新初始化分类列表
+                            initializeCategoryList();
+                            
+                            // 刷新当前显示
+                            if (tagSelectorDialog.activeCategory === '自定义') {
+                                showSubCategories('自定义');
+                            }
+                            
+                            alert('标签删除成功！');
+                        } else {
+                            alert(result.error || '删除失败');
+                        }
+                    } catch (error) {
+                        console.error('Error deleting custom tag:', error);
+                        alert('删除失败，请重试');
+                    }
+                }
+            };
+            
+            tagContainer.appendChild(deleteBtn);
+        }
+        
+        tagContent.appendChild(tagContainer);
     });
 }
 

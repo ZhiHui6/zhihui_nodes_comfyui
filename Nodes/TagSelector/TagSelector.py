@@ -63,14 +63,92 @@ class TagSelector:
         except (FileNotFoundError, json.JSONDecodeError) as e:
             print(f"Error loading tags config: {e}")
             return {}
+    
+    @classmethod
+    def get_user_tags(cls):
+        """读取用户自定义标签"""
+        user_tags_path = os.path.join(os.path.dirname(__file__), "user_tags.json")
+        try:
+            with open(user_tags_path, 'r', encoding='utf-8') as f:
+                return json.load(f)
+        except (FileNotFoundError, json.JSONDecodeError):
+            return {}
+    
+    @classmethod
+    def save_user_tags(cls, user_tags):
+        """保存用户自定义标签"""
+        user_tags_path = os.path.join(os.path.dirname(__file__), "user_tags.json")
+        try:
+            with open(user_tags_path, 'w', encoding='utf-8') as f:
+                json.dump(user_tags, f, ensure_ascii=False, indent=2)
+            return True
+        except Exception as e:
+            print(f"Error saving user tags: {e}")
+            return False
 
 @PromptServer.instance.routes.get('/zhihui/tags')
 async def get_tags(request):
     try:
         tags_data = TagSelector.get_tags_config()
-        if tags_data:
-            return web.json_response(tags_data)
+        user_tags = TagSelector.get_user_tags()
+        
+        # 确保自定义分类始终存在
+        if not tags_data:
+            tags_data = {}
+            
+        # 始终创建自定义分类，即使没有用户标签
+        if user_tags:
+            # 有用户标签时，创建正确的自定义分类结构
+            tags_data["自定义"] = {
+                "我的标签": user_tags
+            }
         else:
-            return web.json_response({"error": "Tags file not found", "tags": {}}, status=404)
+            # 没有用户标签时，创建空的自定义分类结构
+            tags_data["自定义"] = {
+                "我的标签": {}
+            }
+        
+        return web.json_response(tags_data)
+    except Exception as e:
+        return web.json_response({"error": str(e)}, status=500)
+
+@PromptServer.instance.routes.post('/zhihui/user_tags')
+async def save_user_tag(request):
+    try:
+        data = await request.json()
+        name = data.get('name', '').strip()
+        content = data.get('content', '').strip()
+        
+        if not name or not content:
+            return web.json_response({"error": "名称和内容不能为空"}, status=400)
+        
+        user_tags = TagSelector.get_user_tags()
+        user_tags[name] = content
+        
+        if TagSelector.save_user_tags(user_tags):
+            return web.json_response({"success": True, "message": "标签保存成功"})
+        else:
+            return web.json_response({"error": "保存失败"}, status=500)
+    except Exception as e:
+        return web.json_response({"error": str(e)}, status=500)
+
+@PromptServer.instance.routes.delete('/zhihui/user_tags')
+async def delete_user_tag(request):
+    try:
+        data = await request.json()
+        name = data.get('name', '').strip()
+        
+        if not name:
+            return web.json_response({"error": "标签名称不能为空"}, status=400)
+        
+        user_tags = TagSelector.get_user_tags()
+        if name in user_tags:
+            del user_tags[name]
+            if TagSelector.save_user_tags(user_tags):
+                return web.json_response({"success": True, "message": "标签删除成功"})
+            else:
+                return web.json_response({"error": "删除失败"}, status=500)
+        else:
+            return web.json_response({"error": "标签不存在"}, status=404)
     except Exception as e:
         return web.json_response({"error": str(e)}, status=500)
