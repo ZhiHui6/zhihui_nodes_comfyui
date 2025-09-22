@@ -621,17 +621,14 @@ This node collection contains numerous nodes with different functions, divided i
 <td><b>🏷️TAG标签选择器</b><br><b>Tag Selector</b><br><code>TagSelector</code></td>
 <td>
 
-新一代智能标签管理系统，集成海量预设标签库和自定义标签功能，提供前所未有的标签选择体验。<br>Next-generation intelligent tag management system, integrating massive preset tag library and custom tag functionality, providing an unprecedented tag selection experience.
+新一代智能标签管理系统，集成海量预设标签库、自定义标签功能和内置AI扩写能力，提供前所未有的标签选择体验，快速构建复杂提示词，提升创作效率。<br>Next-generation intelligent tag management system, integrating massive preset tag library, custom tag functionality, and built-in AI expansion capabilities, providing an unprecedented tag selection experience, quickly building complex prompts and improving creative efficiency.
 
 <b>核心功能 | Core Features</b>：
-- <b>智能分类体系 | Intelligent Classification System</b>：涵盖常规标签、艺术题材、人物属性、场景环境等全方位分类<br>Covers comprehensive categories including general tags, artistic themes, character attributes, scene environments, etc.
+- <b>标签分类丰富 | Comprehensive Tag Categories</b>：涵盖常规标签、艺术题材、人物属性、场景环境等全方位分类<br>Covers comprehensive categories including general tags, artistic themes, character attributes, scene environments, etc.
 - <b>自定义标签管理 | Custom Tag Management</b>：支持添加、编辑、删除个人专属标签，打造个性化标签库<br>Support adding, editing, and deleting personal exclusive tags, building personalized tag library
 - <b>智能搜索定位 | Smart Search & Positioning</b>：支持关键词搜索，快速找到目标标签<br>Keyword search support, quickly find target tags
 - <b>实时选择统计 | Real-time Selection Statistics</b>：动态显示已选标签数量和详细列表<br>Dynamically display selected tag count and detailed list
-
-<b>使用场景 | Use Cases</b>：
-- <b>AI绘画创作 | AI Art Creation</b>：快速构建复杂提示词，提升创作效率<br>Quickly build complex prompts, improve creative efficiency
-
+- <b>🆕 内置AI扩写 | Built-in AI Expansion</b>：一键智能扩写功能，支持标签式和自然语言式两种扩写模式<br>One-click intelligent expansion feature, supporting both tag-style and natural language expansion modes
 <br>
 <div align="left">
 <a href="images/TAG标签选择器.jpg" target="_blank">

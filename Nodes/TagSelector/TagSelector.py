@@ -1,5 +1,7 @@
 import os
 import json
+import requests
+import urllib.parse
 from typing import Dict, Any
 from aiohttp import web
 from server import PromptServer
@@ -19,6 +21,9 @@ class TagSelector:
                     "default": "",
                     "placeholder": "选择的标签将显示在这里。\nSelected tags will be displayed here."
                 }),
+                "expand_mode": (["禁用", "标签式", "自然语言式"], {
+                    "default": "禁用"
+                }),
             },
             "hidden": {
                 "unique_id": "UNIQUE_ID",
@@ -31,8 +36,13 @@ class TagSelector:
     FUNCTION = "process_tags"
     CATEGORY = "zhihui/text"
     
-    def process_tags(self, tag_edit, unique_id=None, extra_pnginfo=None):
+    def process_tags(self, tag_edit, expand_mode, unique_id=None, extra_pnginfo=None):
         processed_tags = self.clean_tags(tag_edit)
+        
+        if expand_mode != "禁用" and processed_tags.strip():
+            expanded_tags = self._expand_tags_with_llm(processed_tags, expand_mode)
+            return (expanded_tags,)
+        
         return (processed_tags,)
     
     def clean_tags(self, tags_text: str) -> str:
@@ -50,6 +60,61 @@ class TagSelector:
         
         return ', '.join(unique_tags)
     
+    def _expand_tags_with_llm(self, tags_text: str, expand_mode: str) -> str:
+        try:
+            if expand_mode == "标签式":
+                system_prompt = """你是一个专业的AI绘画提示词扩写助手。请将用户提供的简单标签扩写成更详细、更丰富的标签形式。
+
+要求：
+1. 保持标签格式，用逗号分隔
+2. 为每个标签添加更多描述性的修饰词
+3. 增加相关的风格、质量、技术参数标签
+4. 保持原有标签的核心含义不变
+5. 输出应该是可以直接用于AI绘画的提示词标签
+6. 直接给出结果，不要出现说明解释性的句段。
+
+示例：
+输入：girl, cat, garden
+输出：beautiful girl, cute girl, detailed face, expressive eyes, adorable cat, fluffy cat, cat ears, lush garden, blooming flowers, natural lighting, high quality, masterpiece, detailed, 8k resolution"""
+            
+            elif expand_mode == "自然语言式":
+                system_prompt = """你是一个专业的AI绘画提示词扩写助手。请将用户提供的标签转换成自然流畅的句子。
+
+要求：
+1. 将标签组合成完整的、描述性的句子
+2. 添加丰富的细节描述
+3. 使用生动的形容词和副词
+4. 保持语言自然流畅
+5. 适合用作AI绘画的提示词
+6. 直接给出结果，不要出现说明解释性的句段。
+
+示例：
+输入：girl, cat, garden
+输出：A beautiful young girl with expressive eyes and a gentle smile, sitting in a lush blooming garden filled with colorful flowers, holding a cute fluffy cat with soft fur, surrounded by natural sunlight filtering through green leaves, creating a peaceful and enchanting scene with high detail and artistic quality"""
+            
+            else:
+                return tags_text
+            
+            full_prompt = f"{system_prompt}\n\n输入标签：{tags_text}\n\n请扩写："
+            encoded_prompt = urllib.parse.quote(full_prompt)
+            
+            api_url = f"https://text.pollinations.ai/claude/{encoded_prompt}?temperature=0.7"
+            
+            response = requests.get(api_url, timeout=30)
+            response.raise_for_status()
+            
+            expanded_text = response.text.strip()
+            
+            if not expanded_text:
+                print("LLM API returned empty response, using original tags")
+                return tags_text
+                
+            return expanded_text
+            
+        except Exception as e:
+            print(f"LLM expansion failed: {e}")
+            return tags_text
+    
     @classmethod
     def IS_CHANGED(cls, tag_edit, unique_id=None, extra_pnginfo=None):
         return tag_edit
@@ -66,7 +131,6 @@ class TagSelector:
     
     @classmethod
     def get_user_tags(cls):
-        """读取用户自定义标签"""
         user_tags_path = os.path.join(os.path.dirname(__file__), "user_tags.json")
         try:
             with open(user_tags_path, 'r', encoding='utf-8') as f:
@@ -76,7 +140,6 @@ class TagSelector:
     
     @classmethod
     def save_user_tags(cls, user_tags):
-        """保存用户自定义标签"""
         user_tags_path = os.path.join(os.path.dirname(__file__), "user_tags.json")
         try:
             with open(user_tags_path, 'w', encoding='utf-8') as f:
@@ -92,18 +155,14 @@ async def get_tags(request):
         tags_data = TagSelector.get_tags_config()
         user_tags = TagSelector.get_user_tags()
         
-        # 确保自定义分类始终存在
         if not tags_data:
             tags_data = {}
             
-        # 始终创建自定义分类，即使没有用户标签
         if user_tags:
-            # 有用户标签时，创建正确的自定义分类结构
             tags_data["自定义"] = {
                 "我的标签": user_tags
             }
         else:
-            # 没有用户标签时，创建空的自定义分类结构
             tags_data["自定义"] = {
                 "我的标签": {}
             }
