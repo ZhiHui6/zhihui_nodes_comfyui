@@ -61,9 +61,9 @@ If this project helps you, please give us a ⭐**Star**! Your support is our mot
 </tr>
 
 <tr>
-<td><b>🔍额外引导选项</b><br><b>Extra Options</b><br><code>ExtraOptions</code></td>
+<td><b>🏷️TagSelector</b><br><b>标签选择器</b><br><code>TagSelector</code></td>
 <td>提示词处理<br>Prompt Processing</td>
-<td>类似JoyCaption额外选项的通用式图像反推辅助，集成了5种反推类型，提供26个精细化选项开关。<br>Universal image reverse engineering assistant similar to JoyCaption extra options, integrating 5 reverse engineering types with 26 fine-grained option switches.</td>
+<td>新一代智能标签管理系统，提供可视化标签选择界面，支持自定义标签管理和智能搜索功能。分类丰富，涵盖画质、摄影、艺术风格等众多专业标签。<br>Next-generation intelligent tag management system providing visual tag selection interface with custom tag management and intelligent search. Rich categories including quality, photography, artistic styles, etc.</td>
 </tr>
 
 </table>
@@ -621,17 +621,23 @@ This node collection contains numerous nodes with different functions, divided i
 <td><b>🏷️TAG标签选择器</b><br><b>Tag Selector</b><br><code>TagSelector</code></td>
 <td>
 
-专业的可视化标签选择工具，提供直观的多级分类导航界面，支持海量标签的快速选择和管理。<br>Professional visual tag selection tool, providing an intuitive multi-level category navigation interface, supporting rapid selection and management of massive tags.
+新一代智能标签管理系统，集成海量预设标签库和自定义标签功能，提供前所未有的标签选择体验。<br>Next-generation intelligent tag management system, integrating massive preset tag library and custom tag functionality, providing an unprecedented tag selection experience.
 
-<b>特点 | Features</b>：
-- <b>多级分类导航 | Multi-level Category Navigation</b>：支持三级/四级分类结构，清晰的层级导航<br>Supports 3/4-level category structure with clear hierarchical navigation
-- <b>可视化标签选择 | Visual Tag Selection</b>：直观的标签展示界面，支持中英文双语显示<br>Intuitive tag display interface with bilingual Chinese-English support
-- <b>已选标签管理 | Selected Tags Management</b>：实时显示已选标签数量和列表，支持快速移除<br>Real-time display of selected tag count and list with quick removal support
+<b>核心功能 | Core Features</b>：
+- <b>智能分类体系 | Intelligent Classification System</b>：涵盖常规标签、艺术题材、人物属性、场景环境等全方位分类<br>Covers comprehensive categories including general tags, artistic themes, character attributes, scene environments, etc.
+- <b>自定义标签管理 | Custom Tag Management</b>：支持添加、编辑、删除个人专属标签，打造个性化标签库<br>Support adding, editing, and deleting personal exclusive tags, building personalized tag library
+- <b>智能搜索定位 | Smart Search & Positioning</b>：支持关键词搜索，快速找到目标标签<br>Keyword search support, quickly find target tags
+- <b>实时选择统计 | Real-time Selection Statistics</b>：动态显示已选标签数量和详细列表<br>Dynamically display selected tag count and detailed list
 
 <b>使用场景 | Use Cases</b>：
-- 提示词标签的快速选择和组合<br>Quick selection and combination of prompt tags
+- <b>AI绘画创作 | AI Art Creation</b>：快速构建复杂提示词，提升创作效率<br>Quickly build complex prompts, improve creative efficiency
 
-
+<br>
+<div align="left">
+<a href="images/TAG标签选择器.jpg" target="_blank">
+<img src="images/TAG标签选择器.jpg" alt="TAG标签选择器" width="45%"/>
+</a>
+</div>
 </td>
 </tr>
 </table>
