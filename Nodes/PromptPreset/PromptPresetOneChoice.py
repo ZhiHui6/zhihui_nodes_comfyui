@@ -42,7 +42,6 @@ class PromptPresetOneChoice:
     DESCRIPTION = "Single Choice Prompt Preset: Provides 6 preset prompt options, users can select one for output. Each prompt can have comment annotations for easy management and identification of different prompt contents."
 
     def execute(self, prompt1_comment, prompt2_comment, prompt3_comment, prompt4_comment, prompt5_comment, prompt6_comment, prompt1, prompt2, prompt3, prompt4, prompt5, prompt6, select_prompt):
-        # Update cache
         self.prompt_cache["prompt1"] = prompt1
         self.prompt_cache["prompt1_comment"] = prompt1_comment
         self.prompt_cache["prompt2"] = prompt2

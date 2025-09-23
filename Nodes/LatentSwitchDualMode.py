@@ -43,7 +43,7 @@ class LatentSwitchDualMode:
             if selected_latent is None:
                 raise ValueError(f"Selected channel {select_channel} has no input")
                 
-        else:  # auto mode
+        else:
             selected_latent = None
             for latent in latents:
                 if latent is not None:
