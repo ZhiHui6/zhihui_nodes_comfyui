@@ -115,14 +115,29 @@ function createTagSelectorDialog() {
     `;
     
     const dialog = document.createElement('div');
+    
+    // 计算16:9比例的尺寸，基于屏幕高度的80%
+    const screenHeight = window.innerHeight;
+    const screenWidth = window.innerWidth;
+    const dialogHeight = Math.min(screenHeight * 0.8, 720); // 最大高度720px
+    const dialogWidth = dialogHeight * (16 / 9); // 16:9比例
+    
+    // 确保宽度不超过屏幕宽度的90%
+    const finalWidth = Math.min(dialogWidth, screenWidth * 0.9);
+    const finalHeight = finalWidth * (9 / 16); // 保持16:9比例
+    
+    // 计算居中位置
+    const left = (screenWidth - finalWidth) / 2;
+    const top = (screenHeight - finalHeight) / 2;
+    
     dialog.style.cssText = `
         position: fixed;
-        top: 20px;
-        left: 20px;
-        width: 1067px;
-        height: 600px;
-        min-width: 600px; /* 更合理的最小宽度 */
-        min-height: 400px; /* 更合理的最小高度 */
+        top: ${top}px;
+        left: ${left}px;
+        width: ${finalWidth}px;
+        height: ${finalHeight}px;
+        min-width: 600px;
+        min-height: 400px;
         background: linear-gradient(135deg, #1e293b 0%, #0f172a 100%);
         border: none;
         border-radius: 16px;
@@ -201,6 +216,12 @@ function createTagSelectorDialog() {
         // 清理键盘事件监听器
         if (tagSelectorDialog && tagSelectorDialog.keydownHandler) {
             document.removeEventListener('keydown', tagSelectorDialog.keydownHandler);
+        }
+        // 同步关闭预览窗口
+        if (previewPopup && previewPopup.style.display === 'block') {
+            previewPopup.style.display = 'none';
+            // 恢复下方UI界面的交互操作
+            enableMainUIInteraction();
         }
     };
 
@@ -731,17 +752,231 @@ function createTagSelectorDialog() {
         margin: 0;
         box-shadow: inset 0 1px 2px rgba(0, 0, 0, 0.2), 0 1px 2px rgba(59, 130, 246, 0.1);
     `;
+    
+    // 创建弹出预览窗口
+    let previewPopup = null;
+    let previewTextarea = null;
+    
+    function createPreviewPopup() {
+        if (previewPopup) return;
+        
+        previewPopup = document.createElement('div');
+        previewPopup.style.cssText = `
+            position: fixed;
+            background: linear-gradient(135deg, #1e293b 0%, #0f172a 100%);
+            border: 2px solid #3b82f6;
+            border-radius: 12px;
+            padding: 20px 20px 4px 20px;
+            z-index: 10002;
+            display: none;
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.6), 0 0 0 1px rgba(255, 255, 255, 0.1), 0 0 0 4px rgba(59, 130, 246, 0.3);
+            backdrop-filter: blur(20px);
+        `;
+        
+        // 移除之前的点击高亮事件监听器
+        // 窗体弹出时已经有高亮外框，不需要额外的点击高亮效果
+        
+        // 创建标题栏
+        const titleBar = document.createElement('div');
+        titleBar.style.cssText = `
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 12px;
+        `;
+        
+        const title = document.createElement('span');
+        title.textContent = '标签内容预览';
+        title.style.cssText = `
+            color: #f1f5f9;
+            font-size: 16px;
+            font-weight: 600;
+        `;
+        
+        const closeButton = document.createElement('button');
+        closeButton.textContent = '×';
+        closeButton.style.cssText = `
+            background: linear-gradient(135deg, #dc2626 0%, #b91c1c 100%);
+            border: 1px solid #dc2626;
+            color: #ffffff;
+            font-size: 16px;
+            font-weight: 700;
+            cursor: pointer;
+            padding: 0;
+            width: 20px;
+            height: 20px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 4px;
+            transition: all 0.2s ease;
+        `;
+        
+        closeButton.addEventListener('mouseenter', () => {
+            closeButton.style.background = 'linear-gradient(135deg, #ef4444 0%, #dc2626 100%)';
+            closeButton.style.boxShadow = '0 2px 8px rgba(239, 68, 68, 0.4)';
+        });
+        
+        closeButton.addEventListener('mouseleave', () => {
+            closeButton.style.background = 'linear-gradient(135deg, #dc2626 0%, #b91c1c 100%)';
+            closeButton.style.boxShadow = 'none';
+        });
+        
+        closeButton.onclick = () => {
+            previewPopup.style.display = 'none';
+            // 恢复下方UI界面的交互操作
+            enableMainUIInteraction();
+        };
+        
+        titleBar.appendChild(title);
+        titleBar.appendChild(closeButton);
+        
+        // 创建文本域
+        previewTextarea = document.createElement('textarea');
+        previewTextarea.style.cssText = `
+            width: 100%;
+            height: 350px;
+            background: rgba(15, 23, 42, 0.4);
+            border: 1px solid rgba(59, 130, 246, 0.4);
+            border-radius: 8px;
+            padding: 12px;
+            color: white;
+            font-size: 14px;
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            resize: none;
+            outline: none;
+            box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.2);
+        `;
+        
+        // 同步文本域内容到原输入框
+        previewTextarea.addEventListener('input', () => {
+            contentInput.value = previewTextarea.value;
+        });
+        
+        // 创建字符计数显示
+        const charCount = document.createElement('div');
+        charCount.style.cssText = `
+            text-align: right;
+            color: #94a3b8;
+            font-size: 12px;
+            margin-top: 8px;
+            margin-bottom: 0px;
+        `;
+        
+        previewTextarea.addEventListener('input', () => {
+            const length = previewTextarea.value.length;
+            charCount.textContent = `字符数: ${length}`;
+            if (length > 100) {
+                charCount.style.color = '#fbbf24';
+            } else if (length > 200) {
+                charCount.style.color = '#ef4444';
+            } else {
+                charCount.style.color = '#94a3b8';
+            }
+        });
+        
+        previewPopup.appendChild(titleBar);
+        previewPopup.appendChild(previewTextarea);
+        previewPopup.appendChild(charCount);
+        
+        document.body.appendChild(previewPopup);
+    }
+    
+    function showPreviewPopup() {
+        createPreviewPopup();
+        
+        // 同步内容
+        previewTextarea.value = contentInput.value;
+        
+        // 更新字符计数
+        const length = previewTextarea.value.length;
+        const charCount = previewPopup.querySelector('div:last-child');
+        charCount.textContent = `字符数: ${length}`;
+        
+        // 获取输入框和主要UI元素的位置信息
+        const inputRect = contentInput.getBoundingClientRect();
+        const dialogRect = tagSelectorDialog.getBoundingClientRect();
+        
+        // 获取左侧边栏的宽度（类别列表区域）
+        const categoryList = document.querySelector('.category-list');
+        const categoryListWidth = categoryList ? categoryList.getBoundingClientRect().width : 140;
+        
+        // 计算主内容区域的位置和尺寸
+        const contentAreaLeft = dialogRect.left + categoryListWidth + 20; // 左侧边栏宽度 + 间距
+        const contentAreaTop = dialogRect.top + 120; // 标题栏高度 + 间距
+        const contentAreaWidth = dialogRect.width - categoryListWidth - 40; // 总宽度 - 左侧边栏 - 间距
+        const contentAreaHeight = dialogRect.height - 200; // 总高度 - 标题栏和底部区域
+        
+        // 预览窗口尺寸（占据主内容区域的大部分空间）
+        const popupWidth = Math.min(contentAreaWidth * 0.8, 600); // 占80%宽度，最大600px
+        const popupHeight = Math.min(contentAreaHeight * 0.75, 450); // 占75%高度，最大450px
+        
+        // 计算预览窗口在主内容区域中央的位置
+        const left = contentAreaLeft + (contentAreaWidth - popupWidth) / 2;
+        const top = contentAreaTop + (contentAreaHeight - popupHeight) / 2;
+        
+        previewPopup.style.left = left + 'px';
+        previewPopup.style.top = top + 'px';
+        previewPopup.style.width = popupWidth + 'px';
+        previewPopup.style.height = popupHeight + 'px';
+        previewPopup.style.display = 'block';
+        
+        // 禁用下方UI界面的所有交互操作
+        disableMainUIInteraction();
+        
+        // 聚焦到文本域
+        setTimeout(() => {
+            previewTextarea.focus();
+            previewTextarea.setSelectionRange(previewTextarea.value.length, previewTextarea.value.length);
+        }, 100);
+    }
+    
+    // 检测输入框内容长度并显示弹窗
+    function checkContentLength() {
+        const content = contentInput.value;
+        const inputWidth = contentInput.offsetWidth;
+        const textWidth = getTextWidth(content, contentInput);
+        
+        // 如果文本宽度超过输入框宽度的80%，显示弹窗
+        if (textWidth > inputWidth * 0.8 && content.length > 20) {
+            showPreviewPopup();
+        }
+    }
+    
+    // 获取文本宽度的辅助函数
+    function getTextWidth(text, element) {
+        const canvas = document.createElement('canvas');
+        const context = canvas.getContext('2d');
+        const computedStyle = window.getComputedStyle(element);
+        context.font = `${computedStyle.fontSize} ${computedStyle.fontFamily}`;
+        return context.measureText(text).width;
+    }
+    
     contentInput.addEventListener('focus', () => {
         contentInput.style.borderColor = '#38bdf8';
         contentInput.style.boxShadow = '0 0 0 2px rgba(56, 189, 248, 0.2), inset 0 1px 2px rgba(0, 0, 0, 0.2)';
         contentInput.style.background = 'rgba(15, 23, 42, 0.4)';
         contentInput.classList.add('hide-placeholder'); // 聚焦时隐藏placeholder
+        
+        // 检查是否需要显示弹窗
+        setTimeout(checkContentLength, 100);
     });
+    
     contentInput.addEventListener('blur', () => {
         contentInput.style.borderColor = 'rgba(59, 130, 246, 0.4)';
         contentInput.style.boxShadow = 'inset 0 1px 2px rgba(0, 0, 0, 0.2), 0 1px 2px rgba(59, 130, 246, 0.1)';
         contentInput.style.background = 'rgba(15, 23, 42, 0.3)';
         contentInput.classList.remove('hide-placeholder'); // 失焦时显示placeholder
+    });
+    
+    // 监听输入事件，实时检测长度
+    contentInput.addEventListener('input', () => {
+        checkContentLength();
+    });
+    
+    // 双击输入框直接打开预览窗口
+    contentInput.addEventListener('dblclick', () => {
+        showPreviewPopup();
     });
     
     contentInputContainer.appendChild(contentLabel);
@@ -955,11 +1190,22 @@ function createTagSelectorDialog() {
     
     // 添加ESC键退出功能
     const handleKeyDown = (e) => {
-        if (e.key === 'Escape' && tagSelectorDialog && tagSelectorDialog.style.display === 'block') {
-            tagSelectorDialog.style.display = 'none';
-            // 清理键盘事件监听器
-            if (tagSelectorDialog.keydownHandler) {
-                document.removeEventListener('keydown', tagSelectorDialog.keydownHandler);
+        if (e.key === 'Escape') {
+            // 优先检查预览窗口是否打开，如果是则只关闭预览窗口
+            if (previewPopup && previewPopup.style.display === 'block') {
+                previewPopup.style.display = 'none';
+                // 恢复下方UI界面的交互操作
+                enableMainUIInteraction();
+                return; // 阻止进一步处理，不关闭主对话框
+            }
+            
+            // 如果预览窗口未打开，则关闭主对话框
+            if (overlay && overlay.style.display === 'block') {
+                overlay.style.display = 'none';
+                // 清理键盘事件监听器
+                if (tagSelectorDialog && tagSelectorDialog.keydownHandler) {
+                    document.removeEventListener('keydown', tagSelectorDialog.keydownHandler);
+                }
             }
         }
     };
@@ -1108,21 +1354,10 @@ function createTagSelectorDialog() {
     window.addEventListener('resize', handleResize);
     
     // 点击遮罩关闭 - 添加防误触机制
+    // 移除overlay点击关闭功能，只保留拖拽相关的事件处理
     overlay.onclick = (e) => {
-        // 只有在没有进行拖拽或调整大小操作时才允许点击关闭
-        // 并且需要确保点击的是遮罩本身，而不是对话框内容
-        if (e.target === overlay && !isDragging && !isResizing) {
-            // 添加短暂延迟，防止鼠标释放事件立即触发关闭
-            setTimeout(() => {
-                if (!isDragging && !isResizing) {
-                    overlay.style.display = 'none';
-                    // 清理键盘事件监听器
-                    if (tagSelectorDialog && tagSelectorDialog.keydownHandler) {
-                        document.removeEventListener('keydown', tagSelectorDialog.keydownHandler);
-                    }
-                }
-            }, 50);
-        }
+        // 不再允许点击空白处关闭UI，只处理拖拽相关逻辑
+        // UI只能通过关闭按钮或ESC键关闭
     };
 }
 
@@ -2224,4 +2459,38 @@ function showSearchResults(results, q) {
         tagElement.onclick = () => toggleTag(tagObj.value, tagElement);
         container.appendChild(tagElement);
     });
+}
+
+// 禁用下方所有窗体的交互操作
+function disableMainUIInteraction() {
+    // 禁用整个页面的交互，除了预览窗口
+    const overlay = document.createElement('div');
+    overlay.id = 'ui-disable-overlay';
+    overlay.style.cssText = `
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background: rgba(0, 0, 0, 0.3);
+        z-index: 10001;
+        pointer-events: auto;
+    `;
+    
+    // 添加到页面
+    document.body.appendChild(overlay);
+    
+    // 确保预览窗口在覆盖层之上
+    if (previewPopup) {
+        previewPopup.style.zIndex = '10002';
+    }
+}
+
+// 恢复所有窗体的交互操作
+function enableMainUIInteraction() {
+    // 移除禁用覆盖层
+    const overlay = document.getElementById('ui-disable-overlay');
+    if (overlay) {
+        overlay.remove();
+    }
 }
