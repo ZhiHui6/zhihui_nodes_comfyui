@@ -2,6 +2,7 @@ import os
 import json
 import requests
 import urllib.parse
+import base64
 from typing import Dict, Any
 from aiohttp import web
 from server import PromptServer
@@ -134,10 +135,60 @@ class TagSelector:
         user_tags_path = os.path.join(os.path.dirname(__file__), "user_tags.json")
         try:
             with open(user_tags_path, 'r', encoding='utf-8') as f:
-                return json.load(f)
+                user_tags = json.load(f)
+                # 转换旧格式到新格式（如果需要）
+                converted_tags = {}
+                for name, data in user_tags.items():
+                    if isinstance(data, str):
+                        # 旧格式：{ "标签名": "标签内容" }
+                        converted_tags[name] = {
+                            "content": data,
+                            "preview": f"/zhihui/user_tags/preview/{name}"
+                        }
+                    else:
+                        # 新格式：{ "标签名": { "content": "标签内容", "preview": "预览图路径" } }
+                        converted_tags[name] = data
+                return converted_tags
         except (FileNotFoundError, json.JSONDecodeError):
             return {}
-    
+
+    @classmethod
+    def get_preview_image_path(cls, tag_name):
+        """获取标签预览图路径"""
+        user_images_dir = os.path.join(os.path.dirname(__file__), "user_images")
+        # 使用标签名称作为文件名，添加Preview后缀
+        filename = f"{tag_name}_Preview.png"
+        return os.path.join(user_images_dir, filename)
+
+    @classmethod
+    def save_preview_image(cls, tag_name, image_data):
+        """保存标签预览图"""
+        try:
+            # 确保user_images目录存在
+            user_images_dir = os.path.join(os.path.dirname(__file__), "user_images")
+            if not os.path.exists(user_images_dir):
+                os.makedirs(user_images_dir)
+            
+            # 解码base64图片数据
+            if image_data.startswith('data:image'):
+                # 提取base64数据部分
+                header, encoded = image_data.split(',', 1)
+                image_data = encoded
+            
+            image_bytes = base64.b64decode(image_data)
+            
+            # 生成文件路径
+            image_path = cls.get_preview_image_path(tag_name)
+            
+            # 保存图片
+            with open(image_path, 'wb') as f:
+                f.write(image_bytes)
+            
+            return True
+        except Exception as e:
+            print(f"Error saving preview image: {e}")
+            return False
+
     @classmethod
     def save_user_tags(cls, user_tags):
         user_tags_path = os.path.join(os.path.dirname(__file__), "user_tags.json")
@@ -147,6 +198,18 @@ class TagSelector:
             return True
         except Exception as e:
             print(f"Error saving user tags: {e}")
+            return False
+
+    @classmethod
+    def delete_preview_image(cls, tag_name):
+        """删除标签预览图"""
+        try:
+            image_path = cls.get_preview_image_path(tag_name)
+            if os.path.exists(image_path):
+                os.remove(image_path)
+            return True
+        except Exception as e:
+            print(f"Error deleting preview image: {e}")
             return False
 
 @PromptServer.instance.routes.get('/zhihui/tags')
@@ -177,14 +240,23 @@ async def save_user_tag(request):
         data = await request.json()
         name = data.get('name', '').strip()
         content = data.get('content', '').strip()
+        preview_image = data.get('preview_image', None)  # 获取预览图数据
         
         if not name or not content:
             return web.json_response({"error": "名称和内容不能为空"}, status=400)
         
         user_tags = TagSelector.get_user_tags()
-        user_tags[name] = content
+        # 保存标签信息和预览图路径
+        user_tags[name] = {
+            "content": content,
+            "preview": f"/zhihui/user_tags/preview/{name}"
+        }
         
         if TagSelector.save_user_tags(user_tags):
+            # 如果有预览图数据，则保存预览图
+            if preview_image:
+                TagSelector.save_preview_image(name, preview_image)
+            
             return web.json_response({"success": True, "message": "标签保存成功"})
         else:
             return web.json_response({"error": "保存失败"}, status=500)
@@ -204,10 +276,27 @@ async def delete_user_tag(request):
         if name in user_tags:
             del user_tags[name]
             if TagSelector.save_user_tags(user_tags):
+                # 同时删除预览图
+                TagSelector.delete_preview_image(name)
                 return web.json_response({"success": True, "message": "标签删除成功"})
             else:
                 return web.json_response({"error": "删除失败"}, status=500)
         else:
             return web.json_response({"error": "标签不存在"}, status=404)
+    except Exception as e:
+        return web.json_response({"error": str(e)}, status=500)
+
+@PromptServer.instance.routes.get('/zhihui/user_tags/preview/{tag_name}')
+async def get_user_tag_preview(request):
+    """获取用户标签预览图"""
+    try:
+        tag_name = request.match_info['tag_name']
+        image_path = TagSelector.get_preview_image_path(tag_name)
+        
+        if os.path.exists(image_path):
+            return web.FileResponse(image_path)
+        else:
+            # 返回默认图片或404
+            return web.json_response({"error": "预览图不存在"}, status=404)
     except Exception as e:
         return web.json_response({"error": str(e)}, status=500)

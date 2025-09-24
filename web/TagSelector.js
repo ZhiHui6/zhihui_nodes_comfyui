@@ -1,7 +1,6 @@
 import { app } from "/scripts/app.js";
 import { api } from "/scripts/api.js";
 
-// 通用样式对象
 const commonStyles = {
     button: {
         base: {
@@ -95,12 +94,10 @@ const commonStyles = {
     }
 };
 
-// 通用工具函数：应用样式对象到元素
 function applyStyles(element, styles) {
     Object.assign(element.style, styles);
 }
 
-// 通用工具函数：设置按钮悬停效果
 function setupButtonHoverEffect(element, normalStyles, hoverStyles) {
     applyStyles(element, normalStyles);
     
@@ -128,6 +125,8 @@ app.registerExtension({
 let tagSelectorDialog = null;
 let currentNode = null;
 let tagsData = null;
+let currentPreviewImage = null;
+let currentPreviewImageName = null;
 
 async function openTagSelector(node) {
     currentNode = node;
@@ -283,7 +282,7 @@ function createTagSelectorDialog() {
 
     const closeBtn = document.createElement('button');
     closeBtn.textContent = '×';
-    // 应用基础按钮样式
+
     applyStyles(closeBtn, {
         ...commonStyles.button.base,
         ...commonStyles.button.danger,
@@ -299,7 +298,6 @@ function createTagSelectorDialog() {
         margin: '4px 8px 4px 0'
     });
     
-    // 应用关闭按钮悬停效果
     const closeBtnNormalStyle = {
         ...commonStyles.button.danger
     };
@@ -408,7 +406,7 @@ function createTagSelectorDialog() {
     const clearSearchBtn = document.createElement('button');
     clearSearchBtn.textContent = '清除';
     clearSearchBtn.title = '清除搜索内容';
-    // 应用基础按钮样式
+
     applyStyles(clearSearchBtn, {
         ...commonStyles.button.base,
         ...commonStyles.button.danger,
@@ -426,7 +424,6 @@ function createTagSelectorDialog() {
         whiteSpace: 'nowrap'
     });
 
-    // 应用清除搜索按钮悬停效果
     const clearSearchBtnNormalStyle = {
         background: 'rgba(239, 68, 68, 0.15)',
         borderColor: 'rgba(239, 68, 68, 0.35)',
@@ -561,7 +558,6 @@ function createTagSelectorDialog() {
         overflow: hidden;
     `;
 
-
     const categoryList = document.createElement('div');
     categoryList.style.cssText = `
         width: 120px;
@@ -693,6 +689,7 @@ function createTagSelectorDialog() {
             opacity: 0 !important;
         }
     `;
+
     document.head.appendChild(styleElement);
     const customTagsTitle = document.createElement('div');
     customTagsTitle.style.cssText = `
@@ -707,6 +704,7 @@ function createTagSelectorDialog() {
         margin-right: 2px;
         text-shadow: 0 1px 2px rgba(0, 0, 0, 0.3);
     `;
+
     customTagsTitle.textContent = '自定义标签';
     const verticalSeparator = document.createElement('div');
     verticalSeparator.style.cssText = `
@@ -720,7 +718,7 @@ function createTagSelectorDialog() {
     const inputForm = document.createElement('div');
     inputForm.style.cssText = `
         display: flex;
-        gap: 8px;
+        gap: 16px;  /* 加大标签名称与内容之间的间距 */
         align-items: center;
         flex-wrap: wrap;
         flex: 1;
@@ -823,7 +821,8 @@ function createTagSelectorDialog() {
         caret-color: white;
         outline: none;
         transition: all 0.3s ease;
-        flex: 1;
+        flex: 0 1 66%;
+        max-width: 66%;
         min-width: 100px;
         height: 24px;
         margin: 0;
@@ -990,7 +989,7 @@ function createTagSelectorDialog() {
         const inputWidth = contentInput.offsetWidth;
         const textWidth = getTextWidth(content, contentInput);
 
-        if (textWidth > inputWidth * 0.8 && content.length > 20) {
+        if (textWidth > inputWidth * 0.9 || content.length > 15) {
             showPreviewPopup();
         }
     }
@@ -1029,9 +1028,54 @@ function createTagSelectorDialog() {
     contentInputContainer.appendChild(contentLabel);
     contentInputContainer.appendChild(contentInput);
 
-    const addButton = document.createElement('button');
-    addButton.textContent = '添加';
-    addButton.style.cssText = `
+    const previewContainer = document.createElement('div');
+    previewContainer.style.cssText = `
+        display: flex;
+        align-items: center;
+        gap: 2px;
+        margin-left: -62px;  /* 继续向左移动靠近内容输入框 */
+    `;
+
+    const previewLabel = document.createElement('label');
+    previewLabel.textContent = '预览图:';
+    previewLabel.style.cssText = `
+        color: #ffffff;
+        font-size: 14px;
+        font-weight: 600;
+        white-space: nowrap;
+        margin: 0;
+        padding: 0;
+        text-shadow: 0 1px 2px rgba(0, 0, 0, 0.4);
+    `;
+
+    const previewInput = document.createElement('input');
+    previewInput.type = 'file';
+    previewInput.accept = 'image/*';
+    previewInput.style.cssText = `
+        display: none;
+    `;
+
+    const fileNameDisplay = document.createElement('span');
+    fileNameDisplay.textContent = '未加载图片';
+    fileNameDisplay.style.cssText = `
+        background: rgba(15, 23, 42, 0.3);
+        border: 1px solid rgba(59, 130, 246, 0.4);
+        border-radius: 6px;
+        padding: 4px 8px;
+        color: #94a3b8;
+        font-size: 12px;
+        min-width: 100px;
+        max-width: 120px;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+        display: inline-block;
+        vertical-align: middle;
+    `;
+
+    const selectFileButton = document.createElement('button');
+    selectFileButton.textContent = '加载';
+    selectFileButton.style.cssText = `
         background: linear-gradient(135deg, #2563eb 0%, #1d4ed8 50%, #1e40af 100%);
         border: 1px solid rgba(59, 130, 246, 0.7);
         color: #ffffff;
@@ -1042,21 +1086,89 @@ function createTagSelectorDialog() {
         font-weight: 600;
         transition: all 0.3s ease;
         height: 26px;
-        width: 50px;
-        min-width: 50px;
+        margin-left: 4px;
+        white-space: nowrap;
+        text-shadow: 0 1px 1px rgba(0, 0, 0, 0.3);
+    `;
+
+    selectFileButton.addEventListener('mouseenter', () => {
+        selectFileButton.style.background = 'linear-gradient(135deg, #3b82f6 0%, #2563eb 50%, #1d4ed8 100%)';
+        selectFileButton.style.boxShadow = '0 2px 4px rgba(59, 130, 246, 0.2), 0 1px 2px rgba(0, 0, 0, 0.1)';
+        selectFileButton.style.borderColor = 'rgba(59, 130, 246, 0.5)';
+    });
+    selectFileButton.addEventListener('mouseleave', () => {
+        selectFileButton.style.background = 'linear-gradient(135deg, #2563eb 0%, #1d4ed8 50%, #1e40af 100%)';
+        selectFileButton.style.borderColor = 'rgba(59, 130, 246, 0.7)';
+        selectFileButton.style.boxShadow = 'none';
+    });
+
+    selectFileButton.addEventListener('click', () => {
+        previewInput.click();
+    });
+
+    previewInput.addEventListener('change', (e) => {
+        const file = e.target.files[0];
+        if (file) {
+            const reader = new FileReader();
+            reader.onload = (event) => {
+                currentPreviewImage = event.target.result;
+                currentPreviewImageName = file.name;
+                fileNameDisplay.textContent = file.name;
+                fileNameDisplay.style.color = '#e2e8f0';
+            };
+            reader.readAsDataURL(file);
+        } else {
+            currentPreviewImage = null;
+            currentPreviewImageName = null;
+            fileNameDisplay.textContent = '未选择文件';
+            fileNameDisplay.style.color = '#94a3b8';
+        }
+    });
+
+    const previewSeparator = document.createElement('div');
+    previewSeparator.style.cssText = `
+        width: 1px;
+        height: 25px;
+        background: linear-gradient(to bottom, transparent, rgb(62, 178, 255), transparent);
+        margin: 0 10px;
+        flex-shrink: 0;
+    `;
+
+    previewContainer.appendChild(previewLabel);
+    previewContainer.appendChild(fileNameDisplay);
+    previewContainer.appendChild(selectFileButton);
+    previewContainer.appendChild(previewSeparator);
+    previewContainer.appendChild(previewInput);
+
+    const addButton = document.createElement('button');
+    addButton.textContent = '添加标签';
+    addButton.style.cssText = `
+        background: linear-gradient(135deg, #059669 0%, #047857 100%);
+        border: 1px solid rgba(16, 185, 129, 0.7);
+        color: #ffffff;
+        padding: 4px 8px;
+        border-radius: 6px;
+        cursor: pointer;
+        font-size: 12px;
+        font-weight: 600;
+        transition: all 0.3s ease;
+        height: 26px;
+        width: 70px;
+        min-width: 70px;
         white-space: nowrap;
         text-shadow: 0 1px 1px rgba(0, 0, 0, 0.3);
         text-align: center;
+        margin-left: -13px;
     `;
     addButton.addEventListener('mouseenter', () => {
-        addButton.style.background = 'linear-gradient(135deg, #3b82f6 0%, #2563eb 50%, #1d4ed8 100%)';
-        addButton.style.boxShadow = '0 2px 4px rgba(59, 130, 246, 0.2), 0 1px 2px rgba(0, 0, 0, 0.1)';
-        addButton.style.borderColor = 'rgba(59, 130, 246, 0.5)';
+        addButton.style.background = 'linear-gradient(135deg, #10b981 0%, #059669 100%)';
+        addButton.style.boxShadow = '0 2px 4px rgba(16, 185, 129, 0.2), 0 1px 2px rgba(0, 0, 0, 0.1)';
+        addButton.style.borderColor = 'rgba(16, 185, 129, 0.5)';
         addButton.style.transform = 'none';
     });
     addButton.addEventListener('mouseleave', () => {
-        addButton.style.background = 'linear-gradient(135deg, #2563eb 0%, #1d4ed8 50%, #1e40af 100%)';
-        addButton.style.borderColor = 'rgba(59, 130, 246, 0.7)';
+        addButton.style.background = 'linear-gradient(135deg, #059669 0%, #047857 100%)';
+        addButton.style.borderColor = 'rgba(16, 185, 129, 0.7)';
         addButton.style.transform = 'none';
     });
 
@@ -1070,12 +1182,18 @@ function createTagSelectorDialog() {
         }
 
         try {
+            const requestData = { name, content };
+            
+            if (currentPreviewImage) {
+                requestData.preview_image = currentPreviewImage;
+            }
+
             const response = await fetch('/zhihui/user_tags', {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
                 },
-                body: JSON.stringify({ name, content })
+                body: JSON.stringify(requestData)
             });
 
             const result = await response.json();
@@ -1083,6 +1201,11 @@ function createTagSelectorDialog() {
             if (response.ok) {
                 nameInput.value = '';
                 contentInput.value = '';
+
+                currentPreviewImage = null;
+                currentPreviewImageName = null;
+                previewInput.value = '';
+                
                 await loadTagsData();
                 
                 const activeCategory = tagSelectorDialog.activeCategory;
@@ -1112,6 +1235,7 @@ function createTagSelectorDialog() {
 
     inputForm.appendChild(nameInputContainer);
     inputForm.appendChild(contentInputContainer);
+    inputForm.appendChild(previewContainer);
     inputForm.appendChild(addButton);
     singleLineContainer.appendChild(customTagsTitle);
     singleLineContainer.appendChild(verticalSeparator);
@@ -1729,6 +1853,85 @@ function createTooltip(text) {
     return tooltip;
 }
 
+function createCustomTagTooltip(tagData, tagName) {
+    const tooltip = document.createElement('div');
+    
+    applyStyles(tooltip, {
+        ...commonStyles.tooltip.base,
+        padding: '12px',
+        fontSize: '12px',
+        zIndex: '10000',
+        pointerEvents: 'none',
+        opacity: '0',
+        transform: 'translateY(-100%) translateY(-8px)',
+        minWidth: '250px',
+        maxWidth: '500px',
+        display: 'flex',
+        flexDirection: 'row',
+        alignItems: 'flex-start',
+        gap: '15px'
+    });
+    
+    const contentDiv = document.createElement('div');
+    contentDiv.style.cssText = `
+        flex: 1;
+        text-align: left;
+        word-wrap: break-word;
+        max-width: 250px;
+    `;
+    contentDiv.textContent = tagData.content || tagData;
+    
+    tooltip.appendChild(contentDiv);
+    
+    const previewDiv = document.createElement('div');
+    previewDiv.style.cssText = `
+        border-radius: 6px;
+        overflow: hidden;
+        flex-shrink: 0;
+        border: 1px solid rgba(59, 130, 246, 0.5);
+        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        min-width: 50px;
+        min-height: 50px;
+    `;
+    
+    const previewImg = document.createElement('img');
+    previewImg.style.cssText = `
+        object-fit: contain;
+        background-color: #000;
+        display: block;
+        border-radius: 4px;
+        max-width: 300px;
+        max-height: 200px;
+    `;
+    previewImg.src = tagData.preview || `/zhihui/user_tags/preview/${tagName}`;
+    previewImg.alt = tagName;
+    previewImg.onerror = () => {
+        // 如果预览图加载失败，显示默认占位符
+        previewImg.style.display = 'none';
+        const placeholder = document.createElement('div');
+        placeholder.style.cssText = `
+            width: 100%;
+            height: 100%;
+            background: #666;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #ccc;
+            font-size: 12px;
+        `;
+        placeholder.textContent = '无预览';
+        previewDiv.appendChild(placeholder);
+    };
+    
+    previewDiv.appendChild(previewImg);
+    tooltip.appendChild(previewDiv);
+    
+    return tooltip;
+}
+
 function showTags(category, subCategory) {
 
     const subSubCategoryTabs = tagSelectorDialog.subSubCategoryTabs;
@@ -1789,7 +1992,13 @@ function showTags(category, subCategory) {
                 tooltip.parentNode.removeChild(tooltip);
                 tooltip = null;
             }
-            tooltip = createTooltip(value);
+            
+            if (isCustomCategory) {
+                tooltip = createCustomTagTooltip(value, display);
+            } else {
+                tooltip = createTooltip(value);
+            }
+            
             document.body.appendChild(tooltip);
             const rect = tagElement.getBoundingClientRect();
             tooltip.style.left = rect.left + (rect.width / 2) - (tooltip.offsetWidth / 2) + 'px';
