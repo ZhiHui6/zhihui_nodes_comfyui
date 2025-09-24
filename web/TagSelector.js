@@ -40,6 +40,17 @@ const commonStyles = {
             transform: 'none'
         }
     },
+    tooltip: {
+        base: {
+            position: 'absolute',
+            background: 'linear-gradient(135deg, #1e293b 0%, #334155 100%)',
+            color: '#fff',
+            borderRadius: '6px',
+            border: '1px solid #3b82f6',
+            boxShadow: '0 4px 12px rgba(59, 130, 246, 0.3)',
+            transition: 'opacity 0.2s ease'
+        }
+    },
     input: {
         base: {
             padding: '8px 12px',
@@ -1074,14 +1085,12 @@ function createTagSelectorDialog() {
                 contentInput.value = '';
                 await loadTagsData();
                 
-                // 保存当前激活的分类
                 const activeCategory = tagSelectorDialog.activeCategory;
                 
                 initializeCategoryList();
                 
-                // 如果之前激活的是自定义分类，则继续保持在自定义分类
                 if (activeCategory === '自定义') {
-                    // 找到自定义分类的元素并点击它
+
                     const categoryItems = tagSelectorDialog.categoryList.querySelectorAll('div');
                     for (let item of categoryItems) {
                         if (item.textContent === '自定义') {
@@ -1666,11 +1675,9 @@ function showSubSubSubCategories(category, subCategory, subSubCategory) {
     });
 }
 
-// 创建统一的标签元素创建函数
-// 创建统一的标签容器创建函数
 function createTagContainer() {
     const tagContainer = document.createElement('div');
-    // 应用基础容器样式
+
     applyStyles(tagContainer, {
         display: 'inline-block',
         position: 'relative',
@@ -1679,10 +1686,9 @@ function createTagContainer() {
     return tagContainer;
 }
 
-// 创建统一的标签元素创建函数
 function createTagElement(display, value, isSelected) {
     const tagElement = document.createElement('span');
-    // 应用基础标签样式
+
     applyStyles(tagElement, {
         ...commonStyles.tag.base,
         padding: '6px 12px',
@@ -1703,10 +1709,9 @@ function createTagElement(display, value, isSelected) {
     return tagElement;
 }
 
-// 创建统一的工具提示函数
 function createTooltip(text) {
     const tooltip = document.createElement('div');
-    // 应用基础工具提示样式
+
     applyStyles(tooltip, {
         ...commonStyles.tooltip.base,
         padding: '8px 12px',
@@ -1877,14 +1882,12 @@ function showTags(category, subCategory) {
 
                             await loadTagsData();
                             
-                            // 保存当前激活的分类
                             const activeCategory = tagSelectorDialog.activeCategory;
                             
                             initializeCategoryList();
                             
-                            // 如果之前激活的是自定义分类，则继续保持在自定义分类
                             if (activeCategory === '自定义') {
-                                // 找到自定义分类的元素并点击它
+
                                 const categoryItems = tagSelectorDialog.categoryList.querySelectorAll('div');
                                 for (let item of categoryItems) {
                                     if (item.textContent === '自定义') {
