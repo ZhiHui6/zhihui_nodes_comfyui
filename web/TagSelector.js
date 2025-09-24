@@ -1,6 +1,107 @@
 import { app } from "/scripts/app.js";
 import { api } from "/scripts/api.js";
 
+// 通用样式对象
+const commonStyles = {
+    button: {
+        base: {
+            display: 'inline-flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            padding: '6px 12px',
+            borderRadius: '6px',
+            border: '1px solid',
+            fontSize: '14px',
+            fontWeight: '500',
+            cursor: 'pointer',
+            transition: 'all 0.2s ease',
+            outline: 'none'
+        },
+        primary: {
+            background: 'linear-gradient(135deg, #2563eb 0%, #1d4ed8 50%, #1e40af 100%)',
+            borderColor: 'rgba(59, 130, 246, 0.7)',
+            color: '#ffffff'
+        },
+        primaryHover: {
+            background: 'linear-gradient(135deg, #3b82f6 0%, #2563eb 50%, #1d4ed8 100%)',
+            boxShadow: '0 2px 4px rgba(59, 130, 246, 0.2), 0 1px 2px rgba(0, 0, 0, 0.1)',
+            borderColor: 'rgba(59, 130, 246, 0.5)',
+            transform: 'none'
+        },
+        danger: {
+            background: 'linear-gradient(135deg, #dc2626 0%, #b91c1c 100%)',
+            borderColor: 'rgba(220, 38, 38, 0.8)',
+            color: '#ffffff'
+        },
+        dangerHover: {
+            background: 'linear-gradient(135deg, #f87171 0%, #ef4444 100%)',
+            boxShadow: '0 2px 8px rgba(239, 68, 68, 0.4)',
+            borderColor: 'rgba(248, 113, 113, 0.8)',
+            transform: 'none'
+        }
+    },
+    input: {
+        base: {
+            padding: '8px 12px',
+            borderRadius: '6px',
+            border: '1px solid rgba(59, 130, 246, 0.4)',
+            background: 'rgba(15, 23, 42, 0.3)',
+            color: '#e2e8f0',
+            fontSize: '14px',
+            transition: 'all 0.2s ease',
+            outline: 'none'
+        },
+        focus: {
+            borderColor: '#38bdf8',
+            boxShadow: '0 0 0 2px rgba(56, 189, 248, 0.2), inset 0 1px 2px rgba(0, 0, 0, 0.2)',
+            background: 'rgba(15, 23, 42, 0.4)'
+        }
+    },
+    tag: {
+        base: {
+            display: 'inline-block',
+            padding: '6px 12px',
+            background: '#444',
+            color: '#ccc',
+            borderRadius: '16px',
+            cursor: 'pointer',
+            transition: 'all 0.2s',
+            border: '1px solid rgba(71, 85, 105, 0.8)',
+            fontSize: '14px',
+            position: 'relative'
+        },
+        selected: {
+            backgroundColor: '#22c55e',
+            color: '#fff',
+            borderColor: '#22c55e'
+        },
+        hover: {
+            backgroundColor: 'rgb(49, 84, 136)',
+            borderColor: '#1e293b',
+            color: '#fff',
+            borderWidth: '1px'
+        }
+    }
+};
+
+// 通用工具函数：应用样式对象到元素
+function applyStyles(element, styles) {
+    Object.assign(element.style, styles);
+}
+
+// 通用工具函数：设置按钮悬停效果
+function setupButtonHoverEffect(element, normalStyles, hoverStyles) {
+    applyStyles(element, normalStyles);
+    
+    element.addEventListener('mouseenter', () => {
+        applyStyles(element, hoverStyles);
+    });
+    
+    element.addEventListener('mouseleave', () => {
+        applyStyles(element, normalStyles);
+    });
+}
+
 app.registerExtension({
     name: "zhihui.TagSelector",
     nodeCreated(node) {
@@ -171,40 +272,32 @@ function createTagSelectorDialog() {
 
     const closeBtn = document.createElement('button');
     closeBtn.textContent = '×';
-    closeBtn.style.cssText = `
-        background: linear-gradient(135deg, #dc2626 0%, #b91c1c 100%);
-        border: 1px solid #dc2626;
-        color: #ffffff;
-        font-size: 18px;
-        font-weight: 700;
-        cursor: pointer;
-        padding: 0;
-        width: 22px;
-        height: 22px;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        border-radius: 6px;
-        transition: all 0.2s ease;
-        line-height: 22px;
-        vertical-align: middle;
-        position: relative;
-        top: 0;
-        margin: 4px 8px 4px 0;
-    `;
-    closeBtn.addEventListener('mouseenter', () => {
-        closeBtn.style.background = 'linear-gradient(135deg, #ef4444 0%, #dc2626 100%)';
-        closeBtn.style.color = '#ffffff';
-        closeBtn.style.borderColor = '#ef4444';
-        closeBtn.style.boxShadow = '0 2px 8px rgba(239, 68, 68, 0.4)';
-        closeBtn.style.borderRadius = '6px';
+    // 应用基础按钮样式
+    applyStyles(closeBtn, {
+        ...commonStyles.button.base,
+        ...commonStyles.button.danger,
+        padding: '0',
+        width: '22px',
+        height: '22px',
+        fontSize: '18px',
+        fontWeight: '700',
+        lineHeight: '22px',
+        verticalAlign: 'middle',
+        position: 'relative',
+        top: '0',
+        margin: '4px 8px 4px 0'
     });
-    closeBtn.addEventListener('mouseleave', () => {
-        closeBtn.style.background = 'linear-gradient(135deg, #dc2626 0%, #b91c1c 100%)';
-        closeBtn.style.color = '#ffffff';
-        closeBtn.style.borderColor = '#dc2626';
-        closeBtn.style.borderRadius = '6px';
-    });
+    
+    // 应用关闭按钮悬停效果
+    const closeBtnNormalStyle = {
+        ...commonStyles.button.danger
+    };
+    
+    const closeBtnHoverStyle = {
+        ...commonStyles.button.dangerHover
+    };
+    
+    setupButtonHoverEffect(closeBtn, closeBtnNormalStyle, closeBtnHoverStyle);
     closeBtn.onclick = () => {
         overlay.style.display = 'none';
 
@@ -304,38 +397,40 @@ function createTagSelectorDialog() {
     const clearSearchBtn = document.createElement('button');
     clearSearchBtn.textContent = '清除';
     clearSearchBtn.title = '清除搜索内容';
-    clearSearchBtn.style.cssText = `
-        background: rgba(239, 68, 68, 0.15);
-        color: #fecaca;
-        border: 1px solid rgba(239, 68, 68, 0.35);
-        width: auto;
-        height: 20px;
-        border-radius: 4px;
-        cursor: pointer;
-        display: none;
-        padding: 0 8px;
-        align-items: center;
-        justify-content: center;
-        line-height: 1;
-        font-weight: 500;
-        font-size: 11px;
-        transition: all 0.2s ease;
-        white-space: nowrap;
-    `;
-
-    clearSearchBtn.addEventListener('mouseenter', () => {
-        clearSearchBtn.style.background = 'rgba(239, 68, 68, 0.25)';
-        clearSearchBtn.style.borderColor = 'rgba(239, 68, 68, 0.5)';
-        clearSearchBtn.style.color = '#ffb4b4';
-        clearSearchBtn.style.transform = 'translateY(-1px)';
+    // 应用基础按钮样式
+    applyStyles(clearSearchBtn, {
+        ...commonStyles.button.base,
+        ...commonStyles.button.danger,
+        background: 'rgba(239, 68, 68, 0.15)',
+        borderColor: 'rgba(239, 68, 68, 0.35)',
+        color: '#fecaca',
+        width: 'auto',
+        height: '20px',
+        borderRadius: '4px',
+        padding: '0 8px',
+        display: 'none',
+        lineHeight: '1',
+        fontWeight: '500',
+        fontSize: '11px',
+        whiteSpace: 'nowrap'
     });
 
-    clearSearchBtn.addEventListener('mouseleave', () => {
-        clearSearchBtn.style.background = 'rgba(239, 68, 68, 0.15)';
-        clearSearchBtn.style.borderColor = 'rgba(239, 68, 68, 0.35)';
-        clearSearchBtn.style.color = '#fecaca';
-        clearSearchBtn.style.transform = 'translateY(0)';
-    });
+    // 应用清除搜索按钮悬停效果
+    const clearSearchBtnNormalStyle = {
+        background: 'rgba(239, 68, 68, 0.15)',
+        borderColor: 'rgba(239, 68, 68, 0.35)',
+        color: '#fecaca',
+        transform: 'translateY(0)'
+    };
+    
+    const clearSearchBtnHoverStyle = {
+        background: 'rgba(239, 68, 68, 0.25)',
+        borderColor: 'rgba(239, 68, 68, 0.5)',
+        color: '#ffb4b4',
+        transform: 'translateY(-1px)'
+    };
+    
+    setupButtonHoverEffect(clearSearchBtn, clearSearchBtnNormalStyle, clearSearchBtnHoverStyle);
 
     searchContainer.addEventListener('click', () => searchInput.focus());
     const baseBoxShadow = 'none';
@@ -978,10 +1073,22 @@ function createTagSelectorDialog() {
                 nameInput.value = '';
                 contentInput.value = '';
                 await loadTagsData();
+                
+                // 保存当前激活的分类
+                const activeCategory = tagSelectorDialog.activeCategory;
+                
                 initializeCategoryList();
-
-                if (tagSelectorDialog.activeCategory === '自定义') {
-                    showSubCategories('自定义');
+                
+                // 如果之前激活的是自定义分类，则继续保持在自定义分类
+                if (activeCategory === '自定义') {
+                    // 找到自定义分类的元素并点击它
+                    const categoryItems = tagSelectorDialog.categoryList.querySelectorAll('div');
+                    for (let item of categoryItems) {
+                        if (item.textContent === '自定义') {
+                            item.click();
+                            break;
+                        }
+                    }
                 }
 
                 alert('标签添加成功！');
@@ -1559,6 +1666,64 @@ function showSubSubSubCategories(category, subCategory, subSubCategory) {
     });
 }
 
+// 创建统一的标签元素创建函数
+// 创建统一的标签容器创建函数
+function createTagContainer() {
+    const tagContainer = document.createElement('div');
+    // 应用基础容器样式
+    applyStyles(tagContainer, {
+        display: 'inline-block',
+        position: 'relative',
+        margin: '4px'
+    });
+    return tagContainer;
+}
+
+// 创建统一的标签元素创建函数
+function createTagElement(display, value, isSelected) {
+    const tagElement = document.createElement('span');
+    // 应用基础标签样式
+    applyStyles(tagElement, {
+        ...commonStyles.tag.base,
+        padding: '6px 12px',
+        borderRadius: '16px',
+        fontSize: '14px',
+        position: 'relative'
+    });
+
+    tagElement.textContent = display;
+    tagElement.dataset.value = value;
+
+    if (isSelected) {
+        tagElement.style.backgroundColor = '#22c55e';
+        tagElement.style.color = '#fff';
+        tagElement.style.borderColor = '#22c55e';
+    }
+
+    return tagElement;
+}
+
+// 创建统一的工具提示函数
+function createTooltip(text) {
+    const tooltip = document.createElement('div');
+    // 应用基础工具提示样式
+    applyStyles(tooltip, {
+        ...commonStyles.tooltip.base,
+        padding: '8px 12px',
+        fontSize: '12px',
+        whiteSpace: 'pre-wrap',
+        zIndex: '10000',
+        pointerEvents: 'none',
+        opacity: '0',
+        transform: 'translateY(-100%) translateY(-8px)',
+        maxWidth: '300px',
+        wordWrap: 'break-word',
+        lineHeight: '1.4'
+    });
+    tooltip.textContent = text;
+    return tooltip;
+}
+
 function showTags(category, subCategory) {
 
     const subSubCategoryTabs = tagSelectorDialog.subSubCategoryTabs;
@@ -1602,66 +1767,14 @@ function showTags(category, subCategory) {
     }
 
     tagEntries.forEach(([display, value]) => {
-        const tagContainer = document.createElement('div');
-        tagContainer.style.cssText = `
-            display: inline-block;
-            position: relative;
-            margin: 4px;
-        `;
-
-        const tagElement = document.createElement('span');
-        tagElement.style.cssText = `
-            display: inline-block;
-            padding: 6px 12px;
-            ${isCustomCategory ? 'padding-right: 30px;' : ''}
-            background: #444;
-            color: #ccc;
-            border-radius: 16px;
-            cursor: pointer;
-            transition: background-color 0.2s, color 0.2s, border-color 0.2s;
-            border: 1px solid rgba(71, 85, 105, 0.8);
-            font-size: 14px;
-            position: relative;
-        `;
-
-        tagElement.textContent = display;
-        tagElement.dataset.value = value;
-
-        if (isTagSelected(value)) {
-            tagElement.style.backgroundColor = '#22c55e';
-            tagElement.style.color = '#fff';
-            tagElement.style.borderColor = '#22c55e';
-        }
-
-        const createCustomTooltip = () => {
-            const tooltip = document.createElement('div');
-            tooltip.style.cssText = `
-                position: absolute;
-                background: linear-gradient(135deg, #1e293b 0%, #334155 100%);
-                color: #fff;
-                padding: 8px 12px;
-                border-radius: 6px;
-                font-size: 12px;
-                white-space: pre-wrap;
-                z-index: 10000;
-                border: 1px solid #3b82f6;
-                box-shadow: 0 4px 12px rgba(59, 130, 246, 0.3);
-                pointer-events: none;
-                opacity: 0;
-                transition: opacity 0.2s ease;
-                transform: translateY(-100%) translateY(-8px);
-                max-width: 300px;
-                word-wrap: break-word;
-                line-height: 1.4;
-            `;
-            tooltip.textContent = value;
-            return tooltip;
-        };
+        const tagContainer = createTagContainer();
+        const isSelected = isTagSelected(value);
+        const tagElement = createTagElement(display, value, isSelected);
 
         let tooltip = null;
 
         tagElement.onmouseenter = (e) => {
-            if (!isTagSelected(value)) {
+            if (!isSelected) {
                 tagElement.style.backgroundColor = 'rgb(49, 84, 136)';
                 tagElement.style.borderColor = '#1e293b';
                 tagElement.style.color = '#fff';
@@ -1671,7 +1784,7 @@ function showTags(category, subCategory) {
                 tooltip.parentNode.removeChild(tooltip);
                 tooltip = null;
             }
-            tooltip = createCustomTooltip();
+            tooltip = createTooltip(value);
             document.body.appendChild(tooltip);
             const rect = tagElement.getBoundingClientRect();
             tooltip.style.left = rect.left + (rect.width / 2) - (tooltip.offsetWidth / 2) + 'px';
@@ -1680,7 +1793,7 @@ function showTags(category, subCategory) {
         };
 
         tagElement.onmouseleave = () => {
-            if (!isTagSelected(value)) {
+            if (!isSelected) {
                 tagElement.style.backgroundColor = '#444';
                 tagElement.style.borderColor = '#555';
                 tagElement.style.color = '#ccc';
@@ -1709,8 +1822,8 @@ function showTags(category, subCategory) {
             deleteBtn.innerHTML = '×';
             deleteBtn.style.cssText = `
                 position: absolute;
-                top: -2px;
-                right: 2px;
+                top: -5px;
+                right: -5px;
                 width: 18px;
                 height: 18px;
                 border-radius: 50%;
@@ -1728,17 +1841,19 @@ function showTags(category, subCategory) {
                 z-index: 1;
             `;
 
-            deleteBtn.addEventListener('mouseenter', () => {
-                deleteBtn.style.background = 'linear-gradient(135deg, #dc2626 0%, #b91c1c 100%)';
-                deleteBtn.style.transform = 'scale(1.1)';
-                deleteBtn.style.boxShadow = '0 4px 8px rgba(239, 68, 68, 0.5)';
-            });
-
-            deleteBtn.addEventListener('mouseleave', () => {
-                deleteBtn.style.background = 'linear-gradient(135deg, #ef4444 0%, #dc2626 100%)';
-                deleteBtn.style.transform = 'scale(1)';
-                deleteBtn.style.boxShadow = '0 2px 4px rgba(239, 68, 68, 0.3)';
-            });
+            const deleteBtnNormalStyle = {
+                background: 'linear-gradient(135deg, #ef4444 0%, #dc2626 100%)',
+                transform: 'scale(1)',
+                boxShadow: '0 2px 4px rgba(239, 68, 68, 0.3)'
+            };
+            
+            const deleteBtnHoverStyle = {
+                background: 'linear-gradient(135deg, #dc2626 0%, #b91c1c 100%)',
+                transform: 'scale(1.1)',
+                boxShadow: '0 4px 8px rgba(239, 68, 68, 0.5)'
+            };
+            
+            setupButtonHoverEffect(deleteBtn, deleteBtnNormalStyle, deleteBtnHoverStyle);
 
             deleteBtn.onclick = async (e) => {
                 e.stopPropagation();
@@ -1761,10 +1876,22 @@ function showTags(category, subCategory) {
                             }
 
                             await loadTagsData();
+                            
+                            // 保存当前激活的分类
+                            const activeCategory = tagSelectorDialog.activeCategory;
+                            
                             initializeCategoryList();
-
-                            if (tagSelectorDialog.activeCategory === '自定义') {
-                                showSubCategories('自定义');
+                            
+                            // 如果之前激活的是自定义分类，则继续保持在自定义分类
+                            if (activeCategory === '自定义') {
+                                // 找到自定义分类的元素并点击它
+                                const categoryItems = tagSelectorDialog.categoryList.querySelectorAll('div');
+                                for (let item of categoryItems) {
+                                    if (item.textContent === '自定义') {
+                                        item.click();
+                                        break;
+                                    }
+                                }
                             }
 
                             alert('标签删除成功！');
