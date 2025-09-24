@@ -175,11 +175,29 @@ async function loadTagsData() {
 function convertTagsFormat(rawData) {
     const convertNode = (node, isCustomCategory = false) => {
         if (node && typeof node === 'object') {
+            
+            if (isCustomCategory && node.hasOwnProperty('我的标签')) {
+                const customTags = node['我的标签'];
+                const result = {};
+                for (const [tagName, tagData] of Object.entries(customTags)) {
+                    
+                    result[tagName] = {
+                        display: tagName,
+                        value: typeof tagData === 'string' ? tagData : (tagData.content || tagName)
+                    };
+                }
+                return { '我的标签': Object.values(result) };
+            }
+            
             const values = Object.values(node);
             const allString = values.every(v => typeof v === 'string');
             if (allString) {
                 if (isCustomCategory) {
-                    return node;
+                    
+                    return Object.entries(node).map(([tagName, tagData]) => ({
+                        display: tagName,
+                        value: typeof tagData === 'string' ? tagData : (tagData.content || tagName)
+                    }));
                 }
                 return Object.entries(node).map(([chineseName, englishValue]) => ({ display: chineseName, value: englishValue }));
             }
@@ -718,7 +736,7 @@ function createTagSelectorDialog() {
     const inputForm = document.createElement('div');
     inputForm.style.cssText = `
         display: flex;
-        gap: 16px;  /* 加大标签名称与内容之间的间距 */
+        gap: 16px;  
         align-items: center;
         flex-wrap: wrap;
         flex: 1;
@@ -1033,7 +1051,7 @@ function createTagSelectorDialog() {
         display: flex;
         align-items: center;
         gap: 2px;
-        margin-left: -62px;  /* 继续向左移动靠近内容输入框 */
+        margin-left: -62px;  
     `;
 
     const previewLabel = document.createElement('label');
@@ -1853,7 +1871,7 @@ function createTooltip(text) {
     return tooltip;
 }
 
-function createCustomTagTooltip(tagData, tagName) {
+function createCustomTagTooltip(tagValue, tagName) {
     const tooltip = document.createElement('div');
     
     applyStyles(tooltip, {
@@ -1879,8 +1897,8 @@ function createCustomTagTooltip(tagData, tagName) {
         word-wrap: break-word;
         max-width: 250px;
     `;
-    contentDiv.textContent = tagData.content || tagData;
-    
+
+    contentDiv.textContent = tagValue;
     tooltip.appendChild(contentDiv);
     
     const previewDiv = document.createElement('div');
@@ -1906,10 +1924,10 @@ function createCustomTagTooltip(tagData, tagName) {
         max-width: 300px;
         max-height: 200px;
     `;
-    previewImg.src = tagData.preview || `/zhihui/user_tags/preview/${tagName}`;
+
+    previewImg.src = `/zhihui/user_tags/preview/${encodeURIComponent(tagName)}`;
     previewImg.alt = tagName;
     previewImg.onerror = () => {
-        // 如果预览图加载失败，显示默认占位符
         previewImg.style.display = 'none';
         const placeholder = document.createElement('div');
         placeholder.style.cssText = `
@@ -1928,7 +1946,7 @@ function createCustomTagTooltip(tagData, tagName) {
     
     previewDiv.appendChild(previewImg);
     tooltip.appendChild(previewDiv);
-    
+  
     return tooltip;
 }
 
@@ -1948,7 +1966,12 @@ function showTags(category, subCategory) {
     const tags = tagsData[category][subCategory];
     const isCustomCategory = category === '自定义';
 
-    if (isCustomCategory && (!tags || Object.keys(tags).length === 0)) {
+    let actualTags = tags;
+    if (isCustomCategory && tags && tags['我的标签']) {
+        actualTags = tags['我的标签'];
+    }
+
+    if (isCustomCategory && (!actualTags || actualTags.length === 0)) {
         const emptyMessage = document.createElement('div');
         emptyMessage.style.cssText = `
             text-align: center;
@@ -1963,15 +1986,10 @@ function showTags(category, subCategory) {
     }
 
     let tagEntries;
-    if (isCustomCategory) {
-
-        tagEntries = Object.entries(tags);
-    } else if (Array.isArray(tags)) {
-
-        tagEntries = tags.map(tagObj => [tagObj.display, tagObj.value]);
+    if (Array.isArray(actualTags)) {
+        tagEntries = actualTags.map(tagObj => [tagObj.display, tagObj.value]);
     } else {
-
-        tagEntries = Object.entries(tags);
+        tagEntries = Object.entries(actualTags);
     }
 
     tagEntries.forEach(([display, value]) => {
@@ -2007,12 +2025,17 @@ function showTags(category, subCategory) {
         };
 
         tagElement.onmouseleave = () => {
-            if (!isSelected) {
+            const currentlySelected = isTagSelected(value);
+            if (!currentlySelected) {
                 tagElement.style.backgroundColor = '#444';
                 tagElement.style.borderColor = '#555';
                 tagElement.style.color = '#ccc';
                 tagElement.style.borderWidth = '1px';
                 tagElement.style.boxShadow = 'none';
+            } else {
+                tagElement.style.backgroundColor = '#22c55e';
+                tagElement.style.color = '#fff';
+                tagElement.style.borderColor = '#22c55e';
             }
             if (tooltip) {
                 tooltip.style.opacity = '0';
@@ -2200,10 +2223,15 @@ function showTagsFromSubSub(category, subCategory, subSubCategory) {
         };
 
         tagElement.onmouseleave = () => {
-            if (!isTagSelected(tagObj.value)) {
+            const currentlySelected = isTagSelected(tagObj.value);
+            if (!currentlySelected) {
                 tagElement.style.backgroundColor = '#444';
                 tagElement.style.borderColor = '#555';
                 tagElement.style.color = '#ccc';
+            } else {
+                tagElement.style.backgroundColor = '#22c55e';
+                tagElement.style.color = '#fff';
+                tagElement.style.borderColor = '#22c55e';
             }
             if (tooltip) {
                 tooltip.style.opacity = '0';
@@ -2298,10 +2326,15 @@ function showTagsFromSubSubSub(category, subCategory, subSubCategory, subSubSubC
         };
 
         tagElement.onmouseleave = () => {
-            if (!isTagSelected(tagObj.value)) {
+            const currentlySelected = isTagSelected(tagObj.value);
+            if (!currentlySelected) {
                 tagElement.style.backgroundColor = '#444';
                 tagElement.style.borderColor = '#555';
                 tagElement.style.color = '#ccc';
+            } else {
+                tagElement.style.backgroundColor = '#22c55e';
+                tagElement.style.color = '#fff';
+                tagElement.style.borderColor = '#22c55e';
             }
             if (tooltip) {
                 tooltip.style.opacity = '0';
@@ -2609,10 +2642,15 @@ function showSearchResults(results, q) {
             setTimeout(() => { if (tooltip) tooltip.style.opacity = '1'; }, 10);
         };
         tagElement.onmouseleave = () => {
-            if (!isTagSelected(tagObj.value)) {
+            const currentlySelected = isTagSelected(tagObj.value);
+            if (!currentlySelected) {
                 tagElement.style.backgroundColor = '#444';
                 tagElement.style.borderColor = '#555';
                 tagElement.style.color = '#ccc';
+            } else {
+                tagElement.style.backgroundColor = '#22c55e';
+                tagElement.style.color = '#fff';
+                tagElement.style.borderColor = '#22c55e';
             }
             if (tooltip) {
                 tooltip.style.opacity = '0';
