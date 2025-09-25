@@ -2410,17 +2410,29 @@ function updateSelectedTagsOverview() {
         selectedTagsList.style.display = 'flex';
 
         selectedTags.forEach(tag => {
+            const tagContainer = document.createElement('div');
+            tagContainer.style.cssText = `
+                display: flex;
+                flex-direction: column;
+                align-items: center;
+                margin: 0 4px;
+                background: transparent;
+            `;
+
             const tagElement = document.createElement('span');
             tagElement.style.cssText = `
                 background: #4a9eff;
                 color: #fff;
-                padding: 4px 8px;
-                border-radius: 4px;
+                padding: 6px 8px;
+                border-radius: 6px;
                 font-size: 12px;
                 display: inline-flex;
                 align-items: center;
                 gap: 4px;
                 cursor: pointer;
+                width: 100%;
+                justify-content: space-between;
+                margin: 0 0 2px 0;
             `;
 
             const tagText = document.createElement('span');
@@ -2441,7 +2453,55 @@ function updateSelectedTagsOverview() {
 
             tagElement.appendChild(tagText);
             tagElement.appendChild(removeBtn);
-            selectedTagsList.appendChild(tagElement);
+            
+            // 创建中文名称小字
+            const chineseNameElement = document.createElement('span');
+            chineseNameElement.style.cssText = `
+                font-size: 10px;
+                color: #22c55e;
+                text-align: center;
+                overflow: hidden;
+                text-overflow: ellipsis;
+                white-space: nowrap;
+                border: 1px solid #22c55e;
+                width: 100%;
+                box-sizing: border-box;
+                border-radius: 4px;
+            `;
+            
+            // 查找标签对应的中文名称
+            let chineseName = tag;
+            if (tagsData) {
+                const findChineseName = (node) => {
+                    if (Array.isArray(node)) {
+                        for (let t of node) {
+                            if (t.value === tag && t.display) {
+                                return t.display;
+                            }
+                        }
+                    } else if (node && typeof node === 'object') {
+                        for (let [key, value] of Object.entries(node)) {
+                            const result = findChineseName(value);
+                            if (result) return result;
+                        }
+                    }
+                    return null;
+                };
+                
+                for (let [category, subCategories] of Object.entries(tagsData)) {
+                    const result = findChineseName(subCategories);
+                    if (result) {
+                        chineseName = result;
+                        break;
+                    }
+                }
+            }
+            
+            chineseNameElement.textContent = chineseName;
+            
+            tagContainer.appendChild(tagElement);
+            tagContainer.appendChild(chineseNameElement);
+            selectedTagsList.appendChild(tagContainer);
         });
     } else {
 
