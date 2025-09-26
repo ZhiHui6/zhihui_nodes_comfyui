@@ -7,11 +7,11 @@ class TextExpander:
     
     RETURN_TYPES = ("STRING",)
     RETURN_NAMES = ("text_output",)
-    DESCRIPTION = "Text Expander: Uses AI models to intelligently expand input prompts. Supports multiple AI models, adjustable creativity temperature, character count limits, and custom system prompts to control expansion style and direction."
+    DESCRIPTION = "Text Expander: Uses AI models to intelligently expand input prompts. Supports multiple AI models, optional character count limits (controlled via system prompts - leave empty to disable), and custom system prompts to control expansion style and direction."
 
     model_options = [
-        "claude", "deepseek", "gemini", "openai", "mistral", 
-        "qwen-coder", "llama", "sur", "unity", "searchgpt", "evil"
+        "deepseek", "deepseek-reasoning", "gemini", "mistral", "nova-fast", 
+        "openai", "openai-large", "openai-reasoning", "evil", "unity"
     ]
 
     @classmethod
@@ -20,7 +20,6 @@ class TextExpander:
             "required": {
                 "node_switch": ("BOOLEAN", {"default": True}),
                 "character_limit": ("STRING", {"default": "", "multiline": False}),
-                "creativity_temperature": ("FLOAT", {"default": 0.7, "min": 0.1, "max": 2.0, "step": 0.1}),
                 "model_brand": (s.model_options, {"default": "openai"}),
                 "system_prompt": ("STRING", {"default": "", "multiline": True}),
                 "user_prompt": ("STRING", {"default": "", "multiline": True}),
@@ -30,14 +29,14 @@ class TextExpander:
             }
         }
 
-    def _call_llm_api(self, text, model="openai", custom_system_prompt="", temperature=0.7, char_limit=""):
+    def _call_llm_api(self, text, model="deepseek", custom_system_prompt="", char_limit=""):
         system_content = custom_system_prompt if custom_system_prompt and custom_system_prompt.strip() else ""
         
         if char_limit and char_limit.strip():
             try:
                 char_limit_value = int(char_limit.strip())
                 if char_limit_value >= 5:
-                    limit_instruction = f"Please ensure the output content is within {char_limit_value} characters."
+                    limit_instruction = f"请确保输出内容在{char_limit_value}个字符以内。"
                     if system_content:
                         system_content = f"{system_content}\n{limit_instruction}"
                     else:
@@ -53,34 +52,40 @@ class TextExpander:
         encoded_prompt = urllib.parse.quote(full_prompt)
     
         model_mapping = {
-            "claude": "claude",
             "deepseek": "deepseek",
+            "deepseek-reasoning": "deepseek-reasoning",
             "gemini": "gemini",
-            "openai": "openai",
             "mistral": "mistral",
-            "qwen-coder": "qwen-coder",
-            "llama": "llama",
-            "sur": "sur",
-            "unity": "unity",
-            "searchgpt": "searchgpt",
-            "evil": "evil"
+            "nova-fast": "nova-fast",
+            "openai": "openai",
+            "openai-large": "openai-large",
+            "openai-reasoning": "openai-reasoning",
+            "evil": "evil",
+            "unity": "unity"
         }
         
-        model_name = model_mapping.get(model, "openai")
-        api_url = f"https://text.pollinations.ai/{model_name}/{encoded_prompt}?temperature={temperature}"
+        model_name = model_mapping.get(model, "deepseek")
+        api_url = f"https://text.pollinations.ai/{model_name}/{encoded_prompt}"
         
         try:
-            response = requests.get(api_url)
+            response = requests.get(api_url, timeout=30)
             response.raise_for_status()
-            return response.text.strip()
+            result = response.text.strip()
+
+            if not result or len(result) < 5:
+                return text
+            return result
+        except requests.exceptions.Timeout:
+            print(f"API request timeout for model {model}. Using original text.")
+            return text
         except requests.exceptions.RequestException as e:
-            error_message = f"API request failed: {e}"
+            error_message = f"API request failed for model {model}: {e}"
             if 'response' in locals() and response is not None:
-                error_message += f" | Server response: {response.text}"
+                error_message += f" | Status code: {response.status_code} | Server response: {response.text[:200]}..."
             print(error_message)
             return text
 
-    def expand_text(self, node_switch, character_limit, creativity_temperature, model_brand, system_prompt, user_prompt, load_system_prompt=None):
+    def expand_text(self, node_switch, character_limit, model_brand, system_prompt, user_prompt, load_system_prompt=None):
         
         if not node_switch:
             return (user_prompt,)
@@ -105,7 +110,6 @@ class TextExpander:
             user_prompt.strip(),
             model=model_brand,
             custom_system_prompt=actual_system_prompt,
-            temperature=creativity_temperature,
             char_limit=character_limit
         )
         

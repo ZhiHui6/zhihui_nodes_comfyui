@@ -3,6 +3,7 @@ import os
 import requests
 import time
 import re
+import urllib.parse
 
 class KontextPresetsPlus:
     data = None
@@ -86,7 +87,7 @@ class KontextPresetsPlus:
             "required": {
                 "preset": (preset_names, {"default": preset_names[0] if preset_names else "No presets"}),
                 "output_full_info": ("BOOLEAN", {"default": False}),
-                "expansion_model": (["deepseek", "gemini", "openai", "mistral", "qwen-coder", "llama", "sur", "unity", "searchgpt", "evil"], {"default": "openai"}),
+                "expansion_model": (["deepseek", "deepseek-reasoning", "gemini", "mistral", "nova-fast", "openai", "openai-large", "openai-reasoning", "evil", "unity"], {"default": "openai"}),
                 "enable_builtin_expansion": ("BOOLEAN", {"default": False}),
             },
             "optional": {
@@ -117,22 +118,35 @@ class KontextPresetsPlus:
     
     def call_llm_api(self, prompt, expansion_model=""):
         try:
-            api_url = "https://text.pollinations.ai/"
-            random_seed = int(time.time() * 1000000) % 0xffffffffffffffff
+            # 使用与万相提示词生成器相同的API调用逻辑
+            encoded_prompt = urllib.parse.quote(prompt)
             
-            payload = {
-                "messages": [{"role": "user", "content": prompt}],
-                "expansion_model": expansion_model,
-                "seed": random_seed,
-                "timestamp": int(time.time())
+            # 模型映射 - 与万相提示词生成器保持一致
+            model_mapping = {
+                "deepseek": "deepseek",
+                "deepseek-reasoning": "deepseek-reasoning", 
+                "gemini": "gemini",
+                "mistral": "mistral",
+                "nova-fast": "nova-fast",
+                "openai": "openai",
+                "openai-large": "openai-large",
+                "openai-reasoning": "openai-reasoning",
+                "evil": "evil",
+                "unity": "unity"
             }
-            response = requests.post(api_url, 
-                                   json=payload,
-                                   headers={"Content-Type": "application/json"},
-                                   timeout=45)
+            
+            model_name = model_mapping.get(expansion_model, "deepseek")
+            api_url = f"https://text.pollinations.ai/{model_name}/{encoded_prompt}"
+            
+            # 使用GET请求，与万相提示词生成器保持一致
+            response = requests.get(api_url, timeout=30)
             
             if response.status_code == 200:
-                return response.text.strip()
+                result = response.text.strip()
+                # 如果返回结果为空或太短，使用原始文本
+                if not result or len(result) < 5:
+                    return prompt
+                return result
             else:
                 error_messages = {
                     400: "Request parameter error", 401: "API authentication failed", 403: "Access denied",
@@ -143,13 +157,12 @@ class KontextPresetsPlus:
                 return self._handle_error("API Error", error_msg, expansion_model, prompt)
                 
         except requests.exceptions.Timeout:
-            return self._handle_error("Timeout Error", "Request timeout", expansion_model, prompt)
+            print(f"API request timeout for model {expansion_model}. Using original text.")
+            return prompt
         except requests.exceptions.ConnectionError:
             return self._handle_error("Connection Error", "Network connection failed", expansion_model, prompt)
         except requests.exceptions.RequestException as e:
             return self._handle_error("Network Error", f"Request exception: {str(e)}", expansion_model, prompt)
-        except json.JSONDecodeError:
-            return self._handle_error("Format Error", "Response data format error", expansion_model, prompt)
         except Exception as e:
             return self._handle_error("System Error", f"Unknown exception: {str(e)}", expansion_model, prompt)
 

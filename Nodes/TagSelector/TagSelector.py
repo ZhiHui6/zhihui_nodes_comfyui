@@ -25,6 +25,12 @@ class TagSelector:
                 "expand_mode": (["Disabled", "Tag Style", "Natural Language"], {
                     "default": "Disabled"
                 }),
+                "language_output": (["中文", "English"], {
+                    "default": "中文"
+                }),
+                "expand_model": (["deepseek", "deepseek-reasoning", "gemini", "mistral", "nova-fast", "openai", "openai-large", "openai-reasoning", "evil", "unity"], {
+                    "default": "openai"
+                }),
             },
             "hidden": {
                 "unique_id": "UNIQUE_ID",
@@ -37,11 +43,11 @@ class TagSelector:
     FUNCTION = "process_tags"
     CATEGORY = "zhihui/text"
     
-    def process_tags(self, tag_edit, expand_mode, unique_id=None, extra_pnginfo=None):
+    def process_tags(self, tag_edit, expand_mode, language_output, expand_model="openai", unique_id=None, extra_pnginfo=None):
         processed_tags = self.clean_tags(tag_edit)
         
         if expand_mode != "Disabled" and processed_tags.strip():
-            expanded_tags = self._expand_tags_with_llm(processed_tags, expand_mode)
+            expanded_tags = self._expand_tags_with_llm(processed_tags, expand_mode, language_output, expand_model)
             return (expanded_tags,)
         
         return (processed_tags,)
@@ -61,10 +67,14 @@ class TagSelector:
         
         return ', '.join(unique_tags)
     
-    def _expand_tags_with_llm(self, tags_text: str, expand_mode: str) -> str:
+    def _expand_tags_with_llm(self, tags_text: str, expand_mode: str, language_output: str, expand_model: str = "openai") -> str:
         try:
+            # 根据语言选择确定输出语言
+            is_chinese = language_output == "中文"
+            
             if expand_mode == "Tag Style":
-                system_prompt = """你是一个专业的AI绘画提示词扩写助手。请将用户提供的简单标签扩写成更详细、更丰富的标签形式。
+                if is_chinese:
+                    system_prompt = """你是一个专业的AI绘画提示词扩写助手。请将用户提供的简单标签扩写成极致详细、更丰富的标签形式。
 
 要求：
 1. 保持标签格式，用逗号分隔
@@ -72,26 +82,59 @@ class TagSelector:
 3. 增加相关的风格、质量、技术参数标签
 4. 保持原有标签的核心含义不变
 5. 输出应该是可以直接用于AI绘画的提示词标签
-6. 直接给出结果，不要出现说明解释性的句段。
+6. 直接给出结果，不要出现说明解释性的句段
+7. 请用中文输出所有标签
 
 示例：
 输入：girl, cat, garden
-输出：beautiful girl, cute girl, detailed face, expressive eyes, adorable cat, fluffy cat, cat ears, lush garden, blooming flowers, natural lighting, high quality, masterpiece, detailed, 8k resolution"""
+输出：美丽女孩, 可爱女孩, 精致面部, 表情丰富的眼睛, 可爱猫咪, 毛茸茸的猫, 猫耳朵, 茂盛花园, 盛开花朵, 自然光线, 高质量, 杰作, 精细, 8k分辨率"""
+                else:
+                    system_prompt = """You are a professional AI art prompt expansion assistant. Please expand the simple tags provided by the user into extremely detailed and more richer tag formats.
+
+Requirements:
+1. Maintain tag format, separated by commas
+2. Add more descriptive modifiers to each tag
+3. Add related style, quality, and technical parameter tags
+4. Keep the core meaning of original tags unchanged
+5. Output should be prompt tags that can be directly used for AI art
+6. Give results directly without explanatory sentences
+7. Please output all tags in English
+
+Example:
+Input: girl, cat, garden
+Output: beautiful girl, cute girl, detailed face, expressive eyes, adorable cat, fluffy cat, cat ears, lush garden, blooming flowers, natural lighting, high quality, masterpiece, detailed, 8k resolution"""
             
             elif expand_mode == "Natural Language":
-                system_prompt = """你是一个专业的AI绘画提示词扩写助手。请将用户提供的标签转换成自然流畅的句子。
+                if is_chinese:
+                    system_prompt = """你是一个专业的AI绘画提示词扩写助手。请将用户提供的标签转换成自然流畅的句子。
 
 要求：
 1. 将标签组合成完整的、描述性的句子
-2. 添加丰富的细节描述
+2. 添加极致丰富的细节描述
 3. 使用生动的形容词和副词
 4. 保持语言自然流畅
 5. 适合用作AI绘画的提示词
-6. 直接给出结果，不要出现说明解释性的句段。
+6. 直接给出结果，不要出现说明解释性的句段
+7. 请用中文输出描述
 
 示例：
 输入：girl, cat, garden
-输出：A beautiful young girl with expressive eyes and a gentle smile, sitting in a lush blooming garden filled with colorful flowers, holding a cute fluffy cat with soft fur, surrounded by natural sunlight filtering through green leaves, creating a peaceful and enchanting scene with high detail and artistic quality"""
+输出：一个美丽的年轻女孩，有着富有表现力的眼睛和温柔的笑容，坐在一个郁郁葱葱的盛开花园里，花园里满是五颜六色的花朵，她怀里抱着一只可爱毛茸茸的猫，猫咪有着柔软的毛发，周围被透过绿叶的自然阳光包围，营造出一个宁静而迷人的场景，具有高细节和艺术品质"""
+                else:
+                    system_prompt = """You are a professional AI art prompt expansion assistant. Please convert the tags provided by the user into natural and fluent sentences.
+
+Requirements:
+1. Combine tags into complete, descriptive sentences
+2. Add extreme rich detail descriptions
+3. Use vivid adjectives and adverbs
+4. Keep language natural and fluent
+5. Suitable for use as AI art prompts
+6. Give results directly without explanatory sentences
+7. Please output description in English
+
+Example:
+Input: girl, cat, garden
+Output: A beautiful young girl with expressive eyes and a gentle smile, sitting in a lush blooming garden filled with colorful flowers, holding a cute fluffy cat with soft fur, surrounded by natural sunlight filtering through green leaves, creating a peaceful and enchanting scene with high detail and artistic quality"""
             
             else:
                 return tags_text
@@ -99,7 +142,22 @@ class TagSelector:
             full_prompt = f"{system_prompt}\n\n输入标签：{tags_text}\n\n请扩写："
             encoded_prompt = urllib.parse.quote(full_prompt)
             
-            api_url = f"https://text.pollinations.ai/claude/{encoded_prompt}"
+            # 模型映射字典
+            model_mapping = {
+                "deepseek": "deepseek",
+                "deepseek-reasoning": "deepseek-reasoning",
+                "gemini": "gemini",
+                "mistral": "mistral",
+                "nova-fast": "nova-fast",
+                "openai": "openai",
+                "openai-large": "openai-large",
+                "openai-reasoning": "openai-reasoning",
+                "evil": "evil",
+                "unity": "unity"
+            }
+            
+            model_name = model_mapping.get(expand_model, "openai")
+            api_url = f"https://text.pollinations.ai/{model_name}/{encoded_prompt}"
             
             response = requests.get(api_url, timeout=30)
             response.raise_for_status()
@@ -107,17 +165,26 @@ class TagSelector:
             expanded_text = response.text.strip()
             
             if not expanded_text:
-                print("LLM API returned empty response, using original tags")
+                print(f"LLM API returned empty response (model: {expand_model}), using original tags")
                 return tags_text
                 
             return expanded_text
             
+        except requests.exceptions.Timeout:
+            print(f"LLM expansion timeout (model: {expand_model}), using original tags")
+            return tags_text
+        except requests.exceptions.RequestException as e:
+            error_msg = f"LLM expansion failed (model: {expand_model}): {e}"
+            if 'response' in locals() and response is not None:
+                error_msg += f" | status: {response.status_code} | response: {response.text[:200]}..."
+            print(error_msg)
+            return tags_text
         except Exception as e:
-            print(f"LLM expansion failed: {e}")
+            print(f"LLM expansion failed (model: {expand_model}): {e}")
             return tags_text
     
     @classmethod
-    def IS_CHANGED(cls, tag_edit, unique_id=None, extra_pnginfo=None):
+    def IS_CHANGED(cls, tag_edit, expand_mode, language_output, expand_model=None, unique_id=None, extra_pnginfo=None):
         return tag_edit
     
     @classmethod

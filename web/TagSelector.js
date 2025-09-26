@@ -114,7 +114,7 @@ app.registerExtension({
     name: "zhihui.TagSelector",
     nodeCreated(node) {
         if (node.comfyClass === "TagSelector") {
-            const button = node.addWidget("button", "🏷️打开标签选择器", "open_selector", () => {
+            const button = node.addWidget("button", "标签选择器UI ◆ Tag Selector UI", "open_selector", () => {
                 openTagSelector(node);
             });
             button.serialize = false;

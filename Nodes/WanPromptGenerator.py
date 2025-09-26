@@ -131,7 +131,7 @@ class WanPromptGenerator:
                 "preset_combination": (s.preset_combination_options, {"default": "不使用预设"}),
                 "add_prefix": ("BOOLEAN", {"default": False}),
                 "enable_expansion": ("BOOLEAN", {"default": False}),
-                "model_brand": (["claude","deepseek", "gemini", "openai", "mistral", "qwen-coder", "llama", "sur", "unity", "searchgpt", "evil"], {"default": "openai"}), 
+                "model_brand": (["deepseek", "deepseek-reasoning", "gemini", "mistral", "nova-fast", "openai", "openai-large", "openai-reasoning", "evil", "unity"], {"default": "openai"}), 
                 "supplementary_text": ("STRING", {"default": "", "multiline": True}),
                 "custom_system_prompt": ("STRING", {"default": "", "multiline": True, "forceInput": True}),
             }
@@ -172,35 +172,66 @@ class WanPromptGenerator:
         if custom_system_prompt.strip():
             system_prompt = custom_system_prompt
         else:
-            system_prompt = f"""你现在是[通义万相2.2]视频提示词生成专家，你需要将用户提供的文本进行极致详细地扩写出丰富的细节并转换为用于生成视频的专业提示词。请直接给出最终文本，不要有冗余的解释。"""
+            system_prompt = f"""你现在是[通义万相2.2]视频提示词生成专家，你的任务是将用户提供的基础提示词扩写成详细、丰富且专业的视频生成提示词。
+
+请遵循以下扩写原则：
+1. 保持原意不变，在原有基础上增加细节描述
+2. 补充视觉元素：色彩、光影、质感、构图等
+3. 增加情感氛围和故事性描述
+4. 添加专业摄影和电影制作术语
+5. 融入环境、天气、时间等背景细节
+6. 使用更具画面感和感染力的词汇
+7. 保持语言流畅，避免冗余重复
+
+输出要求：
+- 直接给出扩写后的完整提示词
+- 不要包含任何解释性文字
+- 不要使用"扩写后的提示词："等前缀
+- 保持在200字以内，确保简洁有力
+
+基础提示词："""
         full_prompt = f"{system_prompt}{text}"
         encoded_prompt = urllib.parse.quote(full_prompt)
     
         model_mapping = {
-            "claude": "claude",
             "deepseek": "deepseek",
+            "deepseek-reasoning": "deepseek-reasoning",
             "gemini": "gemini",
-            "openai": "openai",
+            "gemini-search": "gemini-search",
             "mistral": "mistral",
-            "qwen-coder": "qwen-coder",
-            "llama": "llama",
-            "sur": "sur",
-            "unity": "unity",
-            "searchgpt": "searchgpt",
-            "evil": "evil"
+            "nova-fast": "nova-fast",
+            "openai": "openai",
+            "openai-audio": "openai-audio",
+            "openai-fast": "openai-fast",
+            "openai-large": "openai-large",
+            "openai-reasoning": "openai-reasoning",
+            "roblox-rp": "roblox-rp",
+            "bidara": "bidara",
+            "chickytutor": "chickytutor",
+            "evil": "evil",
+            "midijourney": "midijourney",
+            "rtist": "rtist",
+            "unity": "unity"
         }
         
         model_name = model_mapping.get(model, "openai")
         api_url = f"https://text.pollinations.ai/{model_name}/{encoded_prompt}"
         
         try:
-            response = requests.get(api_url)
+            response = requests.get(api_url, timeout=30)
             response.raise_for_status()
-            return response.text.strip()
+            result = response.text.strip()
+            # 如果返回结果为空或太短，使用原始文本
+            if not result or len(result) < 5:
+                return text
+            return result
+        except requests.exceptions.Timeout:
+            print(f"API request timeout for model {model}. Using original text.")
+            return text
         except requests.exceptions.RequestException as e:
-            error_message = f"API request failed: {e}"
+            error_message = f"API request failed for model {model}: {e}"
             if 'response' in locals() and response is not None:
-                error_message += f" | Server response: {response.text}"
+                error_message += f" | Status code: {response.status_code} | Server response: {response.text[:200]}..."
             print(error_message)
             return text
     

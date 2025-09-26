@@ -1,6 +1,7 @@
 import requests
 import time
 import json
+import urllib.parse
 
 class FreeTranslate:
 
@@ -19,8 +20,8 @@ class FreeTranslate:
                 "target_language": (["zh", "en"], {
                     "default": "en"
                 }),
-                "model": (["claude", "deepseek", "gemini", "openai", "mistral", "qwen-coder", "llama", "sur", "unity", "searchgpt", "evil"], {
-                    "default": "openai"
+                "model": (["deepseek", "deepseek-reasoning", "gemini", "mistral", "nova-fast", "openai", "openai-large", "openai-reasoning", "evil", "unity"], {
+                    "default": "deepseek"
                 }),
             }
         }
@@ -83,28 +84,39 @@ Text to translate:
         
         return prompt
     
-    def _handle_error(self, error_type, error_msg, model):
+    def _handle_error(self, error_type, error_msg, model=None):
+        if model:
+            return f"[{error_type}] {error_msg} (Model: {model})"
         return f"[{error_type}] {error_msg}"
     
-    def call_translate_api(self, prompt, model="openai"):
+    def call_translate_api(self, prompt, model="deepseek"):
         try:
-            api_url = "https://text.pollinations.ai/"
-            
-            payload = {
-                "messages": [{"role": "user", "content": prompt}],
-                "model": model,
-                "timestamp": int(time.time())
+            model_mapping = {
+                "deepseek": "deepseek",
+                "deepseek-reasoning": "deepseek-reasoning",
+                "gemini": "gemini",
+                "mistral": "mistral",
+                "nova-fast": "nova-fast",
+                "openai": "openai",
+                "openai-large": "openai-large",
+                "openai-reasoning": "openai-reasoning",
+                "evil": "evil",
+                "unity": "unity"
             }
             
-            response = requests.post(
-                api_url, 
-                json=payload,
-                headers={"Content-Type": "application/json"},
-                timeout=45
+            model_name = model_mapping.get(model, "deepseek")
+            encoded_prompt = urllib.parse.quote(prompt)
+            api_url = f"https://text.pollinations.ai/{model_name}/{encoded_prompt}"
+            
+            response = requests.get(
+                api_url,
+                timeout=30
             )
             
             if response.status_code == 200:
                 result = response.text.strip()
+                if not result or len(result) < 1:
+                    return self._handle_error("API Error", "Empty response from API", model)
                 return result
             else:
                 error_messages = {
@@ -116,17 +128,15 @@ Text to translate:
                 return self._handle_error("API Error", error_msg, model)
                 
         except requests.exceptions.Timeout:
-            return self._handle_error("Timeout Error", "Request timeout", model)
+            return self._handle_error("Timeout Error", "Request timeout (30s)", model)
         except requests.exceptions.ConnectionError:
             return self._handle_error("Connection Error", "Network connection failed", model)
         except requests.exceptions.RequestException as e:
             return self._handle_error("Network Error", f"Request exception: {str(e)}", model)
-        except json.JSONDecodeError:
-            return self._handle_error("Format Error", "Response data format error", model)
         except Exception as e:
             return self._handle_error("System Error", f"Unknown exception: {str(e)}", model)
     
-    def translate_text(self, text, source_language, target_language, model):
+    def translate(self, text, source_language, target_language, model):
         if not text.strip():
             return ("Please enter text to translate",)
         
