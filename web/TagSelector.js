@@ -837,7 +837,8 @@ function createTagSelectorDialog() {
     const contentInput = document.createElement('input');
     contentInput.className = 'tag-input';
     contentInput.type = 'text';
-    contentInput.placeholder = '输入标签内容';
+    contentInput.placeholder = '点击打开编辑窗口';
+    contentInput.readOnly = true;
     contentInput.style.cssText = `
         background: rgba(15, 23, 42, 0.3);
         border: 1px solid rgba(59, 130, 246, 0.4);
@@ -845,7 +846,7 @@ function createTagSelectorDialog() {
         padding: 6px 8px;
         color: white;
         font-size: 13px;
-        caret-color: white;
+        caret-color: transparent;
         outline: none;
         transition: all 0.3s ease;
         flex: 0 1 66%;
@@ -854,6 +855,7 @@ function createTagSelectorDialog() {
         height: 24px;
         margin: 0;
         box-shadow: inset 0 1px 2px rgba(0, 0, 0, 0.2), 0 1px 2px rgba(59, 130, 246, 0.1);
+        cursor: pointer;
     `;
 
     let previewPopup = null;
@@ -1005,6 +1007,7 @@ function createTagSelectorDialog() {
         previewPopup.style.display = 'block';
 
         disableMainUIInteraction();
+        
         setTimeout(() => {
             previewTextarea.focus();
             previewTextarea.setSelectionRange(previewTextarea.value.length, previewTextarea.value.length);
@@ -1012,6 +1015,10 @@ function createTagSelectorDialog() {
     }
 
     function checkContentLength() {
+        if (previewPopup && previewPopup.style.display === 'block') {
+            return;
+        }
+        
         const content = contentInput.value;
         const inputWidth = contentInput.offsetWidth;
         const textWidth = getTextWidth(content, contentInput);
@@ -1029,12 +1036,15 @@ function createTagSelectorDialog() {
         return context.measureText(text).width;
     }
 
+    contentInput.addEventListener('click', () => {
+        showPreviewPopup();
+    });
+
     contentInput.addEventListener('focus', () => {
         contentInput.style.borderColor = '#38bdf8';
         contentInput.style.boxShadow = '0 0 0 2px rgba(56, 189, 248, 0.2), inset 0 1px 2px rgba(0, 0, 0, 0.2)';
         contentInput.style.background = 'rgba(15, 23, 42, 0.4)';
         contentInput.classList.add('hide-placeholder');
-        setTimeout(checkContentLength, 100);
     });
 
     contentInput.addEventListener('blur', () => {
@@ -1042,10 +1052,6 @@ function createTagSelectorDialog() {
         contentInput.style.boxShadow = 'inset 0 1px 2px rgba(0, 0, 0, 0.2), 0 1px 2px rgba(59, 130, 246, 0.1)';
         contentInput.style.background = 'rgba(15, 23, 42, 0.3)';
         contentInput.classList.remove('hide-placeholder');
-    });
-
-    contentInput.addEventListener('input', () => {
-        checkContentLength();
     });
 
     contentInput.addEventListener('dblclick', () => {
@@ -1592,7 +1598,6 @@ function initializeCategoryList() {
         }
     });
     
-    // 初始化分类列表后更新红点状态
     updateCategoryRedDots();
 }
 
@@ -1682,7 +1687,6 @@ function showSubCategories(category) {
         }
     });
     
-    // 显示子分类后更新红点状态
     updateCategoryRedDots();
 }
 
@@ -1768,7 +1772,6 @@ function showSubSubCategories(category, subCategory) {
         }
     });
     
-    // 显示子子分类后更新红点状态
     updateCategoryRedDots();
 }
 
@@ -1845,7 +1848,6 @@ function showSubSubSubCategories(category, subCategory, subSubCategory) {
         if (index === 0) tab.click();
     });
     
-    // 显示子子子分类后更新红点状态
     updateCategoryRedDots();
 }
 
@@ -2394,7 +2396,6 @@ function showTagsFromSubSubSub(category, subCategory, subSubCategory, subSubSubC
 
 let selectedTags = new Set();
 
-// 检查指定分类下是否有被选中的标签
 function categoryHasSelectedTags(category, subCategory = null, subSubCategory = null, subSubSubCategory = null) {
     if (!tagsData || !tagsData[category]) return false;
     
@@ -2407,15 +2408,12 @@ function categoryHasSelectedTags(category, subCategory = null, subSubCategory = 
         }
         
         if (typeof obj === 'object' && obj !== null) {
-            // 检查对象的值，可能是字符串（标签值）或嵌套对象
             for (const [key, value] of Object.entries(obj)) {
                 if (typeof value === 'string') {
-                    // 如果值是字符串，检查是否被选中
                     if (selectedTags.has(value)) {
                         return true;
                     }
                 } else if (typeof value === 'object') {
-                    // 如果值是对象，递归检查
                     if (checkTagsInObject(value)) {
                         return true;
                     }
@@ -2424,7 +2422,6 @@ function categoryHasSelectedTags(category, subCategory = null, subSubCategory = 
             return false;
         }
         
-        // 如果是字符串，直接检查
         if (typeof obj === 'string') {
             return selectedTags.has(obj);
         }
@@ -2449,7 +2446,6 @@ function categoryHasSelectedTags(category, subCategory = null, subSubCategory = 
     return checkTagsInObject(targetData);
 }
 
-// 创建红点指示器元素
 function createRedDotIndicator() {
     const redDot = document.createElement('div');
     redDot.className = 'red-dot-indicator';
@@ -2468,11 +2464,9 @@ function createRedDotIndicator() {
     return redDot;
 }
 
-// 更新分类红点显示状态
 function clearAllRedDots() {
     if (!tagSelectorDialog) return;
     
-    // 清理所有现有的红点指示器
     const allRedDots = tagSelectorDialog.querySelectorAll('.red-dot-indicator');
     allRedDots.forEach(dot => dot.remove());
 }
@@ -2480,10 +2474,8 @@ function clearAllRedDots() {
 function updateCategoryRedDots() {
     if (!tagSelectorDialog || !tagsData) return;
     
-    // 首先清理所有现有的红点
     clearAllRedDots();
     
-    // 更新主分类红点
     const categoryList = tagSelectorDialog.categoryList;
     if (categoryList) {
         const categoryItems = categoryList.querySelectorAll('div');
@@ -2500,7 +2492,6 @@ function updateCategoryRedDots() {
         });
     }
     
-    // 更新子分类红点
     const subCategoryTabs = tagSelectorDialog.subCategoryTabs;
     if (subCategoryTabs && tagSelectorDialog.activeCategory) {
         const subCategoryItems = subCategoryTabs.querySelectorAll('div');
@@ -2515,7 +2506,6 @@ function updateCategoryRedDots() {
         });
     }
     
-    // 更新子子分类红点
     const subSubCategoryTabs = tagSelectorDialog.subSubCategoryTabs;
     if (subSubCategoryTabs && tagSelectorDialog.activeCategory && tagSelectorDialog.activeSubCategory) {
         const subSubCategoryItems = subSubCategoryTabs.querySelectorAll('div');
@@ -2530,7 +2520,6 @@ function updateCategoryRedDots() {
         });
     }
     
-    // 更新子子子分类红点
     const subSubSubCategoryTabs = tagSelectorDialog.subSubSubCategoryTabs;
     if (subSubSubCategoryTabs && tagSelectorDialog.activeCategory && tagSelectorDialog.activeSubCategory && tagSelectorDialog.activeSubSubCategory) {
         const subSubSubCategoryItems = subSubSubCategoryTabs.querySelectorAll('div');
@@ -2560,7 +2549,7 @@ function toggleTag(tag, element) {
     }
 
     updateSelectedTags();
-    updateCategoryRedDots(); // 更新红点显示状态
+    updateCategoryRedDots();
 }
 
 function isTagSelected(tag) {
@@ -2644,7 +2633,6 @@ function updateSelectedTagsOverview() {
             tagElement.appendChild(tagText);
             tagElement.appendChild(removeBtn);
             
-            // 创建中文名称小字
             const chineseNameElement = document.createElement('span');
             chineseNameElement.style.cssText = `
                 font-size: 10px;
@@ -2662,7 +2650,6 @@ function updateSelectedTagsOverview() {
                 padding: 2px 4px;
             `;
             
-            // 查找标签对应的中文名称
             let chineseName = tag;
             if (tagsData) {
                 const findChineseName = (node) => {
@@ -2718,7 +2705,7 @@ function removeSelectedTag(tag) {
 
     updateSelectedTags();
     updateSelectedTagsOverview();
-    updateCategoryRedDots(); // 移除选中标签后更新红点状态
+    updateCategoryRedDots();
 }
 
 function loadExistingTags() {
@@ -2732,7 +2719,7 @@ function loadExistingTags() {
     }
 
     updateSelectedTagsOverview();
-    updateCategoryRedDots(); // 加载现有标签后更新红点状态
+    updateCategoryRedDots();
 }
 
 function clearSelectedTags() {
@@ -2747,7 +2734,7 @@ function clearSelectedTags() {
 
     updateSelectedTags();
     updateSelectedTagsOverview();
-    updateCategoryRedDots(); // 清除选中标签后更新红点状态
+    updateCategoryRedDots();
 }
 
 function applySelectedTags() {
@@ -2919,6 +2906,9 @@ function showSearchResults(results, q) {
 }
 
 function disableMainUIInteraction() {
+    const existingOverlay = document.getElementById('ui-disable-overlay');
+    if (existingOverlay) {
+    }
 
     const overlay = document.createElement('div');
     overlay.id = 'ui-disable-overlay';
@@ -2938,6 +2928,12 @@ function disableMainUIInteraction() {
     if (previewPopup) {
         previewPopup.style.zIndex = '10002';
     }
+    
+    if (contentInput) {
+        contentInput.disabled = true;
+        contentInput.style.opacity = '0.5';
+        contentInput.style.cursor = 'not-allowed';
+    }
 }
 
 function enableMainUIInteraction() {
@@ -2945,5 +2941,11 @@ function enableMainUIInteraction() {
     const overlay = document.getElementById('ui-disable-overlay');
     if (overlay) {
         overlay.remove();
+    }
+    
+    if (contentInput) {
+        contentInput.disabled = false;
+        contentInput.style.opacity = '1';
+        contentInput.style.cursor = 'text';
     }
 }
