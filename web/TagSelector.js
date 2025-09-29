@@ -1377,6 +1377,21 @@ function createTagSelectorDialog() {
                 currentPreviewImageName = null;
                 previewInput.value = '';
                 
+                // 修复BUG：保存标签后清除预览图显示
+                if (thumbnailImg) {
+                    thumbnailImg.style.display = 'none';
+                }
+                if (thumbnailPlaceholder) {
+                    thumbnailPlaceholder.style.display = 'flex';
+                }
+                if (fileNameDisplay) {
+                    fileNameDisplay.textContent = '未加载图片';
+                    fileNameDisplay.style.color = '#94a3b8';
+                }
+                
+                // 修复BUG：更新按钮状态
+                updateActionButton();
+                
                 await loadTagsData();
                 
                 const activeCategory = tagSelectorDialog.activeCategory;
