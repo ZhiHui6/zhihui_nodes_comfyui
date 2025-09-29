@@ -540,7 +540,7 @@
                     "八重樱": "Yae Sakura (Honkai Impact 3rd)",
                     "卡莲·卡斯兰娜": "Kallen Kaslana (Honkai Impact 3rd)"
                 },
-                "《Fate/Grand Order》": {
+                "《Fate》": {
                     "阿尔托莉雅·潘德拉贡": "Artoria Pendragon (Fate)",
                     "远坂凛": "Rin Tohsaka (Fate)",
                     "间桐樱": "Sakura Matou (Fate)",
@@ -746,7 +746,7 @@
                 }
             },
             "游戏角色": {
-                "《最终幻想》系列": {
+                "《最终幻想》": {
                     "克劳德·斯特莱夫": "Cloud Strife (Final Fantasy)",
                     "蒂法·洛克哈特": "Tifa Lockhart (Final Fantasy)",
                     "爱丽丝·盖恩斯伯勒": "Aerith Gainsborough (Final Fantasy)",
@@ -760,7 +760,7 @@
                     "9S": "9S (Nier: Automata)",
                     "A2": "A2 (Nier: Automata)"
                 },
-                "《生化危机》系列": {
+                "《生化危机》": {
                     "里昂·S·肯尼迪": "Leon S. Kennedy (Resident Evil)",
                     "艾达·王": "Ada Wong (Resident Evil)",
                     "吉尔·瓦伦蒂安": "Jill Valentine (Resident Evil)",
@@ -773,7 +773,7 @@
                     "特莉丝": "Triss Merigold (The Witcher)",
                     "希里": "Ciri (The Witcher)"
                 },
-                "《黑暗之魂》系列": {
+                "《黑暗之魂》": {
                     "薪王": "Soul of Cinder (Dark Souls)",
                     "太阳战士索拉尔": "Solaire of Astora (Dark Souls)",
                     "防火女": "Fire Keeper (Dark Souls)"
@@ -836,7 +836,7 @@
                     "UMP9": "UMP9 (Girls' Frontline)",
                     "G11": "G11 (Girls' Frontline)"
                 },
-                "《街头霸王》系列": {
+                "《街头霸王》": {
                     "隆": "Ryu (Street Fighter)",
                     "肯": "Ken Masters (Street Fighter)",
                     "春丽": "Chun-Li (Street Fighter)",
@@ -850,7 +850,7 @@
                     "本田": "E. Honda (Street Fighter)",
                     "布兰卡": "Blanka (Street Fighter)"
                 },
-                "《拳皇》系列": {
+                "《拳皇》": {
                     "草薙京": "Kyo Kusanagi (The King of Fighters)",
                     "八神庵": "Iori Yagami (The King of Fighters)",
                     "不知火舞": "Mai Shiranui (The King of Fighters)",
@@ -869,7 +869,7 @@
                     "夏尔米": "Shermie (The King of Fighters)",
                     "克里斯": "Chris (The King of Fighters)"
                 },
-                "《铁拳》系列": {
+                "《铁拳》": {
                     "三岛平八": "Heihachi Mishima (Tekken)",
                     "三岛一八": "Kazuya Mishima (Tekken)",
                     "风间仁": "Jin Kazama (Tekken)",
@@ -883,7 +883,7 @@
                     "李超狼": "Lee Chaolan (Tekken)",
                     "吉光": "Yoshimitsu (Tekken)"
                 },
-                "《死或生》系列": {
+                "《死或生》": {
                     "霞": "Kasumi (Dead or Alive)",
                     "绫音": "Ayane (Dead or Alive)",
                     "瞳": "Hitomi (Dead or Alive)",
@@ -895,7 +895,7 @@
                     "玛丽·萝丝": "Marie Rose (Dead or Alive)",
                     "穗香": "Honoka (Dead or Alive)"
                 },
-                "《罪恶装备》系列": {
+                "《罪恶装备》": {
                     "索尔·巴德盖": "Sol Badguy (Guilty Gear)",
                     "凯": "Ky Kiske (Guilty Gear)",
                     "梅喧": "Baiken (Guilty Gear)",
@@ -2831,8 +2831,8 @@
             "模糊": "blurred"
         }
     },
-    "提示套装": {
-        "潪AI": {
+    "提词套装": {
+        "潪AI严选": {
             "红羽佳人": "一位女性斜坐于古典沙发（深色木质框架+橙色坐垫）上,上半身转向右侧,头部轻抬目光看向画面外,左臂搭在沙发靠背,右臂弯曲置于胸前（手轻扯外套),赤足,身着红色羽毛露肩外套,红色抹胸,红色蕾丝半裙,佩戴细银链配饰,头发插橙色小花,背景为深色墙壁,右侧木质百叶窗,地面铺深色几何图案地毯,采用侧光布光,主体周围形成柔和光晕（头发与羽毛边缘尤为明显）,沙发上投射百叶窗竖条纹阴影,整体呈现复古静谧氛围,融合性感与奢华风格,红色服装与橙色沙发形成温暖色系呼应,传递神秘感。",
             "清纯女大": "一位留着深棕色长发、扎着两条低辫子的东亚妇女坐在混凝土路边的照片。她皮肤白皙，五官精致，穿着白色短袖衬衫、黑色裙子和白色鞋子。她用中性的表情直视镜头。她的双手紧握在腿上，右手拿着一朵粉红色的小花。她肩上挎着一个细细的金链子钱包。背景显示了一条阳光明媚的柏油路，树叶散落，覆盖着一条深色的覆盖物。光线柔和，营造出温和、自然的氛围。",
             "繁花婉卿": "近景半身画幅构图，以浓烈红色轻薄纱幔为背景，纱幔自然垂坠形成戏剧化褶皱，侧逆光穿透纱幔在布面上勾勒出明暗交错的纹理，前景纱幔呈半透明虚化状态，与人物形成虚实层次对比；一位拥有祸国殃民般美颜的年轻美女，面容被纱幔半掩更显神秘魅惑，眼波流转间透出高傲冷艳感，美艳的国风妆容细节清晰，眉如远山含黛，唇色秾艳似朱砂，白皙肌肤在暖光漫射下呈现细腻通透质感，头上盘着古典长发发型，插着金色精致发簪以及戴着昂贵的古典耳饰；身着黑色中国风短袖旗袍，衣料挺括且绣有大量金凤凰与祥云混搭暗的金色暗纹，布料接缝处有金色衬线，暗纹肌理清晰可见，领口采用露沟大弧形剪裁，，线条利落凸显性感的高贵气质，人物姿态自然舒展，兼具银幕表现力与古典韵味；整体画面朦胧的柔光效果，色彩饱和度高，红与黑的强烈对比中穿插金色点缀，光影过渡柔和，细节层次丰富，细腻质感与复古奢华氛围。",

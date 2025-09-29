@@ -111,7 +111,7 @@
         },
         "widgets": {
             "expand_mode": "扩写模式",
-            "language_output": "输出语言",
+            "Expanded_result": "扩写结果",
             "expand_model": "扩写模型",
             "open_selector": "Tag Selector | 标签选择器"
         }

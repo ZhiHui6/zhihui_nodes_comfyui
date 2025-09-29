@@ -76,20 +76,16 @@ const commonStyles = {
             borderRadius: '16px',
             cursor: 'pointer',
             transition: 'all 0.2s',
-            border: '1px solid rgba(71, 85, 105, 0.8)',
             fontSize: '14px',
             position: 'relative'
         },
         selected: {
             backgroundColor: '#22c55e',
-            color: '#fff',
-            borderColor: '#22c55e'
+            color: '#fff'
         },
         hover: {
             backgroundColor: 'rgb(49, 84, 136)',
-            borderColor: '#1e293b',
-            color: '#fff',
-            borderWidth: '1px'
+            color: '#fff'
         }
     }
 };
@@ -114,7 +110,7 @@ app.registerExtension({
     name: "zhihui.TagSelector",
     nodeCreated(node) {
         if (node.comfyClass === "TagSelector") {
-            const button = node.addWidget("button", "标签选择器UI ◆ Tag Selector UI", "open_selector", () => {
+            const button = node.addWidget("button", "打开标签选择器 🔖 Open Tag Selector", "open_selector", () => {
                 openTagSelector(node);
             });
             button.serialize = false;
@@ -241,14 +237,16 @@ function createTagSelectorDialog() {
         background: rgba(0, 0, 0, 0.5);
         z-index: 10000;
         display: none;
+        backdrop-filter: blur(10px);
+        -webkit-backdrop-filter: blur(10px);
     `;
-
+//尺寸计算
     const dialog = document.createElement('div');
     const screenHeight = window.innerHeight;
     const screenWidth = window.innerWidth;
-    const dialogHeight = Math.min(screenHeight * 0.8, 720);
+    const dialogHeight = Math.min(screenHeight * 0.95, 1000);
     const dialogWidth = dialogHeight * (16 / 9);
-    const finalWidth = Math.min(dialogWidth, screenWidth * 0.9);
+    const finalWidth = Math.min(dialogWidth, screenWidth * 0.95);
     const finalHeight = finalWidth * (9 / 16);
     const left = (screenWidth - finalWidth) / 2;
     const top = (screenHeight - finalHeight) / 2;
@@ -259,12 +257,12 @@ function createTagSelectorDialog() {
         left: ${left}px;
         width: ${finalWidth}px;
         height: ${finalHeight}px;
-        min-width: 600px;
-        min-height: 400px;
+        min-width: 800px;
+        min-height: 600px;
         background: linear-gradient(135deg, #1e293b 0%, #0f172a 100%);
-        border: none;
+        border: 2px solid rgb(19, 101, 201);
         border-radius: 16px;
-        box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5), 0 0 0 1px rgba(255, 255, 255, 0.1);
+        box-shadow: 0 0 20px rgba(96, 165, 250, 0.7), 0 0 40px rgba(96, 165, 250, 0.4);
         z-index: 10001;
         display: flex;
         flex-direction: column;
@@ -276,18 +274,17 @@ function createTagSelectorDialog() {
     const header = document.createElement('div');
     header.style.cssText = `
         background:rgb(34, 77, 141);
-        padding: 5px 24px;
-        border-bottom: 1px solid #475569;
+        padding: 6px 4px;
         display: flex;
         align-items: center;
+        justify-content: space-between;
         border-radius: 16px 16px 0 0;
-        cursor: move;
         user-select: none;
         gap: 16px;
     `;
 
     const title = document.createElement('span');
-    title.innerHTML = '🏷️标签选择器UI';
+    title.innerHTML = '🔖 标签选择器';
     title.style.cssText = `
         color: #f1f5f9;
         font-size: 18px;
@@ -296,6 +293,7 @@ function createTagSelectorDialog() {
         display: flex;
         align-items: center;
         gap: 8px;
+        margin-left: 15px;
     `;
 
     const closeBtn = document.createElement('button');
@@ -343,15 +341,14 @@ function createTagSelectorDialog() {
     searchBoxContainer.style.cssText = `
         display: flex;
         align-items: center;
-        margin-left: auto;
-        margin-right: 80px;
+        justify-content: center;
+        flex: 1;
     `;
 
     const closeButtonContainer = document.createElement('div');
     closeButtonContainer.style.cssText = `
         display: flex;
         align-items: center;
-        margin-right: 0px;
     `;
 
     const searchContainer = document.createElement('div');
@@ -504,10 +501,10 @@ function createTagSelectorDialog() {
 
     const selectedOverview = document.createElement('div');
     selectedOverview.style.cssText = `
-        background: linear-gradient(135deg, #334155 0%, #1e293b 100%);
-        border-bottom: 1px solid rgba(71, 85, 105, 0.8);
+        background: linear-gradient(135deg, #475569 0%, #334155 100%);
         display: block;
         transition: all 0.3s ease;
+        min-height: 60px;
     `;
 
     const overviewTitle = document.createElement('div');
@@ -522,10 +519,11 @@ function createTagSelectorDialog() {
     `;
 
     const overviewTitleText = document.createElement('span');
-    overviewTitleText.innerHTML = '已选标签:';
+    overviewTitleText.innerHTML = '已选择的标签:';
     overviewTitleText.style.cssText = `
         text-align: left;
         line-height: 1.2;
+        margin-left: 5px;
     `;
 
 
@@ -562,9 +560,36 @@ function createTagSelectorDialog() {
         gap: 6px;
         padding: 0 20px 16px 20px;
         overflow-y: auto;
-        max-height: 160px;
+        max-height: 340px;
         display: none;
+        scrollbar-width: thin;
+        scrollbar-color: #4a9eff #334155;
     `;
+    
+    // 添加滚动条样式兼容性处理
+    const scrollbarStyle = document.createElement('style');
+    scrollbarStyle.textContent = `
+        /* Webkit browsers */
+        div::-webkit-scrollbar {
+            width: 8px;
+            height: 8px;
+        }
+        
+        div::-webkit-scrollbar-track {
+            background: #334155;
+            border-radius: 4px;
+        }
+        
+        div::-webkit-scrollbar-thumb {
+            background: #4a9eff;
+            border-radius: 4px;
+        }
+        
+        div::-webkit-scrollbar-thumb:hover {
+            background: #3b82f6;
+        }
+    `;
+    document.head.appendChild(scrollbarStyle);
 
     selectedOverview.appendChild(overviewTitle);
     selectedOverview.appendChild(selectedTagsList);
@@ -582,10 +607,10 @@ function createTagSelectorDialog() {
         width: 120px;
         min-width: 120px;
         max-width: 120px;
-        background: linear-gradient(135deg, #334155 0%, #1e293b 100%);
-        border-right: 1px solid rgba(71, 85, 105, 0.8);
+        background: linear-gradient(135deg, #2d3748 0%, #1e293b 100%);
         overflow-y: auto;
         backdrop-filter: blur(10px);
+        margin-right: 2px;
     `;
 
     const rightPanel = document.createElement('div');
@@ -598,19 +623,18 @@ function createTagSelectorDialog() {
     const subCategoryTabs = document.createElement('div');
     subCategoryTabs.style.cssText = `
         background: linear-gradient(135deg, #334155 0%, #1e293b 100%);
-        border-bottom: 1px solid rgba(71, 85, 105, 0.8);
         display: flex;
         flex-wrap: wrap;
         overflow-y: auto;
         max-height: 140px;
         min-height: 30px;
         backdrop-filter: blur(10px);
+        border: none;
     `;
 
     const subSubCategoryTabs = document.createElement('div');
     subSubCategoryTabs.style.cssText = `
-        background: linear-gradient(135deg, #334155 0%, #1e293b 100%);
-        border-bottom: 1px solid rgba(71, 85, 105, 0.8);
+        background: linear-gradient(135deg, #475569 0%, #334155 100%);
         display: none;
         flex-wrap: wrap;
         overflow-y: auto;
@@ -618,12 +642,12 @@ function createTagSelectorDialog() {
         min-height: 2px;
         backdrop-filter: blur(10px);
         margin-top: 2px;
+        border: none;
     `;
 
     const subSubSubCategoryTabs = document.createElement('div');
     subSubSubCategoryTabs.style.cssText = `
-        background: linear-gradient(135deg, #334155 0%, #1e293b 100%);
-        border-bottom: 1px solid rgba(71, 85, 105, 0.8);
+        background: linear-gradient(135deg, #64748b 0%, #475569 100%);
         display: none;
         flex-wrap: wrap;
         overflow-y: auto;
@@ -631,6 +655,7 @@ function createTagSelectorDialog() {
         min-height: 2px;
         backdrop-filter: blur(10px);
         margin-top: 2px;
+        border: none;
     `;
 
     const tagContent = document.createElement('div');
@@ -646,9 +671,8 @@ function createTagSelectorDialog() {
     footer.style.cssText = `
         background: linear-gradient(135deg, #334155 0%, #1e293b 100%);
         padding: 0 16px;
-        border-top: 1px solid rgba(71, 85, 105, 0.8);
         display: flex;
-        justify-content: flex-start;
+        justify-content: space-between;
         align-items: center;
         backdrop-filter: blur(10px);
         border-radius: 0 0 16px 16px;
@@ -683,7 +707,7 @@ function createTagSelectorDialog() {
         background: rgba(37, 99, 235, 0.3);
         border-radius: 8px;
         box-shadow: 0 4px 15px rgba(37, 99, 235, 0.2), 0 2px 6px rgba(0, 0, 0, 0.15);
-        padding: 8px 12px;
+        padding: 4px 8px;
         position: relative;
         overflow: hidden;
         border: 1px solid rgba(59, 130, 246, 0.3);
@@ -745,19 +769,20 @@ function createTagSelectorDialog() {
     const inputForm = document.createElement('div');
     inputForm.style.cssText = `
         display: flex;
-        gap: 16px;  
         align-items: center;
-        flex-wrap: wrap;
+        flex-wrap: nowrap;
         flex: 1;
+        justify-content: flex-start;
+        gap: 30px;
     `;
 
     const nameInputContainer = document.createElement('div');
     nameInputContainer.style.cssText = `
         display: flex;
         align-items: center;
-        gap: 1px;
-        flex: 0.45;
-        min-width: 140px;
+        gap: 2px;
+        flex: none;
+        min-width: auto;
         margin: 0;
         padding: 0;
     `;
@@ -774,7 +799,7 @@ function createTagSelectorDialog() {
         padding: 0;
         text-shadow: 0 1px 2px rgba(0, 0, 0, 0.4);
     `;
-    nameLabel.textContent = '名称:';
+    nameLabel.textContent = '名称';
     const nameInput = document.createElement('input');
     nameInput.className = 'tag-input';
     nameInput.type = 'text';
@@ -789,8 +814,8 @@ function createTagSelectorDialog() {
         caret-color: white;
         outline: none;
         transition: all 0.3s ease;
-        flex: 1;
-        min-width: 70px;
+        width: 120px;
+        min-width: 120px;
         height: 24px;
         margin: 0;
         box-shadow: inset 0 1px 2px rgba(0, 0, 0, 0.2), 0 1px 2px rgba(59, 130, 246, 0.1);
@@ -814,9 +839,9 @@ function createTagSelectorDialog() {
     contentInputContainer.style.cssText = `
         display: flex;
         align-items: center;
-        gap: 1px;
-        flex: 0.8;
-        min-width: 140px;
+        gap: 2px;
+        flex: none;
+        min-width: auto;
         margin: 0;
         padding: 0;
     `;
@@ -833,11 +858,11 @@ function createTagSelectorDialog() {
         padding: 0;
         text-shadow: 0 1px 2px rgba(0, 0, 0, 0.4);
     `;
-    contentLabel.textContent = '内容:';
+    contentLabel.textContent = '内容';
     const contentInput = document.createElement('input');
     contentInput.className = 'tag-input';
     contentInput.type = 'text';
-    contentInput.placeholder = '点击打开编辑窗口';
+    contentInput.placeholder = '请点击打开编辑窗口';
     contentInput.readOnly = true;
     contentInput.style.cssText = `
         background: rgba(15, 23, 42, 0.3);
@@ -849,9 +874,8 @@ function createTagSelectorDialog() {
         caret-color: transparent;
         outline: none;
         transition: all 0.3s ease;
-        flex: 0 1 66%;
-        max-width: 66%;
-        min-width: 100px;
+        width: 140px;
+        min-width: 140px;
         height: 24px;
         margin: 0;
         box-shadow: inset 0 1px 2px rgba(0, 0, 0, 0.2), 0 1px 2px rgba(59, 130, 246, 0.1);
@@ -886,7 +910,7 @@ function createTagSelectorDialog() {
         `;
 
         const title = document.createElement('span');
-        title.textContent = '标签内容预览';
+        title.textContent = '请输入标签内容';
         title.style.cssText = `
             color: #f1f5f9;
             font-size: 16px;
@@ -1065,12 +1089,14 @@ function createTagSelectorDialog() {
     previewContainer.style.cssText = `
         display: flex;
         align-items: center;
-        gap: 2px;
-        margin-left: -62px;  
+        gap: 8px;
+        margin: 0;
+        flex: none;
+        min-width: auto;
     `;
 
     const previewLabel = document.createElement('label');
-    previewLabel.textContent = '预览图:';
+    previewLabel.textContent = '预览图';
     previewLabel.style.cssText = `
         color: #ffffff;
         font-size: 14px;
@@ -1079,6 +1105,7 @@ function createTagSelectorDialog() {
         margin: 0;
         padding: 0;
         text-shadow: 0 1px 2px rgba(0, 0, 0, 0.4);
+        min-width: 50px;
     `;
 
     const previewInput = document.createElement('input');
@@ -1094,23 +1121,72 @@ function createTagSelectorDialog() {
         background: rgba(15, 23, 42, 0.3);
         border: 1px solid rgba(59, 130, 246, 0.4);
         border-radius: 6px;
-        padding: 4px 8px;
+        padding: 6px 8px;
         color: #94a3b8;
         font-size: 12px;
-        min-width: 100px;
-        max-width: 220px;
-        white-space: normal;
-        word-break: break-word;
-        overflow-wrap: anywhere;
+        width: 123px;
+        white-space: nowrap;
+        text-overflow: ellipsis;
+        overflow: hidden;
         display: inline-block;
         vertical-align: middle;
-        max-height: 80px;
-        overflow-y: auto;
+        height: 24px;
+        line-height: 12px;
+        cursor: pointer;
+        position: relative;
+        left: -15px;
     `;
 
-    const selectFileButton = document.createElement('button');
-    selectFileButton.textContent = '加载';
-    selectFileButton.style.cssText = `
+
+
+    // 创建缩略图显示窗口
+    const thumbnailWindow = document.createElement('div');
+    thumbnailWindow.style.cssText = `
+        width: 35px;
+        height: 35px;
+        background: rgba(15, 23, 42, 0.5);
+        border: 1px solid rgba(59, 130, 246, 0.4);
+        border-radius: 6px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        overflow: hidden;
+        margin-left: -18px;
+        flex-shrink: 0;
+    `;
+
+    const thumbnailImg = document.createElement('img');
+    thumbnailImg.style.cssText = `
+        max-width: 100%;
+        max-height: 100%;
+        object-fit: cover;
+        border-radius: 4px;
+        display: none;
+    `;
+
+    // 创建默认占位符
+    const thumbnailPlaceholder = document.createElement('div');
+    thumbnailPlaceholder.style.cssText = `
+        width: 100%;
+        height: 100%;
+        background: #6b7280;
+        border-radius: 4px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: #ffffff;
+        font-size: 16px;
+        font-weight: bold;
+    `;
+    thumbnailPlaceholder.innerHTML = '✕';
+
+    thumbnailWindow.appendChild(thumbnailImg);
+    thumbnailWindow.appendChild(thumbnailPlaceholder);
+
+    // 创建统一的加载/清除按钮
+    const actionButton = document.createElement('button');
+    actionButton.textContent = '加载';
+    actionButton.style.cssText = `
         background: linear-gradient(135deg, #2563eb 0%, #1d4ed8 50%, #1e40af 100%);
         border: 1px solid rgba(59, 130, 246, 0.7);
         color: #ffffff;
@@ -1121,24 +1197,77 @@ function createTagSelectorDialog() {
         font-weight: 600;
         transition: all 0.3s ease;
         height: 26px;
-        margin-left: 4px;
+        margin-left: 0px;
         white-space: nowrap;
         text-shadow: 0 1px 1px rgba(0, 0, 0, 0.3);
     `;
 
-    selectFileButton.addEventListener('mouseenter', () => {
-        selectFileButton.style.background = 'linear-gradient(135deg, #3b82f6 0%, #2563eb 50%, #1d4ed8 100%)';
-        selectFileButton.style.boxShadow = '0 2px 4px rgba(59, 130, 246, 0.2), 0 1px 2px rgba(0, 0, 0, 0.1)';
-        selectFileButton.style.borderColor = 'rgba(59, 130, 246, 0.5)';
-    });
-    selectFileButton.addEventListener('mouseleave', () => {
-        selectFileButton.style.background = 'linear-gradient(135deg, #2563eb 0%, #1d4ed8 50%, #1e40af 100%)';
-        selectFileButton.style.borderColor = 'rgba(59, 130, 246, 0.7)';
-        selectFileButton.style.boxShadow = 'none';
+    // 更新按钮样式和功能的函数
+    function updateActionButton() {
+        if (currentPreviewImage) {
+            // 切换到清除模式
+            actionButton.textContent = '清除';
+            actionButton.style.background = 'linear-gradient(135deg, #dc2626 0%, #b91c1c 100%)';
+            actionButton.style.borderColor = 'rgba(220, 38, 38, 0.8)';
+        } else {
+            // 切换到加载模式
+            actionButton.textContent = '加载';
+            actionButton.style.background = 'linear-gradient(135deg, #2563eb 0%, #1d4ed8 50%, #1e40af 100%)';
+            actionButton.style.borderColor = 'rgba(59, 130, 246, 0.7)';
+        }
+    }
+
+    actionButton.addEventListener('mouseenter', () => {
+        if (currentPreviewImage) {
+            // 清除模式的悬停效果
+            actionButton.style.background = 'linear-gradient(135deg, #f87171 0%, #ef4444 100%)';
+            actionButton.style.boxShadow = '0 2px 8px rgba(239, 68, 68, 0.4)';
+            actionButton.style.borderColor = 'rgba(248, 113, 113, 0.8)';
+        } else {
+            // 加载模式的悬停效果
+            actionButton.style.background = 'linear-gradient(135deg, #3b82f6 0%, #2563eb 50%, #1d4ed8 100%)';
+            actionButton.style.boxShadow = '0 2px 4px rgba(59, 130, 246, 0.2), 0 1px 2px rgba(0, 0, 0, 0.1)';
+            actionButton.style.borderColor = 'rgba(59, 130, 246, 0.5)';
+        }
     });
 
-    selectFileButton.addEventListener('click', () => {
-        previewInput.click();
+    actionButton.addEventListener('mouseleave', () => {
+        if (currentPreviewImage) {
+            // 清除模式的正常样式
+            actionButton.style.background = 'linear-gradient(135deg, #dc2626 0%, #b91c1c 100%)';
+            actionButton.style.borderColor = 'rgba(220, 38, 38, 0.8)';
+            actionButton.style.boxShadow = 'none';
+        } else {
+            // 加载模式的正常样式
+            actionButton.style.background = 'linear-gradient(135deg, #2563eb 0%, #1d4ed8 50%, #1e40af 100%)';
+            actionButton.style.borderColor = 'rgba(59, 130, 246, 0.7)';
+            actionButton.style.boxShadow = 'none';
+        }
+    });
+
+    actionButton.addEventListener('click', () => {
+        if (currentPreviewImage) {
+            // 清除功能
+            currentPreviewImage = null;
+            currentPreviewImageName = null;
+            
+            // 重置文件输入
+            previewInput.value = '';
+            
+            // 重置显示文本
+            fileNameDisplay.textContent = '未加载图片';
+            fileNameDisplay.style.color = '#94a3b8';
+            
+            // 隐藏缩略图并显示占位符
+            thumbnailImg.style.display = 'none';
+            thumbnailPlaceholder.style.display = 'flex';
+            
+            // 更新按钮状态
+            updateActionButton();
+        } else {
+            // 加载功能
+            previewInput.click();
+        }
     });
 
     previewInput.addEventListener('change', (e) => {
@@ -1150,14 +1279,19 @@ function createTagSelectorDialog() {
                 currentPreviewImageName = file.name;
                 fileNameDisplay.textContent = file.name;
                 fileNameDisplay.style.color = '#e2e8f0';
+                
+                // 显示缩略图并隐藏占位符
+                thumbnailImg.src = currentPreviewImage;
+                thumbnailImg.style.display = 'block';
+                thumbnailPlaceholder.style.display = 'none';
+                
+                // 更新按钮状态
+                updateActionButton();
             };
             reader.readAsDataURL(file);
-        } else {
-            currentPreviewImage = null;
-            currentPreviewImageName = null;
-            fileNameDisplay.textContent = '未选择文件';
-            fileNameDisplay.style.color = '#94a3b8';
         }
+        // 移除else分支，避免取消选择时清除已有图片
+        // 如果用户取消选择，保持原有状态不变
     });
 
     const previewSeparator = document.createElement('div');
@@ -1165,18 +1299,19 @@ function createTagSelectorDialog() {
         width: 1px;
         height: 25px;
         background: linear-gradient(to bottom, transparent, rgb(62, 178, 255), transparent);
-        margin: 0 10px;
+        margin: 0 6px;
         flex-shrink: 0;
     `;
 
     previewContainer.appendChild(previewLabel);
     previewContainer.appendChild(fileNameDisplay);
-    previewContainer.appendChild(selectFileButton);
+    previewContainer.appendChild(thumbnailWindow);
+    previewContainer.appendChild(actionButton);
     previewContainer.appendChild(previewSeparator);
     previewContainer.appendChild(previewInput);
 
     const addButton = document.createElement('button');
-    addButton.textContent = '添加标签';
+    addButton.textContent = '保存标签';
     addButton.style.cssText = `
         background: linear-gradient(135deg, #059669 0%, #047857 100%);
         border: 1px solid rgba(16, 185, 129, 0.7);
@@ -1193,7 +1328,8 @@ function createTagSelectorDialog() {
         white-space: nowrap;
         text-shadow: 0 1px 1px rgba(0, 0, 0, 0.3);
         text-align: center;
-        margin-left: -13px;
+        margin-left: -28px;
+        flex-shrink: 0;
     `;
     addButton.addEventListener('mouseenter', () => {
         addButton.style.background = 'linear-gradient(135deg, #10b981 0%, #059669 100%)';
@@ -1283,27 +1419,27 @@ function createTagSelectorDialog() {
         align-items: center;
         gap: 12px;
         margin-left: auto;
-        margin-right: 40px;
+        margin-right: 8px;
         flex-shrink: 0;
     `;
 
     const clearBtn = document.createElement('button');
-    clearBtn.innerHTML = '<span style="font-size: 16px; font-weight: 600; display: block;">清空选择</span>';
+    clearBtn.innerHTML = '<span style="font-size: 14px; font-weight: 600; display: block;">清空选择</span>';
     clearBtn.style.cssText = `
         background: linear-gradient(135deg, #dc2626 0%, #b91c1c 100%);
         border: 1px solid rgba(220, 38, 38, 0.8);
         color: #ffffff;
-        padding: 10px 16px;
+        padding: 6px 12px;
         border-radius: 4px;
         cursor: pointer;
         font-weight: 600;
         transition: all 0.2s ease;
         line-height: 1.2;
-        height: 42px;
+        height: 32px;
         width: auto;
-        min-width: 90px;
+        min-width: 70px;
         white-space: nowrap;
-        font-size: 16px;
+        font-size: 14px;
     `;
     clearBtn.addEventListener('mouseenter', () => {
         clearBtn.style.background = 'linear-gradient(135deg, #f87171 0%, #ef4444 100%)';
@@ -1325,27 +1461,6 @@ function createTagSelectorDialog() {
     footer.appendChild(customTagsSection);
     footer.appendChild(rightButtonsSection);
 
-    const resizeHandle = document.createElement('div');
-    resizeHandle.style.cssText = `
-        position: absolute;
-        bottom: 4px;
-        right: 4px;
-        width: 10px;
-        height: 10px;
-        background: linear-gradient(-45deg, transparent 0%, transparent 25%, rgba(59, 130, 246, 0.9) 25%, rgba(59, 130, 246, 0.9) 35%, transparent 35%, transparent 50%, rgba(59, 130, 246, 0.9) 50%, rgba(59, 130, 246, 0.9) 60%, transparent 60%, transparent 75%, rgba(59, 130, 246, 0.9) 75%, rgba(59, 130, 246, 0.9) 85%, transparent 85%);
-        cursor: se-resize;
-        z-index: 10002;
-        border-radius: 0 0 8px 0;
-        opacity: 0.8;
-        transition: opacity 0.2s ease;
-    `;
-    resizeHandle.addEventListener('mouseenter', () => {
-        resizeHandle.style.opacity = '1';
-    });
-    resizeHandle.addEventListener('mouseleave', () => {
-        resizeHandle.style.opacity = '0.7';
-    });
-
     rightPanel.appendChild(subCategoryTabs);
     rightPanel.appendChild(subSubCategoryTabs);
     rightPanel.appendChild(subSubSubCategoryTabs);
@@ -1356,7 +1471,6 @@ function createTagSelectorDialog() {
     dialog.appendChild(selectedOverview);
     dialog.appendChild(content);
     dialog.appendChild(footer);
-    dialog.appendChild(resizeHandle);
     overlay.appendChild(dialog);
 
     tagSelectorDialog = overlay;
@@ -1406,107 +1520,6 @@ function createTagSelectorDialog() {
     document.addEventListener('keydown', handleKeyDown);
     tagSelectorDialog.keydownHandler = handleKeyDown;
 
-    let isDragging = false;
-    let dragStartX = 0;
-    let dragStartY = 0;
-    let dialogStartX = 0;
-    let dialogStartY = 0;
-
-    header.addEventListener('mousedown', (e) => {
-        if (e.target === closeBtn) return;
-        isDragging = true;
-        dragStartX = e.clientX;
-        dragStartY = e.clientY;
-        const rect = dialog.getBoundingClientRect();
-        dialogStartX = rect.left;
-        dialogStartY = rect.top;
-
-        document.body.style.cursor = 'move';
-        document.body.style.userSelect = 'none';
-
-        if (dialog.style.transform && dialog.style.transform !== 'none') {
-            dialog.style.left = dialogStartX + 'px';
-            dialog.style.top = dialogStartY + 'px';
-            dialog.style.transform = 'none';
-        }
-        e.preventDefault();
-    });
-
-    document.addEventListener('mousemove', (e) => {
-        if (!isDragging) return;
-        const deltaX = e.clientX - dragStartX;
-        const deltaY = e.clientY - dragStartY;
-        const newX = Math.max(0, Math.min(window.innerWidth - dialog.offsetWidth, dialogStartX + deltaX));
-        const newY = Math.max(0, Math.min(window.innerHeight - dialog.offsetHeight, dialogStartY + deltaY));
-        dialog.style.left = newX + 'px';
-        dialog.style.top = newY + 'px';
-    });
-
-    document.addEventListener('mouseup', () => {
-        if (isDragging) {
-            isDragging = false;
-
-            document.body.style.cursor = '';
-            document.body.style.userSelect = '';
-        }
-        if (isResizing) {
-            isResizing = false;
-
-            document.body.style.cursor = '';
-            document.body.style.userSelect = '';
-        }
-    });
-
-    let isResizing = false;
-    let resizeStartX = 0;
-    let resizeStartY = 0;
-    let dialogStartWidth = 0;
-    let dialogStartHeight = 0;
-
-    resizeHandle.addEventListener('mousedown', (e) => {
-        isResizing = true;
-        resizeStartX = e.clientX;
-        resizeStartY = e.clientY;
-
-        if (dialog.style.transform && dialog.style.transform !== 'none') {
-            const rect = dialog.getBoundingClientRect();
-            dialog.style.left = rect.left + 'px';
-            dialog.style.top = rect.top + 'px';
-            dialog.style.transform = 'none';
-        }
-
-        dialogStartWidth = dialog.offsetWidth;
-        dialogStartHeight = dialog.offsetHeight;
-
-        document.body.style.cursor = 'se-resize';
-        document.body.style.userSelect = 'none';
-
-        e.preventDefault();
-        e.stopPropagation();
-    });
-
-    const handleMouseMove = (e) => {
-        if (isResizing) {
-            const deltaX = e.clientX - resizeStartX;
-            const deltaY = e.clientY - resizeStartY;
-            const newWidth = Math.max(600, dialogStartWidth + deltaX);
-            const newHeight = Math.max(400, dialogStartHeight + deltaY);
-            const screenPadding = 50;
-            const maxWidth = window.innerWidth + screenPadding;
-            const maxHeight = window.innerHeight + screenPadding;
-            const finalWidth = Math.min(newWidth, maxWidth);
-            const finalHeight = Math.min(newHeight, maxHeight);
-
-            dialog.style.width = finalWidth + 'px';
-            dialog.style.height = finalHeight + 'px';
-
-            e.preventDefault();
-            e.stopPropagation();
-        }
-    };
-
-    document.addEventListener('mousemove', handleMouseMove);
-
     const handleResize = debounce(() => {
         if (tagSelectorDialog && tagSelectorDialog.style.display === 'block') {
             const dialog = tagSelectorDialog.querySelector('div');
@@ -1541,41 +1554,41 @@ function initializeCategoryList() {
         const categoryItem = document.createElement('div');
         categoryItem.style.cssText = `
             padding: 12px 16px;
-            color: #ccc;
+            color: #ccc; /* 主分类条目文字颜色 */
             cursor: pointer;
-            border-bottom: 1px solid rgba(71, 85, 105, 0.8);
+            border-bottom: 1px solid rgb(112, 130, 155); /* 主分类条目之间的分隔线颜色 */
             transition: all 0.2s;
             text-align: center;
-            background: transparent;
+            background: transparent; /* 主分类条目背景色 */
         `;
         categoryItem.textContent = category;
         categoryItem.onmouseenter = () => {
             if (!categoryItem.classList.contains('active')) {
-                categoryItem.style.backgroundColor = 'rgb(49, 84, 136)';
-                categoryItem.style.color = '#fff';
+                categoryItem.style.backgroundColor = 'rgb(49, 84, 136)'; /* 鼠标悬停时的背景色 */
+                categoryItem.style.color = '#fff'; /* 鼠标悬停时的文字颜色 */
             }
         };
         categoryItem.onmouseleave = () => {
             if (!categoryItem.classList.contains('active')) {
-                categoryItem.style.backgroundColor = 'transparent';
+                categoryItem.style.backgroundColor = 'transparent'; /* 鼠标离开时的背景色 */
                 categoryItem.style.boxShadow = 'none';
-                categoryItem.style.color = '#ccc';
+                categoryItem.style.color = '#ccc'; /* 鼠标离开时的文字颜色 */
             }
         };
 
         categoryItem.onclick = () => {
             categoryList.querySelectorAll('.active').forEach(item => {
                 item.classList.remove('active');
-                item.style.backgroundColor = 'transparent';
-                item.style.color = '#ccc';
+                item.style.backgroundColor = 'transparent'; /* 取消选中时的背景色 */
+                item.style.color = '#ccc'; /* 取消选中时的文字颜色 */
                 item.style.borderTop = 'none';
                 item.style.borderLeft = 'none';
                 item.style.borderRight = 'none';
             });
 
             categoryItem.classList.add('active');
-            categoryItem.style.backgroundColor = '#1d4ed8';
-            categoryItem.style.color = '#fff';
+            categoryItem.style.backgroundColor = '#1d4ed8'; /* 选中时的背景色 */
+            categoryItem.style.color = '#fff'; /* 选中时的文字颜色 */
 
             tagSelectorDialog.activeCategory = category;
             tagSelectorDialog.activeSubCategory = null;
@@ -1620,8 +1633,7 @@ function showSubCategories(category) {
             padding: 10px 16px;
             color: #ccc;
             cursor: pointer;
-            border-right: 1px solid rgba(71, 85, 105, 0.8);
-            border-bottom: 1px solid rgba(71, 85, 105, 0.5);
+            border-right: 1px solid rgb(112, 130, 155); /* 与主分类相同的边框颜色 */
             white-space: normal;
             word-break: break-word;
             overflow-wrap: anywhere;
@@ -1654,8 +1666,7 @@ function showSubCategories(category) {
                 item.style.borderTop = 'none';
                 item.style.borderLeft = 'none';
                 item.style.borderBottom = 'none';
-
-                item.style.borderRight = '1px solid rgba(71, 85, 105, 0.8)';
+                item.style.borderRight = '1px solid rgb(112, 130, 155)'; /* 与主分类相同的边框颜色 */
             });
 
             tab.classList.add('active');
@@ -1707,8 +1718,7 @@ function showSubSubCategories(category, subCategory) {
             padding: 8px 12px;
             color: #ccc;
             cursor: pointer;
-            border-right: 1px solid rgba(71, 85, 105, 0.8);
-            border-bottom: 1px solid rgba(71, 85, 105, 0.5);
+            border-right: 1px solid rgb(112, 130, 155); /* 与主分类相同的边框颜色 */
             white-space: normal;
             word-break: break-word;
             overflow-wrap: anywhere;
@@ -1800,8 +1810,7 @@ function showSubSubSubCategories(category, subCategory, subSubCategory) {
             padding: 6px 10px;
             color: #ccc;
             cursor: pointer;
-            border-right: 1px solid rgba(71, 85, 105, 0.8);
-            border-bottom: 1px solid rgba(71, 85, 105, 0.5);
+            border-right: 1px solid rgb(112, 130, 155); /* 与主分类相同的边框颜色 */
             white-space: normal;
             word-break: break-word;
             overflow-wrap: anywhere;
@@ -1884,7 +1893,6 @@ function createTagElement(display, value, isSelected) {
     if (isSelected) {
         tagElement.style.backgroundColor = '#22c55e';
         tagElement.style.color = '#fff';
-        tagElement.style.borderColor = '#22c55e';
     }
 
     return tagElement;
@@ -2041,9 +2049,7 @@ function showTags(category, subCategory) {
         tagElement.onmouseenter = (e) => {
             if (!isSelected) {
                 tagElement.style.backgroundColor = 'rgb(49, 84, 136)';
-                tagElement.style.borderColor = '#1e293b';
                 tagElement.style.color = '#fff';
-                tagElement.style.borderWidth = '1px';
             }
             if (tooltip && tooltip.parentNode) {
                 tooltip.parentNode.removeChild(tooltip);
@@ -2067,14 +2073,11 @@ function showTags(category, subCategory) {
             const currentlySelected = isTagSelected(value);
             if (!currentlySelected) {
                 tagElement.style.backgroundColor = '#444';
-                tagElement.style.borderColor = '#555';
                 tagElement.style.color = '#ccc';
-                tagElement.style.borderWidth = '1px';
                 tagElement.style.boxShadow = 'none';
             } else {
                 tagElement.style.backgroundColor = '#22c55e';
                 tagElement.style.color = '#fff';
-                tagElement.style.borderColor = '#22c55e';
             }
             if (tooltip) {
                 tooltip.style.opacity = '0';
@@ -2199,11 +2202,10 @@ function showTagsFromSubSub(category, subCategory, subSubCategory) {
             padding: 6px 12px;
             margin: 4px;
             background: #444;
-            color: #ccc;
+            color: '#ccc';
             border-radius: 16px;
             cursor: pointer;
             transition: all 0.2s;
-            border: 1px solid rgba(71, 85, 105, 0.8);
             font-size: 14px;
             position: relative;
         `;
@@ -2214,7 +2216,6 @@ function showTagsFromSubSub(category, subCategory, subSubCategory) {
         if (isTagSelected(tagObj.value)) {
             tagElement.style.backgroundColor = '#22c55e';
             tagElement.style.color = '#fff';
-            tagElement.style.borderColor = '#22c55e';
         }
 
         const createCustomTooltip = () => {
@@ -2246,7 +2247,6 @@ function showTagsFromSubSub(category, subCategory, subSubCategory) {
         tagElement.onmouseenter = (e) => {
             if (!isTagSelected(tagObj.value)) {
                 tagElement.style.backgroundColor = 'rgb(49, 84, 136)';
-                tagElement.style.borderColor = '#1e293b';
                 tagElement.style.color = '#fff';
             }
             if (tooltip && tooltip.parentNode) {
@@ -2265,12 +2265,10 @@ function showTagsFromSubSub(category, subCategory, subSubCategory) {
             const currentlySelected = isTagSelected(tagObj.value);
             if (!currentlySelected) {
                 tagElement.style.backgroundColor = '#444';
-                tagElement.style.borderColor = '#555';
                 tagElement.style.color = '#ccc';
             } else {
                 tagElement.style.backgroundColor = '#22c55e';
                 tagElement.style.color = '#fff';
-                tagElement.style.borderColor = '#22c55e';
             }
             if (tooltip) {
                 tooltip.style.opacity = '0';
@@ -2303,11 +2301,10 @@ function showTagsFromSubSubSub(category, subCategory, subSubCategory, subSubSubC
             padding: 6px 12px;
             margin: 4px;
             background: #444;
-            color: #ccc;
+            color: '#ccc';
             border-radius: 16px;
             cursor: pointer;
             transition: all 0.2s;
-            border: 1px solid rgba(71, 85, 105, 0.8);
             font-size: 14px;
             position: relative;
         `;
@@ -2318,7 +2315,6 @@ function showTagsFromSubSubSub(category, subCategory, subSubCategory, subSubSubC
         if (isTagSelected(tagObj.value)) {
             tagElement.style.backgroundColor = '#22c55e';
             tagElement.style.color = '#fff';
-            tagElement.style.borderColor = '#22c55e';
         }
 
         let tooltip = null;
@@ -2349,7 +2345,6 @@ function showTagsFromSubSubSub(category, subCategory, subSubCategory, subSubSubC
         tagElement.onmouseenter = (e) => {
             if (!isTagSelected(tagObj.value)) {
                 tagElement.style.backgroundColor = 'rgb(49, 84, 136)';
-                tagElement.style.borderColor = '#1e293b';
                 tagElement.style.color = '#fff';
             }
             if (tooltip && tooltip.parentNode) {
@@ -2368,12 +2363,10 @@ function showTagsFromSubSubSub(category, subCategory, subSubCategory, subSubSubC
             const currentlySelected = isTagSelected(tagObj.value);
             if (!currentlySelected) {
                 tagElement.style.backgroundColor = '#444';
-                tagElement.style.borderColor = '#555';
                 tagElement.style.color = '#ccc';
             } else {
                 tagElement.style.backgroundColor = '#22c55e';
                 tagElement.style.color = '#fff';
-                tagElement.style.borderColor = '#22c55e';
             }
             if (tooltip) {
                 tooltip.style.opacity = '0';
@@ -2540,12 +2533,10 @@ function toggleTag(tag, element) {
         selectedTags.delete(tag);
         element.style.backgroundColor = '#444';
         element.style.color = '#ccc';
-        element.style.borderColor = '#555';
     } else {
         selectedTags.add(tag);
         element.style.backgroundColor = '#22c55e';
         element.style.color = '#fff';
-        element.style.borderColor = '#22c55e';
     }
 
     updateSelectedTags();
@@ -2560,7 +2551,21 @@ function updateSelectedTags() {
     if (currentNode) {
         const tagEditWidget = currentNode.widgets.find(w => w.name === 'tag_edit');
         if (tagEditWidget) {
-            tagEditWidget.value = Array.from(selectedTags).join(', ');
+            // 创建两个值：一个用于显示（逗号分隔），一个用于内部存储（JSON格式）
+            const tagsArray = Array.from(selectedTags);
+            
+            // 显示值：使用逗号分隔，与UI显示一致
+            const displayValue = tagsArray.join(', ');
+            
+            // 存储值：使用特殊分隔符来避免长文本标签被分割
+            // 使用不常见的分隔符组合：|||
+            const storageValue = tagsArray.join('|||');
+            
+            // 设置显示值
+            tagEditWidget.value = displayValue;
+            
+            // 将存储值保存到一个隐藏属性中，用于重新加载时使用
+            tagEditWidget._internalValue = storageValue;
 
             if (tagEditWidget.callback) {
                 tagEditWidget.callback(tagEditWidget.value);
@@ -2600,11 +2605,11 @@ function updateSelectedTagsOverview() {
 
             const tagElement = document.createElement('span');
             tagElement.style.cssText = `
-                background: #4a9eff;
+                background: linear-gradient(135deg, #4a9eff 0%, #1e88e5 100%);
                 color: #fff;
-                padding: 6px 8px;
+                padding: 3px 8px;
                 border-radius: 6px;
-                font-size: 12px;
+                font-size: 14px;
                 display: inline-flex;
                 align-items: center;
                 gap: 4px;
@@ -2612,7 +2617,12 @@ function updateSelectedTagsOverview() {
                 width: 100%;
                 justify-content: space-between;
                 margin: 0 0 2px 0;
+                box-shadow: 0 2px 4px rgba(74, 158, 255, 0.4), 0 1px 2px rgba(74, 158, 255, 0.2);
+                border: 1px solid rgba(30, 136, 229, 0.8);
+                transition: all 0.3s ease;
             `;
+
+
 
             const tagText = document.createElement('span');
             tagText.textContent = tag;
@@ -2620,11 +2630,39 @@ function updateSelectedTagsOverview() {
             const removeBtn = document.createElement('span');
             removeBtn.textContent = '×';
             removeBtn.style.cssText = `
-                font-size: 14px;
+                font-size: 8px;
+                font-family: 'SimHei', '黑体', sans-serif; /* 黑体字体 */
                 font-weight: bold;
                 cursor: pointer;
                 opacity: 0.8;
+                background-color: #3b7ddd; /* 稍深的蓝色 */
+                color: white;
+                border-radius: 50%; /* 圆形 */
+                width: 14px;
+                height: 14px;
+                min-width: 14px; /* 确保最小宽度 */
+                min-height: 14px; /* 确保最小高度 */
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                transition: background-color 0.2s;
+                line-height: 1; /* 确保符号垂直居中 */
+                text-align: center; /* 水平居中 */
+                padding: 0; /* 移除默认填充 */
+                margin: 0; /* 移除默认边距 */
+                transform: translate(0, 0); /* 确保无偏移 */
+                flex-shrink: 0; /* 防止在flex容器中被压缩 */
+                box-sizing: border-box; /* 确保边框计算在尺寸内 */
             `;
+            
+            // 添加悬停效果
+            removeBtn.onmouseenter = () => {
+                removeBtn.style.backgroundColor = '#ff4444'; /* 悬停时变为红色 */
+            };
+            
+            removeBtn.onmouseleave = () => {
+                removeBtn.style.backgroundColor = '#3b7ddd'; /* 恢复原始颜色 */
+            };
             removeBtn.onclick = (e) => {
                 e.stopPropagation();
                 removeSelectedTag(tag);
@@ -2647,7 +2685,7 @@ function updateSelectedTagsOverview() {
                 overflow-y: auto;
                 box-sizing: border-box;
                 border-radius: 4px;
-                padding: 2px 4px;
+                padding: 0px 4px;
             `;
             
             let chineseName = tag;
@@ -2699,7 +2737,6 @@ function removeSelectedTag(tag) {
         if (element.textContent === tag) {
             element.style.backgroundColor = '#444';
             element.style.color = '#ccc';
-            element.style.borderColor = '#555';
         }
     });
 
@@ -2712,9 +2749,30 @@ function loadExistingTags() {
     selectedTags.clear();
     if (currentNode) {
         const tagEditWidget = currentNode.widgets.find(w => w.name === 'tag_edit');
-        if (tagEditWidget && tagEditWidget.value) {
-            const currentTags = tagEditWidget.value.split(',').map(t => t.trim()).filter(t => t);
-            currentTags.forEach(tag => selectedTags.add(tag));
+        if (tagEditWidget && (tagEditWidget.value || tagEditWidget._internalValue)) {
+            // 优先使用内部存储值（特殊分隔符格式）
+            if (tagEditWidget._internalValue) {
+                const currentTags = tagEditWidget._internalValue.split('|||').filter(t => t.trim());
+                currentTags.forEach(tag => selectedTags.add(tag.trim()));
+            } else if (tagEditWidget.value) {
+                try {
+                    // 尝试解析JSON格式的标签数据（兼容旧版本）
+                    const tagsArray = JSON.parse(tagEditWidget.value);
+                    if (Array.isArray(tagsArray)) {
+                        tagsArray.forEach(tag => {
+                            if (tag && typeof tag === 'string') {
+                                selectedTags.add(tag);
+                            }
+                        });
+                    } else {
+                        throw new Error('Not an array');
+                    }
+                } catch (e) {
+                    // 如果JSON解析失败，使用逗号分割方式作为兼容性处理
+                    const currentTags = tagEditWidget.value.split(',').map(t => t.trim()).filter(t => t);
+                    currentTags.forEach(tag => selectedTags.add(tag));
+                }
+            }
         }
     }
 
@@ -2729,7 +2787,6 @@ function clearSelectedTags() {
     tagElements.forEach(element => {
         element.style.backgroundColor = '#444';
         element.style.color = '#ccc';
-        element.style.borderColor = '#555';
     });
 
     updateSelectedTags();
@@ -2791,8 +2848,8 @@ function searchTags(query) {
         if (Array.isArray(node)) {
             node.forEach(t => {
                 const c = (t.display || '').toLowerCase();
-                const e = (t.value || '').toLowerCase();
-                if (c.includes(q) || e.includes(q)) {
+                // 仅搜索标签的名称（display字段），不搜索内容（value字段）
+                if (c.includes(q) || fuzzyMatch(c, q)) {
                     results.push({ ...t, path: [...pathArr] });
                 }
             });
@@ -2802,6 +2859,28 @@ function searchTags(query) {
     };
     Object.entries(tagsData || {}).forEach(([k, v]) => walk(v, [k]));
     return results;
+}
+
+function fuzzyMatch(str, query) {
+    // 如果查询为空，返回true
+    if (!query) return true;
+    
+    // 如果字符串为空但查询不为空，返回false
+    if (!str) return false;
+    
+    // 简单的模糊匹配算法：
+    // 1. 检查查询中的每个字符是否都能在字符串中找到（顺序不重要）
+    // 2. 支持跳字匹配，如"韩女星"可以匹配"韩国女明星"
+    
+    let queryIndex = 0;
+    for (let i = 0; i < str.length && queryIndex < query.length; i++) {
+        if (str[i] === query[queryIndex]) {
+            queryIndex++;
+        }
+    }
+    
+    // 如果所有查询字符都匹配到了，返回true
+    return queryIndex === query.length;
 }
 
 function showSearchResults(results, q) {
@@ -2832,7 +2911,6 @@ function showSearchResults(results, q) {
             border-radius: 16px;
             cursor: pointer;
             transition: all 0.2s;
-            border: 1px solid rgba(71, 85, 105, 0.8);
             font-size: 14px;
             position: relative;
         `;
@@ -2842,7 +2920,6 @@ function showSearchResults(results, q) {
         if (isTagSelected(tagObj.value)) {
             tagElement.style.backgroundColor = '#22c55e';
             tagElement.style.color = '#fff';
-            tagElement.style.borderColor = '#22c55e';
         }
         let tooltip = null;
         const createCustomTooltip = () => {
@@ -2873,7 +2950,6 @@ function showSearchResults(results, q) {
         tagElement.onmouseenter = () => {
             if (!isTagSelected(tagObj.value)) {
                 tagElement.style.backgroundColor = 'rgb(49, 84, 136)';
-                tagElement.style.borderColor = '#1e293b';
                 tagElement.style.color = '#fff';
             }
             if (tooltip && tooltip.parentNode) tooltip.parentNode.removeChild(tooltip);
@@ -2888,12 +2964,10 @@ function showSearchResults(results, q) {
             const currentlySelected = isTagSelected(tagObj.value);
             if (!currentlySelected) {
                 tagElement.style.backgroundColor = '#444';
-                tagElement.style.borderColor = '#555';
                 tagElement.style.color = '#ccc';
             } else {
                 tagElement.style.backgroundColor = '#22c55e';
                 tagElement.style.color = '#fff';
-                tagElement.style.borderColor = '#22c55e';
             }
             if (tooltip) {
                 tooltip.style.opacity = '0';

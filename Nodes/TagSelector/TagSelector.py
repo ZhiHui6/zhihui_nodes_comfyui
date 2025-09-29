@@ -25,7 +25,7 @@ class TagSelector:
                 "expand_mode": (["Disabled", "Tag Style", "Natural Language"], {
                     "default": "Disabled"
                 }),
-                "language_output": (["中文", "English"], {
+                "Expanded_result": (["中文", "English"], {
                     "default": "中文"
                 }),
                 "expand_model": (["deepseek", "deepseek-reasoning", "gemini", "mistral", "nova-fast", "openai", "openai-large", "openai-reasoning", "evil", "unity"], {
@@ -43,11 +43,11 @@ class TagSelector:
     FUNCTION = "process_tags"
     CATEGORY = "zhihui/text"
     
-    def process_tags(self, tag_edit, expand_mode, language_output, expand_model="openai", unique_id=None, extra_pnginfo=None):
+    def process_tags(self, tag_edit, expand_mode, Expanded_result, expand_model="openai", unique_id=None, extra_pnginfo=None):
         processed_tags = self.clean_tags(tag_edit)
         
         if expand_mode != "Disabled" and processed_tags.strip():
-            expanded_tags = self._expand_tags_with_llm(processed_tags, expand_mode, language_output, expand_model)
+            expanded_tags = self._expand_tags_with_llm(processed_tags, expand_mode, Expanded_result, expand_model)
             return (expanded_tags,)
         
         return (processed_tags,)
@@ -67,10 +67,10 @@ class TagSelector:
         
         return ', '.join(unique_tags)
     
-    def _expand_tags_with_llm(self, tags_text: str, expand_mode: str, language_output: str, expand_model: str = "openai") -> str:
+    def _expand_tags_with_llm(self, tags_text: str, expand_mode: str, Expanded_result: str, expand_model: str = "openai") -> str:
         try:
             # 根据语言选择确定输出语言
-            is_chinese = language_output == "中文"
+            is_chinese = Expanded_result == "中文"
             
             if expand_mode == "Tag Style":
                 if is_chinese:
@@ -184,7 +184,7 @@ Output: A beautiful young girl with expressive eyes and a gentle smile, sitting 
             return tags_text
     
     @classmethod
-    def IS_CHANGED(cls, tag_edit, expand_mode, language_output, expand_model=None, unique_id=None, extra_pnginfo=None):
+    def IS_CHANGED(cls, tag_edit, expand_mode, Expanded_result, expand_model=None, unique_id=None, extra_pnginfo=None):
         return tag_edit
     
     @classmethod
