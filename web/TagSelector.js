@@ -240,7 +240,7 @@ function createTagSelectorDialog() {
         backdrop-filter: blur(10px);
         -webkit-backdrop-filter: blur(10px);
     `;
-//尺寸计算
+
     const dialog = document.createElement('div');
     const screenHeight = window.innerHeight;
     const screenWidth = window.innerWidth;
@@ -1137,9 +1137,6 @@ function createTagSelectorDialog() {
         left: -15px;
     `;
 
-
-
-    // 创建缩略图显示窗口
     const thumbnailWindow = document.createElement('div');
     thumbnailWindow.style.cssText = `
         width: 35px;
@@ -1164,7 +1161,6 @@ function createTagSelectorDialog() {
         display: none;
     `;
 
-    // 创建默认占位符
     const thumbnailPlaceholder = document.createElement('div');
     thumbnailPlaceholder.style.cssText = `
         width: 100%;
@@ -1183,8 +1179,7 @@ function createTagSelectorDialog() {
     thumbnailWindow.appendChild(thumbnailImg);
     thumbnailWindow.appendChild(thumbnailPlaceholder);
 
-    // 创建统一的加载/清除按钮
-    const actionButton = document.createElement('button');
+   const actionButton = document.createElement('button');
     actionButton.textContent = '加载';
     actionButton.style.cssText = `
         background: linear-gradient(135deg, #2563eb 0%, #1d4ed8 50%, #1e40af 100%);
@@ -1201,30 +1196,21 @@ function createTagSelectorDialog() {
         white-space: nowrap;
         text-shadow: 0 1px 1px rgba(0, 0, 0, 0.3);
     `;
-
-    // 更新按钮样式和功能的函数
     function updateActionButton() {
-        if (currentPreviewImage) {
-            // 切换到清除模式
-            actionButton.textContent = '清除';
+        if (currentPreviewImage) {            actionButton.textContent = '清除';
             actionButton.style.background = 'linear-gradient(135deg, #dc2626 0%, #b91c1c 100%)';
             actionButton.style.borderColor = 'rgba(220, 38, 38, 0.8)';
-        } else {
-            // 切换到加载模式
-            actionButton.textContent = '加载';
+        } else {            actionButton.textContent = '加载';
             actionButton.style.background = 'linear-gradient(135deg, #2563eb 0%, #1d4ed8 50%, #1e40af 100%)';
             actionButton.style.borderColor = 'rgba(59, 130, 246, 0.7)';
         }
     }
 
     actionButton.addEventListener('mouseenter', () => {
-        if (currentPreviewImage) {
-            // 清除模式的悬停效果
-            actionButton.style.background = 'linear-gradient(135deg, #f87171 0%, #ef4444 100%)';
+        if (currentPreviewImage) {            actionButton.style.background = 'linear-gradient(135deg, #f87171 0%, #ef4444 100%)';
             actionButton.style.boxShadow = '0 2px 8px rgba(239, 68, 68, 0.4)';
             actionButton.style.borderColor = 'rgba(248, 113, 113, 0.8)';
         } else {
-            // 加载模式的悬停效果
             actionButton.style.background = 'linear-gradient(135deg, #3b82f6 0%, #2563eb 50%, #1d4ed8 100%)';
             actionButton.style.boxShadow = '0 2px 4px rgba(59, 130, 246, 0.2), 0 1px 2px rgba(0, 0, 0, 0.1)';
             actionButton.style.borderColor = 'rgba(59, 130, 246, 0.5)';
@@ -1233,12 +1219,10 @@ function createTagSelectorDialog() {
 
     actionButton.addEventListener('mouseleave', () => {
         if (currentPreviewImage) {
-            // 清除模式的正常样式
             actionButton.style.background = 'linear-gradient(135deg, #dc2626 0%, #b91c1c 100%)';
             actionButton.style.borderColor = 'rgba(220, 38, 38, 0.8)';
             actionButton.style.boxShadow = 'none';
         } else {
-            // 加载模式的正常样式
             actionButton.style.background = 'linear-gradient(135deg, #2563eb 0%, #1d4ed8 50%, #1e40af 100%)';
             actionButton.style.borderColor = 'rgba(59, 130, 246, 0.7)';
             actionButton.style.boxShadow = 'none';
@@ -1247,25 +1231,15 @@ function createTagSelectorDialog() {
 
     actionButton.addEventListener('click', () => {
         if (currentPreviewImage) {
-            // 清除功能
             currentPreviewImage = null;
-            currentPreviewImageName = null;
-            
-            // 重置文件输入
-            previewInput.value = '';
-            
-            // 重置显示文本
+            currentPreviewImageName = null;   
+            previewInput.value = '';         
             fileNameDisplay.textContent = '未加载图片';
-            fileNameDisplay.style.color = '#94a3b8';
-            
-            // 隐藏缩略图并显示占位符
+            fileNameDisplay.style.color = '#94a3b8';         
             thumbnailImg.style.display = 'none';
             thumbnailPlaceholder.style.display = 'flex';
-            
-            // 更新按钮状态
             updateActionButton();
         } else {
-            // 加载功能
             previewInput.click();
         }
     });
@@ -1279,19 +1253,13 @@ function createTagSelectorDialog() {
                 currentPreviewImageName = file.name;
                 fileNameDisplay.textContent = file.name;
                 fileNameDisplay.style.color = '#e2e8f0';
-                
-                // 显示缩略图并隐藏占位符
                 thumbnailImg.src = currentPreviewImage;
                 thumbnailImg.style.display = 'block';
                 thumbnailPlaceholder.style.display = 'none';
-                
-                // 更新按钮状态
                 updateActionButton();
             };
             reader.readAsDataURL(file);
         }
-        // 移除else分支，避免取消选择时清除已有图片
-        // 如果用户取消选择，保持原有状态不变
     });
 
     const previewSeparator = document.createElement('div');
@@ -1377,7 +1345,6 @@ function createTagSelectorDialog() {
                 currentPreviewImageName = null;
                 previewInput.value = '';
                 
-                // 修复BUG：保存标签后清除预览图显示
                 if (thumbnailImg) {
                     thumbnailImg.style.display = 'none';
                 }
@@ -1389,7 +1356,6 @@ function createTagSelectorDialog() {
                     fileNameDisplay.style.color = '#94a3b8';
                 }
                 
-                // 修复BUG：更新按钮状态
                 updateActionButton();
                 
                 await loadTagsData();
@@ -1569,41 +1535,41 @@ function initializeCategoryList() {
         const categoryItem = document.createElement('div');
         categoryItem.style.cssText = `
             padding: 12px 16px;
-            color: #ccc; /* 主分类条目文字颜色 */
+            color: #ccc;
             cursor: pointer;
-            border-bottom: 1px solid rgb(112, 130, 155); /* 主分类条目之间的分隔线颜色 */
+            border-bottom: 1px solid rgb(112, 130, 155);
             transition: all 0.2s;
             text-align: center;
-            background: transparent; /* 主分类条目背景色 */
+            background: transparent; 
         `;
         categoryItem.textContent = category;
         categoryItem.onmouseenter = () => {
             if (!categoryItem.classList.contains('active')) {
-                categoryItem.style.backgroundColor = 'rgb(49, 84, 136)'; /* 鼠标悬停时的背景色 */
-                categoryItem.style.color = '#fff'; /* 鼠标悬停时的文字颜色 */
+                categoryItem.style.backgroundColor = 'rgb(49, 84, 136)';
+                categoryItem.style.color = '#fff';
             }
         };
         categoryItem.onmouseleave = () => {
             if (!categoryItem.classList.contains('active')) {
-                categoryItem.style.backgroundColor = 'transparent'; /* 鼠标离开时的背景色 */
+                categoryItem.style.backgroundColor = 'transparent'; 
                 categoryItem.style.boxShadow = 'none';
-                categoryItem.style.color = '#ccc'; /* 鼠标离开时的文字颜色 */
+                categoryItem.style.color = '#ccc';
             }
         };
 
         categoryItem.onclick = () => {
             categoryList.querySelectorAll('.active').forEach(item => {
                 item.classList.remove('active');
-                item.style.backgroundColor = 'transparent'; /* 取消选中时的背景色 */
-                item.style.color = '#ccc'; /* 取消选中时的文字颜色 */
+                item.style.backgroundColor = 'transparent';
+                item.style.color = '#ccc';
                 item.style.borderTop = 'none';
                 item.style.borderLeft = 'none';
                 item.style.borderRight = 'none';
             });
 
             categoryItem.classList.add('active');
-            categoryItem.style.backgroundColor = '#1d4ed8'; /* 选中时的背景色 */
-            categoryItem.style.color = '#fff'; /* 选中时的文字颜色 */
+            categoryItem.style.backgroundColor = '#1d4ed8';
+            categoryItem.style.color = '#fff';
 
             tagSelectorDialog.activeCategory = category;
             tagSelectorDialog.activeSubCategory = null;
@@ -1648,7 +1614,7 @@ function showSubCategories(category) {
             padding: 10px 16px;
             color: #ccc;
             cursor: pointer;
-            border-right: 1px solid rgb(112, 130, 155); /* 与主分类相同的边框颜色 */
+            border-right: 1px solid rgb(112, 130, 155);
             white-space: normal;
             word-break: break-word;
             overflow-wrap: anywhere;
@@ -1681,7 +1647,7 @@ function showSubCategories(category) {
                 item.style.borderTop = 'none';
                 item.style.borderLeft = 'none';
                 item.style.borderBottom = 'none';
-                item.style.borderRight = '1px solid rgb(112, 130, 155)'; /* 与主分类相同的边框颜色 */
+                item.style.borderRight = '1px solid rgb(112, 130, 155)';
             });
 
             tab.classList.add('active');
@@ -1733,8 +1699,8 @@ function showSubSubCategories(category, subCategory) {
             padding: 8px 12px;
             color: #ccc;
             cursor: pointer;
-            border-right: 1px solid rgb(112, 130, 155); /* 与主分类相同的边框颜色 */
-            white-space: normal;
+            border-right: 1px solid rgb(112, 130, 155);
+            white-space: normal;    
             word-break: break-word;
             overflow-wrap: anywhere;
             transition: background-color 0.2s;
@@ -1825,7 +1791,7 @@ function showSubSubSubCategories(category, subCategory, subSubCategory) {
             padding: 6px 10px;
             color: #ccc;
             cursor: pointer;
-            border-right: 1px solid rgb(112, 130, 155); /* 与主分类相同的边框颜色 */
+            border-right: 1px solid rgb(112, 130, 155);
             white-space: normal;
             word-break: break-word;
             overflow-wrap: anywhere;
@@ -2566,28 +2532,16 @@ function updateSelectedTags() {
     if (currentNode) {
         const tagEditWidget = currentNode.widgets.find(w => w.name === 'tag_edit');
         if (tagEditWidget) {
-            // 创建两个值：一个用于显示（逗号分隔），一个用于内部存储（JSON格式）
             const tagsArray = Array.from(selectedTags);
-            
-            // 显示值：使用逗号分隔，与UI显示一致
             const displayValue = tagsArray.join(', ');
-            
-            // 存储值：使用特殊分隔符来避免长文本标签被分割
-            // 使用不常见的分隔符组合：|||
-            const storageValue = tagsArray.join('|||');
-            
-            // 设置显示值
+            const storageValue = tagsArray.join('|||');          
             tagEditWidget.value = displayValue;
-            
-            // 将存储值保存到一个隐藏属性中，用于重新加载时使用
             tagEditWidget._internalValue = storageValue;
-
             if (tagEditWidget.callback) {
                 tagEditWidget.callback(tagEditWidget.value);
             }
         }
     }
-
     updateSelectedTagsOverview();
 }
 
@@ -2637,8 +2591,6 @@ function updateSelectedTagsOverview() {
                 transition: all 0.3s ease;
             `;
 
-
-
             const tagText = document.createElement('span');
             tagText.textContent = tag;
 
@@ -2646,37 +2598,36 @@ function updateSelectedTagsOverview() {
             removeBtn.textContent = '×';
             removeBtn.style.cssText = `
                 font-size: 8px;
-                font-family: 'SimHei', '黑体', sans-serif; /* 黑体字体 */
+                font-family: 'SimHei', '黑体', sans-serif;
                 font-weight: bold;
                 cursor: pointer;
                 opacity: 0.8;
-                background-color: #3b7ddd; /* 稍深的蓝色 */
+                background-color: #3b7ddd;
                 color: white;
-                border-radius: 50%; /* 圆形 */
+                border-radius: 50%;
                 width: 14px;
                 height: 14px;
-                min-width: 14px; /* 确保最小宽度 */
-                min-height: 14px; /* 确保最小高度 */
+                min-width: 14px;
+                min-height: 14px;
                 display: flex;
                 align-items: center;
                 justify-content: center;
                 transition: background-color 0.2s;
-                line-height: 1; /* 确保符号垂直居中 */
-                text-align: center; /* 水平居中 */
-                padding: 0; /* 移除默认填充 */
-                margin: 0; /* 移除默认边距 */
-                transform: translate(0, 0); /* 确保无偏移 */
-                flex-shrink: 0; /* 防止在flex容器中被压缩 */
-                box-sizing: border-box; /* 确保边框计算在尺寸内 */
+                line-height: 1;
+                text-align: center;
+                padding: 0;
+                margin: 0;
+                transform: translate(0, 0);
+                flex-shrink: 0;
+                box-sizing: border-box;
             `;
             
-            // 添加悬停效果
             removeBtn.onmouseenter = () => {
-                removeBtn.style.backgroundColor = '#ff4444'; /* 悬停时变为红色 */
+                removeBtn.style.backgroundColor = '#ff4444';
             };
             
             removeBtn.onmouseleave = () => {
-                removeBtn.style.backgroundColor = '#3b7ddd'; /* 恢复原始颜色 */
+                removeBtn.style.backgroundColor = '#3b7ddd';
             };
             removeBtn.onclick = (e) => {
                 e.stopPropagation();
@@ -2765,13 +2716,11 @@ function loadExistingTags() {
     if (currentNode) {
         const tagEditWidget = currentNode.widgets.find(w => w.name === 'tag_edit');
         if (tagEditWidget && (tagEditWidget.value || tagEditWidget._internalValue)) {
-            // 优先使用内部存储值（特殊分隔符格式）
             if (tagEditWidget._internalValue) {
                 const currentTags = tagEditWidget._internalValue.split('|||').filter(t => t.trim());
                 currentTags.forEach(tag => selectedTags.add(tag.trim()));
             } else if (tagEditWidget.value) {
                 try {
-                    // 尝试解析JSON格式的标签数据（兼容旧版本）
                     const tagsArray = JSON.parse(tagEditWidget.value);
                     if (Array.isArray(tagsArray)) {
                         tagsArray.forEach(tag => {
@@ -2783,7 +2732,6 @@ function loadExistingTags() {
                         throw new Error('Not an array');
                     }
                 } catch (e) {
-                    // 如果JSON解析失败，使用逗号分割方式作为兼容性处理
                     const currentTags = tagEditWidget.value.split(',').map(t => t.trim()).filter(t => t);
                     currentTags.forEach(tag => selectedTags.add(tag));
                 }
@@ -2863,7 +2811,6 @@ function searchTags(query) {
         if (Array.isArray(node)) {
             node.forEach(t => {
                 const c = (t.display || '').toLowerCase();
-                // 仅搜索标签的名称（display字段），不搜索内容（value字段）
                 if (c.includes(q) || fuzzyMatch(c, q)) {
                     results.push({ ...t, path: [...pathArr] });
                 }
@@ -2877,16 +2824,8 @@ function searchTags(query) {
 }
 
 function fuzzyMatch(str, query) {
-    // 如果查询为空，返回true
     if (!query) return true;
-    
-    // 如果字符串为空但查询不为空，返回false
-    if (!str) return false;
-    
-    // 简单的模糊匹配算法：
-    // 1. 检查查询中的每个字符是否都能在字符串中找到（顺序不重要）
-    // 2. 支持跳字匹配，如"韩女星"可以匹配"韩国女明星"
-    
+    if (!str) return false;   
     let queryIndex = 0;
     for (let i = 0; i < str.length && queryIndex < query.length; i++) {
         if (str[i] === query[queryIndex]) {
@@ -2894,7 +2833,6 @@ function fuzzyMatch(str, query) {
         }
     }
     
-    // 如果所有查询字符都匹配到了，返回true
     return queryIndex === query.length;
 }
 
