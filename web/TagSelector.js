@@ -1638,6 +1638,11 @@ function createTagSelectorDialog() {
     document.body.appendChild(overlay);
 
     const handleKeyDown = (e) => {
+        // 如果随机规则设置界面正在显示，则不处理ESC键
+        if (window.randomGeneratorDialog && window.randomGeneratorDialog.style.display === 'block') {
+            return;
+        }
+
         if (e.key === 'Escape') {
 
             if (previewPopup && previewPopup.style.display === 'block') {

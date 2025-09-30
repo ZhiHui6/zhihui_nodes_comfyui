@@ -78,6 +78,13 @@ let randomSettings = {
     totalTagsRange: { min: 12, max: 20 }
 };
 
+// 关闭随机生成器对话框
+function closeRandomGeneratorDialog() {
+    if (randomGeneratorDialog) {
+        randomGeneratorDialog.style.display = 'none';
+    }
+}
+
 // 创建随机生成器对话框
 function createRandomGeneratorDialog() {
     const overlay = document.createElement('div');
@@ -100,7 +107,7 @@ function createRandomGeneratorDialog() {
         top: 50%;
         left: 50%;
         transform: translate(-50%, -50%);
-        width: 1100px;
+        width: 1200px;
         max-width: 95vw;
         height: 850px;
         max-height: 95vh;
@@ -128,7 +135,7 @@ function createRandomGeneratorDialog() {
     `;
 
     const title = document.createElement('span');
-    title.innerHTML = '随机参数设置';
+    title.innerHTML = '随机规则设置';
     title.style.cssText = `
         color: #f1f5f9;
         font-size: 18px;
@@ -169,7 +176,7 @@ function createRandomGeneratorDialog() {
         closeBtn.style.borderColor = 'rgba(220, 38, 38, 0.8)';
     });
     closeBtn.onclick = () => {
-        overlay.style.display = 'none';
+        closeRandomGeneratorDialog();
     };
 
     header.appendChild(title);
@@ -214,18 +221,50 @@ function createRandomGeneratorDialog() {
     const resetBtn = document.createElement('button');
     resetBtn.innerHTML = '🔄 重置默认';
     resetBtn.style.cssText = `
-        background: linear-gradient(135deg, #6b7280 0%, #4b5563 100%);
-        border: 1px solid rgba(107, 114, 128, 0.8);
+        background: linear-gradient(135deg, #3b82f6 0%, #2563eb 100%);
+        border: 1px solid rgba(59, 130, 246, 0.8);
         color: #ffffff;
         padding: 8px 16px;
         border-radius: 6px;
         cursor: pointer;
         font-size: 14px;
         font-weight: 500;
-        transition: all 0.2s ease;
+        transition: all 0.3s ease;
         outline: none;
+        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
     `;
+    
+    // 添加悬停效果
+    resetBtn.addEventListener('mouseenter', () => {
+        resetBtn.style.background = 'linear-gradient(135deg, #60a5fa 0%, #3b82f6 100%)';
+        resetBtn.style.transform = 'translateY(-2px)';
+        resetBtn.style.boxShadow = '0 4px 8px rgba(0, 0, 0, 0.3)';
+    });
+    
+    resetBtn.addEventListener('mouseleave', () => {
+        resetBtn.style.background = 'linear-gradient(135deg, #3b82f6 0%, #2563eb 100%)';
+        resetBtn.style.transform = 'translateY(0)';
+        resetBtn.style.boxShadow = '0 2px 4px rgba(0, 0, 0, 0.2)';
+    });
+    
+    // 添加点击反馈效果
+    resetBtn.addEventListener('mousedown', () => {
+        resetBtn.style.transform = 'translateY(1px)';
+        resetBtn.style.boxShadow = '0 1px 2px rgba(0, 0, 0, 0.2)';
+    });
+    
+    resetBtn.addEventListener('mouseup', () => {
+        resetBtn.style.transform = 'translateY(-2px)';
+        resetBtn.style.boxShadow = '0 4px 8px rgba(0, 0, 0, 0.3)';
+    });
+    
     resetBtn.onclick = () => {
+        // 添加点击动画效果
+        resetBtn.style.transform = 'scale(0.95)';
+        setTimeout(() => {
+            resetBtn.style.transform = '';
+        }, 100);
+        
         resetRandomSettings();
         overlay.style.display = 'none';
         createRandomGeneratorDialog();
@@ -242,12 +281,28 @@ function createRandomGeneratorDialog() {
     document.body.appendChild(overlay);
     randomGeneratorDialog = overlay;
 
-    // ESC键关闭
-    overlay.addEventListener('keydown', (e) => {
-        if (e.key === 'Escape') {
-            overlay.style.display = 'none';
+    // ESC键关闭 - 使用document级别的事件监听器以确保能捕获到按键事件
+    const escapeHandler = (e) => {
+        // 只有当随机规则对话框显示时才响应ESC键
+        if (randomGeneratorDialog && randomGeneratorDialog.style.display === 'block' && e.key === 'Escape') {
+            e.preventDefault(); // 阻止默认行为
+            e.stopPropagation(); // 阻止事件冒泡
+            e.stopImmediatePropagation(); // 阻止其他事件监听器处理此事件
+            closeRandomGeneratorDialog();
         }
-    });
+    };
+    
+    // 使用更高的优先级添加事件监听器
+    document.addEventListener('keydown', escapeHandler, true);
+    
+    // 在关闭对话框时移除事件监听器
+    const originalCloseFunction = closeRandomGeneratorDialog;
+    closeRandomGeneratorDialog = function() {
+        document.removeEventListener('keydown', escapeHandler);
+        if (randomGeneratorDialog) {
+            randomGeneratorDialog.style.display = 'none';
+        }
+    };
 }
 
 // 创建快速生成区域
