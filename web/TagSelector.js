@@ -1,6 +1,11 @@
 import { app } from "/scripts/app.js";
 import { api } from "/scripts/api.js";
 
+// 加载随机生成器模块
+const script = document.createElement('script');
+script.src = '/extensions/zhihui_nodes_comfyui/TagSelectorRandomGenerator.js';
+document.head.appendChild(script);
+
 const commonStyles = {
     button: {
         base: {
@@ -88,7 +93,13 @@ const commonStyles = {
             color: '#fff'
         }
     }
-};
+}
+
+// 暴露函数给全局作用域
+window.updateCategoryRedDots = updateCategoryRedDots;
+
+// 暴露函数给全局作用域
+window.updateSelectedTagsOverview = updateSelectedTagsOverview;;
 
 function applyStyles(element, styles) {
     Object.assign(element.style, styles);
@@ -158,13 +169,16 @@ async function loadTagsData() {
         if (response.ok) {
             const rawData = await response.json();
             tagsData = convertTagsFormat(rawData);
+            window.tagsData = tagsData; // 暴露给全局作用域
         } else {
             console.warn('Failed to load tags from server, using default data');
             tagsData = getDefaultTagsData();
+            window.tagsData = tagsData; // 暴露给全局作用域
         }
     } catch (error) {
         console.error('Error loading tags:', error);
         tagsData = getDefaultTagsData();
+        window.tagsData = tagsData; // 暴露给全局作用域
     }
 }
 
@@ -672,11 +686,11 @@ function createTagSelectorDialog() {
         background: linear-gradient(135deg, #334155 0%, #1e293b 100%);
         padding: 0 16px;
         display: flex;
-        justify-content: space-between;
+        justify-content: flex-start;
         align-items: center;
         backdrop-filter: blur(10px);
         border-radius: 0 0 16px 16px;
-        column-gap: 24px;
+        column-gap: 8px;
         min-height: 60px;
         height: 60px;
         flex-shrink: 0;
@@ -1399,9 +1413,62 @@ function createTagSelectorDialog() {
         display: flex;
         align-items: center;
         gap: 12px;
-        margin-left: auto;
+        margin-left: 20px;
         margin-right: 8px;
         flex-shrink: 0;
+    `;
+
+    // 随机按钮容器 - 参照自定义标签样式
+    const randomButtonsContainer = document.createElement('div');
+    randomButtonsContainer.style.cssText = `
+        display: flex;
+        gap: 6px;
+        align-items: center;
+        background: rgba(37, 99, 235, 0.3);
+        border-radius: 8px;
+        box-shadow: 0 4px 15px rgba(37, 99, 235, 0.2), 0 2px 6px rgba(0, 0, 0, 0.15);
+        padding: 4px 12px;
+        position: relative;
+        overflow: hidden;
+        border: 1px solid rgba(59, 130, 246, 0.3);
+        backdrop-filter: blur(8px);
+        height: 45px;
+    `;
+
+    // 随机功能标题
+    const randomTitle = document.createElement('div');
+    randomTitle.style.cssText = `
+        color: #38bdf8;
+        font-size: 15px;
+        font-weight: 700;
+        text-align: center;
+        letter-spacing: 0.3px;
+        white-space: normal;
+        word-break: break-word;
+        overflow-wrap: anywhere;
+        flex-shrink: 0;
+        padding-right: 2px;
+        margin-right: 0;
+        text-shadow: 0 1px 2px rgba(0, 0, 0, 0.3);
+    `;
+    randomTitle.textContent = '随机标签';
+
+    // 分隔线
+    const randomSeparator = document.createElement('div');
+    randomSeparator.style.cssText = `
+        width: 1px;
+        height: 25px;
+        background: linear-gradient(to bottom, transparent, rgb(62, 178, 255), transparent);
+        margin: 0 4px 0 4px;
+        flex-shrink: 0;
+    `;
+
+    // 清空按钮容器
+    const clearButtonContainer = document.createElement('div');
+    clearButtonContainer.style.cssText = `
+        display: flex;
+        align-items: center;
+        margin-left: auto;
     `;
 
     const clearBtn = document.createElement('button');
@@ -1410,13 +1477,13 @@ function createTagSelectorDialog() {
         background: linear-gradient(135deg, #dc2626 0%, #b91c1c 100%);
         border: 1px solid rgba(220, 38, 38, 0.8);
         color: #ffffff;
-        padding: 6px 12px;
+        padding: 7px 14px;
         border-radius: 4px;
         cursor: pointer;
         font-weight: 600;
         transition: all 0.2s ease;
         line-height: 1.2;
-        height: 32px;
+        height: 35px;
         width: auto;
         min-width: 70px;
         white-space: nowrap;
@@ -1438,9 +1505,101 @@ function createTagSelectorDialog() {
         clearSelectedTags();
     };
 
-    rightButtonsSection.appendChild(clearBtn);
+    // 随机生成器按钮
+    const randomGeneratorBtn = document.createElement('button');
+    randomGeneratorBtn.textContent = '设置';
+    randomGeneratorBtn.style.cssText = `
+        background: linear-gradient(135deg, #2563eb 0%, #1d4ed8 100%);
+        border: 1px solid rgba(59, 130, 246, 0.7);
+        color: #ffffff;
+        padding: 4px 8px;
+        border-radius: 6px;
+        cursor: pointer;
+        font-weight: 600;
+        transition: all 0.2s ease;
+        line-height: 1.2;
+        height: 26px;
+        width: auto;
+        min-width: 0;
+        white-space: nowrap;
+        font-size: 12px;
+        text-shadow: 0 1px 1px rgba(0, 0, 0, 0.3);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    `;
+    randomGeneratorBtn.addEventListener('mouseenter', () => {
+        randomGeneratorBtn.style.background = 'linear-gradient(135deg, #3b82f6 0%, #2563eb 100%)';
+        randomGeneratorBtn.style.boxShadow = '0 2px 4px rgba(59, 130, 246, 0.2), 0 1px 2px rgba(0, 0, 0, 0.1)';
+        randomGeneratorBtn.style.borderColor = 'rgba(59, 130, 246, 0.5)';
+        randomGeneratorBtn.style.transform = 'none';
+    });
+    randomGeneratorBtn.addEventListener('mouseleave', () => {
+        randomGeneratorBtn.style.background = 'linear-gradient(135deg, #2563eb 0%, #1d4ed8 100%)';
+        randomGeneratorBtn.style.borderColor = 'rgba(59, 130, 246, 0.7)';
+        randomGeneratorBtn.style.transform = 'none';
+    });
+    randomGeneratorBtn.onclick = () => {
+        if (window.openRandomGeneratorDialog) {
+            window.openRandomGeneratorDialog();
+        }
+    };
+
+    // 一键随机组合按钮
+    const quickRandomBtn = document.createElement('button');
+    quickRandomBtn.textContent = '一键随机';
+    quickRandomBtn.style.cssText = `
+        background: linear-gradient(135deg, #7c3aed 0%, #6d28d9 100%);
+        border: 1px solid rgba(139, 92, 246, 0.7);
+        color: #ffffff;
+        padding: 4px 8px;
+        border-radius: 6px;
+        cursor: pointer;
+        font-weight: 600;
+        transition: all 0.2s ease;
+        line-height: 1.2;
+        height: 26px;
+        width: auto;
+        min-width: 0;
+        white-space: nowrap;
+        font-size: 12px;
+        text-shadow: 0 1px 1px rgba(0, 0, 0, 0.3);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    `;
+    quickRandomBtn.addEventListener('mouseenter', () => {
+        quickRandomBtn.style.background = 'linear-gradient(135deg, #8b5cf6 0%, #7c3aed 100%)';
+        quickRandomBtn.style.boxShadow = '0 2px 4px rgba(139, 92, 246, 0.2), 0 1px 2px rgba(0, 0, 0, 0.1)';
+        quickRandomBtn.style.borderColor = 'rgba(139, 92, 246, 0.5)';
+        quickRandomBtn.style.transform = 'none';
+    });
+    quickRandomBtn.addEventListener('mouseleave', () => {
+        quickRandomBtn.style.background = 'linear-gradient(135deg, #7c3aed 0%, #6d28d9 100%)';
+        quickRandomBtn.style.borderColor = 'rgba(139, 92, 246, 0.7)';
+        quickRandomBtn.style.transform = 'none';
+    });
+    quickRandomBtn.onclick = () => {
+        if (window.generateRandomCombination) {
+            window.generateRandomCombination();
+        }
+    };
+
+    // 将随机按钮添加到随机按钮容器
+    randomButtonsContainer.appendChild(randomTitle);
+    randomButtonsContainer.appendChild(randomSeparator);
+    randomButtonsContainer.appendChild(randomGeneratorBtn);
+    randomButtonsContainer.appendChild(quickRandomBtn);
+    
+    // 将清空按钮添加到清空按钮容器
+    clearButtonContainer.appendChild(clearBtn);
+    
+    // 将容器添加到右侧按钮区域
+    rightButtonsSection.appendChild(randomButtonsContainer);
+    
     footer.appendChild(customTagsSection);
     footer.appendChild(rightButtonsSection);
+    footer.appendChild(clearButtonContainer);
 
     rightPanel.appendChild(subCategoryTabs);
     rightPanel.appendChild(subSubCategoryTabs);
@@ -1576,11 +1735,8 @@ function initializeCategoryList() {
             tagSelectorDialog.activeSubSubCategory = null;
             tagSelectorDialog.activeSubSubSubCategory = null;
 
-            if (category === '自定义') {
-                tagSelectorDialog.querySelector('.custom-tags-section').style.display = 'flex';
-            } else {
-                tagSelectorDialog.querySelector('.custom-tags-section').style.display = 'none';
-            }
+            // 自定义标签区域固定显示
+            tagSelectorDialog.querySelector('.custom-tags-section').style.display = 'flex';
 
             showSubCategories(category);
         };
@@ -2370,6 +2526,13 @@ function showTagsFromSubSubSub(category, subCategory, subSubCategory, subSubSubC
 
 let selectedTags = new Set();
 
+// 将必要的变量和函数暴露给全局作用域，供随机生成器使用
+window.selectedTags = selectedTags;
+window.tagsData = null;
+window.updateSelectedTags = null;
+window.updateSelectedTagsOverview = null;
+window.updateCategoryRedDots = null;
+
 function categoryHasSelectedTags(category, subCategory = null, subSubCategory = null, subSubSubCategory = null) {
     if (!tagsData || !tagsData[category]) return false;
     
@@ -2544,6 +2707,9 @@ function updateSelectedTags() {
     }
     updateSelectedTagsOverview();
 }
+
+// 暴露函数给全局作用域
+window.updateSelectedTags = updateSelectedTags;
 
 function updateSelectedTagsOverview() {
     if (!tagSelectorDialog) return;
