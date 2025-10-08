@@ -3,6 +3,7 @@ import json
 import requests
 import urllib.parse
 import base64
+import random
 from typing import Dict, Any
 from aiohttp import web
 from server import PromptServer
@@ -22,11 +23,16 @@ class TagSelector:
                     "default": "",
                     "placeholder": "选择的标签将显示在这里。\nSelected tags will be displayed here."
                 }),
+                "auto_random_tags": ("BOOLEAN", {
+                    "default": False,
+                    "label_on": "On",
+                    "label_off": "Off"
+                }),
                 "expand_mode": (["Disabled", "Tag Style", "Natural Language"], {
                     "default": "Disabled"
                 }),
-                "Expanded_result": (["中文", "English"], {
-                    "default": "中文"
+                "Expanded_result": (["Chinese", "English"], {
+                    "default": "Chinese"
                 }),
                 "expand_model": (["deepseek", "deepseek-reasoning", "gemini", "mistral", "nova-fast", "openai", "openai-large", "openai-reasoning", "evil", "unity"], {
                     "default": "openai"
@@ -43,8 +49,16 @@ class TagSelector:
     FUNCTION = "process_tags"
     CATEGORY = "zhihui/text"
     
-    def process_tags(self, tag_edit, expand_mode, Expanded_result, expand_model="openai", unique_id=None, extra_pnginfo=None):
-        processed_tags = self.clean_tags(tag_edit)
+    def process_tags(self, tag_edit, auto_random_tags, expand_mode, Expanded_result, expand_model="openai", unique_id=None, extra_pnginfo=None):
+        # 如果启用了自动随机标签，生成随机标签
+        if auto_random_tags:
+            random_tags = self._generate_random_tags()
+            if random_tags:
+                processed_tags = self.clean_tags(random_tags)
+            else:
+                processed_tags = self.clean_tags(tag_edit)
+        else:
+            processed_tags = self.clean_tags(tag_edit)
         
         if expand_mode != "Disabled" and processed_tags.strip():
             expanded_tags = self._expand_tags_with_llm(processed_tags, expand_mode, Expanded_result, expand_model)
@@ -52,6 +66,164 @@ class TagSelector:
         
         return (processed_tags,)
     
+    def _generate_random_tags(self):
+        """
+        根据随机规则设置生成随机标签
+        严格遵循"随机规则设置"中定义的所有规则，包括"全局设置"和"R18成人内容"部分的规定
+        """
+        try:
+            # 获取标签数据
+            tags_data = self.get_tags_config()
+            if not tags_data:
+                return ""
+            
+            # 从文件读取随机设置，而非使用硬编码
+            random_settings = self.get_random_settings()
+            
+            generated_tags = []
+            used_tags = set()
+            
+            # 获取启用的普通分类
+            enabled_categories = [path for path, setting in random_settings['categories'].items() 
+                                if setting['enabled']]
+            
+            # 如果启用了R18内容，添加成人内容分类
+            if random_settings['includeNSFW'] and random_settings['adultCategories']:
+                enabled_adult_categories = [path for path, setting in random_settings['adultCategories'].items() 
+                                          if setting['enabled']]
+                enabled_categories.extend(enabled_adult_categories)
+            
+            if not enabled_categories:
+                return ""
+            
+            # 按权重随机选择分类并生成标签
+            for category_path in enabled_categories:
+                # 从普通分类或成人内容分类中获取设置
+                setting = random_settings['categories'].get(category_path) or random_settings['adultCategories'].get(category_path)
+                if not setting:
+                    continue
+                    
+                should_include = random.random() < (setting['weight'] / 10)  # 权重转换为概率
+                
+                if should_include:
+                    tags = self._get_tags_from_category_path(tags_data, category_path)
+                    if tags:
+                        random_tags = random.sample(tags, min(setting['count'], len(tags)))
+                        for tag in random_tags:
+                            tag_value = tag if isinstance(tag, str) else tag.get('value', tag.get('display', ''))
+                            if tag_value and tag_value not in used_tags:
+                                used_tags.add(tag_value)
+                                generated_tags.append(tag_value)
+            
+            # 如果生成的标签数量不足，随机补充
+            # 使用从文件读取的全局设置中的标签数量范围
+            target_count = random.randint(
+                random_settings['totalTagsRange']['min'],
+                random_settings['totalTagsRange']['max']
+            )
+            
+            if len(generated_tags) < target_count:
+                all_available_tags = self._get_all_available_tags(tags_data, random_settings)
+                remaining_tags = [tag for tag in all_available_tags if tag not in used_tags]
+                
+                additional_count = min(target_count - len(generated_tags), len(remaining_tags))
+                if additional_count > 0:
+                    additional_tags = random.sample(remaining_tags, additional_count)
+                    generated_tags.extend(additional_tags)
+            
+            return ', '.join(generated_tags)
+            
+        except Exception as e:
+            print(f"Error generating random tags: {e}")
+            return ""
+    
+    def _get_tags_from_category_path(self, tags_data, category_path):
+        """
+        从分类路径获取标签
+        """
+        path_parts = category_path.split('.')
+        current = tags_data
+        
+        for part in path_parts:
+            if current and isinstance(current, dict) and part in current:
+                current = current[part]
+            else:
+                return []
+        
+        return self._extract_all_tags_from_object(current)
+    
+    def _extract_all_tags_from_object(self, obj):
+        """
+        从对象中提取所有标签
+        """
+        tags = []
+        
+        def extract(current):
+            if isinstance(current, dict):
+                for key, value in current.items():
+                    if isinstance(value, str):
+                        # 这是一个标签
+                        tags.append(value)
+                    elif isinstance(value, dict):
+                        # 递归处理子对象
+                        extract(value)
+                    elif isinstance(value, list):
+                        # 处理标签数组
+                        for item in value:
+                            if isinstance(item, dict) and 'value' in item:
+                                tags.append(item['value'])
+                            elif isinstance(item, str):
+                                tags.append(item)
+            elif isinstance(current, list):
+                for item in current:
+                    if isinstance(item, dict) and 'value' in item:
+                        tags.append(item['value'])
+                    elif isinstance(item, str):
+                        tags.append(item)
+        
+        extract(obj)
+        return tags
+    
+    def _get_all_available_tags(self, tags_data, random_settings):
+        """
+        获取所有可用标签（严格按照随机规则设置排除指定分类）
+        """
+        all_tags = []
+        excluded_categories = random_settings.get('excludedCategories', [])
+        include_nsfw = random_settings.get('includeNSFW', False)
+        
+        def extract_from_category(obj, category_path=''):
+            if isinstance(obj, dict):
+                for key, value in obj.items():
+                    current_path = f"{category_path}.{key}" if category_path else key
+                    
+                    # 检查是否为排除的分类
+                    is_excluded = any(excluded in current_path or excluded in key 
+                                    for excluded in excluded_categories)
+                    
+                    # 严格按照includeNSFW设置处理NSFW内容
+                    if not include_nsfw:
+                        # 如果不包含NSFW，则排除所有包含NSFW、涩影湿等关键词的分类
+                        nsfw_keywords = ['NSFW', '涩影湿', '擦边', 'R18', '成人', '性行为', '身体部位', 
+                                       '道具玩具', '束缚调教', '特殊癖好', '视觉效果']
+                        if any(keyword in current_path or keyword in key for keyword in nsfw_keywords):
+                            is_excluded = True
+                    
+                    if not is_excluded:
+                        if isinstance(value, str):
+                            all_tags.append(value)
+                        elif isinstance(value, dict):
+                            extract_from_category(value, current_path)
+                        elif isinstance(value, list):
+                            for item in value:
+                                if isinstance(item, dict) and 'value' in item:
+                                    all_tags.append(item['value'])
+                                elif isinstance(item, str):
+                                    all_tags.append(item)
+        
+        extract_from_category(tags_data)
+        return all_tags
+
     def clean_tags(self, tags_text: str) -> str:
         if not tags_text:
             return ""
@@ -184,8 +356,124 @@ Output: A beautiful young girl with expressive eyes and a gentle smile, sitting 
             return tags_text
     
     @classmethod
-    def IS_CHANGED(cls, tag_edit, expand_mode, Expanded_result, expand_model=None, unique_id=None, extra_pnginfo=None):
+    def IS_CHANGED(cls, tag_edit, auto_random_tags, expand_mode, Expanded_result, expand_model=None, unique_id=None, extra_pnginfo=None):
+        # 如果启用了自动随机标签，每次都返回不同的值以触发重新计算
+        if auto_random_tags:
+            import time
+            return f"{tag_edit}_{time.time()}"
         return tag_edit
+    
+    @classmethod
+    def get_random_settings(cls):
+        """
+        获取随机规则设置，优先从文件读取，如果文件不存在则使用默认设置
+        """
+        settings_path = os.path.join(os.path.dirname(__file__), "random_settings.json")
+        try:
+            with open(settings_path, 'r', encoding='utf-8') as f:
+                return json.load(f)
+        except (FileNotFoundError, json.JSONDecodeError) as e:
+            print(f"Warning: Could not load random settings from file: {e}")
+            # 返回默认设置
+            return cls._get_default_random_settings()
+    
+    @classmethod
+    def save_random_settings(cls, settings):
+        """
+        保存随机规则设置到文件
+        """
+        settings_path = os.path.join(os.path.dirname(__file__), "random_settings.json")
+        try:
+            os.makedirs(os.path.dirname(settings_path), exist_ok=True)
+            with open(settings_path, 'w', encoding='utf-8') as f:
+                json.dump(settings, f, ensure_ascii=False, indent=2)
+            return True
+        except Exception as e:
+            print(f"Error saving random settings: {e}")
+            return False
+    
+    @classmethod
+    def _get_default_random_settings(cls):
+        """
+        获取默认的随机规则设置
+        """
+        return {
+            'categories': {
+                # [画质风格] - 画质、艺术风格、技法形式
+                '画质风格.画质': {'enabled': True, 'weight': 2, 'count': 1},
+                '画质风格.艺术家风格': {'enabled': True, 'weight': 1, 'count': 1},
+                '画质风格.艺术流派': {'enabled': True, 'weight': 1, 'count': 1},
+                '画质风格.技法形式': {'enabled': True, 'weight': 1, 'count': 1},
+                '画质风格.媒介与效果': {'enabled': True, 'weight': 1, 'count': 1},
+                
+                # [主体] - 人物角色、外貌特征、服饰
+                '主体.人物类.角色': {'enabled': True, 'weight': 2, 'count': 1},
+                '主体.人物类.外貌与特征': {'enabled': True, 'weight': 2, 'count': 2},
+                '主体.人物类.人设.职业': {'enabled': True, 'weight': 1, 'count': 1},
+                '主体.人物类.人设.性别/年龄': {'enabled': True, 'weight': 1, 'count': 1},
+                '主体.人物类.服饰': {'enabled': True, 'weight': 2, 'count': 2},
+                
+                # [动作] - 动作表情、姿态、手部腿部
+                '动作.人物类.动作/表情.基础姿态': {'enabled': True, 'weight': 2, 'count': 1},
+                '动作.人物类.动作/表情.多人互动': {'enabled': True, 'weight': 1, 'count': 1},
+                '动作.人物类.动作/表情.手部': {'enabled': True, 'weight': 1, 'count': 1},
+                '动作.人物类.动作/表情.腿部': {'enabled': True, 'weight': 1, 'count': 1},
+                '动作.人物类.动作/表情.眼神': {'enabled': True, 'weight': 1, 'count': 1},
+                '动作.人物类.动作/表情.表情': {'enabled': True, 'weight': 2, 'count': 1},
+                
+                # [构图视角] - 摄影构图、视角
+                '构图视角.常规标签.摄影': {'enabled': True, 'weight': 2, 'count': 1},
+                '构图视角.常规标签.构图': {'enabled': True, 'weight': 2, 'count': 1},
+                
+                # [技术参数] - 光影、色彩质感、装饰图案
+                '技术参数.常规标签.光影': {'enabled': True, 'weight': 2, 'count': 1},
+                '技术参数.常规标签.色彩与质感': {'enabled': True, 'weight': 1, 'count': 1},
+                '技术参数.常规标签.装饰图案': {'enabled': True, 'weight': 1, 'count': 1},
+                
+                # [光线氛围] - 光线环境、情感氛围、背景环境
+                '光线氛围.场景类.光线环境': {'enabled': True, 'weight': 2, 'count': 1},
+                '光线氛围.场景类.情感与氛围': {'enabled': True, 'weight': 2, 'count': 1},
+                '光线氛围.场景类.背景环境': {'enabled': True, 'weight': 1, 'count': 1},
+                '光线氛围.场景类.反射效果': {'enabled': True, 'weight': 1, 'count': 1},
+                
+                # [场景] - 室外、室内、建筑、自然景观
+                '场景.场景类.室外': {'enabled': True, 'weight': 2, 'count': 1},
+                '场景.场景类.城市': {'enabled': True, 'weight': 1, 'count': 1},
+                '场景.场景类.建筑': {'enabled': True, 'weight': 2, 'count': 1},
+                '场景.场景类.室内装饰': {'enabled': True, 'weight': 1, 'count': 1},
+                '场景.场景类.自然景观': {'enabled': True, 'weight': 2, 'count': 1},
+                '场景.场景类.人造景观': {'enabled': True, 'weight': 1, 'count': 1}
+            },
+            
+            # R18成人内容详细设置
+            'adultCategories': {
+                # [轻度内容] - 擦边、诱惑类
+                '轻度内容.涩影湿.擦边': {'enabled': True, 'weight': 2, 'count': 1},
+                
+                # [性行为类型] - 各种性行为
+                '性行为.涩影湿.NSFW.性行为类型': {'enabled': True, 'weight': 3, 'count': 2},
+                
+                # [身体部位] - 身体特征描述
+                '身体部位.涩影湿.NSFW.身体部位': {'enabled': True, 'weight': 2, 'count': 1},
+                
+                # [道具玩具] - 成人用品
+                '道具玩具.涩影湿.NSFW.道具与玩具': {'enabled': False, 'weight': 1, 'count': 1},
+                
+                # [束缚调教] - BDSM相关
+                '束缚调教.涩影湿.NSFW.束缚与调教': {'enabled': False, 'weight': 1, 'count': 1},
+                
+                # [特殊癖好] - 特殊情境和癖好
+                '特殊癖好.涩影湿.NSFW.特殊癖好与情境': {'enabled': False, 'weight': 1, 'count': 1},
+                
+                # [视觉效果] - 视觉风格和特效
+                '视觉效果.涩影湿.NSFW.视觉风格与特定元素': {'enabled': True, 'weight': 1, 'count': 1}
+            },
+            
+            # 全局设置
+            'excludedCategories': ['自定义', '灵感套装'],
+            'includeNSFW': False,  # 默认不包含R18成人内容
+            'totalTagsRange': {'min': 12, 'max': 20}  # 标签总数范围
+        }
     
     @classmethod
     def get_tags_config(cls):
@@ -290,6 +578,32 @@ Output: A beautiful young girl with expressive eyes and a gentle smile, sitting 
         except Exception as e:
             print(f"Error deleting preview image: {e}")
             return False
+
+@PromptServer.instance.routes.get('/zhihui/random_settings')
+async def get_random_settings(request):
+    """
+    获取随机规则设置
+    """
+    try:
+        settings = TagSelector.get_random_settings()
+        return web.json_response(settings)
+    except Exception as e:
+        return web.json_response({"error": str(e)}, status=500)
+
+@PromptServer.instance.routes.post('/zhihui/random_settings')
+async def save_random_settings(request):
+    """
+    保存随机规则设置
+    """
+    try:
+        data = await request.json()
+        
+        if TagSelector.save_random_settings(data):
+            return web.json_response({"success": True, "message": "随机规则设置保存成功"})
+        else:
+            return web.json_response({"error": "保存失败"}, status=500)
+    except Exception as e:
+        return web.json_response({"error": str(e)}, status=500)
 
 @PromptServer.instance.routes.get('/zhihui/tags')
 async def get_tags(request):

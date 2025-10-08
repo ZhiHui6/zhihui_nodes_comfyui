@@ -10,6 +10,8 @@ This is a ComfyUI custom node collection carefully created by <span style="color
 
 ### ✨ 主要特点 | Key Features
 
+>**提供专门的中文汉化文件，配合 ComfyUI-DD-Translation 扩展使用，让中文用户能够更便捷地使用各个节点功能。详细说明请参考 [Localization_Guide.md](doc/Localization_Guide.md)。**<br>**Provides dedicated Chinese localization files that work with ComfyUI-DD-Translation extension, allowing Chinese users to use node functions more conveniently. For detailed instructions, please refer to [Localization_Guide.md](doc/Localization_Guide.md).**
+
 - 🔄 **双语翻译节点**：提供百度翻译、腾讯翻译、免费在线翻译三节点，支持中英文本双向转换。<br>**Bilingual Translation Nodes**: Provides three translation nodes - Baidu Translate, Tencent Translate, and Free Online Translate, supporting bidirectional Chinese-English text conversion.
 
 - 📝 **全面文本处理**：提供多行文本编辑、文本合并分离、内容提取修改、语言过滤等5类文本操作节点。<br>**Comprehensive Text Processing**: Provides 5 categories of text operation nodes including multi-line text editing, text merging and separation, content extraction and modification, language filtering, etc.
@@ -17,8 +19,6 @@ This is a ComfyUI custom node collection carefully created by <span style="color
 - 🎯 **智能提示词系统**：Kontext预设增强版、摄影提示词生成器、万相视频提示词生成器等专业的提示词生成工具。<br>**Intelligent Prompt System**: Professional prompt generation tools including Kontext Presets Enhanced, Photography Prompt Generator, WAN Video Prompt Generator, etc.
 
 - 🖼️ **实用图像工具**：支持多算法图像缩放、智能切换、颜色移除等等。<br>**Practical Image Tools**: Supports multi-algorithm image scaling, intelligent switching, color removal, and more.
-
-- 🌐 **完整汉化支持**：提供专门的中文汉化文件，配合 ComfyUI-DD-Translation 扩展使用，让中文用户能够更便捷地使用各个节点功能。详细说明请参考 [Localization_Guide.md](doc/Localization_Guide.md)。<br>**Complete Chinese Localization**: Provides dedicated Chinese localization files that work with ComfyUI-DD-Translation extension, allowing Chinese users to use node functions more conveniently. For detailed instructions, please refer to [Localization_Guide.md](doc/Localization_Guide.md).
 
 如果这个项目对您有帮助，请给我们一个 ⭐**Star**！您的支持是我们持续改进的动力。
 If this project helps you, please give us a ⭐**Star**! Your support is our motivation for continuous improvement.
@@ -628,7 +628,8 @@ This node collection contains numerous nodes with different functions, divided i
 - <b>自定义标签管理 | Custom Tag Management</b>：支持添加、编辑、删除个人专属标签，打造个性化标签库<br>Support adding, editing, and deleting personal exclusive tags, building personalized tag library
 - <b>智能搜索定位 | Smart Search & Positioning</b>：支持关键词搜索，快速找到目标标签<br>Keyword search support, quickly find target tags
 - <b>实时选择统计 | Real-time Selection Statistics</b>：动态显示已选标签数量和详细列表<br>Dynamically display selected tag count and detailed list
-- <b>🆕 内置AI扩写 | Built-in AI Expansion</b>：一键智能扩写功能，支持标签式和自然语言式两种扩写模式<br>One-click intelligent expansion feature, supporting both tag-style and natural language expansion modes
+- <b>随机标签生成 | Random Tag Generation</b>：智能随机标签生成功能，支持按分类权重和数量配置自动生成多样化标签组合<br>Intelligent random tag generation, supporting automatic generation of diverse tag combinations based on category weights and quantity configuration
+- <b>内置AI扩写 | Built-in AI Expansion</b>：一键智能扩写功能，支持标签式和自然语言式两种扩写模式<br>One-click intelligent expansion feature, supporting both tag-style and natural language expansion modes
 <br>
 <div align="left">
 <a href="images/TAG标签选择器.jpg" target="_blank">

@@ -113,7 +113,7 @@
             "expand_mode": "扩写模式",
             "Expanded_result": "扩写结果",
             "expand_model": "扩写模型",
-            "open_selector": "Tag Selector | 标签选择器"
+            "auto_random_tags": "自动随机标签"
         }
     },
     "ImageAspectRatio": {

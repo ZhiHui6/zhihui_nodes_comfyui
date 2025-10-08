@@ -78,6 +78,50 @@ let randomSettings = {
     totalTagsRange: { min: 12, max: 20 }
 };
 
+// 加载随机设置
+async function loadRandomSettings() {
+    try {
+        const response = await fetch('/zhihui/random_settings');
+        if (response.ok) {
+            const settings = await response.json();
+            randomSettings = settings;
+            console.log('随机设置加载成功');
+        } else {
+            console.warn('无法从服务器加载随机设置，使用默认设置');
+        }
+    } catch (error) {
+        console.error('加载随机设置时出错:', error);
+    }
+}
+
+// 保存随机设置
+async function saveRandomSettings() {
+    try {
+        const response = await fetch('/zhihui/random_settings', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify(randomSettings)
+        });
+        
+        if (response.ok) {
+            const result = await response.json();
+            console.log('随机设置保存成功:', result.message);
+            return true;
+        } else {
+            console.error('保存随机设置失败');
+            return false;
+        }
+    } catch (error) {
+        console.error('保存随机设置时出错:', error);
+        return false;
+    }
+}
+
+// 页面加载时自动加载设置
+document.addEventListener('DOMContentLoaded', loadRandomSettings);
+
 // 关闭随机生成器对话框
 function closeRandomGeneratorDialog() {
     if (randomGeneratorDialog) {
@@ -198,9 +242,11 @@ function createRandomGeneratorDialog() {
     
     // 分类设置区域
     const categoriesSection = createCategoriesSection();
+    categoriesSection.classList.add('categories-section'); // 添加类名以便后续查找
     
     // 全局设置区域
     const globalSection = createGlobalSection();
+    globalSection.classList.add('global-section'); // 添加类名以便后续查找
 
     content.appendChild(rulesSection);
     content.appendChild(categoriesSection);
@@ -446,6 +492,7 @@ function createCategoriesSection() {
                     }
                     // 控制详细设置的显示/隐藏
                     adultSettingsContainer.style.display = nsfwCheckbox.checked ? 'block' : 'none';
+                    saveRandomSettings(); // 自动保存设置
                 };
 
                 const nsfwLabel = document.createElement('label');
@@ -624,6 +671,7 @@ function createCategorySettingItem(categoryPath, setting, themeColor = '#60a5fa'
     `;
     checkbox.onchange = () => {
         randomSettings.categories[categoryPath].enabled = checkbox.checked;
+        saveRandomSettings(); // 自动保存设置
     };
 
     // 分类名称
@@ -664,6 +712,7 @@ function createCategorySettingItem(categoryPath, setting, themeColor = '#60a5fa'
     `;
     weightInput.onchange = () => {
         randomSettings.categories[categoryPath].weight = parseFloat(weightInput.value) || 0;
+        saveRandomSettings(); // 自动保存设置
     };
 
     // 数量设置
@@ -690,6 +739,7 @@ function createCategorySettingItem(categoryPath, setting, themeColor = '#60a5fa'
     `;
     countInput.onchange = () => {
         randomSettings.categories[categoryPath].count = parseInt(countInput.value) || 0;
+        saveRandomSettings(); // 自动保存设置
     };
 
     item.appendChild(checkbox);
@@ -752,6 +802,7 @@ function createGlobalSection() {
     `;
     minInput.onchange = () => {
         randomSettings.totalTagsRange.min = parseInt(minInput.value) || 1;
+        saveRandomSettings(); // 自动保存设置
     };
 
     const separator = document.createElement('span');
@@ -777,6 +828,7 @@ function createGlobalSection() {
     `;
     maxInput.onchange = () => {
         randomSettings.totalTagsRange.max = parseInt(maxInput.value) || 1;
+        saveRandomSettings(); // 自动保存设置
     };
 
     rangeContainer.appendChild(rangeLabel);
@@ -1087,9 +1139,34 @@ function getRandomTagsFromArray(tags, count) {
 }
 
 // 打开随机生成器对话框
-function openRandomGeneratorDialog() {
+// 更新对话框内容以反映最新的配置
+function updateRandomGeneratorDialogContent() {
+    if (!randomGeneratorDialog) return;
+    
+    // 更新分类设置
+    const categoriesSection = randomGeneratorDialog.querySelector('.categories-section');
+    if (categoriesSection) {
+        const newCategoriesSection = createCategoriesSection();
+        categoriesSection.parentNode.replaceChild(newCategoriesSection, categoriesSection);
+    }
+    
+    // 更新全局设置
+    const globalSection = randomGeneratorDialog.querySelector('.global-section');
+    if (globalSection) {
+        const newGlobalSection = createGlobalSection();
+        globalSection.parentNode.replaceChild(newGlobalSection, globalSection);
+    }
+}
+
+async function openRandomGeneratorDialog() {
+    // 每次打开对话框时重新加载配置，确保获取最新的设置
+    await loadRandomSettings();
+    
     if (!randomGeneratorDialog) {
         createRandomGeneratorDialog();
+    } else {
+        // 如果对话框已存在，更新其内容以反映最新配置
+        updateRandomGeneratorDialogContent();
     }
     randomGeneratorDialog.style.display = 'block';
 }
