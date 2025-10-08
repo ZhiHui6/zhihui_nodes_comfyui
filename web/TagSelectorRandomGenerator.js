@@ -304,14 +304,17 @@ function createRandomGeneratorDialog() {
         resetBtn.style.boxShadow = '0 4px 8px rgba(0, 0, 0, 0.3)';
     });
     
-    resetBtn.onclick = () => {
+    resetBtn.onclick = async () => {
         // 添加点击动画效果
         resetBtn.style.transform = 'scale(0.95)';
         setTimeout(() => {
             resetBtn.style.transform = '';
         }, 100);
         
+        // 重置配置并保存到文件
         resetRandomSettings();
+        await saveRandomSettings();
+        
         overlay.style.display = 'none';
         createRandomGeneratorDialog();
         randomGeneratorDialog.style.display = 'block';
