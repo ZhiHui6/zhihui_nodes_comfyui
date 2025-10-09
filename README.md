@@ -5,23 +5,30 @@
 ## 📖 项目介绍 | Project Introduction
 
 这是一个由<span style="color: red;"> **Binity** </span>精心创建的 ComfyUI 自定义节点工具合集，旨在为用户提供一系列实用、高效的节点，以增强和扩展 ComfyUI 的功能。本节点集包含30+功能节点，涵盖文本处理、提示词优化、图像处理、翻译工具、Latent处理等多个方面，为您的 AI 创作提供全方位支持。
-
 This is a ComfyUI custom node collection carefully created by <span style="color: red;"> **Binity** </span>, designed to provide users with a series of practical and efficient nodes to enhance and extend ComfyUI's functionality. This node collection contains 25+ functional nodes, covering text processing, prompt optimization, image processing, translation tools, Latent processing and many other aspects, providing comprehensive support for your AI creation.
-
-### ✨ 主要特点 | Key Features
-
->**提供专门的中文汉化文件，配合 ComfyUI-DD-Translation 扩展使用，让中文用户能够更便捷地使用各个节点功能。详细说明请参考 [Localization_Guide.md](doc/Localization_Guide.md)。**<br>**Provides dedicated Chinese localization files that work with ComfyUI-DD-Translation extension, allowing Chinese users to use node functions more conveniently. For detailed instructions, please refer to [Localization_Guide.md](doc/Localization_Guide.md).**
-
-- 🔄 **双语翻译节点**：提供百度翻译、腾讯翻译、免费在线翻译三节点，支持中英文本双向转换。<br>**Bilingual Translation Nodes**: Provides three translation nodes - Baidu Translate, Tencent Translate, and Free Online Translate, supporting bidirectional Chinese-English text conversion.
-
-- 📝 **全面文本处理**：提供多行文本编辑、文本合并分离、内容提取修改、语言过滤等5类文本操作节点。<br>**Comprehensive Text Processing**: Provides 5 categories of text operation nodes including multi-line text editing, text merging and separation, content extraction and modification, language filtering, etc.
-
-- 🎯 **智能提示词系统**：Kontext预设增强版、摄影提示词生成器、万相视频提示词生成器等专业的提示词生成工具。<br>**Intelligent Prompt System**: Professional prompt generation tools including Kontext Presets Enhanced, Photography Prompt Generator, WAN Video Prompt Generator, etc.
-
-- 🖼️ **实用图像工具**：支持多算法图像缩放、智能切换、颜色移除等等。<br>**Practical Image Tools**: Supports multi-algorithm image scaling, intelligent switching, color removal, and more.
 
 如果这个项目对您有帮助，请给我们一个 ⭐**Star**！您的支持是我们持续改进的动力。
 If this project helps you, please give us a ⭐**Star**! Your support is our motivation for continuous improvement.
+
+## ✨ 主要特点 | Key Features
+
+### **中文本地化支持 | Chinese Localization Support**
+
+提供专门的中文汉化文件，配合 ComfyUI-DD-Translation 扩展使用，让中文用户能够更便捷地使用各个节点功能。详细说明请参考 <a href="doc/Localization_Guide.md">Localization_Guide.md</a>。
+Provides dedicated Chinese localization files that work with ComfyUI-DD-Translation extension, allowing Chinese users to use node functions more conveniently. For detailed instructions, please refer to <a href="doc/Localization_Guide.md">Localization_Guide.md</a>.
+
+### **核心功能特色 | Core Function Features**
+
+- 🔄 **双语翻译节点**：提供百度翻译、腾讯翻译、免费在线翻译三节点，支持中英文本双向转换。
+**Bilingual Translation Nodes**: Provides three translation nodes - Baidu Translate, Tencent Translate, and Free Online Translate, supporting bidirectional Chinese-English text conversion.
+
+- 📝 **全面文本处理**：提供多行文本编辑、文本合并分离、内容提取修改、语言过滤等5类文本操作节点。**Comprehensive Text Processing**: Provides 5 categories of text operation nodes including multi-line text editing, text merging and separation, content extraction and modification, language filtering, etc.
+
+- 🎯 **智能提示词系统**：标签选择器、Kontext预设增强版、摄影提示词生成器、万相视频提示词生成器等专业的提示词生成工具。
+**Intelligent Prompt System**: Professional prompt generation tools including Kontext Presets Enhanced, Photography Prompt Generator, WAN Video Prompt Generator, etc.
+
+- 🖼️ **实用图像工具**：支持多算法图像缩放、智能切换、颜色移除等等。
+**Practical Image Tools**: Supports multi-algorithm image scaling, intelligent switching, color removal, and more.
 
 ## ⭐ 明星节点 | Featured Nodes
 
@@ -31,8 +38,14 @@ If this project helps you, please give us a ⭐**Star**! Your support is our mot
 <table>
 <tr>
 <th width="30%">节点名称 | Node Name</th>
-<th width="15%">类别 | Category</th>
-<th>核心功能 | Core Features</th>
+<th width="19%">类别 | Category</th>
+<th width="51%">核心功能 | Core Features</th>
+</tr>
+
+<tr>
+<td><b>🏷️TagSelector</b><br><b>标签选择器</b><br><code>TagSelector</code></td>
+<td>提示词处理<br>Prompt Processing</td>
+<td>新一代智能标签管理系统，提供可视化标签选择界面，支持自定义标签管理和智能搜索功能。分类丰富，涵盖画质、摄影、艺术风格等众多专业标签。<br>Next-generation intelligent tag management system providing visual tag selection interface with custom tag management and intelligent search. Rich categories including quality, photography, artistic styles, etc.</td>
 </tr>
 
 <tr>
@@ -59,13 +72,6 @@ If this project helps you, please give us a ⭐**Star**! Your support is our mot
 <td>提示词处理<br>Prompt Processing</td>
 <td>专业系统引导词预设工具，内置众多类别模板，输出引导内容给下游LLM节点生成专业的提示词。<br>Professional system prompt preset tool with built-in multiple category templates, outputting guidance content to downstream LLM nodes for generating professional prompts.</td>
 </tr>
-
-<tr>
-<td><b>🏷️TagSelector</b><br><b>标签选择器</b><br><code>TagSelector</code></td>
-<td>提示词处理<br>Prompt Processing</td>
-<td>新一代智能标签管理系统，提供可视化标签选择界面，支持自定义标签管理和智能搜索功能。分类丰富，涵盖画质、摄影、艺术风格等众多专业标签。<br>Next-generation intelligent tag management system providing visual tag selection interface with custom tag management and intelligent search. Rich categories including quality, photography, artistic styles, etc.</td>
-</tr>
-
 </table>
 
 💡 **使用建议**：新用户建议从 **摄影提示词生成器** 和 **万相视频提示词生成器** 开始体验，这两个节点能够快速提升您的创作效率和作品质量。
