@@ -242,7 +242,7 @@ class TagSelector:
     def _expand_tags_with_llm(self, tags_text: str, expand_mode: str, Expanded_result: str, expand_model: str = "openai") -> str:
         try:
             # 根据语言选择确定输出语言
-            is_chinese = Expanded_result == "中文"
+            is_chinese = Expanded_result == "Chinese"
             
             if expand_mode == "Tag Style":
                 if is_chinese:
