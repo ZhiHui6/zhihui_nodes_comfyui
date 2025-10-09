@@ -49,10 +49,9 @@ Provides dedicated Chinese localization files that work with ComfyUI-DD-Translat
 </tr>
 
 <tr>
-<td><b>🎯Kontext预设增强版</b><br><b>Kontext Presets Plus</b><br><code>KontextPresetsPlus</code></td>
+<td><b>🤖系统引导词加载器</b><br><b>System Prompt Loader</b><br><code>SystemPromptLoader</code></td>
 <td>提示词处理<br>Prompt Processing</td>
-<td>内置20+创意预设的Kontext图像编辑预设工具，支持用户自定义预设扩展，集成多种LLM模型免费在线智能扩写。
-<br>Kontext image editing preset tool with 20+ built-in creative presets, supports user-defined preset extensions, integrates multiple LLM models for free online intelligent expansion.</td>
+<td>专业系统引导词预设工具，内置众多类别模板，输出引导内容给下游LLM节点生成专业的提示词。<br>Professional system prompt preset tool with built-in multiple category templates, outputting guidance content to downstream LLM nodes for generating professional prompts.</td>
 </tr>
 
 <tr>
@@ -62,20 +61,21 @@ Provides dedicated Chinese localization files that work with ComfyUI-DD-Translat
 </tr>
 
 <tr>
+<td><b>🎯Kontext预设增强版</b><br><b>Kontext Presets Plus</b><br><code>KontextPresetsPlus</code></td>
+<td>提示词处理<br>Prompt Processing</td>
+<td>内置20+创意预设的Kontext图像编辑预设工具，支持用户自定义预设扩展，集成多种LLM模型免费在线智能扩写。
+<br>Kontext image editing preset tool with 20+ built-in creative presets, supports user-defined preset extensions, integrates multiple LLM models for free online intelligent expansion.</td>
+</tr>
+
+<tr>
 <td><b>📸摄影提示词生成器</b><br><b>Photography Prompt Generator</b><br><code>PhotographPromptGenerator</code></td>
 <td>提示词处理<br>Prompt Processing</td>
 <td>专业摄影风格提示词生成器，涵盖人物、场景、镜头、光线等15个维度，一键生成专业摄影提示词。<br>Professional photography style prompt generator covering 15 dimensions including characters, scenes, lenses, lighting, generating professional photography prompts with one click.</td>
 </tr>
-
-<tr>
-<td><b>🤖系统引导词加载器</b><br><b>System Prompt Loader</b><br><code>SystemPromptLoader</code></td>
-<td>提示词处理<br>Prompt Processing</td>
-<td>专业系统引导词预设工具，内置众多类别模板，输出引导内容给下游LLM节点生成专业的提示词。<br>Professional system prompt preset tool with built-in multiple category templates, outputting guidance content to downstream LLM nodes for generating professional prompts.</td>
-</tr>
 </table>
 
-💡 **使用建议**：新用户建议从 **摄影提示词生成器** 和 **万相视频提示词生成器** 开始体验，这两个节点能够快速提升您的创作效率和作品质量。
-**Usage Recommendation**: New users are recommended to start with **Photography Prompt Generator** and **Wan Prompt Generator**, these two nodes can quickly improve your creative efficiency and work quality.
+💡 **使用建议**：新用户建议从 **标签选择器** 和 **万相视频提示词生成器** 开始体验，这两个节点能够快速提升您的创作效率和作品质量。
+**Usage Recommendation**: New users are recommended to start with **TagSelector** and **Wan Prompt Generator**, these two nodes can quickly improve your creative efficiency and work quality.
 
 ---
 
@@ -489,6 +489,30 @@ This node collection contains numerous nodes with different functions, divided i
 <th>功能描述 | Function Description</th>
 </tr>
 <tr>
+<td><b>🏷️TAG标签选择器</b><br><b>Tag Selector</b><br><code>TagSelector</code></td>
+<td>
+
+新一代智能标签管理系统，集成海量预设标签库、自定义标签功能和内置AI扩写能力，提供前所未有的标签选择体验，快速构建复杂提示词，提升创作效率。<br>Next-generation intelligent tag management system, integrating massive preset tag library, custom tag functionality, and built-in AI expansion capabilities, providing an unprecedented tag selection experience, quickly building complex prompts and improving creative efficiency.
+
+<b>核心功能 | Core Features</b>：
+- <b>标签分类丰富 | Comprehensive Tag Categories</b>：涵盖常规标签、艺术题材、人物属性、场景环境等全方位分类<br>Covers comprehensive categories including general tags, artistic themes, character attributes, scene environments, etc.
+- <b>自定义标签管理 | Custom Tag Management</b>：支持添加、编辑、删除个人专属标签，打造个性化标签库<br>Support adding, editing, and deleting personal exclusive tags, building personalized tag library
+- <b>智能搜索定位 | Smart Search & Positioning</b>：支持关键词搜索，快速找到目标标签<br>Keyword search support, quickly find target tags
+- <b>实时选择统计 | Real-time Selection Statistics</b>：动态显示已选标签数量和详细列表<br>Dynamically display selected tag count and detailed list
+- <b>随机标签生成 | Random Tag Generation</b>：智能随机标签生成功能，支持按分类权重和数量配置自动生成多样化标签组合<br>Intelligent random tag generation, supporting automatic generation of diverse tag combinations based on category weights and quantity configuration
+- <b>内置AI扩写 | Built-in AI Expansion</b>：一键智能扩写功能，支持标签式和自然语言式两种扩写模式<br>One-click intelligent expansion feature, supporting both tag-style and natural language expansion modes
+<br>
+<div align="left">
+<a href="images/TAG标签选择器2.jpg" target="_blank">
+<img src="images/TAG标签选择器2.jpg" alt="TAG标签选择器2" width="45%"/>
+<a href="images/TAG标签选择器.jpg" target="_blank">
+<img src="images/TAG标签选择器.jpg" alt="TAG标签选择器" width="45%"/>
+</a>
+</a>
+</div>
+</td>
+</tr>
+<tr>
 <td><b>Latent切换器(双模式)</b><br><b>Latent Switch Dual Mode</b><br><code>LatentSwitch</code></td>
 <td>支持3个Latent输入的双模式切换器，可通过下拉菜单手动选择输出，或启用自动模式智能检测单个有效输入。<br>Supports 3 Latent inputs with dual-mode switching, can manually select output through dropdown menu, or enable auto mode to intelligently detect single valid input.
 
@@ -619,27 +643,6 @@ This node collection contains numerous nodes with different functions, divided i
 <div align="left">
 <a href="images/本地文件画廊.jpg" target="_blank">
 <img src="images/本地文件画廊.jpg" alt="本地文件画廊" width="45%"/>
-</a>
-</div>
-</td>
-</tr>
-<tr>
-<td><b>🏷️TAG标签选择器</b><br><b>Tag Selector</b><br><code>TagSelector</code></td>
-<td>
-
-新一代智能标签管理系统，集成海量预设标签库、自定义标签功能和内置AI扩写能力，提供前所未有的标签选择体验，快速构建复杂提示词，提升创作效率。<br>Next-generation intelligent tag management system, integrating massive preset tag library, custom tag functionality, and built-in AI expansion capabilities, providing an unprecedented tag selection experience, quickly building complex prompts and improving creative efficiency.
-
-<b>核心功能 | Core Features</b>：
-- <b>标签分类丰富 | Comprehensive Tag Categories</b>：涵盖常规标签、艺术题材、人物属性、场景环境等全方位分类<br>Covers comprehensive categories including general tags, artistic themes, character attributes, scene environments, etc.
-- <b>自定义标签管理 | Custom Tag Management</b>：支持添加、编辑、删除个人专属标签，打造个性化标签库<br>Support adding, editing, and deleting personal exclusive tags, building personalized tag library
-- <b>智能搜索定位 | Smart Search & Positioning</b>：支持关键词搜索，快速找到目标标签<br>Keyword search support, quickly find target tags
-- <b>实时选择统计 | Real-time Selection Statistics</b>：动态显示已选标签数量和详细列表<br>Dynamically display selected tag count and detailed list
-- <b>随机标签生成 | Random Tag Generation</b>：智能随机标签生成功能，支持按分类权重和数量配置自动生成多样化标签组合<br>Intelligent random tag generation, supporting automatic generation of diverse tag combinations based on category weights and quantity configuration
-- <b>内置AI扩写 | Built-in AI Expansion</b>：一键智能扩写功能，支持标签式和自然语言式两种扩写模式<br>One-click intelligent expansion feature, supporting both tag-style and natural language expansion modes
-<br>
-<div align="left">
-<a href="images/TAG标签选择器.jpg" target="_blank">
-<img src="images/TAG标签选择器.jpg" alt="TAG标签选择器" width="45%"/>
 </a>
 </div>
 </td>
