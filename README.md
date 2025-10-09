@@ -7,8 +7,8 @@
 这是一个由<span style="color: red;"> **Binity** </span>精心创建的 ComfyUI 自定义节点工具合集，旨在为用户提供一系列实用、高效的节点，以增强和扩展 ComfyUI 的功能。本节点集包含30+功能节点，涵盖文本处理、提示词优化、图像处理、翻译工具、Latent处理等多个方面，为您的 AI 创作提供全方位支持。
 This is a ComfyUI custom node collection carefully created by <span style="color: red;"> **Binity** </span>, designed to provide users with a series of practical and efficient nodes to enhance and extend ComfyUI's functionality. This node collection contains 25+ functional nodes, covering text processing, prompt optimization, image processing, translation tools, Latent processing and many other aspects, providing comprehensive support for your AI creation.
 
-如果这个项目对您有帮助，请给我们一个 ⭐**Star**！您的支持是我们持续改进的动力。
-If this project helps you, please give us a ⭐**Star**! Your support is our motivation for continuous improvement.
+***如果这个项目对您有帮助，请给我们一个⭐Star！您的支持是我们持续改进的动力。***
+***If this project helps you, please give us a⭐Star! Your support is our motivation for continuous improvement.***
 
 ## ✨ 主要特点 | Key Features
 
