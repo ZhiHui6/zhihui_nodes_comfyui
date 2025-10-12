@@ -1,24 +1,16 @@
-// ==================== 随机生成器功能 ====================
-
-// 随机生成器相关变量
 let randomGeneratorDialog = null;
 let randomSettings = {
     categories: {
-        // [常规标签] - 画质、摄影、构图、光影
         '常规标签.画质': { enabled: true, weight: 2, count: 1 },
         '常规标签.摄影': { enabled: true, weight: 2, count: 1 },
         '常规标签.构图': { enabled: true, weight: 2, count: 1 },
         '常规标签.光影': { enabled: true, weight: 2, count: 1 },
-        
-        // [艺术题材] - 艺术风格、技法形式等
         '艺术题材.艺术家风格': { enabled: true, weight: 1, count: 1 },
         '艺术题材.艺术流派': { enabled: true, weight: 1, count: 1 },
         '艺术题材.技法形式': { enabled: true, weight: 1, count: 1 },
         '艺术题材.媒介与效果': { enabled: true, weight: 1, count: 1 },
         '艺术题材.装饰图案': { enabled: true, weight: 1, count: 1 },
         '艺术题材.色彩与质感': { enabled: true, weight: 1, count: 1 },
-        
-        // [人物类] - 角色、外貌、人设、服饰
         '人物类.角色.动漫角色': { enabled: true, weight: 2, count: 1 },
         '人物类.角色.游戏角色': { enabled: true, weight: 1, count: 1 },
         '人物类.角色.二次元虚拟偶像': { enabled: true, weight: 1, count: 1 },
@@ -47,8 +39,6 @@ let randomSettings = {
         '人物类.服饰.帽子': { enabled: true, weight: 1, count: 1 },
         '人物类.服饰.制服COS': { enabled: true, weight: 1, count: 1 },
         '人物类.服饰.传统服饰': { enabled: true, weight: 1, count: 1 },
-        
-        // [动作/表情] - 姿态、表情、手部腿部等
         '动作/表情.姿态动作': { enabled: true, weight: 2, count: 1 },
         '动作/表情.多人互动': { enabled: true, weight: 1, count: 1 },
         '动作/表情.手部': { enabled: true, weight: 1, count: 1 },
@@ -56,14 +46,10 @@ let randomSettings = {
         '动作/表情.眼神': { enabled: true, weight: 1, count: 1 },
         '动作/表情.表情': { enabled: true, weight: 2, count: 1 },
         '动作/表情.嘴型': { enabled: true, weight: 1, count: 1 },
-        
-        // [道具] - 翅膀、尾巴、耳朵、角
         '道具.翅膀': { enabled: true, weight: 1, count: 1 },
         '道具.尾巴': { enabled: true, weight: 1, count: 1 },
         '道具.耳朵': { enabled: true, weight: 1, count: 1 },
         '道具.角': { enabled: true, weight: 1, count: 1 },
-        
-        // [场景类] - 光线环境、室外、建筑、自然景观等
         '场景类.光线环境': { enabled: true, weight: 2, count: 1 },
         '场景类.情感与氛围': { enabled: true, weight: 2, count: 1 },
         '场景类.背景环境': { enabled: true, weight: 1, count: 1 },
@@ -74,37 +60,18 @@ let randomSettings = {
         '场景类.室内装饰': { enabled: true, weight: 1, count: 1 },
         '场景类.自然景观': { enabled: true, weight: 2, count: 1 },
         '场景类.人造景观': { enabled: true, weight: 1, count: 1 },
-        
-        // [动物生物] - 动物、幻想生物、行为动态
         '动物生物.动物': { enabled: true, weight: 1, count: 1 },
         '动物生物.幻想生物': { enabled: true, weight: 1, count: 1 },
         '动物生物.行为动态': { enabled: true, weight: 1, count: 1 }
     },
-    
-    // R18成人内容详细设置
     adultCategories: {
-        // [轻度内容] - 擦边、诱惑类
         '轻度内容.涩影湿.擦边': { enabled: true, weight: 2, count: 1 },
-        
-        // [性行为类型] - 各种性行为
         '性行为.涩影湿.NSFW.性行为类型': { enabled: true, weight: 3, count: 2 },
-        
-        // [身体部位] - 身体特征描述
         '身体部位.涩影湿.NSFW.身体部位': { enabled: true, weight: 2, count: 1 },
-        
-        // [道具玩具] - 成人用品
         '道具玩具.涩影湿.NSFW.道具与玩具': { enabled: true, weight: 1, count: 1 },
-        
-        // [束缚调教] - BDSM相关
         '束缚调教.涩影湿.NSFW.束缚与调教': { enabled: true, weight: 1, count: 1 },
-        
-        // [特殊癖好] - 特殊情境和癖好
         '特殊癖好.涩影湿.NSFW.特殊癖好与情境': { enabled: true, weight: 1, count: 1 },
-        
-        // [视觉效果] - 视觉风格和特效
         '视觉效果.涩影湿.NSFW.视觉风格与特定元素': { enabled: true, weight: 1, count: 1 },
-        
-        // [欲望表情] - 新增的表情分类
         '欲望表情.涩影湿.NSFW.欲望表情': { enabled: true, weight: 2, count: 1 }
     },
     excludedCategories: ['自定义', '灵感套装'],
@@ -112,7 +79,6 @@ let randomSettings = {
     totalTagsRange: { min: 12, max: 20 }
 };
 
-// 加载随机设置
 async function loadRandomSettings() {
     try {
         const response = await fetch('/zhihui/random_settings');
@@ -128,7 +94,6 @@ async function loadRandomSettings() {
     }
 }
 
-// 保存随机设置
 async function saveRandomSettings() {
     try {
         const response = await fetch('/zhihui/random_settings', {
@@ -153,17 +118,14 @@ async function saveRandomSettings() {
     }
 }
 
-// 页面加载时自动加载设置
 document.addEventListener('DOMContentLoaded', loadRandomSettings);
 
-// 关闭随机生成器对话框
 function closeRandomGeneratorDialog() {
     if (randomGeneratorDialog) {
         randomGeneratorDialog.style.display = 'none';
     }
 }
 
-// 创建随机生成器对话框
 function createRandomGeneratorDialog() {
     const overlay = document.createElement('div');
     overlay.style.cssText = `
@@ -200,7 +162,6 @@ function createRandomGeneratorDialog() {
         overflow: hidden;
     `;
 
-    // 标题栏
     const header = document.createElement('div');
     header.style.cssText = `
         background: rgb(34, 77, 141);
@@ -260,7 +221,6 @@ function createRandomGeneratorDialog() {
     header.appendChild(title);
     header.appendChild(closeBtn);
 
-    // 内容区域
     const content = document.createElement('div');
     content.style.cssText = `
         flex: 1;
@@ -271,22 +231,18 @@ function createRandomGeneratorDialog() {
         gap: 20px;
     `;
 
-    // 规则说明区域
     const rulesSection = createRulesSection();
     
-    // 分类设置区域
     const categoriesSection = createCategoriesSection();
-    categoriesSection.classList.add('categories-section'); // 添加类名以便后续查找
+    categoriesSection.classList.add('categories-section');
     
-    // 全局设置区域
     const globalSection = createGlobalSection();
-    globalSection.classList.add('global-section'); // 添加类名以便后续查找
+    globalSection.classList.add('global-section');
 
     content.appendChild(rulesSection);
     content.appendChild(categoriesSection);
     content.appendChild(globalSection);
 
-    // 底部按钮
     const footer = document.createElement('div');
     footer.style.cssText = `
         background: linear-gradient(135deg, #334155 0%, #1e293b 100%);
@@ -314,7 +270,6 @@ function createRandomGeneratorDialog() {
         box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
     `;
     
-    // 添加悬停效果
     resetBtn.addEventListener('mouseenter', () => {
         resetBtn.style.background = 'linear-gradient(135deg, #60a5fa 0%, #3b82f6 100%)';
         resetBtn.style.transform = 'translateY(-2px)';
@@ -327,7 +282,6 @@ function createRandomGeneratorDialog() {
         resetBtn.style.boxShadow = '0 2px 4px rgba(0, 0, 0, 0.2)';
     });
     
-    // 添加点击反馈效果
     resetBtn.addEventListener('mousedown', () => {
         resetBtn.style.transform = 'translateY(1px)';
         resetBtn.style.boxShadow = '0 1px 2px rgba(0, 0, 0, 0.2)';
@@ -339,13 +293,11 @@ function createRandomGeneratorDialog() {
     });
     
     resetBtn.onclick = async () => {
-        // 添加点击动画效果
         resetBtn.style.transform = 'scale(0.95)';
         setTimeout(() => {
             resetBtn.style.transform = '';
         }, 100);
         
-        // 重置配置并保存到文件
         resetRandomSettings();
         await saveRandomSettings();
         
@@ -364,21 +316,17 @@ function createRandomGeneratorDialog() {
     document.body.appendChild(overlay);
     randomGeneratorDialog = overlay;
 
-    // ESC键关闭 - 使用document级别的事件监听器以确保能捕获到按键事件
     const escapeHandler = (e) => {
-        // 只有当随机规则对话框显示时才响应ESC键
         if (randomGeneratorDialog && randomGeneratorDialog.style.display === 'block' && e.key === 'Escape') {
-            e.preventDefault(); // 阻止默认行为
-            e.stopPropagation(); // 阻止事件冒泡
-            e.stopImmediatePropagation(); // 阻止其他事件监听器处理此事件
+            e.preventDefault();
+            e.stopPropagation();
+            e.stopImmediatePropagation();
             closeRandomGeneratorDialog();
         }
     };
     
-    // 使用更高的优先级添加事件监听器
     document.addEventListener('keydown', escapeHandler, true);
     
-    // 在关闭对话框时移除事件监听器
     const originalCloseFunction = closeRandomGeneratorDialog;
     closeRandomGeneratorDialog = function() {
         document.removeEventListener('keydown', escapeHandler);
@@ -388,8 +336,6 @@ function createRandomGeneratorDialog() {
     };
 }
 
-// 创建快速生成区域
-// 创建规则说明区域
 function createRulesSection() {
     const section = document.createElement('div');
     section.style.cssText = `
@@ -423,7 +369,6 @@ function createRulesSection() {
     return section;
 }
 
-// 创建分类设置区域
 function createCategoriesSection() {
     const section = document.createElement('div');
     section.style.cssText = `
@@ -442,10 +387,8 @@ function createCategoriesSection() {
         margin: 0 0 16px 0;
     `;
     
-    // 先将标题添加到section中
     section.appendChild(title);
 
-    // 按生成公式的7个元素分组显示
     const formulaGroups = {
         '常规标签': {
             title: '🎨 [常规标签] - 画质、摄影、构图、光影',
@@ -484,7 +427,6 @@ function createCategoriesSection() {
         }
     };
 
-    // 将分类按公式元素分组
     Object.keys(randomSettings.categories).forEach(categoryPath => {
         const formulaElement = categoryPath.split('.')[0];
         if (formulaGroups[formulaElement]) {
@@ -492,16 +434,13 @@ function createCategoriesSection() {
         }
     });
 
-    // 为每个公式元素创建分组
     Object.keys(formulaGroups).forEach(groupKey => {
         const group = formulaGroups[groupKey];
         if (group.categories.length > 0) {
             const groupSection = createFormulaGroupSection(group);
             section.appendChild(groupSection);
             
-            // 在动物生物分组后添加R18选项
             if (groupKey === '动物生物') {
-                // NSFW复选框容器
                 const nsfwContainer = document.createElement('div');
                 nsfwContainer.style.cssText = `
                     display: flex;
@@ -522,14 +461,12 @@ function createCategoriesSection() {
                 `;
                 nsfwCheckbox.onchange = () => {
                     randomSettings.includeNSFW = nsfwCheckbox.checked;
-                    // 同步全局设置中的复选框
                     const globalNsfwCheckbox = document.getElementById('nsfw-checkbox');
                     if (globalNsfwCheckbox) {
                         globalNsfwCheckbox.checked = nsfwCheckbox.checked;
                     }
-                    // 控制详细设置的显示/隐藏
                     adultSettingsContainer.style.display = nsfwCheckbox.checked ? 'block' : 'none';
-                    saveRandomSettings(); // 自动保存设置
+                    saveRandomSettings();
                 };
 
                 const nsfwLabel = document.createElement('label');
@@ -547,7 +484,6 @@ function createCategoriesSection() {
                 nsfwContainer.appendChild(nsfwLabel);
                 section.appendChild(nsfwContainer);
                 
-                // R18详细设置区域
                 const adultSettingsContainer = document.createElement('div');
                 adultSettingsContainer.id = 'adult-settings-container-categories';
                 adultSettingsContainer.style.cssText = `
@@ -559,7 +495,6 @@ function createCategoriesSection() {
                     display: ${randomSettings.includeNSFW ? 'block' : 'none'};
                 `;
 
-                // R18设置标题
                 const adultTitle = document.createElement('h4');
                 adultTitle.textContent = '🔞 R18成人内容详细设置';
                 adultTitle.style.cssText = `
@@ -570,13 +505,11 @@ function createCategoriesSection() {
                     text-shadow: 0 0 10px rgba(248, 113, 113, 0.5);
                 `;
 
-                // 创建成人内容分类设置 - 按类型分组
                 const adultCategoriesContainer = document.createElement('div');
                 adultCategoriesContainer.style.cssText = `
                     margin-top: 12px;
                 `;
 
-                // 创建分组结构
                 const categoryGroups = {
                     '轻度内容': { color: '#fbbf24', icon: '💋', categories: [] },
                     '性行为': { color: '#f87171', icon: '🔥', categories: [] },
@@ -588,7 +521,6 @@ function createCategoriesSection() {
                     '欲望表情': { color: '#ec4899', icon: '😍', categories: [] }
                 };
 
-                // 将分类分组
                 Object.keys(randomSettings.adultCategories).forEach(categoryPath => {
                     const setting = randomSettings.adultCategories[categoryPath];
                     const groupName = categoryPath.split('.')[0];
@@ -597,11 +529,9 @@ function createCategoriesSection() {
                     }
                 });
 
-                // 为每个分组创建UI
                 Object.keys(categoryGroups).forEach(groupName => {
                     const group = categoryGroups[groupName];
                     if (group.categories.length > 0) {
-                        // 分组标题
                         const groupTitle = document.createElement('div');
                         groupTitle.textContent = `${group.icon} ${groupName}`;
                         groupTitle.style.cssText = `
@@ -614,7 +544,6 @@ function createCategoriesSection() {
                             padding-bottom: 4px;
                         `;
 
-                        // 分组网格
                         const groupGrid = document.createElement('div');
                         groupGrid.style.cssText = `
                             display: grid;
@@ -623,7 +552,6 @@ function createCategoriesSection() {
                             margin-bottom: 12px;
                         `;
 
-                        // 添加分类项
                         group.categories.forEach(({ path, setting }) => {
                             const categoryItem = createCategorySettingItem(path, setting, group.color);
                             groupGrid.appendChild(categoryItem);
@@ -644,7 +572,6 @@ function createCategoriesSection() {
     return section;
 }
 
-// 创建公式元素分组区域
 function createFormulaGroupSection(group) {
     const groupSection = document.createElement('div');
     groupSection.style.cssText = `
@@ -673,7 +600,6 @@ function createFormulaGroupSection(group) {
         gap: 8px;
     `;
 
-    // 为该组的每个分类创建设置项
     group.categories.forEach(categoryPath => {
         const setting = randomSettings.categories[categoryPath];
         const item = createCategorySettingItem(categoryPath, setting, group.color);
@@ -685,7 +611,6 @@ function createFormulaGroupSection(group) {
     return groupSection;
 }
 
-// 创建单个分类设置项
 function createCategorySettingItem(categoryPath, setting, themeColor = '#60a5fa') {
     const item = document.createElement('div');
     item.style.cssText = `
@@ -698,7 +623,6 @@ function createCategorySettingItem(categoryPath, setting, themeColor = '#60a5fa'
         gap: 12px;
     `;
 
-    // 启用复选框
     const checkbox = document.createElement('input');
     checkbox.type = 'checkbox';
     checkbox.checked = setting.enabled;
@@ -709,12 +633,10 @@ function createCategorySettingItem(categoryPath, setting, themeColor = '#60a5fa'
     `;
     checkbox.onchange = () => {
         randomSettings.categories[categoryPath].enabled = checkbox.checked;
-        saveRandomSettings(); // 自动保存设置
+        saveRandomSettings();
     };
 
-    // 分类名称
     const name = document.createElement('div');
-    // 简化显示名称，只显示最后的分类名
     const displayName = categoryPath.split('.').pop();
     name.textContent = displayName;
     name.style.cssText = `
@@ -725,7 +647,6 @@ function createCategorySettingItem(categoryPath, setting, themeColor = '#60a5fa'
         min-width: 0;
     `;
 
-    // 权重设置
     const weightLabel = document.createElement('span');
     weightLabel.textContent = '权重:';
     weightLabel.style.cssText = `
@@ -750,10 +671,9 @@ function createCategorySettingItem(categoryPath, setting, themeColor = '#60a5fa'
     `;
     weightInput.onchange = () => {
         randomSettings.categories[categoryPath].weight = parseFloat(weightInput.value) || 0;
-        saveRandomSettings(); // 自动保存设置
+        saveRandomSettings();
     };
 
-    // 数量设置
     const countLabel = document.createElement('span');
     countLabel.textContent = '数量:';
     countLabel.style.cssText = `
@@ -777,7 +697,7 @@ function createCategorySettingItem(categoryPath, setting, themeColor = '#60a5fa'
     `;
     countInput.onchange = () => {
         randomSettings.categories[categoryPath].count = parseInt(countInput.value) || 0;
-        saveRandomSettings(); // 自动保存设置
+        saveRandomSettings();
     };
 
     item.appendChild(checkbox);
@@ -790,7 +710,6 @@ function createCategorySettingItem(categoryPath, setting, themeColor = '#60a5fa'
     return item;
 }
 
-// 创建全局设置区域
 function createGlobalSection() {
     const section = document.createElement('div');
     section.style.cssText = `
@@ -840,7 +759,7 @@ function createGlobalSection() {
     `;
     minInput.onchange = () => {
         randomSettings.totalTagsRange.min = parseInt(minInput.value) || 1;
-        saveRandomSettings(); // 自动保存设置
+        saveRandomSettings();
     };
 
     const separator = document.createElement('span');
@@ -866,7 +785,7 @@ function createGlobalSection() {
     `;
     maxInput.onchange = () => {
         randomSettings.totalTagsRange.max = parseInt(maxInput.value) || 1;
-        saveRandomSettings(); // 自动保存设置
+        saveRandomSettings();
     };
 
     rangeContainer.appendChild(rangeLabel);
@@ -879,25 +798,19 @@ function createGlobalSection() {
     return section;
 }
 
-// 重置随机设置为默认值
 function resetRandomSettings() {
     randomSettings = {
         categories: {
-            // [常规标签] - 画质、摄影、构图、光影
             '常规标签.画质': { enabled: true, weight: 2, count: 1 },
             '常规标签.摄影': { enabled: true, weight: 2, count: 1 },
             '常规标签.构图': { enabled: true, weight: 2, count: 1 },
             '常规标签.光影': { enabled: true, weight: 2, count: 1 },
-            
-            // [艺术题材] - 艺术家风格、艺术流派、技法形式等
             '艺术题材.艺术家风格': { enabled: true, weight: 1, count: 1 },
             '艺术题材.艺术流派': { enabled: true, weight: 1, count: 1 },
             '艺术题材.技法形式': { enabled: true, weight: 1, count: 1 },
             '艺术题材.媒介与效果': { enabled: true, weight: 1, count: 1 },
             '艺术题材.装饰图案': { enabled: true, weight: 1, count: 1 },
             '艺术题材.色彩与质感': { enabled: true, weight: 1, count: 1 },
-            
-            // [人物类] - 角色、外貌特征、人设、服饰
             '人物类.角色.动漫角色': { enabled: true, weight: 2, count: 1 },
             '人物类.角色.游戏角色': { enabled: true, weight: 1, count: 1 },
             '人物类.角色.二次元虚拟偶像': { enabled: true, weight: 1, count: 1 },
@@ -926,8 +839,6 @@ function resetRandomSettings() {
             '人物类.服饰.帽子': { enabled: true, weight: 1, count: 1 },
             '人物类.服饰.制服COS': { enabled: true, weight: 1, count: 1 },
             '人物类.服饰.传统服饰': { enabled: true, weight: 1, count: 1 },
-            
-            // [动作/表情] - 姿态动作、多人互动、手部腿部、眼神表情
             '动作/表情.姿态动作': { enabled: true, weight: 2, count: 1 },
             '动作/表情.多人互动': { enabled: true, weight: 1, count: 1 },
             '动作/表情.手部': { enabled: true, weight: 1, count: 1 },
@@ -935,14 +846,10 @@ function resetRandomSettings() {
             '动作/表情.眼神': { enabled: true, weight: 1, count: 1 },
             '动作/表情.表情': { enabled: true, weight: 2, count: 1 },
             '动作/表情.嘴型': { enabled: true, weight: 1, count: 1 },
-            
-            // [道具] - 翅膀、尾巴、耳朵、角
             '道具.翅膀': { enabled: true, weight: 1, count: 1 },
             '道具.尾巴': { enabled: true, weight: 1, count: 1 },
             '道具.耳朵': { enabled: true, weight: 1, count: 1 },
             '道具.角': { enabled: true, weight: 1, count: 1 },
-            
-            // [场景类] - 光线环境、情感氛围、背景环境、室外室内等
             '场景类.光线环境': { enabled: true, weight: 2, count: 1 },
             '场景类.情感与氛围': { enabled: true, weight: 2, count: 1 },
             '场景类.背景环境': { enabled: true, weight: 1, count: 1 },
@@ -953,46 +860,26 @@ function resetRandomSettings() {
             '场景类.室内装饰': { enabled: true, weight: 1, count: 1 },
             '场景类.自然景观': { enabled: true, weight: 2, count: 1 },
             '场景类.人造景观': { enabled: true, weight: 1, count: 1 },
-            
-            // [动物生物] - 动物、幻想生物、行为动态
-            '动物生物.动物': { enabled: true, weight: 1, count: 1 },
-            '动物生物.幻想生物': { enabled: true, weight: 1, count: 1 },
-            '动物生物.行为动态': { enabled: true, weight: 1, count: 1 }
+            '动物生物.动物': { enabled: false, weight: 1, count: 1 },
+            '动物生物.幻想生物': { enabled: false, weight: 1, count: 1 },
+            '动物生物.行为动态': { enabled: false, weight: 1, count: 1 }
         },
-        
-        // R18成人内容详细设置
-         adultCategories: {
-             // [轻度内容] - 擦边、诱惑类
-             '轻度内容.涩影湿.擦边': { enabled: true, weight: 2, count: 1 },
-             
-             // [性行为类型] - 各种性行为
-             '性行为.涩影湿.NSFW.性行为类型': { enabled: true, weight: 3, count: 2 },
-             
-             // [身体部位] - 身体特征描述
-             '身体部位.涩影湿.NSFW.身体部位': { enabled: true, weight: 2, count: 1 },
-             
-             // [道具玩具] - 成人用品
-             '道具玩具.涩影湿.NSFW.道具与玩具': { enabled: false, weight: 1, count: 1 },
-             
-             // [束缚调教] - BDSM相关
-             '束缚调教.涩影湿.NSFW.束缚与调教': { enabled: false, weight: 1, count: 1 },
-             
-             // [特殊癖好] - 特殊情境和癖好
-             '特殊癖好.涩影湿.NSFW.特殊癖好与情境': { enabled: false, weight: 1, count: 1 },
-             
-             // [视觉效果] - 视觉风格和特效
-             '视觉效果.涩影湿.NSFW.视觉风格与特定元素': { enabled: true, weight: 1, count: 1 },
-             
-             // [欲望表情] - 新增的表情分类
-             '欲望表情.涩影湿.NSFW.欲望表情': { enabled: true, weight: 2, count: 1 }
-         },
+        adultCategories: {
+            '轻度内容.涩影湿.擦边': { enabled: true, weight: 2, count: 1 },
+            '性行为.涩影湿.NSFW.性行为类型': { enabled: true, weight: 3, count: 2 },
+            '身体部位.涩影湿.NSFW.身体部位': { enabled: true, weight: 2, count: 1 },
+            '道具玩具.涩影湿.NSFW.道具与玩具': { enabled: true, weight: 1, count: 1 },
+            '束缚调教.涩影湿.NSFW.束缚与调教': { enabled: true, weight: 1, count: 1 },
+            '特殊癖好.涩影湿.NSFW.特殊癖好与情境': { enabled: true, weight: 1, count: 1 },
+            '视觉效果.涩影湿.NSFW.视觉风格与特定元素': { enabled: true, weight: 1, count: 1 },
+            '欲望表情.涩影湿.NSFW.欲望表情': { enabled: true, weight: 2, count: 1 }
+        },
         excludedCategories: ['自定义', '灵感套装'],
         includeNSFW: false,
         totalTagsRange: { min: 12, max: 20 }
     };
 }
 
-// 生成随机组合的主函数
 function generateRandomCombination() {
     if (!window.tagsData) {
         alert('标签数据未加载，请稍后再试');
@@ -1002,12 +889,10 @@ function generateRandomCombination() {
     const generatedTags = [];
     const usedTags = new Set();
 
-    // 获取启用的分类
     const enabledCategories = Object.keys(randomSettings.categories).filter(
         categoryPath => randomSettings.categories[categoryPath].enabled
     );
 
-    // 如果启用了R18内容，添加成人内容分类
     if (randomSettings.includeNSFW && randomSettings.adultCategories) {
         const enabledAdultCategories = Object.keys(randomSettings.adultCategories).filter(
             categoryPath => randomSettings.adultCategories[categoryPath].enabled
@@ -1020,11 +905,9 @@ function generateRandomCombination() {
         return;
     }
 
-    // 按权重随机选择分类并生成标签
     enabledCategories.forEach(categoryPath => {
-        // 从普通分类或成人内容分类中获取设置
         const setting = randomSettings.categories[categoryPath] || randomSettings.adultCategories[categoryPath];
-        const shouldInclude = Math.random() < (setting.weight / 10); // 权重转换为概率
+        const shouldInclude = Math.random() < (setting.weight / 10);
 
         if (shouldInclude) {
             const tags = getTagsFromCategoryPath(categoryPath);
@@ -1041,7 +924,6 @@ function generateRandomCombination() {
         }
     });
 
-    // 如果生成的标签数量不足，随机补充
     const targetCount = Math.floor(
         Math.random() * (randomSettings.totalTagsRange.max - randomSettings.totalTagsRange.min + 1)
     ) + randomSettings.totalTagsRange.min;
@@ -1063,14 +945,11 @@ function generateRandomCombination() {
         });
     }
 
-    // 应用生成的标签到选择器
     if (generatedTags.length > 0) {
-        // 清空当前选择
         if (window.selectedTags) {
             window.selectedTags.clear();
         }
         
-        // 添加生成的标签
         generatedTags.forEach(tag => {
             const tagValue = tag.value || tag.display;
             if (window.selectedTags) {
@@ -1078,7 +957,6 @@ function generateRandomCombination() {
             }
         });
         
-        // 更新UI
         if (window.updateSelectedTags) {
             window.updateSelectedTags();
         }
@@ -1088,16 +966,9 @@ function generateRandomCombination() {
         if (window.updateCategoryRedDots) {
             window.updateCategoryRedDots();
         }
-        
-        // 不显示成功消息
-        // alert(`🎉 成功生成 ${generatedTags.length} 个随机标签组合！`);
-    } else {
-        // 可选：保留失败时的提示，或者也移除
-        // alert('❌ 未能生成标签，请检查设置或标签数据');
     }
 }
 
-// 从分类路径获取标签
 function getTagsFromCategoryPath(categoryPath) {
     if (!window.tagsData) return [];
     
@@ -1115,14 +986,12 @@ function getTagsFromCategoryPath(categoryPath) {
     return extractAllTagsFromObject(current);
 }
 
-// 从对象中提取所有标签
 function extractAllTagsFromObject(obj) {
     const tags = [];
     
     function extract(current, parentPath = '') {
         if (typeof current === 'object' && current !== null) {
             if (Array.isArray(current)) {
-                // 处理标签数组
                 current.forEach(tag => {
                     if (typeof tag === 'object' && tag.display && tag.value) {
                         tags.push(tag);
@@ -1131,19 +1000,16 @@ function extractAllTagsFromObject(obj) {
                     }
                 });
             } else {
-                // 处理对象
                 Object.entries(current).forEach(([key, value]) => {
                     const currentPath = parentPath ? `${parentPath}.${key}` : key;
                     
                     if (typeof value === 'string') {
-                        // 这是一个标签
                         tags.push({
                             display: key,
                             value: value,
                             category: parentPath || '未分类'
                         });
                     } else if (typeof value === 'object') {
-                        // 递归处理子对象
                         extract(value, currentPath);
                     }
                 });
@@ -1155,7 +1021,6 @@ function extractAllTagsFromObject(obj) {
     return tags;
 }
 
-// 获取所有可用标签（排除指定分类）
 function getAllAvailableTags() {
     if (!window.tagsData) return [];
     
@@ -1166,12 +1031,10 @@ function getAllAvailableTags() {
         Object.entries(obj).forEach(([key, value]) => {
             const currentPath = categoryPath ? `${categoryPath}.${key}` : key;
             
-            // 检查是否为排除的分类
             let isExcluded = excludedCategories.some(excluded => 
                 currentPath.includes(excluded) || key.includes(excluded)
             );
             
-            // 如果不包含NSFW，则排除NSFW分类
             if (!randomSettings.includeNSFW && (currentPath.includes('NSFW') || key.includes('NSFW'))) {
                 isExcluded = true;
             }
@@ -1202,7 +1065,6 @@ function getAllAvailableTags() {
     return allTags;
 }
 
-// 从数组中随机选择指定数量的标签
 function getRandomTagsFromArray(tags, count) {
     if (tags.length === 0 || count <= 0) return [];
     
@@ -1210,19 +1072,15 @@ function getRandomTagsFromArray(tags, count) {
     return shuffled.slice(0, Math.min(count, tags.length));
 }
 
-// 打开随机生成器对话框
-// 更新对话框内容以反映最新的配置
 function updateRandomGeneratorDialogContent() {
     if (!randomGeneratorDialog) return;
     
-    // 更新分类设置
     const categoriesSection = randomGeneratorDialog.querySelector('.categories-section');
     if (categoriesSection) {
         const newCategoriesSection = createCategoriesSection();
         categoriesSection.parentNode.replaceChild(newCategoriesSection, categoriesSection);
     }
     
-    // 更新全局设置
     const globalSection = randomGeneratorDialog.querySelector('.global-section');
     if (globalSection) {
         const newGlobalSection = createGlobalSection();
@@ -1231,18 +1089,15 @@ function updateRandomGeneratorDialogContent() {
 }
 
 async function openRandomGeneratorDialog() {
-    // 每次打开对话框时重新加载配置，确保获取最新的设置
     await loadRandomSettings();
     
     if (!randomGeneratorDialog) {
         createRandomGeneratorDialog();
     } else {
-        // 如果对话框已存在，更新其内容以反映最新配置
         updateRandomGeneratorDialogContent();
     }
     randomGeneratorDialog.style.display = 'block';
 }
 
-// 导出函数供主文件使用
 window.openRandomGeneratorDialog = openRandomGeneratorDialog;
 window.generateRandomCombination = generateRandomCombination;

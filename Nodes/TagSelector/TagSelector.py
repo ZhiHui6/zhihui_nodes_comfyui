@@ -26,16 +26,20 @@ class TagSelector:
                 "auto_random_tags": ("BOOLEAN", {
                     "default": False,
                     "label_on": "On",
-                    "label_off": "Off"
+                    "label_off": "Off",
+                    "tooltip": "启用后将自动生成随机标签。需要先在标签选择器界面中配置随机标签生成设置，包括启用分类、设置权重和数量等参数。"
                 }),
                 "expand_mode": (["Disabled", "Tag Style", "Natural Language"], {
-                    "default": "Disabled"
+                    "default": "Disabled",
+                    "tooltip": "选择标签扩写模式：禁用/标签风格/自然语言风格"
                 }),
                 "Expanded_result": (["Chinese", "English"], {
-                    "default": "Chinese"
+                    "default": "Chinese",
+                    "tooltip": "选择扩写结果的语言：中文/英文。仅在启用标签扩写模式时生效。"
                 }),
                 "expand_model": (["deepseek", "deepseek-reasoning", "gemini", "mistral", "nova-fast", "openai", "openai-large", "openai-reasoning", "evil", "unity"], {
-                    "default": "openai"
+                    "default": "openai",
+                    "tooltip": "选择用于标签扩写的AI模型"
                 }),
             },
             "hidden": {
@@ -66,10 +70,6 @@ class TagSelector:
         return (processed_tags,)
     
     def _generate_random_tags(self):
-        """
-        根据随机规则设置生成随机标签
-        严格遵循"随机规则设置"中定义的所有规则，包括"全局设置"和"R18成人内容"部分的规定
-        """
         try:
             tags_data = self.get_tags_config()
             if not tags_data:
@@ -129,9 +129,6 @@ class TagSelector:
             return ""
     
     def _get_tags_from_category_path(self, tags_data, category_path):
-        """
-        从分类路径获取标签
-        """
         path_parts = category_path.split('.')
         current = tags_data
         
@@ -144,9 +141,6 @@ class TagSelector:
         return self._extract_all_tags_from_object(current)
     
     def _extract_all_tags_from_object(self, obj):
-        """
-        从对象中提取所有标签
-        """
         tags = []
         
         def extract(current):
@@ -173,9 +167,6 @@ class TagSelector:
         return tags
     
     def _get_all_available_tags(self, tags_data, random_settings):
-        """
-        获取所有可用标签（严格按照随机规则设置排除指定分类）
-        """
         all_tags = []
         excluded_categories = random_settings.get('excludedCategories', [])
         include_nsfw = random_settings.get('includeNSFW', False)
@@ -272,7 +263,7 @@ Output: beautiful girl, cute girl, detailed face, expressive eyes, adorable cat,
 
 示例：
 输入：girl, cat, garden
-输出：一个美丽的年轻女孩，有着富有表现力的眼睛和温柔的笑容，坐在一个郁郁葱葱的盛开花园里，花园里满是五颜六色的花朵，她怀里抱着一只可爱毛茸茸的猫，猫咪有着柔软的毛发，周围被透过绿叶的自然阳光包围，营造出一个宁静而迷人的场景，具有高细节和艺术品质"""
+输出：一个美丽的年轻女孩，有着富有表现力的眼睛和温柔笑容，坐在一个郁郁葱葱的盛开花园里，花园里满是五颜六色的花朵，她怀里抱一只可爱猫，猫咪有着柔软的毛发，周围被透过绿叶的自然阳光包围，营造出一个宁静而迷人的场景，具有高细节和艺术品质"""
                 else:
                     system_prompt = """You are a professional AI art prompt expansion assistant. Please convert the tags provided by the user into natural and fluent sentences.
 
@@ -343,9 +334,7 @@ Output: A beautiful young girl with expressive eyes and a gentle smile, sitting 
     
     @classmethod
     def get_random_settings(cls):
-        """
-        获取随机规则设置，优先从文件读取，如果文件不存在则使用默认设置
-        """
+
         settings_path = os.path.join(os.path.dirname(__file__), "random_settings.json")
         try:
             with open(settings_path, 'r', encoding='utf-8') as f:
