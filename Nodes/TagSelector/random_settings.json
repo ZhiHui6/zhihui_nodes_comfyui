@@ -5,6 +5,21 @@
       "weight": 2,
       "count": 1
     },
+    "常规标签.摄影": {
+      "enabled": true,
+      "weight": 2,
+      "count": 1
+    },
+    "常规标签.构图": {
+      "enabled": true,
+      "weight": 2,
+      "count": 1
+    },
+    "常规标签.光影": {
+      "enabled": true,
+      "weight": 2,
+      "count": 1
+    },
     "艺术题材.艺术家风格": {
       "enabled": true,
       "weight": 1,
@@ -210,21 +225,6 @@
       "weight": 1,
       "count": 1
     },
-    "常规标签.摄影": {
-      "enabled": true,
-      "weight": 2,
-      "count": 1
-    },
-    "常规标签.构图": {
-      "enabled": true,
-      "weight": 2,
-      "count": 1
-    },
-    "常规标签.光影": {
-      "enabled": true,
-      "weight": 2,
-      "count": 1
-    },
     "道具.翅膀": {
       "enabled": true,
       "weight": 1,
@@ -328,17 +328,17 @@
       "count": 1
     },
     "道具玩具.涩影湿.NSFW.道具与玩具": {
-      "enabled": false,
+      "enabled": true,
       "weight": 1,
       "count": 1
     },
     "束缚调教.涩影湿.NSFW.束缚与调教": {
-      "enabled": false,
+      "enabled": true,
       "weight": 1,
       "count": 1
     },
     "特殊癖好.涩影湿.NSFW.特殊癖好与情境": {
-      "enabled": false,
+      "enabled": true,
       "weight": 1,
       "count": 1
     },
@@ -357,7 +357,7 @@
     "自定义",
     "灵感套装"
   ],
-  "includeNSFW": false,
+  "includeNSFW": true,
   "totalTagsRange": {
     "min": 12,
     "max": 20

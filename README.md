@@ -4,18 +4,15 @@
 
 ## 📖 项目介绍 | Project Introduction
 
-这是一个由<span style="color: red;"> **Binity** </span>精心创建的 ComfyUI 自定义节点工具合集，旨在为用户提供一系列实用、高效的节点，以增强和扩展 ComfyUI 的功能。本节点集包含30+功能节点，涵盖文本处理、提示词优化、图像处理、翻译工具、Latent处理等多个方面，为您的 AI 创作提供全方位支持。
-This is a ComfyUI custom node collection carefully created by <span style="color: red;"> **Binity** </span>, designed to provide users with a series of practical and efficient nodes to enhance and extend ComfyUI's functionality. This node collection contains 25+ functional nodes, covering text processing, prompt optimization, image processing, translation tools, Latent processing and many other aspects, providing comprehensive support for your AI creation.
+这是一个由<span style="color: red;"> **Binity** </span>精心创建的 ComfyUI 自定义节点工具合集，旨在为用户提供一系列实用、高效的节点，以增强和扩展 ComfyUI 的功能。本节点集包含30+功能节点，涵盖文本处理、提示词优化、图像处理、翻译工具、Latent处理等多个方面，为您的 AI 创作提供全方位支持。<br>This is a ComfyUI custom node collection carefully created by <span style="color: red;"> **Binity** </span>, designed to provide users with a series of practical and efficient nodes to enhance and extend ComfyUI's functionality. This node collection contains 25+ functional nodes, covering text processing, prompt optimization, image processing, translation tools, Latent processing and many other aspects, providing comprehensive support for your AI creation.
 
-***如果这个项目对您有帮助，请给我们一个⭐Star！您的支持是我们持续改进的动力。***
-***If this project helps you, please give us a⭐Star! Your support is our motivation for continuous improvement.***
+***如果这个项目对您有帮助，请给我们一个⭐Star！您的支持是我们持续改进的动力。***<br>***If this project helps you, please give us a⭐Star! Your support is our motivation for continuous improvement.***
 
 ## ✨ 主要特点 | Key Features
 
 ### **中文本地化支持 | Chinese Localization Support**
 
-提供专门的中文汉化文件，配合 ComfyUI-DD-Translation 扩展使用，让中文用户能够更便捷地使用各个节点功能。详细说明请参考 <a href="doc/Localization_Guide.md">Localization_Guide.md</a>。
-Provides dedicated Chinese localization files that work with ComfyUI-DD-Translation extension, allowing Chinese users to use node functions more conveniently. For detailed instructions, please refer to <a href="doc/Localization_Guide.md">Localization_Guide.md</a>.
+提供专门的中文汉化文件，配合 ComfyUI-DD-Translation 扩展使用，让中文用户能够更便捷地使用各个节点功能。详细说明请参考 <a href="doc/Localization_Guide.md">Localization_Guide.md</a>。<br>Provides dedicated Chinese localization files that work with ComfyUI-DD-Translation extension, allowing Chinese users to use node functions more conveniently. For detailed instructions, please refer to <a href="doc/Localization_Guide.md">Localization_Guide.md</a>.
 
 ### **核心功能特色 | Core Function Features**
 
@@ -32,8 +29,7 @@ Provides dedicated Chinese localization files that work with ComfyUI-DD-Translat
 
 ## ⭐ 明星节点 | Featured Nodes
 
-🔥 **<span style="color: #FF6B35; font-weight: bold; font-size: 1.1em;">以下是本节点集中重点推荐的特色节点：</span>**
-**<span style="color: #FF6B35; font-weight: bold; font-size: 1.1em;">The following are the featured nodes highly recommended in this node collection:</span>**
+🔥 **<span style="color: #FF6B35; font-weight: bold; font-size: 1.1em;">以下是本节点集中重点推荐的特色节点：</span>**<br>**<span style="color: #FF6B35; font-weight: bold; font-size: 1.1em;">The following are the featured nodes highly recommended in this node collection:</span>**
 
 <table>
 <tr>
