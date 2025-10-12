@@ -50,7 +50,6 @@ class TagSelector:
     CATEGORY = "zhihui/text"
     
     def process_tags(self, tag_edit, auto_random_tags, expand_mode, Expanded_result, expand_model="openai", unique_id=None, extra_pnginfo=None):
-        # 如果启用了自动随机标签，生成随机标签
         if auto_random_tags:
             random_tags = self._generate_random_tags()
             if random_tags:
@@ -72,22 +71,18 @@ class TagSelector:
         严格遵循"随机规则设置"中定义的所有规则，包括"全局设置"和"R18成人内容"部分的规定
         """
         try:
-            # 获取标签数据
             tags_data = self.get_tags_config()
             if not tags_data:
                 return ""
             
-            # 从文件读取随机设置，而非使用硬编码
             random_settings = self.get_random_settings()
             
             generated_tags = []
             used_tags = set()
             
-            # 获取启用的普通分类
             enabled_categories = [path for path, setting in random_settings['categories'].items() 
                                 if setting['enabled']]
             
-            # 如果启用了R18内容，添加成人内容分类
             if random_settings['includeNSFW'] and random_settings['adultCategories']:
                 enabled_adult_categories = [path for path, setting in random_settings['adultCategories'].items() 
                                           if setting['enabled']]
@@ -96,9 +91,7 @@ class TagSelector:
             if not enabled_categories:
                 return ""
             
-            # 按权重随机选择分类并生成标签
             for category_path in enabled_categories:
-                # 从普通分类或成人内容分类中获取设置
                 setting = random_settings['categories'].get(category_path) or random_settings['adultCategories'].get(category_path)
                 if not setting:
                     continue
@@ -115,8 +108,6 @@ class TagSelector:
                                 used_tags.add(tag_value)
                                 generated_tags.append(tag_value)
             
-            # 如果生成的标签数量不足，随机补充
-            # 使用从文件读取的全局设置中的标签数量范围
             target_count = random.randint(
                 random_settings['totalTagsRange']['min'],
                 random_settings['totalTagsRange']['max']
@@ -162,13 +153,10 @@ class TagSelector:
             if isinstance(current, dict):
                 for key, value in current.items():
                     if isinstance(value, str):
-                        # 这是一个标签
                         tags.append(value)
                     elif isinstance(value, dict):
-                        # 递归处理子对象
                         extract(value)
                     elif isinstance(value, list):
-                        # 处理标签数组
                         for item in value:
                             if isinstance(item, dict) and 'value' in item:
                                 tags.append(item['value'])
@@ -195,20 +183,14 @@ class TagSelector:
         def extract_from_category(obj, category_path=''):
             if isinstance(obj, dict):
                 for key, value in obj.items():
-                    current_path = f"{category_path}.{key}" if category_path else key
-                    
-                    # 检查是否为排除的分类
+                    current_path = f"{category_path}.{key}" if category_path else key                
                     is_excluded = any(excluded in current_path or excluded in key 
-                                    for excluded in excluded_categories)
-                    
-                    # 严格按照includeNSFW设置处理NSFW内容
+                                    for excluded in excluded_categories)                   
                     if not include_nsfw:
-                        # 如果不包含NSFW，则排除所有包含NSFW、涩影湿等关键词的分类
                         nsfw_keywords = ['NSFW', '涩影湿', '擦边', 'R18', '成人', '性行为', '身体部位', 
                                        '道具玩具', '束缚调教', '特殊癖好', '视觉效果']
                         if any(keyword in current_path or keyword in key for keyword in nsfw_keywords):
-                            is_excluded = True
-                    
+                            is_excluded = True                   
                     if not is_excluded:
                         if isinstance(value, str):
                             all_tags.append(value)
@@ -241,7 +223,6 @@ class TagSelector:
     
     def _expand_tags_with_llm(self, tags_text: str, expand_mode: str, Expanded_result: str, expand_model: str = "openai") -> str:
         try:
-            # 根据语言选择确定输出语言
             is_chinese = Expanded_result == "Chinese"
             
             if expand_mode == "Tag Style":
@@ -313,8 +294,6 @@ Output: A beautiful young girl with expressive eyes and a gentle smile, sitting 
             
             full_prompt = f"{system_prompt}\n\n输入标签：{tags_text}\n\n请扩写："
             encoded_prompt = urllib.parse.quote(full_prompt)
-            
-            # 模型映射字典
             model_mapping = {
                 "deepseek": "deepseek",
                 "deepseek-reasoning": "deepseek-reasoning",
@@ -357,7 +336,6 @@ Output: A beautiful young girl with expressive eyes and a gentle smile, sitting 
     
     @classmethod
     def IS_CHANGED(cls, tag_edit, auto_random_tags, expand_mode, Expanded_result, expand_model=None, unique_id=None, extra_pnginfo=None):
-        # 如果启用了自动随机标签，每次都返回不同的值以触发重新计算
         if auto_random_tags:
             import time
             return f"{tag_edit}_{time.time()}"
@@ -374,14 +352,10 @@ Output: A beautiful young girl with expressive eyes and a gentle smile, sitting 
                 return json.load(f)
         except (FileNotFoundError, json.JSONDecodeError) as e:
             print(f"Warning: Could not load random settings from file: {e}")
-            # 返回默认设置
             return cls._get_default_random_settings()
     
     @classmethod
     def save_random_settings(cls, settings):
-        """
-        保存随机规则设置到文件
-        """
         settings_path = os.path.join(os.path.dirname(__file__), "random_settings.json")
         try:
             os.makedirs(os.path.dirname(settings_path), exist_ok=True)
@@ -394,85 +368,85 @@ Output: A beautiful young girl with expressive eyes and a gentle smile, sitting 
     
     @classmethod
     def _get_default_random_settings(cls):
-        """
-        获取默认的随机规则设置
-        """
         return {
             'categories': {
-                # [画质风格] - 画质、艺术风格、技法形式
-                '画质风格.画质': {'enabled': True, 'weight': 2, 'count': 1},
-                '画质风格.艺术家风格': {'enabled': True, 'weight': 1, 'count': 1},
-                '画质风格.艺术流派': {'enabled': True, 'weight': 1, 'count': 1},
-                '画质风格.技法形式': {'enabled': True, 'weight': 1, 'count': 1},
-                '画质风格.媒介与效果': {'enabled': True, 'weight': 1, 'count': 1},
-                
-                # [主体] - 人物角色、外貌特征、服饰
-                '主体.人物类.角色': {'enabled': True, 'weight': 2, 'count': 1},
-                '主体.人物类.外貌与特征': {'enabled': True, 'weight': 2, 'count': 2},
-                '主体.人物类.人设.职业': {'enabled': True, 'weight': 1, 'count': 1},
-                '主体.人物类.人设.性别/年龄': {'enabled': True, 'weight': 1, 'count': 1},
-                '主体.人物类.服饰': {'enabled': True, 'weight': 2, 'count': 2},
-                
-                # [动作] - 动作表情、姿态、手部腿部
-                '动作.人物类.动作/表情.基础姿态': {'enabled': True, 'weight': 2, 'count': 1},
-                '动作.人物类.动作/表情.多人互动': {'enabled': True, 'weight': 1, 'count': 1},
-                '动作.人物类.动作/表情.手部': {'enabled': True, 'weight': 1, 'count': 1},
-                '动作.人物类.动作/表情.腿部': {'enabled': True, 'weight': 1, 'count': 1},
-                '动作.人物类.动作/表情.眼神': {'enabled': True, 'weight': 1, 'count': 1},
-                '动作.人物类.动作/表情.表情': {'enabled': True, 'weight': 2, 'count': 1},
-                
-                # [构图视角] - 摄影构图、视角
-                '构图视角.常规标签.摄影': {'enabled': True, 'weight': 2, 'count': 1},
-                '构图视角.常规标签.构图': {'enabled': True, 'weight': 2, 'count': 1},
-                
-                # [技术参数] - 光影、色彩质感、装饰图案
-                '技术参数.常规标签.光影': {'enabled': True, 'weight': 2, 'count': 1},
-                '技术参数.常规标签.色彩与质感': {'enabled': True, 'weight': 1, 'count': 1},
-                '技术参数.常规标签.装饰图案': {'enabled': True, 'weight': 1, 'count': 1},
-                
-                # [光线氛围] - 光线环境、情感氛围、背景环境
-                '光线氛围.场景类.光线环境': {'enabled': True, 'weight': 2, 'count': 1},
-                '光线氛围.场景类.情感与氛围': {'enabled': True, 'weight': 2, 'count': 1},
-                '光线氛围.场景类.背景环境': {'enabled': True, 'weight': 1, 'count': 1},
-                '光线氛围.场景类.反射效果': {'enabled': True, 'weight': 1, 'count': 1},
-                
-                # [场景] - 室外、室内、建筑、自然景观
-                '场景.场景类.室外': {'enabled': True, 'weight': 2, 'count': 1},
-                '场景.场景类.城市': {'enabled': True, 'weight': 1, 'count': 1},
-                '场景.场景类.建筑': {'enabled': True, 'weight': 2, 'count': 1},
-                '场景.场景类.室内装饰': {'enabled': True, 'weight': 1, 'count': 1},
-                '场景.场景类.自然景观': {'enabled': True, 'weight': 2, 'count': 1},
-                '场景.场景类.人造景观': {'enabled': True, 'weight': 1, 'count': 1}
+                '常规标签.画质': {'enabled': True, 'weight': 2, 'count': 1},
+                '艺术题材.艺术家风格': {'enabled': True, 'weight': 1, 'count': 1},
+                '艺术题材.艺术流派': {'enabled': True, 'weight': 1, 'count': 1},
+                '艺术题材.技法形式': {'enabled': True, 'weight': 1, 'count': 1},
+                '艺术题材.媒介与效果': {'enabled': True, 'weight': 1, 'count': 1},
+                '艺术题材.装饰图案': {'enabled': True, 'weight': 1, 'count': 1},
+                '艺术题材.色彩与质感': {'enabled': True, 'weight': 1, 'count': 1}, 
+                '人物类.角色.动漫角色': {'enabled': True, 'weight': 2, 'count': 1},
+                '人物类.角色.游戏角色': {'enabled': True, 'weight': 1, 'count': 1},
+                '人物类.角色.二次元虚拟偶像': {'enabled': True, 'weight': 1, 'count': 1},
+                '人物类.角色.3D动画角色': {'enabled': True, 'weight': 1, 'count': 1},
+                '人物类.外貌与特征': {'enabled': True, 'weight': 2, 'count': 2},
+                '人物类.人设.职业': {'enabled': True, 'weight': 1, 'count': 1},
+                '人物类.人设.性别/年龄': {'enabled': True, 'weight': 1, 'count': 1},
+                '人物类.人设.胸部': {'enabled': True, 'weight': 1, 'count': 1},
+                '人物类.人设.脸型': {'enabled': True, 'weight': 1, 'count': 1},
+                '人物类.人设.鼻子': {'enabled': True, 'weight': 1, 'count': 1},
+                '人物类.人设.嘴巴': {'enabled': True, 'weight': 1, 'count': 1},
+                '人物类.人设.皮肤': {'enabled': True, 'weight': 1, 'count': 1},
+                '人物类.人设.体型': {'enabled': True, 'weight': 1, 'count': 1},
+                '人物类.人设.眉毛': {'enabled': True, 'weight': 1, 'count': 1},
+                '人物类.人设.头发': {'enabled': True, 'weight': 2, 'count': 1},
+                '人物类.人设.眼睛': {'enabled': True, 'weight': 2, 'count': 1},
+                '人物类.人设.瞳孔': {'enabled': True, 'weight': 1, 'count': 1},
+                '人物类.服饰': {'enabled': True, 'weight': 2, 'count': 2},
+                '人物类.服饰.常服': {'enabled': True, 'weight': 2, 'count': 1},
+                '人物类.服饰.泳装': {'enabled': True, 'weight': 1, 'count': 1},
+                '人物类.服饰.运动装': {'enabled': True, 'weight': 1, 'count': 1},
+                '人物类.服饰.内衣': {'enabled': True, 'weight': 1, 'count': 1},
+                '人物类.服饰.配饰': {'enabled': True, 'weight': 1, 'count': 1},
+                '人物类.服饰.鞋类': {'enabled': True, 'weight': 1, 'count': 1},
+                '人物类.服饰.睡衣': {'enabled': True, 'weight': 1, 'count': 1},
+                '人物类.服饰.帽子': {'enabled': True, 'weight': 1, 'count': 1},
+                '人物类.服饰.制服COS': {'enabled': True, 'weight': 1, 'count': 1},
+                '人物类.服饰.传统服饰': {'enabled': True, 'weight': 1, 'count': 1},
+                '动作/表情.姿态动作': {'enabled': True, 'weight': 2, 'count': 1},
+                '动作/表情.多人互动': {'enabled': True, 'weight': 1, 'count': 1},
+                '动作/表情.手部': {'enabled': True, 'weight': 1, 'count': 1},
+                '动作/表情.腿部': {'enabled': True, 'weight': 1, 'count': 1},
+                '动作/表情.眼神': {'enabled': True, 'weight': 1, 'count': 1},
+                '动作/表情.表情': {'enabled': True, 'weight': 2, 'count': 1},
+                '动作/表情.嘴型': {'enabled': True, 'weight': 1, 'count': 1},
+                '常规标签.摄影': {'enabled': True, 'weight': 2, 'count': 1},
+                '常规标签.构图': {'enabled': True, 'weight': 2, 'count': 1},
+                '常规标签.光影': {'enabled': True, 'weight': 2, 'count': 1},
+                '道具.翅膀': {'enabled': True, 'weight': 1, 'count': 1},
+                '道具.尾巴': {'enabled': True, 'weight': 1, 'count': 1},
+                '道具.耳朵': {'enabled': True, 'weight': 1, 'count': 1},
+                '道具.角': {'enabled': True, 'weight': 1, 'count': 1},
+                '场景类.光线环境': {'enabled': True, 'weight': 2, 'count': 1},
+                '场景类.情感与氛围': {'enabled': True, 'weight': 2, 'count': 1},
+                '场景类.背景环境': {'enabled': True, 'weight': 1, 'count': 1},
+                '场景类.反射效果': {'enabled': True, 'weight': 1, 'count': 1},
+                '场景类.室外': {'enabled': True, 'weight': 2, 'count': 1},
+                '场景类.城市': {'enabled': True, 'weight': 1, 'count': 1},
+                '场景类.建筑': {'enabled': True, 'weight': 2, 'count': 1},
+                '场景类.室内装饰': {'enabled': True, 'weight': 1, 'count': 1},
+                '场景类.自然景观': {'enabled': True, 'weight': 2, 'count': 1},
+                '场景类.人造景观': {'enabled': True, 'weight': 1, 'count': 1},              
+                '动物生物.动物': {'enabled': True, 'weight': 1, 'count': 1},
+                '动物生物.幻想生物': {'enabled': True, 'weight': 1, 'count': 1},
+                '动物生物.行为动态': {'enabled': True, 'weight': 1, 'count': 1}
             },
             
-            # R18成人内容详细设置
             'adultCategories': {
-                # [轻度内容] - 擦边、诱惑类
                 '轻度内容.涩影湿.擦边': {'enabled': True, 'weight': 2, 'count': 1},
-                
-                # [性行为类型] - 各种性行为
                 '性行为.涩影湿.NSFW.性行为类型': {'enabled': True, 'weight': 3, 'count': 2},
-                
-                # [身体部位] - 身体特征描述
                 '身体部位.涩影湿.NSFW.身体部位': {'enabled': True, 'weight': 2, 'count': 1},
-                
-                # [道具玩具] - 成人用品
-                '道具玩具.涩影湿.NSFW.道具与玩具': {'enabled': False, 'weight': 1, 'count': 1},
-                
-                # [束缚调教] - BDSM相关
-                '束缚调教.涩影湿.NSFW.束缚与调教': {'enabled': False, 'weight': 1, 'count': 1},
-                
-                # [特殊癖好] - 特殊情境和癖好
-                '特殊癖好.涩影湿.NSFW.特殊癖好与情境': {'enabled': False, 'weight': 1, 'count': 1},
-                
-                # [视觉效果] - 视觉风格和特效
+               '道具玩具.涩影湿.NSFW.道具与玩具': {'enabled': False, 'weight': 1, 'count': 1},
+                '束缚调教.涩影湿.NSFW.束缚与调教': {'enabled': False, 'weight': 1, 'count': 1},              
+                '特殊癖好.涩影湿.NSFW.特殊癖好与情境': {'enabled': False, 'weight': 1, 'count': 1},               
                 '视觉效果.涩影湿.NSFW.视觉风格与特定元素': {'enabled': True, 'weight': 1, 'count': 1}
             },
             
-            # 全局设置
             'excludedCategories': ['自定义', '灵感套装'],
-            'includeNSFW': False,  # 默认不包含R18成人内容
-            'totalTagsRange': {'min': 12, 'max': 20}  # 标签总数范围
+            'includeNSFW': False,
+            'totalTagsRange': {'min': 12, 'max': 20}
         }
     
     @classmethod
@@ -581,9 +555,6 @@ Output: A beautiful young girl with expressive eyes and a gentle smile, sitting 
 
 @PromptServer.instance.routes.get('/zhihui/random_settings')
 async def get_random_settings(request):
-    """
-    获取随机规则设置
-    """
     try:
         settings = TagSelector.get_random_settings()
         return web.json_response(settings)
@@ -592,9 +563,6 @@ async def get_random_settings(request):
 
 @PromptServer.instance.routes.post('/zhihui/random_settings')
 async def save_random_settings(request):
-    """
-    保存随机规则设置
-    """
     try:
         data = await request.json()
         
