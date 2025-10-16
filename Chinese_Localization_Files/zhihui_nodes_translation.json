@@ -570,5 +570,47 @@
         "outputs": {
             "any": "任意输出"
         }
+    },
+    "SunoSongStylePromptGenerator": {
+        "title": "Suno歌曲风格提示词生成器",
+        "description": "Suno AI歌曲风格生成器：结合歌词偏好和音乐元素生成结构化的Suno提示词，用于在Suno中快速构建风格一致的歌曲。",
+        "widgets": {
+            "preference": "偏好",
+            "Theme": "主题",
+            "Melody": "旋律",
+            "Harmony": "和声",
+            "Rhythm": "节奏",
+            "Structure or Form": "结构或形式",
+            "Instrumentation": "配器",
+            "Style/Genre": "风格/流派",
+            "Emotion": "情绪",
+            "Dynamics": "动态",
+            "Production": "制作",
+            "Originality and Creativity": "原创性和创造力",
+            "Vocal Style and Performance": "声乐风格和表现力",
+            "Output_original_text": "输出原文"
+        },
+        "outputs": {
+            "prompt": "提示词"
+        }
+    },
+    "SunoLyricsGenerator": {
+        "title": "Suno歌词生成器",
+        "description": "Suno AI歌词生成器：基于在线LLM的歌词生成工具，可生成结构化、可演唱的歌词，包含引言/主歌/副歌/桥段/尾声等部分，支持主题、语言、演唱编制、风格、情绪和流派等多维度引导。",
+        "inputs": {
+            "preference": "歌词创意"
+        },
+        "widgets": {
+            "Theme": "主题",
+            "Lyrics Language": "歌词语言",
+            "Vocal Arrangement": "演唱编制",
+            "Lyrics Style": "歌词风格",
+            "Mood": "情绪",
+            "Style/Genre": "风格/流派",
+            "Output_original_text": "输出原文"
+        },
+        "outputs": {
+            "lyrics": "歌词"
+        }
     }
 }

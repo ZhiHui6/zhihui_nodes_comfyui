@@ -33,6 +33,8 @@ from .Nodes.Preview_or_Compare_Images import PreviewOrCompareImages
 from .Nodes.PauseWorkflow import PauseWorkflow
 from .Nodes.TextEditorWithContinue import TextEditorWithContinue
 from .Nodes.TagSelector.TagSelector import TagSelector
+from .Nodes.SunoTools.SunoSongStylePromptGenerator import SunoSongStylePromptGenerator
+from .Nodes.SunoTools.SunoLyricsGenerator import SunoLyricsGenerator
 
 import os
 
@@ -72,6 +74,8 @@ NODE_CLASS_MAPPINGS = {
     "PauseWorkflow": PauseWorkflow,
     "TextEditorWithContinue": TextEditorWithContinue,
     "TagSelector": TagSelector,
+    "SunoSongStylePromptGenerator": SunoSongStylePromptGenerator,
+    "SunoLyricsGenerator": SunoLyricsGenerator,
 }
 
 NODE_DISPLAY_NAME_MAPPINGS = {
@@ -110,6 +114,8 @@ NODE_DISPLAY_NAME_MAPPINGS = {
     "PauseWorkflow": "Pause Workflow",
     "TextEditorWithContinue": "Text Editor with Continue",
     "TagSelector": "Tag Selector",
+    "SunoSongStylePromptGenerator": "Suno Song Style Prompt Generator",
+    "SunoLyricsGenerator": "Suno AI Lyrics Generator",
 }
 
 WEB_DIRECTORY = os.path.dirname(os.path.abspath(__file__))

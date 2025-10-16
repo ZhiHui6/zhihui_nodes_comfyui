@@ -1,7 +1,6 @@
 import { app } from "/scripts/app.js";
 import { api } from "/scripts/api.js";
 
-// 加载随机生成器模块
 const script = document.createElement('script');
 script.src = '/extensions/zhihui_nodes_comfyui/TagSelectorRandomGenerator.js';
 document.head.appendChild(script);
@@ -95,10 +94,7 @@ const commonStyles = {
     }
 }
 
-// 暴露函数给全局作用域
 window.updateCategoryRedDots = updateCategoryRedDots;
-
-// 暴露函数给全局作用域
 window.updateSelectedTagsOverview = updateSelectedTagsOverview;;
 
 function applyStyles(element, styles) {
@@ -169,16 +165,16 @@ async function loadTagsData() {
         if (response.ok) {
             const rawData = await response.json();
             tagsData = convertTagsFormat(rawData);
-            window.tagsData = tagsData; // 暴露给全局作用域
+            window.tagsData = tagsData; 
         } else {
             console.warn('Failed to load tags from server, using default data');
             tagsData = getDefaultTagsData();
-            window.tagsData = tagsData; // 暴露给全局作用域
+            window.tagsData = tagsData; 
         }
     } catch (error) {
         console.error('Error loading tags:', error);
         tagsData = getDefaultTagsData();
-        window.tagsData = tagsData; // 暴露给全局作用域
+        window.tagsData = tagsData;
     }
 }
 
@@ -580,7 +576,6 @@ function createTagSelectorDialog() {
         scrollbar-color: #4a9eff #334155;
     `;
     
-    // 添加滚动条样式兼容性处理
     const scrollbarStyle = document.createElement('style');
     scrollbarStyle.textContent = `
         /* Webkit browsers */
@@ -1418,7 +1413,6 @@ function createTagSelectorDialog() {
         flex-shrink: 0;
     `;
 
-    // 随机按钮容器 - 参照自定义标签样式
     const randomButtonsContainer = document.createElement('div');
     randomButtonsContainer.style.cssText = `
         display: flex;
@@ -1435,7 +1429,6 @@ function createTagSelectorDialog() {
         height: 45px;
     `;
 
-    // 随机功能标题
     const randomTitle = document.createElement('div');
     randomTitle.style.cssText = `
         color: #38bdf8;
@@ -1453,7 +1446,6 @@ function createTagSelectorDialog() {
     `;
     randomTitle.textContent = '随机标签';
 
-    // 分隔线
     const randomSeparator = document.createElement('div');
     randomSeparator.style.cssText = `
         width: 1px;
@@ -1463,7 +1455,6 @@ function createTagSelectorDialog() {
         flex-shrink: 0;
     `;
 
-    // 清空按钮容器
     const clearButtonContainer = document.createElement('div');
     clearButtonContainer.style.cssText = `
         display: flex;
@@ -1505,7 +1496,6 @@ function createTagSelectorDialog() {
         clearSelectedTags();
     };
 
-    // 随机生成器按钮
     const randomGeneratorBtn = document.createElement('button');
     randomGeneratorBtn.textContent = '设置';
     randomGeneratorBtn.style.cssText = `
@@ -1545,7 +1535,6 @@ function createTagSelectorDialog() {
         }
     };
 
-    // 一键随机组合按钮
     const quickRandomBtn = document.createElement('button');
     quickRandomBtn.textContent = '一键随机';
     quickRandomBtn.style.cssText = `
@@ -1585,22 +1574,15 @@ function createTagSelectorDialog() {
         }
     };
 
-    // 将随机按钮添加到随机按钮容器
     randomButtonsContainer.appendChild(randomTitle);
     randomButtonsContainer.appendChild(randomSeparator);
     randomButtonsContainer.appendChild(randomGeneratorBtn);
     randomButtonsContainer.appendChild(quickRandomBtn);
-    
-    // 将清空按钮添加到清空按钮容器
     clearButtonContainer.appendChild(clearBtn);
-    
-    // 将容器添加到右侧按钮区域
     rightButtonsSection.appendChild(randomButtonsContainer);
-    
     footer.appendChild(customTagsSection);
     footer.appendChild(rightButtonsSection);
     footer.appendChild(clearButtonContainer);
-
     rightPanel.appendChild(subCategoryTabs);
     rightPanel.appendChild(subSubCategoryTabs);
     rightPanel.appendChild(subSubSubCategoryTabs);
@@ -1638,7 +1620,6 @@ function createTagSelectorDialog() {
     document.body.appendChild(overlay);
 
     const handleKeyDown = (e) => {
-        // 如果随机规则设置界面正在显示，则不处理ESC键
         if (window.randomGeneratorDialog && window.randomGeneratorDialog.style.display === 'block') {
             return;
         }
@@ -1740,7 +1721,6 @@ function initializeCategoryList() {
             tagSelectorDialog.activeSubSubCategory = null;
             tagSelectorDialog.activeSubSubSubCategory = null;
 
-            // 自定义标签区域固定显示
             tagSelectorDialog.querySelector('.custom-tags-section').style.display = 'flex';
 
             showSubCategories(category);
@@ -2531,7 +2511,6 @@ function showTagsFromSubSubSub(category, subCategory, subSubCategory, subSubSubC
 
 let selectedTags = new Set();
 
-// 将必要的变量和函数暴露给全局作用域，供随机生成器使用
 window.selectedTags = selectedTags;
 window.tagsData = null;
 window.updateSelectedTags = null;
@@ -2713,7 +2692,6 @@ function updateSelectedTags() {
     updateSelectedTagsOverview();
 }
 
-// 暴露函数给全局作用域
 window.updateSelectedTags = updateSelectedTags;
 
 function updateSelectedTagsOverview() {

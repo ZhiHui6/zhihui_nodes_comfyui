@@ -47,6 +47,8 @@ app.registerExtension({
                     "4:7(768x1344)",
                     "12:5(1536x640)",
                     "5:12(640x1536)",
+                    "9:16(768x1344)",
+                    "16:9(1344x768)",
                 ];
 
                 const setComboOptions = (widget, values) => {
