@@ -114,7 +114,7 @@ class SunoLyricsGenerator:
     RETURN_NAMES = ("lyrics",)
     FUNCTION = "generate"
     CATEGORY = "zhihui/Generator"
-    DESCRIPTION = "Suno AI Lyrics Generator: Online LLM-powered generator producing structured, singable lyrics with sections (Intro/Verse/Chorus/Bridge/Outro) guided by theme, language, vocal arrangement, style, mood, and genre."
+    DESCRIPTION = "Suno AI Lyrics Generator: Online LLM-powered generator producing structured, singable lyrics with detailed meta-tags and sections ([Intro][Soft Guitar], [Verse 1][Piano], [Chorus][Soaring Vocals], etc.) guided by theme, language, vocal arrangement, style, mood, and genre."
 
     def _random_choice(self, value, options):
         if value == "Random":
@@ -137,7 +137,7 @@ class SunoLyricsGenerator:
 
     def _build_instruction(self, base, theme, language, vocal, lstyle, mood, genre):
         lang_tip = self._language_instruction(language)
-        system_prompt = f"""你是一位专业词作人。请基于“用户对歌曲的描述”与“音乐特性选项”的组合，创作符合用户描述、富有创造力且可演唱的专业歌词。
+        system_prompt = f"""你是一位专业词作人。请基于"用户对歌曲的描述"与"音乐特性选项"的组合，创作符合用户描述、富有创造力且可演唱的专业歌词。
 
 写作目标：
 - 用现代歌曲的表达写出自然、可演唱的句子，节奏清晰、韵脚自然。
@@ -153,17 +153,45 @@ class SunoLyricsGenerator:
 - 演唱编制：{vocal}
 - 核心创作依据（用户描述）：{base}
 
-写作建议（非强制格式）：
-- 可采用段落组织：Verse 1 -> Pre-Chorus -> Chorus -> Verse 2 -> Bridge -> Final Chorus -> Outro。
-- 段落名称无需输出；只需直接给出歌词正文。
-- 总行数建议 16–28 行，避免空洞注释或元说明。
+**重要格式要求：必须使用结构化元标签格式输出歌词**
+
+格式规范：
+1. 每个段落必须以结构标签开头，格式为：[段落类型][音乐描述]
+2. 可选的演唱指导注释用圆括号包围，如：(Humming a gentle melody)
+3. 段落类型包括：[Intro]、[Verse 1]、[Verse 2]、[Pre-Chorus]、[Chorus]、[Bridge]、[Outro]等
+4. 音乐描述包括：[Soft Acoustic Guitar]、[Melancholy Piano]、[Building Strings]、[Soaring Vocals]、[Heartbreak Anthem]、[Emotional Guitar Solo]、[Fading Acoustic Guitar]等
+
+输出格式示例：
+[Intro][Soft Acoustic Guitar]
+(Humming a gentle melody)
+
+[Verse 1][Melancholy Piano]
+歌词内容...
+
+[Pre-Chorus][Building Strings]
+歌词内容...
+
+[Chorus][Soaring Vocals][Heartbreak Anthem]
+歌词内容...
+
+[Bridge][Emotional Guitar Solo]
+歌词内容...
+
+[Outro][Fading Acoustic Guitar]
+歌词内容...
+(Humming fades away)
+
+写作建议：
+- 采用完整的歌曲结构：Intro -> Verse 1 -> Pre-Chorus -> Chorus -> Verse 2 -> Pre-Chorus -> Chorus -> Bridge -> Chorus -> Outro
+- 总行数建议 20–35 行（不包括标签行）
+- 音乐描述标签要与歌曲的情绪和风格相匹配
 
 限制：
-- 不要输出任何解释、标签、括号中的描述或格式说明。
-- 不要在歌词之外输出额外内容（例如“以下是歌词”）。
-- 允许适度重复以加强记忆点，但避免机械重复。
+- 必须严格按照上述格式输出，包含所有结构化标签
+- 不要在歌词之外输出额外的解释内容
+- 允许适度重复以加强记忆点，但避免机械重复
 
-现在直接输出完整歌词。
+现在直接输出完整的结构化歌词。
 """
         return system_prompt
 

@@ -4,7 +4,7 @@
 
 ## 📖 项目介绍 | Project Introduction
 
-这是一个由<span style="color: red;"> **Binity** </span>精心创建的 ComfyUI 自定义节点工具合集，旨在为用户提供一系列实用、高效的节点，以增强和扩展 ComfyUI 的功能。本节点集包含30+功能节点，涵盖文本处理、提示词优化、图像处理、翻译工具、Latent处理等多个方面，为您的 AI 创作提供全方位支持。<br>This is a ComfyUI custom node collection carefully created by <span style="color: red;"> **Binity** </span>, designed to provide users with a series of practical and efficient nodes to enhance and extend ComfyUI's functionality. This node collection contains 25+ functional nodes, covering text processing, prompt optimization, image processing, translation tools, Latent processing and many other aspects, providing comprehensive support for your AI creation.
+这是一个由<span style="color: red;"> **Binity** </span>精心创建的 ComfyUI 自定义节点工具合集，旨在为用户提供一系列实用、高效的节点，以增强和扩展 ComfyUI 的功能。本节点集包含30+功能节点，涵盖文本处理、提示词优化、图像处理、翻译工具、音乐创作辅助、Latent处理等多个方面，为您的 AI 创作提供全方位支持。<br>This is a ComfyUI custom node collection carefully created by <span style="color: red;"> **Binity** </span>, designed to provide users with a series of practical and efficient nodes to enhance and extend ComfyUI's functionality. This node collection contains 30+ functional nodes, covering text processing, prompt optimization, image processing, translation tools, music composition assistant , Latent processing and many other aspects, providing comprehensive support for your AI creation.
 
 ***如果这个项目对您有帮助，请给我们一个⭐Star！您的支持是我们持续改进的动力。***<br>***If this project helps you, please give us a⭐Star! Your support is our motivation for continuous improvement.***
 
@@ -473,6 +473,43 @@ This node collection contains numerous nodes with different functions, divided i
 <img src="images/颜色匹配.jpg" alt="色彩匹配" width="45%"/>
 </a>
 </div>
+</td>
+</tr>
+</table>
+
+### 🎵 音乐相关节点 | Music Related Nodes
+
+<table>
+<tr>
+<th width="30%">节点名称 | Node Name</th>
+<th>功能描述 | Function Description</th>
+</tr>
+<tr>
+<td><b>Suno歌词生成器</b><br><b>Suno Lyrics Generator</b><br><code>SunoLyricsGenerator</code></td>
+<td>
+专业的AI歌词创作工具，基于在线LLM生成结构化的可演唱歌词，支持多种音乐风格和语言。<br>Professional AI lyrics creation tool that generates structured, singable lyrics based on online LLM, supporting multiple music styles and languages.
+
+<br>
+<div align="left">
+<a href="images/Lyrics Generator.jpg" target="_blank">
+<img src="images/Lyrics Generator.jpg" alt="Suno歌词生成器" width="45%"/>
+</a>
+</div>
+
+</td>
+</tr>
+<tr>
+<td><b>Suno歌曲风格提示词生成器</b><br><b>Suno Song Style Prompt Generator</b><br><code>SunoSongStylePromptGenerator</code></td>
+<td>
+专业的歌曲风格提示词生成工具，结合用户偏好和音乐元素，生成结构化的Suno风格提示词，用于快速构建风格一致的歌曲。<br>Professional song style prompt generation tool that combines user preferences and musical elements to generate structured Suno style prompts for quickly building stylistically consistent songs.
+
+<br>
+<div align="left">
+<a href="images/Song Style Prompt Generator.jpg" target="_blank">
+<img src="images/Song Style Prompt Generator.jpg" alt="Suno歌曲风格提示词生成器" width="45%"/>
+</a>
+</div>
+
 </td>
 </tr>
 </table>
