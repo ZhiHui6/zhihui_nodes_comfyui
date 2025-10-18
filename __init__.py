@@ -35,7 +35,8 @@ from .Nodes.TextEditorWithContinue import TextEditorWithContinue
 from .Nodes.TagSelector.TagSelector import TagSelector
 from .Nodes.SunoTools.SunoSongStylePromptGenerator import SunoSongStylePromptGenerator
 from .Nodes.SunoTools.SunoLyricsGenerator import SunoLyricsGenerator
-from .Nodes.Qwen3VL.Qwen3VL import Qwen3VLAdv, Qwen3VLExtraOptions
+from .Nodes.Qwen3VL.Qwen3VL import Qwen3VLAdv
+from .Nodes.Qwen3VL.Qwen3VLExtraOptions import Qwen3VLExtraOptions
 from .Nodes.Qwen3VL.AuxiliaryNodes import ImageLoader, VideoLoader, MultiplePathsInput
 from .Nodes.Qwen3VL.ModelDownloader import ModelDownloader
 

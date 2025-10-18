@@ -620,6 +620,8 @@
             "source_path": "源路径"
         },
         "widgets": {
+            "output_language": "输出语言",
+            "nsfw_jailbreak": "NSFW破限",
             "batch_mode": "批处理模式",
             "batch_directory": "批处理目录",
             "user_prompt": "用户提示词",
@@ -659,7 +661,7 @@
         "title": "Qwen3-VL额外选项",
         "description": "Qwen3-VL额外选项：为Qwen3-VL模型提供详细的图像描述控制选项，可精确控制输出内容的各个方面，包括人物信息、光照、相机角度、美学质量等多维度参数。",
         "widgets": {
-            "refer_character_name": "引用角色名称",
+            "refer_character_name": "参考角色名称",
             "exclude_people_info": "排除人物信息",
             "include_lighting": "包含光照信息",
             "include_camera_angle": "包含相机角度",
@@ -674,18 +676,18 @@
             "specify_depth_field": "指定景深",
             "specify_lighting_sources": "指定光源",
             "do_not_use_ambiguous_language": "不使用模糊语言",
-            "include_nsfw": "包含NSFW内容",
-            "only_describe_most_important_elements": "仅描述最重要元素",
-            "do_not_include_artist_name_or_title": "不包含艺术家姓名或标题",
+            "include_nsfw": "包含NSFW信息",
+            "only_describe_most_important_elements": "只描述最重要元素",
+            "do_not_include_artist_name_or_title": "不包含艺术家名或标题",
             "identify_image_orientation": "识别图像方向",
-            "use_vulgar_slang_and_profanity": "使用粗俗俚语和亵渎",
+            "use_vulgar_slang_and_profanity": "使用粗俗俚语和脏话",
             "do_not_use_polite_euphemisms": "不使用礼貌委婉语",
             "include_character_age": "包含角色年龄",
-            "include_camera_shot_type": "包含相机拍摄类型",
+            "include_camera_shot_type": "包含相机镜头类型",
             "exclude_mood_feeling": "排除情绪感受",
             "include_camera_vantage_height": "包含相机视角高度",
             "mention_watermark": "提及水印",
-            "avoid_meta_descriptive_phrases": "避免元描述短语",
+            "avoid_meta_descriptive_phrases": "避免元描述性短语",
             "character_name": "角色名称"
         },
         "outputs": {
