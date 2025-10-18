@@ -647,7 +647,9 @@
         },
         "widgets": {
             "model": "模型",
-            "quantization": "量化"
+            "platform": "平台",
+            "quantization": "量化",
+            "force_redownload": "强制重新下载"
         },
         "outputs": {
             "model_path": "模型路径"
