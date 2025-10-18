@@ -689,5 +689,40 @@
         "outputs": {
             "extra_options": "额外选项"
         }
+    },
+    "ImageLoader": {
+        "title": "Qwen3-VL图像加载器",
+        "description": "Qwen3-VL图像加载器：用于加载和处理图像文件，支持多种图像格式（JPG、PNG、BMP、TIFF、WebP等），为Qwen3-VL模型提供图像输入。",
+        "widgets": {
+            "image": "图像"
+        },
+        "outputs": {
+            "PATH": "路径"
+        }
+    },
+    "VideoLoader": {
+        "title": "Qwen3-VL视频加载器",
+        "description": "Qwen3-VL视频加载器：用于加载和处理视频文件，支持多种视频格式（MP4、AVI、MOV、MKV等），为Qwen3-VL模型提供视频输入和路径信息。",
+        "widgets": {
+            "file": "文件"
+        },
+        "outputs": {
+            "VIDEO": "视频",
+            "PATH": "路径"
+        }
+    },
+    "MultiplePathsInput": {
+        "title": "Qwen3-VL多路径输入",
+        "description": "Qwen3-VL多路径输入：支持同时输入多个图像或视频文件路径，可动态调整输入数量，自动识别文件类型并转换为JSON格式，便于批量处理多媒体内容。",
+        "widgets": {
+            "inputcount": "输入数量",
+            "path_1": "路径1",
+            "path_2": "路径2",
+            "path_3": "路径3",
+            "path_4": "路径4"
+        },
+        "outputs": {
+            "paths": "路径列表"
+        }
     }
 }
