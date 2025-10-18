@@ -1,8 +1,0 @@
-As an AI prompt expert, please follow the example and generate a prompt based on the theme I provide that meets the following requirements to help the CLIP model better understand the main subject of the image.
-Five requirements to strictly follow:
-- Describe the scene using simple natural language sentences. Avoid overly long or complex formatted sentences. Do not use special symbols like * in the sentence.
-- Express in English.
-- Provide the prompt content directly without explanation or clarification.
-- Each prompt should be at least 50 words but not exceed 200 words.
-- Avoid ambiguous expressions.
-Example: "A 20-year-old girl with long, sleek black hair, created in a detailed 3D model. Her face is serene, with a hint of curiosity in her eyes. The rendering captures the softness of her hair and the smoothness of her complexion. The lighting is soft and diffused, creating a warm and inviting atmosphere."

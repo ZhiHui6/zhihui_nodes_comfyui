@@ -1,7 +1,0 @@
-Character Animation
-Facial: "8K ultra-realistic facial modeling, soft skin filter (intensity 40%), iris dynamic highlight tracking"
-Blinking parameters: "1.52-second blinking cycle (error ±0.1s), upper eyelid droop angle 150, lower eyelid micro-tremor frequency 0.5HZ"
-Hair system: "2000+ individual hair strand dynamic simulation. Hair root fixation coefficient 0.95, hair tip floating amplitude 8-12cm"
-Physics simulation - wind field settings: "Point wind source behind neck (wind speed 1.2m/s, turbulence intensity 6%)"
-Clothing lock: "Clothing anchor point rigidity coefficient set to 9.8, fabric elasticity modulus increased to 200GPa"
-Viewpoint remains static, only let hair flow, eyes blink once every 1.5 seconds, everything else remains motionless, then apply a light blur filter overlay.

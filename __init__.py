@@ -35,6 +35,9 @@ from .Nodes.TextEditorWithContinue import TextEditorWithContinue
 from .Nodes.TagSelector.TagSelector import TagSelector
 from .Nodes.SunoTools.SunoSongStylePromptGenerator import SunoSongStylePromptGenerator
 from .Nodes.SunoTools.SunoLyricsGenerator import SunoLyricsGenerator
+from .Nodes.Qwen3VL.Qwen3VL import Qwen3VLAdv, Qwen3VLExtraOptions
+from .Nodes.Qwen3VL.AuxiliaryNodes import ImageLoader, VideoLoader, MultiplePathsInput
+from .Nodes.Qwen3VL.ModelDownloader import ModelDownloader
 
 import os
 
@@ -76,6 +79,13 @@ NODE_CLASS_MAPPINGS = {
     "TagSelector": TagSelector,
     "SunoSongStylePromptGenerator": SunoSongStylePromptGenerator,
     "SunoLyricsGenerator": SunoLyricsGenerator,
+    "Qwen3VLAdv": Qwen3VLAdv,
+    "Qwen3VLExtraOptions": Qwen3VLExtraOptions,
+    "ImageLoader": ImageLoader,
+    "VideoLoader": VideoLoader,
+    "MultiplePathsInput": MultiplePathsInput,
+    "ModelDownloader": ModelDownloader,
+
 }
 
 NODE_DISPLAY_NAME_MAPPINGS = {
@@ -116,6 +126,13 @@ NODE_DISPLAY_NAME_MAPPINGS = {
     "TagSelector": "Tag Selector",
     "SunoSongStylePromptGenerator": "Suno Song Style Prompt Generator",
     "SunoLyricsGenerator": "Suno AI Lyrics Generator",
+    "Qwen3VLAdv": "Qwen3-VL Advanced",
+    "Qwen3VLExtraOptions": "Qwen3-VL Extra Options",
+    "ImageLoader": "Qwen3-VL Image Loader",
+    "VideoLoader": "Qwen3-VL Video Loader",
+    "MultiplePathsInput": "Qwen3-VL Multiple Paths Input",
+    "ModelDownloader": "Qwen3-VL Model Downloader",
+
 }
 
 WEB_DIRECTORY = os.path.dirname(os.path.abspath(__file__))

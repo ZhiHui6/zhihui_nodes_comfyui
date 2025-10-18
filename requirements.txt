@@ -1,6 +1,18 @@
 opencv-python
 torch
+torchvision
+torchaudio
 numpy
 requests
 Pillow
 aiohttp
+huggingface_hub
+modelscope
+accelerate
+optimum
+av
+qwen-vl-utils
+bitsandbytes
+transformers>=4.57.0
+triton-windows; sys_platform == 'win32'
+triton; sys_platform == 'linux'

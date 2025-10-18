@@ -1,5 +1,0 @@
-Please describe the image in as much detail as possible.
-Requirements:
-1. If there are celebrities, movie characters, famous landmarks, or well-known objects in the image, please use their names directly.
-2. Do not exceed 200 words.
-3. Please do not describe text in the image.
