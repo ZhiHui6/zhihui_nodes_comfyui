@@ -617,7 +617,8 @@
         "title": "Qwen3-VL高级版",
         "description": "Qwen3-VL高级版：基于阿里巴巴Qwen3-VL多模态大语言模型的图像理解节点，支持多种模型规格和量化选项，可进行详细的图像描述、分析和理解，支持批处理模式和自定义提示词。",
         "inputs": {
-            "source_path": "源路径"
+        "extra_options": "额外选项",
+        "source_path": "源路径"
         },
         "widgets": {
             "output_language": "输出语言",
@@ -634,8 +635,8 @@
             "max_pixels": "最大像素数",
             "seed": "随机种子",
             "attention": "注意力机制",
-            "keep_model_loaded": "保持模型加载",
-            "extra_options": "额外选项"
+            "keep_model_loaded": "保持模型加载"
+
         },
         "outputs": {
             "STRING": "字符串"
