@@ -189,5 +189,7 @@
     "flash_attention_2":"Flash注意力2",
     "huggingface":"HuggingFace",
     "hf-mirror":"HF镜像",
-    "modelscope":"魔搭社区"
+    "modelscope":"魔搭社区",
+    "open":"开启",
+    "close":"关闭"
 }
