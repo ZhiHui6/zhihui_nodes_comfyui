@@ -65,7 +65,6 @@ class MultiplePathsInput:
         result = path_list
         return (result,)
 
-
 class ImageLoader:
     @classmethod
     def INPUT_TYPES(s):
@@ -103,7 +102,6 @@ class ImageLoader:
             return "Invalid image file: {}".format(image)
 
         return True
-
 
 class VideoLoader(ComfyNodeABC):
     @classmethod

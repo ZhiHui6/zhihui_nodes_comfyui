@@ -643,7 +643,7 @@
         }
     },
     "ModelDownloader": {
-        "title": "模型下载器",
+        "title": "Qwen3-VL模型下载器",
         "description": "模型下载器：用于下载和管理Qwen3-VL模型文件，支持从Hugging Face等平台下载，可自定义模型规格和量化选项。",
         "inputs": {
             "model_name": "模型名称"

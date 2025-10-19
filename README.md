@@ -525,6 +525,13 @@ This node collection contains numerous nodes with different functions, divided i
 <td><b>Qwen3-VL高级版</b><br><b>Qwen3-VL Advanced</b><br><code>Qwen3VLAdv</code></td>
 <td>
 基于阿里巴巴Qwen3-VL模型的高级视觉理解节点，支持图像和视频分析、OCR文字识别、场景描述等多种AI视觉任务，具备批量处理和多种量化选项。<br>Advanced vision understanding node based on Alibaba's Qwen3-VL model, supporting image and video analysis, OCR text recognition, scene description and other AI vision tasks, with batch processing and multiple quantization options.
+
+<br>
+<div align="left">
+<a href="images/Qwen3VL高级版.jpg" target="_blank">
+<img src="images/Qwen3VL高级版.jpg" alt="Qwen3-VL Advanced" width="45%"/>
+</a>
+</div>
 </td>
 </tr>
 <tr>
@@ -534,8 +541,8 @@ This node collection contains numerous nodes with different functions, divided i
 
 <br>
 <div align="left">
-<a href="images/Qwen3-VL Extra Options.svg" target="_blank">
-<img src="images/Qwen3-VL Extra Options.svg" alt="Qwen3-VL Extra Options" width="45%"/>
+<a href="images/Qwen3VL额外选项.jpg" target="_blank">
+<img src="images/Qwen3VL额外选项.jpg" alt="Qwen3-VL Extra Options" width="45%"/>
 </a>
 </div>
 </td>
@@ -544,6 +551,13 @@ This node collection contains numerous nodes with different functions, divided i
 <td><b>Qwen3-VL图像加载器</b><br><b>Qwen3-VL Image Loader</b><br><code>ImageLoader</code></td>
 <td>
 专为Qwen3-VL优化的图像加载节点，支持多种图像格式和批量加载功能。<br>Image loader node optimized for Qwen3-VL, supporting multiple image formats and batch loading functionality.
+
+<br>
+<div align="left">
+<a href="images/Qwen3-VL Image Loader.jpg" target="_blank">
+<img src="images/Qwen3-VL Image Loader.jpg" alt="Qwen3-VL Image Loader" width="45%"/>
+</a>
+</div>
 </td>
 </tr>
 <tr>
@@ -553,8 +567,8 @@ This node collection contains numerous nodes with different functions, divided i
 
 <br>
 <div align="left">
-<a href="images/Qwen3-VL Video Loader.svg" target="_blank">
-<img src="images/Qwen3-VL Video Loader.svg" alt="Qwen3-VL Video Loader" width="45%"/>
+<a href="images/Qwen3-VL Video Loader.jpg" target="_blank">
+<img src="images/Qwen3-VL Video Loader.jpg" alt="Qwen3-VL Video Loader" width="45%"/>
 </a>
 </div>
 </td>
@@ -563,12 +577,26 @@ This node collection contains numerous nodes with different functions, divided i
 <td><b>Qwen3-VL多路径输入</b><br><b>Qwen3-VL Multiple Paths Input</b><br><code>MultiplePathsInput</code></td>
 <td>
 支持同时处理多个文件路径的输入节点，便于批量处理图像和视频文件。<br>Input node that supports processing multiple file paths simultaneously, facilitating batch processing of image and video files.
+
+<br>
+<div align="left">
+<a href="images/Qwen3-VL Multiple Paths Input.jpg" target="_blank">
+<img src="images/Qwen3-VL Multiple Paths Input.jpg" alt="Qwen3-VL Multiple Paths Input" width="45%"/>
+</a>
+</div>
 </td>
 </tr>
 <tr>
 <td><b>Qwen3-VL模型下载器</b><br><b>Qwen3-VL Model Downloader</b><br><code>ModelDownloader</code></td>
 <td>
 自动下载和管理Qwen3-VL模型的工具节点，支持从HuggingFace、ModelScope等平台下载不同版本的模型。<br>Tool node for automatically downloading and managing Qwen3-VL models, supporting downloads from HuggingFace, ModelScope and other platforms for different model versions.
+
+<br>
+<div align="left">
+<a href="images/Qwen3-VL Model Downloader.jpg" target="_blank">
+<img src="images/Qwen3-VL Model Downloader.jpg" alt="Qwen3-VL Model Downloader" width="45%"/>
+</a>
+</div>
 </td>
 </tr>
 </table>
