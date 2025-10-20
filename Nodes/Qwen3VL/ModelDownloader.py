@@ -25,10 +25,8 @@ class ModelDownloader:
                         "Qwen3-VL-4B-Thinking-FP8",
                         "Qwen3-VL-8B-Instruct-FP8",
                         "Qwen3-VL-8B-Thinking-FP8",
-                        "Qwen3-VL-4B-Instruct-abliterated",
-                        "Qwen3-VL-4B-Thinking-abliterated",
-                        "Qwen3-VL-8B-Instruct-abliterated",
-                        "Qwen3-VL-8B-Thinking-abliterated",
+                        "Huihui-Qwen3-VL-8B-Instruct-abliterated",
+                        
                     ],
                     {"default": "Qwen3-VL-8B-Instruct"},
                 ),
@@ -45,7 +43,7 @@ class ModelDownloader:
     FUNCTION = "download_model"
     CATEGORY = "Comfyui_Qwen3-VL_Adv/Model Management"
 
-    def get_platform_config(self, platform: str) -> Dict[str, Any]:
+    def get_platform_config(self, platform: str, model: str = None) -> Dict[str, Any]:
         configs = {
             "huggingface": {
                 "repo_prefix": "qwen",
@@ -63,7 +61,15 @@ class ModelDownloader:
                 "use_hf_hub": False,
             }
         }
-        return configs.get(platform, configs["huggingface"])
+        
+        config = configs.get(platform, configs["huggingface"])
+        
+        # 为abliterated系列模型在ModelScope平台设置特殊的仓库前缀
+        if platform == "modelscope" and model and "abliterated" in model:
+            config = config.copy()  # 创建副本避免修改原配置
+            config["repo_prefix"] = "ayumix5"
+            
+        return config
 
     def get_model_save_path(self, model: str) -> str:
         models_dir = os.path.join(folder_paths.models_dir, "prompt_generator")
@@ -160,17 +166,9 @@ class ModelDownloader:
     def download_model_async(self, model: str, platform: str, model_path: str, 
                             force_redownload: bool):
         try:
-            config = self.get_platform_config(platform)
+            config = self.get_platform_config(platform, model)
             
-            if "abliterated" in model:
-                if platform == "modelscope":
-                    repo_id = f"fireicewolf/{model}"
-                elif platform in ["huggingface", "hf-mirror"]:
-                    repo_id = f"prithivMLmods/{model}"
-                else:
-                    repo_id = f"{config['repo_prefix']}/{model}"
-            else:
-                repo_id = f"{config['repo_prefix']}/{model}"
+            repo_id = f"{config['repo_prefix']}/{model}"
             
             self.download_status[model] = {
                 "status": "downloading",
