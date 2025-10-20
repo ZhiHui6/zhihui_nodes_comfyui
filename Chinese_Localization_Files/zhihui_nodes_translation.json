@@ -635,8 +635,8 @@
             "max_pixels": "最大像素数",
             "seed": "随机种子",
             "attention": "注意力机制",
-            "keep_model_loaded": "保持模型加载"
-
+            "keep_model_loaded": "保持模型加载",
+            "device": "设备"
         },
         "outputs": {
             "STRING": "字符串"
