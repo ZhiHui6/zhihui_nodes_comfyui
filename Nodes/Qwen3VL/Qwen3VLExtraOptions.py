@@ -31,7 +31,7 @@ class Qwen3VLExtraOptions:
                 "include_camera_vantage_height": ("BOOLEAN", {"default": False}),
                 "mention_watermark": ("BOOLEAN", {"default": False}),
                 "avoid_meta_descriptive_phrases": ("BOOLEAN", {"default": False}),
-                "character_name": ("STRING", {"default": "Character", "multiline": False}),
+                "character_name": ("STRING", {"default": "", "multiline": False}),
             },
             "optional": {
             }
