@@ -80,7 +80,6 @@ class ImageLoader:
         }
 
     CATEGORY = "Comfyui_Qwen3-VL_Adv"
-
     RETURN_TYPES = ("PATH",)
     FUNCTION = "load_image"
 
@@ -114,12 +113,11 @@ class VideoLoader(ComfyNodeABC):
         ]
         files = folder_paths.filter_files_content_types(files, ["video"])
         return {
-            "required": {"file": (sorted(files), {"video_upload": True})},
+            "required": {"file": (sorted(files), {"video_upload": True, "video_preview": True})},
         }
 
     CATEGORY = "Comfyui_Qwen3-VL_Adv"
-
-    RETURN_TYPES = (IO.VIDEO, "PATH")
+    RETURN_TYPES = ("PATH")
     FUNCTION = "load_video"
 
     def load_video(self, file):

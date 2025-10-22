@@ -39,6 +39,37 @@ app.registerExtension({
                     });
                 };
                 break;
+            case "VideoLoader":
+                const onNodeCreated = nodeType.prototype.onNodeCreated;
+                nodeType.prototype.onNodeCreated = function () {
+                    const r = onNodeCreated ? onNodeCreated.apply(this, arguments) : undefined;
+                    
+                    const videoWidget = this.widgets?.find(w => w.name === "file" && w.type === "combo");
+                    if (videoWidget) {
+                        const originalCallback = videoWidget.callback;
+                        videoWidget.callback = function(value) {
+                            if (originalCallback) {
+                                originalCallback.call(this, value);
+                            }
+                            
+                            setTimeout(() => {
+                                const videoElements = document.querySelectorAll('video');
+                                videoElements.forEach(video => {
+                                    if (video.src && video.src.includes(value)) {
+                                        video.style.objectFit = 'contain';
+                                        video.style.maxWidth = '100%';
+                                        video.style.maxHeight = '100%';
+                                        video.style.width = 'auto';
+                                        video.style.height = 'auto';
+                                    }
+                                });
+                            }, 100);
+                        };
+                    }
+                    
+                    return r;
+                };
+                break;
         }
     },
     async setup() {
