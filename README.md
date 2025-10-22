@@ -599,6 +599,19 @@ This node collection contains numerous nodes with different functions, divided i
 </div>
 </td>
 </tr>
+<tr>
+<td><b>Qwen3-VL路径切换器</b><br><b>Qwen3-VL Path Switch</b><br><code>PathSwitchDualMode</code></td>
+<td>
+双通道路径切换器，支持手动和自动两种切换模式。可在2个来自MultiplePathsInput节点的路径输入之间智能切换，支持注释标签便于管理。手动模式下可指定选择通道，自动模式下智能选择第一个非空输入，适用于工作流中的条件分支和动态切换。输出可直接连接到Qwen3-VL高级版的source_path输入。<br>Dual-channel path switcher supporting both manual and automatic switching modes. Can intelligently switch between 2 path inputs from MultiplePathsInput nodes, with annotation labels for easy management. Manual mode allows specifying channel selection, while automatic mode intelligently selects the first non-empty input, suitable for conditional branching and dynamic switching in workflows. Output can be directly connected to Qwen3-VL Advanced's source_path input.
+
+<br>
+<div align="left">
+<a href="images/Qwen3-VL Path Switch.jpg" target="_blank">
+<img src="images/Qwen3-VL Path Switch.jpg" alt="Qwen3-VL Path Switch" width="45%"/>
+</a>
+</div>
+</td>
+</tr>
 </table>
 
 ### ⚙️ 逻辑与工具类节点 | Logic and Utility Nodes
