@@ -13,7 +13,7 @@ from pathlib import Path
 
 QWEN_PROMPT_TYPES = {
     "Ignore": "",
-    "Detailed Explanation":"Please explain the image content in the utmost detail.",
+    "Detailed_Explanation":"Please explain the image content in the utmost detail.",
     "Describe": "Describe this image in detail.",
     "Caption": "Write a concise caption for this image.",
     "Analyze": "Analyze the main elements and scene in this image.",
