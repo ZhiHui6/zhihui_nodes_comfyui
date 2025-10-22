@@ -13,6 +13,7 @@ from pathlib import Path
 
 QWEN_PROMPT_TYPES = {
     "Ignore": "",
+    "Detailed Explanation":"Please explain the image content in the utmost detail.",
     "Describe": "Describe this image in detail.",
     "Caption": "Write a concise caption for this image.",
     "Analyze": "Analyze the main elements and scene in this image.",
@@ -45,32 +46,31 @@ class Qwen3VLAdv:
         )
 
     def check_model_exists(self, model):
-        """
-        检查模型是否已下载到本地
-        
-        Args:
-            model: 模型名称
-            
-        Returns:
-            tuple: (is_exists, model_path, error_message)
-        """
+     
         model_id = f"qwen/{model}"
         model_path = os.path.join(
             folder_paths.models_dir, "prompt_generator", os.path.basename(model_id)
         )
         
-        # 检查模型目录是否存在
         if not os.path.exists(model_path):
             error_msg = f"模型 '{model}' 未找到！请使用 'ModelDownloader' 模型下载器节点下载Qwen3-VL模型。"
             return False, model_path, error_msg
         
-        # 检查模型文件是否完整（至少包含config.json）
         config_file = os.path.join(model_path, "config.json")
         if not os.path.exists(config_file):
             error_msg = f"模型 '{model}' 文件不完整！请使用 'ModelDownloader' 模型下载器节点重新下载Qwen3-VL模型。"
             return False, model_path, error_msg
         
         return True, model_path, None
+
+    def _apply_output_language(self, final_prompt, output_language):
+        if output_language == "Chinese":
+            return final_prompt + " 请用中文回答。"
+        elif output_language == "english":
+            return final_prompt + " Please respond in English."
+        elif output_language == "Chinese&English":
+            return final_prompt + " 请用中英双语回答，先用中文描述，然后用英文描述。Please respond in both Chinese and English, first describe in Chinese, then describe in English."
+        return final_prompt
 
     @classmethod
     def INPUT_TYPES(s):
@@ -80,7 +80,7 @@ class Qwen3VLAdv:
                 "batch_directory": ("STRING", {"default": ""}),
                 "user_prompt": ("STRING", {"default": "", "multiline": True}),
                 "preset_prompt": (list(QWEN_PROMPT_TYPES.keys()), {"default": "Ignore"}),
-                "output_language": (["Ignore", "Chinese", "english"], {"default": "Ignore"}),
+                "output_language": (["Ignore", "Chinese", "english", "Chinese&English"], {"default": "Ignore"}),
                 "model": (
                     [
                         "Qwen3-VL-4B-Instruct",
@@ -183,10 +183,7 @@ class Qwen3VLAdv:
                 extra_text = " " + " ".join(extra_instructions)
                 final_prompt = final_prompt + extra_text
         
-        if output_language == "Chinese":
-            final_prompt = final_prompt + " 请用中文回答。"
-        elif output_language == "english":
-            final_prompt = final_prompt + " Please respond in English."
+        final_prompt = self._apply_output_language(final_prompt, output_language)
         
         if batch_mode:
             conflicts = []
@@ -213,7 +210,6 @@ class Qwen3VLAdv:
         if seed != -1:
             torch.manual_seed(seed)
         
-        # 检查模型是否存在
         model_exists, model_path, error_message = self.check_model_exists(model)
         if not model_exists:
             raise ValueError(error_message)
@@ -371,7 +367,6 @@ class Qwen3VLAdv:
         if not image_files:
             return (f"No image files found in directory '{batch_directory}'.",)
         
-        # 检查模型是否存在
         model_exists, model_path, error_message = self.check_model_exists(model)
         if not model_exists:
             return (error_message,)
@@ -414,10 +409,7 @@ class Qwen3VLAdv:
             if extra_instructions:
                 final_prompt += " " + " ".join(extra_instructions)
         
-        if output_language == "Chinese":
-            final_prompt += " 请用中文回答。"
-        elif output_language == "english":
-            final_prompt += " Please respond in English."
+        final_prompt = self._apply_output_language(final_prompt, output_language)
         
         for image_file in image_files:
             try:
