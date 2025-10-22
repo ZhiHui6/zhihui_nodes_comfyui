@@ -117,7 +117,8 @@ class VideoLoader(ComfyNodeABC):
         }
 
     CATEGORY = "Comfyui_Qwen3-VL_Adv"
-    RETURN_TYPES = ("PATH")
+    RETURN_TYPES = ("VIDEO", "PATH")
+    RETURN_NAMES = ("VIDEO", "PATH")
     FUNCTION = "load_video"
 
     def load_video(self, file):
