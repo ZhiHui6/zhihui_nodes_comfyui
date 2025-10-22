@@ -474,6 +474,6 @@ class Qwen3VLAdv:
                 torch.cuda.empty_cache()
                 torch.cuda.ipc_collect()
 
-        log_message = f"Batch processing completed. Processed: {processed_count} images, Failed: {failed_count} images in directory '{directory}'."
+        log_message = f"Batch processing completed. Processed: {processed_count} images, Failed: {failed_count} images in directory '{batch_directory}'."
         
         return (log_message,)

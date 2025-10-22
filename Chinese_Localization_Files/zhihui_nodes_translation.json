@@ -729,5 +729,20 @@
         "outputs": {
             "paths": "路径列表"
         }
+    },
+    "PathSwitch": {
+        "title": "Qwen3-VL路径切换器",
+        "description": "双通道路径切换器，支持手动和自动模式。可在2个来自MultiplePathsInput节点的路径输入之间切换，支持注释标签便于管理，自动模式下智能选择非空输入，适用于工作流中的条件分支和动态切换。输出可连接到Qwen3-VL高级版的source_path输入。",
+        "widgets": {
+            "mode": "模式",
+            "select_channel": "选择通道",
+            "Path_1": "路径1",
+            "Path_2": "路径2",
+            "Path_1_comment": "路径1备注",
+            "Path_2_comment": "路径2备注"
+        },
+        "outputs": {
+            "output_path": "输出路径"
+        }
     }
 }

@@ -141,7 +141,7 @@ class ModelDownloader:
             
             ms_snapshot_download(
                 model_id=repo_id,
-                cache_dir=local_dir,
+                local_dir=local_dir,
                 revision="master"
             )
             

@@ -37,8 +37,11 @@ from .Nodes.SunoTools.SunoSongStylePromptGenerator import SunoSongStylePromptGen
 from .Nodes.SunoTools.SunoLyricsGenerator import SunoLyricsGenerator
 from .Nodes.Qwen3VL.Qwen3VL import Qwen3VLAdv
 from .Nodes.Qwen3VL.Qwen3VLExtraOptions import Qwen3VLExtraOptions
-from .Nodes.Qwen3VL.AuxiliaryNodes import ImageLoader, VideoLoader, MultiplePathsInput
+from .Nodes.Qwen3VL.ImageLoader import ImageLoader
+from .Nodes.Qwen3VL.VideoLoader import VideoLoader
+from .Nodes.Qwen3VL.MultiplePathsInput import MultiplePathsInput
 from .Nodes.Qwen3VL.ModelDownloader import ModelDownloader
+from .Nodes.Qwen3VL.PathSwitch import PathSwitch
 
 import os
 
@@ -72,6 +75,7 @@ NODE_CLASS_MAPPINGS = {
     "ColorMatchToReference": ColorMatchToReference,
     "FilmGrain": FilmGrain,
     "LatentSwitchDualMode": LatentSwitchDualMode,
+    "PathSwitch": PathSwitch,
     "LocalFileGallery": LocalFileGallery,
     "ImageAspectRatio": ImageAspectRatio,
     "PreviewOrCompareImages": PreviewOrCompareImages,
@@ -133,7 +137,7 @@ NODE_DISPLAY_NAME_MAPPINGS = {
     "VideoLoader": "Qwen3-VL Video Loader",
     "MultiplePathsInput": "Qwen3-VL Multiple Paths Input",
     "ModelDownloader": "Qwen3-VL Model Downloader",
-
+    "PathSwitch": "Qwen3-VL Path Switch",
 }
 
 WEB_DIRECTORY = os.path.dirname(os.path.abspath(__file__))
