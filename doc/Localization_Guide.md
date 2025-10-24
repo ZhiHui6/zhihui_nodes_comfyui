@@ -1,5 +1,5 @@
 # 节点汉化安装指南
-
+### ⚠️安装前请先删除已停止维护的旧版汉化扩展"AIGODLIKE-ComfyUI-Translation"，否则会导致冲突。
 ## 1.安装ComfyUI-DD-Translation节点
 
 **方法1：Git安装（推荐）**
