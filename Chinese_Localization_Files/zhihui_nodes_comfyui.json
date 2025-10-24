@@ -1,4 +1,5 @@
 {
+    "Custom":"自定义",
     "Ignore":"忽略",
     "nearest exact":"最近精确匹配",
     "Auto detect":"自动检测",
@@ -28,7 +29,6 @@
     "MidJourney Prompt":"MidJourney提示词",
     "Booru Tags":"Booru标签",
     "Custom Guide":"自定义引导",
-    "Disabled":"禁用",
     "Tag Style":"标签风格",
     "Natural Language":"自然语言",
     "English":"英文",
@@ -193,5 +193,12 @@
     "open":"开启",
     "close":"关闭",
     "Chinese&English":"中英双语",
-    "Detailed_Explanation":"详细解说"
+    "Detailed_Explanation":"详细解说",
+    "Rotate 90°":"旋转90°",
+    "Rotate 180°":"旋转180°",
+    "Rotate 270°":"旋转270°",
+    "Vertical Flip":"垂直翻转",
+    "Horizontal Flip":"水平翻转",
+    "Expand Canvas":"扩展画布",
+    "Crop Blank":"裁剪空白"
 }

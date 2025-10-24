@@ -380,6 +380,21 @@ This node collection contains numerous nodes with different functions, divided i
 <a href="images/颜色移除节点展示.jpg" target="_blank"><img src="images/颜色移除节点展示.jpg" alt="颜色移除节点展示" width="400"/></a></td>
 </tr>
 <tr>
+<td><b>图像旋转工具</b><br><b>Image Rotate Tool</b><br><code>ImageRotateTool</code></td>
+<td>
+
+专业的图像旋转和翻转工具，支持预设角度和自定义角度旋转。<br>Professional image rotation and flip tool supporting preset angles and custom angle rotation.
+
+<b>特点 | Features</b>：
+- <b>预设旋转 | Preset Rotation</b>：提供90°、180°、270°、360°快速旋转选项<br>Provides 90°, 180°, 270°, 360° quick rotation options
+- <b>翻转功能 | Flip Functions</b>：支持垂直翻转和水平翻转操作<br>Supports vertical flip and horizontal flip operations
+- <b>自定义角度 | Custom Angle</b>：支持-360°到360°范围内的精确角度旋转<br>Supports precise angle rotation within -360° to 360° range
+- <b>画布处理 | Canvas Processing</b>：可选择扩展画布或裁剪空白两种处理模式<br>Optional expand canvas or crop blank processing modes
+- <b>批量处理 | Batch Processing</b>：支持批量图像的同时处理<br>Supports simultaneous processing of batch images
+
+</td>
+</tr>
+<tr>
 <td><b>图像预览/对比</b><br><b>Preview or Compare Images</b><br><code>PreviewOrCompareImages</code></td>
 <td>多功能图像预览和对比节点，支持单张图像预览或两张图像的并排对比显示。image_1为必需输入，image_2为可选输入，当提供两张图像时自动启用对比模式。<br>Multi-functional image preview and comparison node that supports single image preview or side-by-side comparison of two images. image_1 is required input, image_2 is optional input, automatically enables comparison mode when two images are provided.
 

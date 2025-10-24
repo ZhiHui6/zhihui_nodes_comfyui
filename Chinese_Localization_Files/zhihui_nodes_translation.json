@@ -744,5 +744,23 @@
         "outputs": {
             "output_path": "输出路径"
         }
+    },
+    "ImageRotateTool": {
+        "title": "图像旋转工具",
+        "description": "支持预设和自定义角度的图像旋转功能。提供90°、180°、270°、360°旋转选项，以及垂直翻转、水平翻转功能。支持扩展画布、裁剪空白或禁用三种处理模式，适用于图像方向调整和创意变换。",
+        "inputs": {
+            "image": "图像",
+            "preset": "预设",
+            "custom_angle": "自定义角度",
+            "canvas_mode": "画布模式"
+        },
+        "outputs": {
+            "IMAGE": "图像"
+        },
+        "widgets": {
+            "preset": "预设",
+            "custom_angle": "自定义角度",
+            "canvas_mode": "画布模式"
+        }
     }
 }
