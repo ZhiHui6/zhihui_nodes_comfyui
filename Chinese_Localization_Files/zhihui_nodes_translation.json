@@ -630,6 +630,10 @@
             "model": "模型",
             "quantization": "量化",
             "temperature": "温度",
+            "top_p": "Top-P采样",
+            "num_beams": "束搜索数量",
+            "repetition_penalty": "重复惩罚",
+            "frame_count": "帧数",
             "max_new_tokens": "最大新令牌数",
             "min_resolution": "最小分辨率",
             "max_resolution": "最大分辨率",
@@ -720,11 +724,7 @@
         "title": "Qwen3-VL多路径输入",
         "description": "Qwen3-VL多路径输入：支持同时输入多个图像或视频文件路径，可动态调整输入数量，自动识别文件类型并转换为JSON格式，便于批量处理多媒体内容。",
         "widgets": {
-            "inputcount": "输入数量",
-            "path_1": "路径1",
-            "path_2": "路径2",
-            "path_3": "路径3",
-            "path_4": "路径4"
+            "inputcount": "输入数量"
         },
         "outputs": {
             "paths": "路径列表"
@@ -736,10 +736,8 @@
         "widgets": {
             "mode": "模式",
             "select_channel": "选择通道",
-            "Path_1": "路径1",
-            "Path_2": "路径2",
-            "Path_1_comment": "路径1备注",
-            "Path_2_comment": "路径2备注"
+            "Path_1_comment": "Path_1备注",
+            "Path_2_comment": "Path_2备注"
         },
         "outputs": {
             "output_path": "输出路径"

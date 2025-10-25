@@ -13,25 +13,23 @@ from pathlib import Path
 
 QWEN_PROMPT_TYPES = {
     "Ignore": "",
-    "Detailed_Explanation":"Please explain the image content in the utmost detail.",
-    "Describe": "Describe this image in detail.",
-    "Caption": "Write a concise caption for this image.",
-    "Analyze": "Analyze the main elements and scene in this image.",
-    "Identify": "What objects and subjects do you see in this image?",
-    "Explain": "Explain what's happening in this image.",
-    "List": "List the main objects visible in this image.",
-    "Scene": "Describe the scene and setting of this image.",
-    "Details": "What are the key details in this image?",
-    "Summarize": "Summarize the key content of this image in 1-2 sentences.",
-    "Emotion": "Describe the emotions or mood conveyed by this image.",
-    "Style": "Describe the artistic or visual style of this image.",
-    "Location": "Where might this image be taken? Analyze the setting or location.",
-    "Question": "What question could be asked based on this image?",
-    "Creative": "Describe this image as if writing the beginning of a short story.",
-    "OCR": "Extract and transcribe any text visible in this image.",
-    "Count": "Count and list the number of specific objects in this image.",
-    "Compare": "Compare and contrast the different elements in this image.",
-    "Technical": "Provide a technical analysis of this image including composition, lighting, and visual elements.",
+    "[Prompt Style]Tags": "Your task is to generate a clean list of comma-separated tags for a text-to-image AI, based *only* on the visual information in the image. Limit the output to a maximum of 50 unique tags. Strictly describe visual elements like subject, clothing, environment, colors, lighting, and composition. Do not include abstract concepts, interpretations, marketing terms, or technical jargon (e.g., no 'SEO', 'brand-aligned', 'viral potential'). The goal is a concise list of visual descriptors. Avoid repeating tags.",
+    "[Prompt Style]Simple": "Analyze the image and generate a simple, single-sentence text-to-image prompt. Describe the main subject and the setting concisely.",
+    "[Prompt Style]Detailed": "Generate a detailed, artistic text-to-image prompt based on the image. Combine the subject, their actions, the environment, lighting, and overall mood into a single, cohesive paragraph of about 2-3 sentences. Focus on key visual details.",
+    "[Prompt Style]Extreme Detailed": "Generate an extremely detailed and descriptive text-to-image prompt from the image. Create a rich paragraph that elaborates on the subject's appearance, textures of clothing, specific background elements, the quality and color of light, shadows, and the overall atmosphere. Aim for a highly descriptive and immersive prompt.",
+    "[Prompt Style]Cinematic": "Act as a master prompt engineer. Create a highly detailed and evocative prompt for an image generation AI. Describe the subject, their pose, the environment, the lighting, the mood, and the artistic style (e.g., photorealistic, cinematic, painterly). Weave all elements into a single, natural language paragraph, focusing on visual impact.",
+    "[Creative]Story": "Describe this image as if writing the beginning of a short story.",
+    "[Creative]Detailed Analysis": "Describe this image in detail, breaking down the subject, attire, accessories, background, and composition into separate sections.",
+    "[Creative]Summarize Video": "Summarize the key events and narrative points in this video.",
+    "[Creative]Short Story": "Write a short, imaginative story inspired by this image or video.",
+    "[Creative]Refine & Expand Prompt": "Refine and enhance the following user prompt for creative text-to-image generation. Keep the meaning and keywords, make it more expressive and visually rich. Output **only the improved prompt text itself**, without any reasoning steps, thinking process, or additional commentary.",
+    "[Analysis]Explain": "Explain what's happening in this image.",
+    "[Analysis]Scene": "Describe the scene and setting of this image.",
+    "[Analysis]Emotion": "Describe the emotions or mood conveyed by this image.",
+    "[Analysis]Style": "Describe the artistic or visual style of this image.",
+    "[Analysis]Location": "Where might this image be taken? Analyze the setting or location.",
+    "[Analysis]Technical": "Provide a technical analysis of this image including composition, lighting, and visual elements.",
+    "[Utility]Compare": "Compare and contrast the different elements in this image.",
 }
 
 class Qwen3VLAdv:
@@ -76,12 +74,10 @@ class Qwen3VLAdv:
     def INPUT_TYPES(s):
         return {
             "required": {
-                "batch_mode": ("BOOLEAN", {"default": False}),
-                "batch_directory": ("STRING", {"default": ""}),
-                "user_prompt": ("STRING", {"default": "", "multiline": True}),
-                "system_prompt": ("STRING", {"default": "", "multiline": True}),
                 "preset_prompt": (list(QWEN_PROMPT_TYPES.keys()), {"default": "Ignore"}),
                 "output_language": (["Ignore", "Chinese", "english", "Chinese&English"], {"default": "Ignore"}),
+                "user_prompt": ("STRING", {"default": "", "multiline": True}),
+                "system_prompt": ("STRING", {"default": "", "multiline": True}),
                 "model": (
                     [
                         "Qwen3-VL-4B-Instruct",
@@ -103,6 +99,22 @@ class Qwen3VLAdv:
                 "temperature": (
                     "FLOAT",
                     {"default": 0.7, "min": 0, "max": 1, "step": 0.1},
+                ),
+                "top_p": (
+                    "FLOAT",
+                    {"default": 0.9, "min": 0, "max": 1, "step": 0.1},
+                ),
+                "num_beams": (
+                    "INT",
+                    {"default": 1, "min": 1, "max": 10, "step": 1},
+                ),
+                "repetition_penalty": (
+                    "FLOAT",
+                    {"default": 1.2, "min": 0.1, "max": 2.0, "step": 0.1},
+                ),
+                "frame_count": (
+                    "INT",
+                    {"default": 16, "min": 1, "max": 64, "step": 1},
                 ),
                 "max_new_tokens": (
                     "INT",
@@ -129,6 +141,8 @@ class Qwen3VLAdv:
                     {"default": "auto"},
                 ),
                 "keep_model_loaded": ("BOOLEAN", {"default": False}),
+                "batch_mode": ("BOOLEAN", {"default": False}),
+                "batch_directory": ("STRING", {"default": ""}),
                 
             },
             "optional": {
@@ -150,6 +164,10 @@ class Qwen3VLAdv:
         user_prompt,
         keep_model_loaded,
         temperature,
+        top_p,
+        num_beams,
+        repetition_penalty,
+        frame_count,
         max_new_tokens,
         min_resolution,
         max_resolution,
@@ -220,7 +238,8 @@ class Qwen3VLAdv:
             
             return self.batch_inference(
                 final_prompt, batch_directory, model, quantization, keep_model_loaded,
-                temperature, max_new_tokens, min_pixels, max_pixels,
+                temperature, top_p, num_beams, repetition_penalty, frame_count, 
+                max_new_tokens, min_pixels, max_pixels,
                 seed, attention, output_language, device, system_prompt, extra_options
             )
         
@@ -315,7 +334,12 @@ class Qwen3VLAdv:
             )
             inputs = inputs.to(self.device)
             generated_ids = self.model.generate(
-                **inputs, max_new_tokens=max_new_tokens, temperature=temperature
+                **inputs, 
+                max_new_tokens=max_new_tokens, 
+                temperature=temperature, 
+                top_p=top_p,
+                num_beams=num_beams,
+                repetition_penalty=repetition_penalty
             )
             generated_ids_trimmed = [
                 out_ids[len(in_ids) :]
@@ -377,6 +401,10 @@ class Qwen3VLAdv:
         quantization,
         keep_model_loaded,
         temperature,
+        top_p,
+        num_beams,
+        repetition_penalty,
+        frame_count,
         max_new_tokens,
         min_pixels,
         max_pixels,
@@ -472,7 +500,12 @@ class Qwen3VLAdv:
                     inputs = inputs.to(self.device)
                     
                     generated_ids = self.model.generate(
-                        **inputs, max_new_tokens=max_new_tokens, temperature=temperature
+                        **inputs, 
+                        max_new_tokens=max_new_tokens, 
+                        temperature=temperature, 
+                        top_p=top_p,
+                        num_beams=num_beams,
+                        repetition_penalty=repetition_penalty
                     )
                     generated_ids_trimmed = [
                         out_ids[len(in_ids) :]
