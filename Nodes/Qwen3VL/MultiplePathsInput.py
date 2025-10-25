@@ -3,12 +3,17 @@ import cv2
 class MultiplePathsInput:
     @classmethod
     def INPUT_TYPES(s):
-        return {
+        inputs = {
             "required": {
                 "inputcount": ("INT", {"default": 1, "min": 1, "max": 1000, "step": 1}),
-                "path_1": ("PATH",),
             },
         }
+        
+        # 动态生成输入字段，默认生成10个以支持界面显示
+        for i in range(1, 11):
+            inputs["required"][f"path_{i}"] = ("PATH",)
+        
+        return inputs
 
     RETURN_TYPES = ("PATH",)
     RETURN_NAMES = ("paths",)
@@ -17,6 +22,9 @@ class MultiplePathsInput:
 
     @staticmethod
     def convert_path_to_json(file_path):
+        if not file_path or file_path.strip() == "":
+            return None
+            
         ext = file_path.split('.')[-1].lower()
 
         if ext in ["jpg", "jpeg", "png", "bmp", "tiff", "webp"]:
@@ -52,10 +60,14 @@ class MultiplePathsInput:
     def combine(self, inputcount, **kwargs):
         path_list = []
         for c in range(inputcount):
-            path = kwargs[f"path_{c + 1}"]
-            path = self.convert_path_to_json(path)
-            print(path)
-            path_list.append(path)
+            path_key = f"path_{c + 1}"
+            if path_key in kwargs:
+                path = kwargs[path_key]
+                if path and path.strip() != "":
+                    converted_path = self.convert_path_to_json(path)
+                    if converted_path:
+                        print(converted_path)
+                        path_list.append(converted_path)
         print(path_list)
         result = path_list
         return (result,)
