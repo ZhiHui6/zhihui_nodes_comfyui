@@ -79,6 +79,7 @@ class Qwen3VLAdv:
                 "batch_mode": ("BOOLEAN", {"default": False}),
                 "batch_directory": ("STRING", {"default": ""}),
                 "user_prompt": ("STRING", {"default": "", "multiline": True}),
+                "system_prompt": ("STRING", {"default": "", "multiline": True}),
                 "preset_prompt": (list(QWEN_PROMPT_TYPES.keys()), {"default": "Ignore"}),
                 "output_language": (["Ignore", "Chinese", "english", "Chinese&English"], {"default": "Ignore"}),
                 "model": (
@@ -107,23 +108,13 @@ class Qwen3VLAdv:
                     "INT",
                     {"default": 2048, "min": 128, "max": 2048, "step": 1},
                 ),
-                "min_pixels": (
+                "min_resolution": (
                     "INT",
-                    {
-                        "default": 256 * 28 * 28,
-                        "min": 4 * 28 * 28,
-                        "max": 16384 * 28 * 28,
-                        "step": 28 * 28,
-                    },
+                    {"default": 256, "min": 112, "max": 2048, "step": 1},
                 ),
-                "max_pixels": (
-                    "INT",
-                    {
-                        "default": 1280 * 28 * 28,
-                        "min": 4 * 28 * 28,
-                        "max": 16384 * 28 * 28,
-                        "step": 28 * 28,
-                    },
+                "max_resolution": (
+                    "INT", 
+                    {"default": 1280, "min": 256, "max": 4096, "step": 1},
                 ),
                 "seed": ("INT", {"default": -1}),
                 "attention": (
@@ -155,12 +146,13 @@ class Qwen3VLAdv:
         output_language,
         preset_prompt,
         model,
+        system_prompt,
         user_prompt,
         keep_model_loaded,
         temperature,
         max_new_tokens,
-        min_pixels,
-        max_pixels,
+        min_resolution,
+        max_resolution,
         seed,
         quantization,
         device,
@@ -171,6 +163,28 @@ class Qwen3VLAdv:
         extra_options=None,
     ):
         preset_text = QWEN_PROMPT_TYPES.get(preset_prompt, "Describe this image.")
+        
+        if system_prompt and system_prompt.strip():
+            conflicts = []
+            
+            if preset_prompt != "Ignore":
+                conflicts.append("预设提示词")
+            
+            if extra_options is not None:
+                extra_instructions, character_name = extra_options
+                if extra_instructions:
+                    conflicts.append("额外选项")
+            
+            if conflicts:
+                conflict_list = "、".join(conflicts)
+                error_message = (
+                    f"检测到系统提示词与以下选项冲突：{conflict_list}。\n\n"
+                    f"解决方式：\n"
+                    f"• 如需使用系统提示词，请将预设提示词设置为 'Ignore' 并关闭额外选项\n"
+                    f"• 如需使用{conflict_list}，请清空系统提示词输入框\n\n"
+                    f"注意：系统提示词与预设提示词/额外选项不能同时使用，以避免提示词冲突。"
+                )
+                raise ValueError(error_message)
         
         if preset_prompt == "Ignore":
             final_prompt = user_prompt.strip() if (isinstance(user_prompt, str) and user_prompt.strip()) else ""
@@ -201,10 +215,13 @@ class Qwen3VLAdv:
                 )
                 raise ValueError(error_message)
             
+            min_pixels = self._resolution_to_pixels(min_resolution)
+            max_pixels = self._resolution_to_pixels(max_resolution)
+            
             return self.batch_inference(
                 final_prompt, batch_directory, model, quantization, keep_model_loaded,
                 temperature, max_new_tokens, min_pixels, max_pixels,
-                seed, attention, output_language, device, extra_options
+                seed, attention, output_language, device, system_prompt, extra_options
             )
         
         if seed != -1:
@@ -215,6 +232,12 @@ class Qwen3VLAdv:
             raise ValueError(error_message)
         
         self.model_checkpoint = model_path
+
+        if min_resolution > max_resolution:
+            raise ValueError(f"最小分辨率 ({min_resolution}) 不能大于最大分辨率 ({max_resolution})")
+        
+        min_pixels = self._resolution_to_pixels(min_resolution)
+        max_pixels = self._resolution_to_pixels(max_resolution)
 
         if self.processor is None:
             self.processor = AutoProcessor.from_pretrained(
@@ -255,7 +278,7 @@ class Qwen3VLAdv:
                 messages = [
                     {
                         "role": "system",
-                        "content": "You are QwenVL, you are a helpful assistant expert in turning images into words.",
+                        "content": system_prompt,
                     },
                     {
                         "role": "user",
@@ -267,6 +290,10 @@ class Qwen3VLAdv:
                 ]
             else:
                 messages = [
+                    {
+                        "role": "system",
+                        "content": system_prompt,
+                    },
                     {
                         "role": "user",
                         "content": [
@@ -323,6 +350,8 @@ class Qwen3VLAdv:
             image_files.extend(glob.glob(os.path.join(batch_directory, ext)))
             image_files.extend(glob.glob(os.path.join(batch_directory, ext.upper())))
         
+        image_files = list(set(image_files))
+        
         valid_files = []
         for file_path in image_files:
             try:
@@ -355,6 +384,7 @@ class Qwen3VLAdv:
         attention,
         output_language,
         device,
+        system_prompt,
         extra_options=None,
     ):
         if seed != -1:
@@ -417,7 +447,7 @@ class Qwen3VLAdv:
                     messages = [
                         {
                             "role": "system",
-                            "content": "You are QwenVL, you are a helpful assistant expert in turning images into words.",
+                            "content": system_prompt,
                         },
                         {
                             "role": "user",
@@ -477,3 +507,7 @@ class Qwen3VLAdv:
         log_message = f"Batch processing completed. Processed: {processed_count} images, Failed: {failed_count} images in directory '{batch_directory}'."
         
         return (log_message,)
+
+    def _resolution_to_pixels(self, resolution):
+
+        return resolution * resolution
