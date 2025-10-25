@@ -3,17 +3,13 @@ import cv2
 class MultiplePathsInput:
     @classmethod
     def INPUT_TYPES(s):
-        inputs = {
+        return {
             "required": {
                 "inputcount": ("INT", {"default": 1, "min": 1, "max": 1000, "step": 1}),
+                "path_1": ("PATH",),
             },
+            "optional": {}
         }
-        
-        # 动态生成输入字段，默认生成10个以支持界面显示
-        for i in range(1, 11):
-            inputs["required"][f"path_{i}"] = ("PATH",)
-        
-        return inputs
 
     RETURN_TYPES = ("PATH",)
     RETURN_NAMES = ("paths",)
