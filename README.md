@@ -541,6 +541,8 @@ This node collection contains numerous nodes with different functions, divided i
 <td>
 基于阿里巴巴Qwen3-VL模型的高级视觉理解节点，支持图像和视频分析、OCR文字识别、场景描述等多种AI视觉任务，具备批量处理和多种量化选项。<br>Advanced vision understanding node based on Alibaba's Qwen3-VL model, supporting image and video analysis, OCR text recognition, scene description and other AI vision tasks, with batch processing and multiple quantization options.
 
+📖 **参数详解文档 | Parameter Guide**: [Qwen3VL_Parameters_Guide.md](doc/Qwen3VL_Parameters_Guide.md)
+
 <br>
 <div align="left">
 <a href="images/Qwen3VL高级版.jpg" target="_blank">
