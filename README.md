@@ -45,9 +45,9 @@
 </tr>
 
 <tr>
-<td><b>🤖系统引导词加载器</b><br><b>System Prompt Loader</b><br><code>SystemPromptLoader</code></td>
-<td>提示词处理<br>Prompt Processing</td>
-<td>专业系统引导词预设工具，内置众多类别模板，输出引导内容给下游LLM节点生成专业的提示词。<br>Professional system prompt preset tool with built-in multiple category templates, outputting guidance content to downstream LLM nodes for generating professional prompts.</td>
+<td><b>👁️Qwen3-VL高级版</b><br><b>Qwen3-VL Advanced</b><br><code>Qwen3VLAdv</code></td>
+<td>AI视觉理解<br>AI Vision Understanding</td>
+<td>通过Qwen3-VL视觉识别大模型，提供专业级内容描述、场景理解等核心功能，实现图像/视频智能分析。支持NSFW破限分析，具备4bit/8bit量化加速和批量处理能力。<br>Qwen3-VL advanced version for professional content description, scene understanding, etc. Image/video intelligent analysis. Supports NSFW unrestricted analysis, with 4bit/8bit quantization acceleration and batch processing capabilities.</td>
 </tr>
 
 <tr>
