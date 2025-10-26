@@ -4,6 +4,7 @@ class Qwen3VLExtraOptions:
     def INPUT_TYPES(s):
         return {
             "required": {
+                "extra_options_control": (["Enable", "Disable"], {"default": "Enable"}),
                 "refer_character_name": ("BOOLEAN", {"default": False}),
                 "exclude_people_info": ("BOOLEAN", {"default": False}),
                 "include_lighting": ("BOOLEAN", {"default": False}),
@@ -42,7 +43,7 @@ class Qwen3VLExtraOptions:
     FUNCTION = "generate_extra_options"
     CATEGORY = "Comfyui_Qwen3-VL_Adv"
 
-    def generate_extra_options(self, refer_character_name, exclude_people_info, include_lighting, include_camera_angle,
+    def generate_extra_options(self, extra_options_control, refer_character_name, exclude_people_info, include_lighting, include_camera_angle,
                      include_watermark, include_JPEG_artifacts, include_exif, exclude_sexual,
                      exclude_image_resolution, include_aesthetic_quality, include_composition_style,
                      exclude_text, specify_depth_field, specify_lighting_sources,
@@ -51,6 +52,9 @@ class Qwen3VLExtraOptions:
                      do_not_use_polite_euphemisms, include_character_age, include_camera_shot_type,
                      exclude_mood_feeling, include_camera_vantage_height, mention_watermark, avoid_meta_descriptive_phrases,
                      character_name):
+
+        if extra_options_control == "Disable":
+            return ([[], character_name],)
 
         extra_list = {
             "refer_character_name": f"If there is a person/character in the image you must refer to them as {character_name}.",

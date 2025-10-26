@@ -617,16 +617,15 @@
         "title": "Qwen3-VL高级版",
         "description": "Qwen3-VL高级版：基于阿里巴巴Qwen3-VL多模态大语言模型的图像理解节点，支持多种模型规格和量化选项，可进行详细的图像描述、分析和理解，支持批处理模式和自定义提示词。",
         "inputs": {
-        "extra_options": "额外选项",
-        "source_path": "源路径"
+            "extra_options": "额外选项",
+            "source_path": "源路径"
         },
         "widgets": {
-            "output_language": "输出语言",
-            "nsfw_jailbreak": "NSFW破限",
-            "batch_mode": "批处理模式",
-            "batch_directory": "批处理目录",
-            "user_prompt": "用户提示词",
             "preset_prompt": "预设提示词",
+            "output_language": "输出语言",
+            "user_prompt": "用户提示词",
+            "system_prompt": "系统提示词",
+            "nsfw_blasting": "爆破涩涩",
             "model": "模型",
             "quantization": "量化",
             "temperature": "温度",
@@ -639,8 +638,10 @@
             "max_resolution": "最大分辨率",
             "seed": "随机种子",
             "attention": "注意力机制",
+            "device": "设备",
             "keep_model_loaded": "保持模型加载",
-            "device": "设备"
+            "batch_mode": "批处理模式",
+            "batch_directory": "批处理目录"
         },
         "outputs": {
             "STRING": "字符串"
@@ -649,23 +650,20 @@
     "ModelDownloader": {
         "title": "Qwen3-VL模型下载器",
         "description": "模型下载器：用于下载和管理Qwen3-VL模型文件，支持从Hugging Face等平台下载，可自定义模型规格和量化选项。",
-        "inputs": {
-            "model_name": "模型名称"
-        },
         "widgets": {
             "model": "模型",
             "platform": "平台",
-            "quantization": "量化",
             "force_redownload": "强制重新下载"
         },
         "outputs": {
-            "model_path": "模型路径"
+            "info": "信息"
         }
     },
     "Qwen3VLExtraOptions": {
         "title": "Qwen3-VL额外选项",
         "description": "Qwen3-VL额外选项：为Qwen3-VL模型提供详细的图像描述控制选项，可精确控制输出内容的各个方面，包括人物信息、光照、相机角度、美学质量等多维度参数。",
         "widgets": {
+            "extra_options_control": "额外选项控制",
             "refer_character_name": "参考角色名称",
             "exclude_people_info": "排除人物信息",
             "include_lighting": "包含光照信息",
@@ -723,6 +721,9 @@
     "MultiplePathsInput": {
         "title": "Qwen3-VL多路径输入",
         "description": "Qwen3-VL多路径输入：支持同时输入多个图像或视频文件路径，可动态调整输入数量，自动识别文件类型并转换为JSON格式，便于批量处理多媒体内容。",
+        "inputs": {
+            "path_1": "路径1"
+        },
         "widgets": {
             "inputcount": "输入数量"
         },
@@ -733,6 +734,10 @@
     "PathSwitch": {
         "title": "Qwen3-VL路径切换器",
         "description": "双通道路径切换器，支持手动和自动模式。可在2个来自MultiplePathsInput节点的路径输入之间切换，支持注释标签便于管理，自动模式下智能选择非空输入，适用于工作流中的条件分支和动态切换。输出可连接到Qwen3-VL高级版的source_path输入。",
+        "inputs": {
+            "Path_1": "路径1",
+            "Path_2": "路径2"
+        },
         "widgets": {
             "mode": "模式",
             "select_channel": "选择通道",
