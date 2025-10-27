@@ -615,7 +615,7 @@
     },
     "Qwen3VLAdv": {
         "title": "Qwen3-VL高级版",
-        "description": "Qwen3-VL高级版：基于阿里巴巴Qwen3-VL多模态大语言模型的图像理解节点，支持多种模型规格和量化选项，可进行详细的图像描述、分析和理解，支持批处理模式和自定义提示词。",
+        "description": "基于Qwen3-VL多模态大语言模型的图像理解节点，支持多种模型规格和量化选项，可进行详细的图像描述、分析和理解，支持批处理模式和自定义提示词。新增解锁限制功能，提供多种输出模式选择。",
         "inputs": {
             "extra_options": "额外选项",
             "source_path": "源路径"
@@ -625,7 +625,7 @@
             "output_language": "输出语言",
             "user_prompt": "用户提示词",
             "system_prompt": "系统提示词",
-            "nsfw_blasting": "爆破涩涩",
+            "nsfw_blasting": "解锁限制",
             "model": "模型",
             "quantization": "量化",
             "temperature": "温度",
@@ -641,7 +641,8 @@
             "device": "设备",
             "keep_model_loaded": "保持模型加载",
             "batch_mode": "批处理模式",
-            "batch_directory": "批处理目录"
+            "batch_directory": "批处理目录",
+            "unlock_restrictions": "解锁限制"
         },
         "outputs": {
             "STRING": "字符串"

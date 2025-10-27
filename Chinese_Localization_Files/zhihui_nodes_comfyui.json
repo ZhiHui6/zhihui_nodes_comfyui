@@ -211,6 +211,8 @@
     "Huihui-Qwen3-VL-8B-Instruct-abliterated":"慧慧-Qwen3-VL-8B指令版-破限",
     "Enable":"启用",
     "Disable":"禁用",
+    "Unlock_Instruction_A":"解锁指令A",
+    "Unlock_Instruction_B":"解锁指令B",
     "Expand Canvas":"扩展画布",
     "Crop Blank":"裁剪空白"
 }

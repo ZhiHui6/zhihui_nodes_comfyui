@@ -61,13 +61,15 @@
   - 设置特定的回答格式要求
   - 启用NSFW破限时会被自动覆盖
 
-### **nsfw_blasting（NSFW破限）**
-- **作用**：启用无限制内容分析功能
-- **类型**：布尔值（True/False）
-- **默认值**：`False`
+### **unlock_restrictions（解锁限制）**
+- **作用**：选择解锁限制模式
+- **类型**：下拉选择（Disabled/Unlock_Instruction_A/Unlock_Instruction_B）
+- **默认值**：`Disabled`
 - **功能说明**：
-  - 启用后可以分析和描述任何类型的图像内容
-  - 会自动覆盖system_prompt为专门的破限提示词
+  - **Disabled**：禁用解锁功能，使用标准模式
+  - **Unlock_Instruction_A**：启用解锁指令A，可以分析和描述任何类型的图像内容
+  - **Unlock_Instruction_B**：启用解锁指令B，使用全局规则进行内容分析
+  - 启用任一解锁模式后会自动覆盖system_prompt为对应的解锁提示词
   - 会忽略output_language设置，默认使用中文输出
   - 提供直白、详细的内容描述
 
@@ -77,19 +79,13 @@
 
 ### **model（模型选择）**
 - **作用**：选择使用的Qwen3-VL模型版本
-- **默认值**：`Qwen3-VL-8B-Instruct`
 - **选项详解**：
-  - **标准版本**：
+  - **指令版本**：
     - `Qwen3-VL-4B-Instruct`：4B参数指令优化版，速度快
     - `Qwen3-VL-8B-Instruct`：8B参数指令优化版，质量高
   - **思维链版本**：
     - `Qwen3-VL-4B-Thinking`：4B思维链版本，逻辑推理强
     - `Qwen3-VL-8B-Thinking`：8B思维链版本，分析深度好
-  - **FP8精度版本**：
-    - `Qwen3-VL-4B-Instruct-FP8`：4B FP8精度优化版
-    - `Qwen3-VL-4B-Thinking-FP8`：4B思维链FP8版
-    - `Qwen3-VL-8B-Instruct-FP8`：8B FP8精度优化版
-    - `Qwen3-VL-8B-Thinking-FP8`：8B思维链FP8版
   - **特殊版本**：
     - `Huihui-Qwen3-VL-8B-Instruct-abliterated`：特殊优化版本
 
