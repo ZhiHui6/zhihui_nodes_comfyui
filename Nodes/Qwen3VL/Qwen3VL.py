@@ -151,8 +151,9 @@ class Qwen3VLAdv:
                 
             },
             "optional": {
-                "source_path": ("PATH",), 
                 "extra_options": ("QWEN3VL_EXTRA_OPTIONS",),
+                "source_path": ("PATH",), 
+                "image": ("IMAGE",),
             },
         }
 
@@ -180,6 +181,7 @@ class Qwen3VLAdv:
         seed,
         quantization,
         device,
+        image=None,
         source_path=None,
         attention="eager",
         batch_mode=False,
@@ -249,10 +251,23 @@ class Qwen3VLAdv:
         
         final_prompt = self._apply_output_language(final_prompt, output_language)
         
+        # 检查source_path和image是否同时被连接
+        if source_path is not None and image is not None:
+            error_message = (
+                "检测到输入端口冲突：source_path 和 image 不能同时连接。\n\n"
+                "解决方式(A或B)：\n"
+                "A. 断开 source_path 端口的连接，使用 image 端口输入图像\n"
+                "B. 断开 image 端口的连接，使用 source_path 端口输入图像路径\n\n"
+                "注意：这两个输入端口是互斥的，只能选择其中一个作为图像输入源。"
+            )
+            raise ValueError(error_message)
+        
         if batch_mode:
             conflicts = []
             if source_path is not None:
                 conflicts.append("source_path")
+            if image is not None:
+                conflicts.append("image")
             
             if conflicts:
                 conflict_list = "、".join(conflicts)
@@ -340,6 +355,26 @@ class Qwen3VLAdv:
                         "role": "user",
                         "content": source_path
                         + [
+                            {"type": "text", "text": final_prompt},
+                        ],
+                    },
+                ]
+            elif image is not None:
+                # Convert ComfyUI image tensor to PIL Image
+                to_pil = ToPILImage()
+                # ComfyUI image format is [batch, height, width, channels]
+                # Convert to [channels, height, width] for ToPILImage
+                pil_image = to_pil(image[0].permute(2, 0, 1))
+                
+                messages = [
+                    {
+                        "role": "system",
+                        "content": system_prompt,
+                    },
+                    {
+                        "role": "user",
+                        "content": [
+                            {"type": "image", "image": pil_image},
                             {"type": "text", "text": final_prompt},
                         ],
                     },
