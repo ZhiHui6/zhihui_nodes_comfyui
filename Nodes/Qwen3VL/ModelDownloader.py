@@ -21,10 +21,6 @@ class ModelDownloader:
                         "Qwen3-VL-4B-Thinking", 
                         "Qwen3-VL-8B-Instruct",
                         "Qwen3-VL-8B-Thinking",
-                        "Qwen3-VL-4B-Instruct-FP8",
-                        "Qwen3-VL-4B-Thinking-FP8",
-                        "Qwen3-VL-8B-Instruct-FP8",
-                        "Qwen3-VL-8B-Thinking-FP8",
                         "Huihui-Qwen3-VL-8B-Instruct-abliterated",
                         
                     ],
@@ -64,9 +60,8 @@ class ModelDownloader:
         
         config = configs.get(platform, configs["huggingface"])
         
-        # 为abliterated系列模型在ModelScope平台设置特殊的仓库前缀
         if platform == "modelscope" and model and "abliterated" in model:
-            config = config.copy()  # 创建副本避免修改原配置
+            config = config.copy()
             config["repo_prefix"] = "ayumix5"
             
         return config

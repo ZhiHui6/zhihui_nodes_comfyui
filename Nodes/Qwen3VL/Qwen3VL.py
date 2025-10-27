@@ -85,17 +85,13 @@ class Qwen3VLAdv:
                         "Qwen3-VL-4B-Thinking",
                         "Qwen3-VL-8B-Instruct",
                         "Qwen3-VL-8B-Thinking",
-                        "Qwen3-VL-4B-Instruct-FP8",
-                        "Qwen3-VL-4B-Thinking-FP8",
-                        "Qwen3-VL-8B-Instruct-FP8",
-                        "Qwen3-VL-8B-Thinking-FP8", 
                         "Huihui-Qwen3-VL-8B-Instruct-abliterated",
                     ],
-                    {"default": "Qwen3-VL-4B-Instruct-FP8"},
+                    {"default": "Qwen3-VL-8B-Instruct"},
                 ),
                 "quantization": (
                     ["none", "4bit", "8bit"],
-                    {"default": "4bit"},
+                    {"default": "8bit"},
                 ),
                 "temperature": (
                     "FLOAT",
@@ -115,7 +111,7 @@ class Qwen3VLAdv:
                 ),
                 "frame_count": (
                     "INT",
-                    {"default": 8, "min": 1, "max": 64, "step": 1},
+                    {"default": 23, "min": 1, "max": 64, "step": 1},
                 ),
                 "max_new_tokens": (
                     "INT",
@@ -127,7 +123,7 @@ class Qwen3VLAdv:
                 ),
                 "max_resolution": (
                     "INT", 
-                    {"default": 896, "min": 256, "max": 4096, "step": 1},
+                    {"default": 768, "min": 256, "max": 4096, "step": 1},
                 ),
                 "seed": ("INT", {"default": -1}),
                 "attention": (
