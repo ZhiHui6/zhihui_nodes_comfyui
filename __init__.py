@@ -35,7 +35,8 @@ from .Nodes.TextEditorWithContinue import TextEditorWithContinue
 from .Nodes.TagSelector.TagSelector import TagSelector
 from .Nodes.SunoTools.SunoSongStylePromptGenerator import SunoSongStylePromptGenerator
 from .Nodes.SunoTools.SunoLyricsGenerator import SunoLyricsGenerator
-from .Nodes.Qwen3VL.Qwen3VL import Qwen3VLAdv
+from .Nodes.Qwen3VL.Qwen3VLAdvanced import Qwen3VLAdvanced
+from .Nodes.Qwen3VL.Qwen3VLBasic import Qwen3VLBasic
 from .Nodes.Qwen3VL.Qwen3VLExtraOptions import Qwen3VLExtraOptions
 from .Nodes.Qwen3VL.ImageLoader import ImageLoader
 from .Nodes.Qwen3VL.VideoLoader import VideoLoader
@@ -85,7 +86,8 @@ NODE_CLASS_MAPPINGS = {
     "TagSelector": TagSelector,
     "SunoSongStylePromptGenerator": SunoSongStylePromptGenerator,
     "SunoLyricsGenerator": SunoLyricsGenerator,
-    "Qwen3VLAdv": Qwen3VLAdv,
+    "Qwen3VLAdvanced": Qwen3VLAdvanced,
+    "Qwen3VLBasic": Qwen3VLBasic,
     "Qwen3VLExtraOptions": Qwen3VLExtraOptions,
     "ImageLoader": ImageLoader,
     "VideoLoader": VideoLoader,
@@ -133,7 +135,8 @@ NODE_DISPLAY_NAME_MAPPINGS = {
     "TagSelector": "Tag Selector",
     "SunoSongStylePromptGenerator": "Suno Song Style Prompt Generator",
     "SunoLyricsGenerator": "Suno AI Lyrics Generator",
-    "Qwen3VLAdv": "Qwen3-VL Advanced",
+    "Qwen3VLAdvanced": "Qwen3-VL Advanced",
+    "Qwen3VLBasic": "Qwen3-VL Basic",
     "Qwen3VLExtraOptions": "Qwen3-VL Extra Options",
     "ImageLoader": "Qwen3-VL Image Loader",
     "VideoLoader": "Qwen3-VL Video Loader",

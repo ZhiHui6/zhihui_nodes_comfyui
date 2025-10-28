@@ -649,6 +649,33 @@
             "STRING": "字符串"
         }
     },
+    "Qwen3VLBasic": {
+        "title": "Qwen3-VL基础版",
+        "description": "基于Qwen3-VL多模态大语言模型的图像理解节点基础版，提供核心的图像描述和分析功能，支持多种模型规格和量化选项，界面简洁易用，适合基础图像理解任务。",
+        "inputs": {
+            "image": "图像",
+            "source_path": "源路径"
+        },
+        "widgets": {
+            "user_prompt": "用户提示词",
+            "system_prompt": "系统提示词",
+            "model": "模型",
+            "quantization": "量化",
+            "temperature": "温度",
+            "max_new_tokens": "最大新令牌数",
+            "min_resolution": "最小分辨率",
+            "max_resolution": "最大分辨率",
+            "seed": "随机种子",
+            "attention": "注意力机制",
+            "device": "设备",
+            "keep_model_loaded": "保持模型加载",
+            "batch_mode": "批处理模式",
+            "batch_directory": "批处理目录"
+        },
+        "outputs": {
+            "STRING": "字符串"
+        }
+    },
     "ModelDownloader": {
         "title": "Qwen3-VL模型下载器",
         "description": "模型下载器：用于下载和管理Qwen3-VL模型文件，支持从Hugging Face等平台下载，可自定义模型规格和量化选项。",

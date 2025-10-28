@@ -10,6 +10,7 @@ from transformers import (
 import model_management
 from qwen_vl_utils import process_vision_info
 from pathlib import Path
+import re
 
 QWEN_PROMPT_TYPES = {
     "Ignore": "",
@@ -32,7 +33,7 @@ QWEN_PROMPT_TYPES = {
     "[Utility]Compare": "Compare and contrast the different elements in this image.",
 }
 
-class Qwen3VLAdv:
+class Qwen3VLAdvanced:
     def __init__(self):
         self.model_checkpoint = None
         self.processor = None
@@ -122,7 +123,7 @@ class Qwen3VLAdv:
                 ),
                 "max_new_tokens": (
                     "INT",
-                    {"default": 1024, "min": 128, "max": 2048, "step": 1},
+                    {"default": 1024, "min": 128, "max": 8192, "step": 1},
                 ),
                 "min_resolution": (
                     "INT",
@@ -148,6 +149,7 @@ class Qwen3VLAdv:
                 "keep_model_loaded": ("BOOLEAN", {"default": False}),
                 "batch_mode": ("BOOLEAN", {"default": False}),
                 "batch_directory": ("STRING", {"default": ""}),
+                "filter_thinking_process": ("BOOLEAN", {"default": False}),
                 
             },
             "optional": {
@@ -159,7 +161,7 @@ class Qwen3VLAdv:
 
     RETURN_TYPES = ("STRING",)
     FUNCTION = "inference"
-    CATEGORY = "Comfyui_Qwen3-VL_Adv"
+    CATEGORY = "Comfyui_Qwen3VL"
 
     def inference(
         self,
@@ -187,6 +189,7 @@ class Qwen3VLAdv:
         batch_mode=False,
         batch_directory="",
         extra_options=None,
+        filter_thinking_process=False,
     ):
         preset_text = QWEN_PROMPT_TYPES.get(preset_prompt, "Describe this image.")
         
@@ -251,7 +254,6 @@ class Qwen3VLAdv:
         
         final_prompt = self._apply_output_language(final_prompt, output_language)
         
-        # 检查source_path和image是否同时被连接
         if source_path is not None and image is not None:
             error_message = (
                 "检测到输入端口冲突：source_path 和 image 不能同时连接。\n\n"
@@ -287,7 +289,7 @@ class Qwen3VLAdv:
                 final_prompt, batch_directory, model, quantization, keep_model_loaded,
                 temperature, top_p, num_beams, repetition_penalty, frame_count, 
                 max_new_tokens, min_pixels, max_pixels,
-                seed, attention, output_language, device, system_prompt, unlock_restrictions, extra_options
+                seed, attention, output_language, device, system_prompt, unlock_restrictions, extra_options, filter_thinking_process
             )
         
         if seed != -1:
@@ -358,12 +360,9 @@ class Qwen3VLAdv:
                             {"type": "text", "text": final_prompt},
                         ],
                     },
-                ]
+                ]             
             elif image is not None:
-                # Convert ComfyUI image tensor to PIL Image
                 to_pil = ToPILImage()
-                # ComfyUI image format is [batch, height, width, channels]
-                # Convert to [channels, height, width] for ToPILImage
                 pil_image = to_pil(image[0].permute(2, 0, 1))
                 
                 messages = [
@@ -451,7 +450,12 @@ class Qwen3VLAdv:
                 import gc
                 gc.collect()
 
-            return (result,)
+            # 应用思考过程过滤（如果启用）
+            final_result = result[0]
+            if filter_thinking_process:
+                final_result = self._filter_thinking_process(final_result, model)
+
+            return (final_result,)
 
     def get_image_files(self, batch_directory):
         import glob
@@ -505,6 +509,7 @@ class Qwen3VLAdv:
         system_prompt,
         unlock_restrictions,
         extra_options=None,
+        filter_thinking_process=False,
     ):
         if seed != -1:
             torch.manual_seed(seed)
@@ -618,6 +623,11 @@ class Qwen3VLAdv:
                         torch.cuda.empty_cache()
                     
                     description = result[0] if result else "No description generated"
+                    
+                    # 应用思考过程过滤（如果启用）
+                    if filter_thinking_process:
+                        description = self._filter_thinking_process(description, model)
+                    
                     self.save_description(image_file, description)
                     
                     processed_count += 1
@@ -646,3 +656,39 @@ class Qwen3VLAdv:
     def _resolution_to_pixels(self, resolution):
 
         return resolution * resolution
+
+    def _filter_thinking_process(self, text, model_name):
+        """
+        过滤思考型模型的思考过程内容，只保留最终输出
+        """
+        # 检查是否为思考型模型
+        if "Thinking" not in model_name:
+            return text
+        
+        # 常见的思考过程标记模式
+        thinking_patterns = [
+            r'<thinking>.*?</thinking>',  # <thinking>...</thinking>
+            r'<think>.*?</think>',        # <think>...</think>
+            r'思考过程：.*?(?=\n\n|\n[^思]|$)',  # 中文思考过程标记
+            r'思考：.*?(?=\n\n|\n[^思]|$)',     # 简化中文思考标记
+            r'Let me think.*?(?=\n\n|\n[A-Z]|$)',  # 英文思考过程
+            r'I need to think.*?(?=\n\n|\n[A-Z]|$)',  # 英文思考过程
+            r'\*thinking\*.*?\*end thinking\*',  # *thinking*...*end thinking*
+            r'【思考】.*?【/思考】',              # 【思考】...【/思考】
+        ]
+        
+        filtered_text = text
+        
+        # 应用所有过滤模式
+        for pattern in thinking_patterns:
+            filtered_text = re.sub(pattern, '', filtered_text, flags=re.DOTALL | re.IGNORECASE)
+        
+        # 清理多余的空行和空白字符
+        filtered_text = re.sub(r'\n\s*\n\s*\n', '\n\n', filtered_text)  # 多个空行合并为两个
+        filtered_text = filtered_text.strip()
+        
+        # 如果过滤后内容为空或过短，返回原文本
+        if len(filtered_text.strip()) < 10:
+            return text
+            
+        return filtered_text

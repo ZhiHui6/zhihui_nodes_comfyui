@@ -21,8 +21,8 @@ class PathSwitch:
     RETURN_TYPES = ("PATH",)
     RETURN_NAMES = ("output_path",)
     FUNCTION = "execute"
-    CATEGORY = "Comfyui_Qwen3-VL_Adv"
-    DESCRIPTION = "Dual-channel path switcher supporting manual and automatic modes. Can switch between 2 path inputs from MultiplePathsInput nodes, supports annotation tags for easy management, intelligently selects non-empty inputs in automatic mode, suitable for conditional branching and dynamic switching in workflows. Output can be connected to Qwen3-VL Advanced source_path input."
+    CATEGORY = "Comfyui_Qwen3VL"
+    DESCRIPTION = "Dual-channel path switcher supporting manual and automatic modes. Can switch between 2 path inputs from MultiplePathsInput nodes, supports annotation tags for easy management, intelligently selects non-empty inputs in automatic mode, suitable for conditional branching and dynamic switching in workflows. Output can be connected to Qwen3VL source_path input."
 
     def execute(self, mode, select_channel, Path_1=None, Path_2=None, 
                 Path_1_comment="", Path_2_comment=""):

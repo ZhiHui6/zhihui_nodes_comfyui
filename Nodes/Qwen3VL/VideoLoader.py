@@ -17,7 +17,7 @@ class VideoLoader(ComfyNodeABC):
             "required": {"file": (sorted(files), {"video_upload": True, "video_preview": True})},
         }
 
-    CATEGORY = "Comfyui_Qwen3-VL_Adv"
+    CATEGORY = "Comfyui_Qwen3VL"
     RETURN_TYPES = ("VIDEO", "PATH")
     RETURN_NAMES = ("VIDEO", "PATH")
     FUNCTION = "load_video"
