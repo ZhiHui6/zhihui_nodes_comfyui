@@ -75,17 +75,18 @@ class Qwen3VLAdvanced:
     def INPUT_TYPES(s):
         return {
             "required": {
-                "preset_prompt": (list(QWEN_PROMPT_TYPES.keys()), {"default": "Ignore"}),
-                "output_language": (["Ignore", "Chinese", "english", "Chinese&English"], {"default": "Ignore"}),
-                "user_prompt": ("STRING", {"default": "", "multiline": True}),
-                "system_prompt": ("STRING", {"default": "", "multiline": True}),
+                "preset_prompt": (list(QWEN_PROMPT_TYPES.keys()), {"default": "Ignore", "tooltip": "选择预设的提示词模板，包含标签生成、详细描述、创意分析等多种模式"}),
+                "output_language": (["Ignore", "Chinese", "english", "Chinese&English"], {"default": "Ignore", "tooltip": "设置输出语言，可选择中文、英文或双语输出"}),
+                "user_prompt": ("STRING", {"default": "", "multiline": True, "tooltip": "用户自定义的提示词，用于指导模型生成特定内容"}),
+                "system_prompt": ("STRING", {"default": "", "multiline": True, "tooltip": "系统级提示词，用于设定模型的行为模式和角色定位"}),
+                "filter_thinking_process": ("BOOLEAN", {"default": False, "tooltip": "过滤思考过程内容，启用后将移除Thinking模型的推理过程，提供更简洁的输出"}),
                 "unlock_restrictions": (
                     [
                         "Disable",
                         "Unlock_Instruction_A", 
                         "Unlock_Instruction_B"
                     ],
-                    {"default": "Disable"}
+                    {"default": "Disable", "tooltip": "解锁模型限制，提供不同级别的内容生成自由度"}
                 ),
                 "model": (
                     [
@@ -95,61 +96,60 @@ class Qwen3VLAdvanced:
                         "Qwen3-VL-8B-Thinking",
                         "Huihui-Qwen3-VL-8B-Instruct-abliterated",
                     ],
-                    {"default": "Qwen3-VL-8B-Instruct"},
+                    {"default": "Qwen3-VL-8B-Instruct", "tooltip": "选择Qwen3-VL模型版本，包含4B/8B参数量和Instruct/Thinking两种类型"},
                 ),
                 "quantization": (
                     ["none", "4bit", "8bit"],
-                    {"default": "8bit"},
+                    {"default": "8bit", "tooltip": "模型量化设置，降低显存占用。8bit平衡性能与资源，4bit更节省显存但可能影响质量"},
                 ),
                 "temperature": (
                     "FLOAT",
-                    {"default": 0.7, "min": 0, "max": 1, "step": 0.1},
+                    {"default": 0.7, "min": 0, "max": 1, "step": 0.1, "tooltip": "控制生成文本的随机性，值越高越有创意，值越低越保守稳定"},
                 ),
                 "top_p": (
                     "FLOAT",
-                    {"default": 0.9, "min": 0, "max": 1, "step": 0.1},
+                    {"default": 0.9, "min": 0, "max": 1, "step": 0.1, "tooltip": "核采样参数，控制词汇选择范围，较小值使输出更集中，较大值增加多样性"},
                 ),
                 "num_beams": (
                     "INT",
-                    {"default": 1, "min": 1, "max": 10, "step": 1},
+                    {"default": 1, "min": 1, "max": 10, "step": 1, "tooltip": "束搜索数量，值大于1时启用束搜索，可提高输出质量但增加计算时间"},
                 ),
                 "repetition_penalty": (
                     "FLOAT",
-                    {"default": 1.2, "min": 0.1, "max": 2.0, "step": 0.1},
+                    {"default": 1.2, "min": 0.1, "max": 2.0, "step": 0.1, "tooltip": "重复惩罚系数，防止生成重复内容，值越大越避免重复"},
                 ),
                 "frame_count": (
                     "INT",
-                    {"default": 23, "min": 1, "max": 64, "step": 1},
+                    {"default": 23, "min": 1, "max": 64, "step": 1, "tooltip": "视频处理时的帧数量，影响视频理解的精度和处理速度"},
                 ),
                 "max_new_tokens": (
                     "INT",
-                    {"default": 1024, "min": 128, "max": 8192, "step": 1},
+                    {"default": 1024, "min": 128, "max": 8192, "step": 1, "tooltip": "生成文本的最大长度，值越大可生成越长的内容但消耗更多资源"},
                 ),
                 "min_resolution": (
                     "INT",
-                    {"default": 256, "min": 112, "max": 2048, "step": 1},
+                    {"default": 256, "min": 112, "max": 2048, "step": 1, "tooltip": "图像处理的最小分辨率，影响图像理解的细节程度和处理速度"},
                 ),
                 "max_resolution": (
                     "INT", 
-                    {"default": 768, "min": 256, "max": 4096, "step": 1},
+                    {"default": 768, "min": 256, "max": 4096, "step": 1, "tooltip": "图像处理的最大分辨率，更高分辨率提供更多细节但消耗更多资源"},
                 ),
-                "seed": ("INT", {"default": -1}),
+                "seed": ("INT", {"default": -1, "tooltip": "随机种子，设置为-1使用随机值，固定值可确保结果可重现"}),
                 "attention": (
                     [
                         "eager",
                         "sdpa",
                         "flash_attention_2",
                     ],
-                    {"default": "sdpa"},
+                    {"default": "sdpa", "tooltip": "注意力机制类型，sdpa平衡性能，flash_attention_2更快但需要特定硬件支持"},
                 ),
                 "device": (
                     ["auto", "gpu", "cpu"],
-                    {"default": "auto"},
+                    {"default": "auto", "tooltip": "计算设备选择，auto自动选择最佳设备，gpu使用显卡加速，cpu使用处理器"},
                 ),
-                "keep_model_loaded": ("BOOLEAN", {"default": False}),
-                "batch_mode": ("BOOLEAN", {"default": False}),
-                "batch_directory": ("STRING", {"default": ""}),
-                "filter_thinking_process": ("BOOLEAN", {"default": False}),
+                "keep_model_loaded": ("BOOLEAN", {"default": False, "tooltip": "保持模型在内存中，启用后可加快后续推理速度但占用更多显存"}),
+                "batch_mode": ("BOOLEAN", {"default": False, "tooltip": "批处理模式，启用后可批量处理指定目录下的所有图像文件"}),
+                "batch_directory": ("STRING", {"default": "", "tooltip": "批处理目录路径，指定要批量处理的图像文件所在目录"}),
                 
             },
             "optional": {

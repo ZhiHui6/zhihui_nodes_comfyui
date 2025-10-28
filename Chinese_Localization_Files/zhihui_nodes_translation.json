@@ -613,7 +613,7 @@
             "lyrics": "歌词"
         }
     },
-    "Qwen3VLAdv": {
+    "Qwen3VLAdvanced": {
         "title": "Qwen3-VL高级版",
         "description": "基于Qwen3-VL多模态大语言模型的图像理解节点，支持多种模型规格和量化选项，可进行详细的图像描述、分析和理解，支持批处理模式和自定义提示词。新增解锁限制功能，提供多种输出模式选择。",
         "inputs": {
@@ -643,7 +643,8 @@
             "keep_model_loaded": "保持模型加载",
             "batch_mode": "批处理模式",
             "batch_directory": "批处理目录",
-            "unlock_restrictions": "解锁限制"
+            "unlock_restrictions": "解锁限制",
+            "filter_thinking_process": "过滤思考过程"
         },
         "outputs": {
             "STRING": "字符串"
@@ -657,20 +658,21 @@
             "source_path": "源路径"
         },
         "widgets": {
-            "user_prompt": "用户提示词",
-            "system_prompt": "系统提示词",
-            "model": "模型",
-            "quantization": "量化",
-            "temperature": "温度",
-            "max_new_tokens": "最大新令牌数",
-            "min_resolution": "最小分辨率",
-            "max_resolution": "最大分辨率",
-            "seed": "随机种子",
-            "attention": "注意力机制",
-            "device": "设备",
-            "keep_model_loaded": "保持模型加载",
-            "batch_mode": "批处理模式",
-            "batch_directory": "批处理目录"
+            "user_prompt": "用户提示词输入",
+            "system_prompt": "系统提示词输入",
+            "filter_thinking_process": "过滤思考过程开关",
+            "model": "选择模型",
+            "quantization": "量化设置",
+            "temperature": "生成温度",
+            "max_new_tokens": "最大生成令牌数",
+            "min_resolution": "最小图像分辨率",
+            "max_resolution": "最大图像分辨率",
+            "seed": "随机种子值",
+            "attention": "注意力机制类型",
+            "device": "运行设备",
+            "keep_model_loaded": "保持模型在内存中",
+            "batch_mode": "启用批处理模式",
+            "batch_directory": "批处理文件夹路径"
         },
         "outputs": {
             "STRING": "字符串"
