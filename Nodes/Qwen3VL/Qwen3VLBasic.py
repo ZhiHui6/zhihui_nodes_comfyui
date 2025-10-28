@@ -54,10 +54,6 @@ class Qwen3VLBasic:
                     "multiline": True,
                     "tooltip": "系统级提示词，用于设定模型的行为模式和角色定位"
                 }),
-                "filter_thinking_process": ("BOOLEAN", {
-                    "default": False,
-                    "tooltip": "过滤思考过程内容，启用后将移除Thinking模型的推理过程，提供更简洁的输出"
-                }),
                 "model": (
                     [
                         "Qwen3-VL-4B-Instruct",
@@ -74,7 +70,7 @@ class Qwen3VLBasic:
                 "quantization": (
                     ["none", "4bit", "8bit"],
                     {
-                        "default": "8bit",
+                        "default": "none",
                         "tooltip": "模型量化设置，降低显存占用。8bit平衡性能与资源，4bit更节省显存但可能影响质量"
                     },
                 ),
@@ -100,26 +96,14 @@ class Qwen3VLBasic:
                 ),
                 "min_resolution": (
                     "INT",
-                    {
-                        "default": 448, 
-                        "min": 224, 
-                        "max": 1344, 
-                        "step": 224,
-                        "tooltip": "图像处理的最小分辨率，影响处理速度和细节保留"
-                    },
+                    {"default": 256, "min": 112, "max": 2048, "step": 1, "tooltip": "图像处理的最小分辨率，影响图像理解的细节程度和处理速度"},
                 ),
                 "max_resolution": (
                     "INT", 
-                    {
-                        "default": 1344, 
-                        "min": 448, 
-                        "max": 1344, 
-                        "step": 224,
-                        "tooltip": "图像处理的最大分辨率，影响处理质量和资源消耗"
-                    },
+                    {"default": 768, "min": 256, "max": 4096, "step": 1, "tooltip": "图像处理的最大分辨率，更高分辨率提供更多细节但消耗更多资源"},
                 ),
                 "seed": ("INT", {
-                    "default": 42,
+                    "default": -1,
                     "tooltip": "随机种子，控制生成结果的随机性。相同种子产生相同结果，-1为随机种子"
                 }),
                 "attention": (
@@ -141,7 +125,7 @@ class Qwen3VLBasic:
                     },
                 ),
                 "keep_model_loaded": ("BOOLEAN", {
-                    "default": True,
+                    "default": False,
                     "tooltip": "保持模型在内存中加载，提高后续处理速度但占用更多内存"
                 }),
                 "batch_mode": ("BOOLEAN", {
@@ -175,7 +159,6 @@ class Qwen3VLBasic:
         model,
         system_prompt,
         user_prompt,
-        filter_thinking_process,
         keep_model_loaded,
         temperature,
         max_new_tokens,
@@ -364,10 +347,6 @@ class Qwen3VLBasic:
                 generated_ids_trimmed, skip_special_tokens=True, clean_up_tokenization_spaces=False
             )
             
-            # 应用思考过程过滤
-            if filter_thinking_process and result:
-                result[0] = self._filter_thinking_process(result[0], model)
-            
             del generated_ids, generated_ids_trimmed, input_ids
             if torch.cuda.is_available():
                 torch.cuda.empty_cache()
@@ -380,41 +359,23 @@ class Qwen3VLBasic:
 
         return (result[0],)
 
-    def _filter_thinking_process(self, text, model_name):
-        """
-        过滤思考型模型的思考过程内容，只保留最终输出
-        """
-        # 检查是否为思考型模型
-        if "Thinking" not in model_name:
-            return text
+    def get_image_files(self, batch_directory):
+        """获取目录中的所有图像文件"""
+        image_extensions = ('.png', '.jpg', '.jpeg', '.bmp', '.tiff', '.webp', '.gif')
+        image_files = []
         
-        # 常见的思考过程标记模式
-        thinking_patterns = [
-            r'<thinking>.*?</thinking>',  # <thinking>...</thinking>
-            r'<think>.*?</think>',        # <think>...</think>
-            r'思考过程：.*?(?=\n\n|\n[^思]|$)',  # 中文思考过程标记
-            r'思考：.*?(?=\n\n|\n[^思]|$)',     # 简化中文思考标记
-            r'Let me think.*?(?=\n\n|\n[A-Z]|$)',  # 英文思考过程
-            r'I need to think.*?(?=\n\n|\n[A-Z]|$)',  # 英文思考过程
-            r'\*thinking\*.*?\*end thinking\*',  # *thinking*...*end thinking*
-            r'【思考】.*?【/思考】',              # 【思考】...【/思考】
-        ]
+        for root, dirs, files in os.walk(batch_directory):
+            for file in files:
+                if file.lower().endswith(image_extensions):
+                    image_files.append(os.path.join(root, file))
         
-        filtered_text = text
-        
-        # 应用所有过滤模式
-        for pattern in thinking_patterns:
-            filtered_text = re.sub(pattern, '', filtered_text, flags=re.DOTALL | re.IGNORECASE)
-        
-        # 清理多余的空行和空白字符
-        filtered_text = re.sub(r'\n\s*\n\s*\n', '\n\n', filtered_text)  # 多个空行合并为两个
-        filtered_text = filtered_text.strip()
-        
-        # 如果过滤后内容为空或过短，返回原文本
-        if len(filtered_text.strip()) < 10:
-            return text
-            
-        return filtered_text
+        return sorted(image_files)
+
+    def save_description(self, image_file, description):
+        """保存描述到文本文件"""
+        txt_file = os.path.splitext(image_file)[0] + ".txt"
+        with open(txt_file, 'w', encoding='utf-8') as f:
+            f.write(description)
 
     def batch_inference(
         self,
@@ -432,15 +393,19 @@ class Qwen3VLBasic:
         device,
         system_prompt,
     ):
-        if not batch_directory or not os.path.exists(batch_directory):
-            raise ValueError(f"批量目录不存在或为空: {batch_directory}")
-        
         if seed != -1:
             torch.manual_seed(seed)
+            
+        if not os.path.exists(batch_directory):
+            return (f"Error: Directory '{batch_directory}' does not exist.",)
+        
+        image_files = self.get_image_files(batch_directory)
+        if not image_files:
+            return (f"No image files found in directory '{batch_directory}'.",)
         
         model_exists, model_path, error_message = self.check_model_exists(model)
         if not model_exists:
-            raise ValueError(error_message)
+            return (error_message,)
         
         self.model_checkpoint = model_path
 
@@ -451,20 +416,16 @@ class Qwen3VLBasic:
 
         if self.model is None:
             if quantization == "4bit":
-                quantization_config = BitsAndBytesConfig(
-                    load_in_4bit=True,
-                )
+                quantization_config = BitsAndBytesConfig(load_in_4bit=True)
             elif quantization == "8bit":
-                quantization_config = BitsAndBytesConfig(
-                    load_in_8bit=True,
-                )
+                quantization_config = BitsAndBytesConfig(load_in_8bit=True)
             else:
                 quantization_config = None
 
             if device == "cpu":
-                device_map = {"": "cpu"}
+                device_map = {"":"cpu"}
             elif device == "gpu":
-                device_map = {"": 0}
+                device_map = {"":0}
             else:
                 device_map = "auto"
 
@@ -476,91 +437,105 @@ class Qwen3VLBasic:
                 quantization_config=quantization_config,
             )
 
-        image_extensions = {'.jpg', '.jpeg', '.png', '.bmp', '.tiff', '.webp'}
-        image_files = []
+        processed_count = 0
+        failed_count = 0
         
-        for file in os.listdir(batch_directory):
-            if Path(file).suffix.lower() in image_extensions:
-                image_files.append(os.path.join(batch_directory, file))
-        
-        if not image_files:
-            raise ValueError(f"在目录 {batch_directory} 中未找到支持的图像文件")
-        
-        results = []
-        
-        for image_path in image_files:
+        for image_file in image_files:
             try:
-                with torch.no_grad():
-                    import gc
-                    gc.collect()
-                    if torch.cuda.is_available():
-                        torch.cuda.empty_cache()
-                    
+                if system_prompt:
                     messages = [
                         {
                             "role": "system",
-                            "content": system_prompt,
+                            "content": [{"type": "text", "text": system_prompt}],
                         },
                         {
                             "role": "user",
                             "content": [
-                                {"type": "image", "image": image_path},
+                                {"type": "image", "image": image_file},
+                                {"type": "text", "text": user_prompt},
+                            ],
+                        },
+                    ]
+                else:
+                    messages = [
+                        {
+                            "role": "user",
+                            "content": [
+                                {"type": "image", "image": image_file},
                                 {"type": "text", "text": user_prompt},
                             ],
                         },
                     ]
 
-                    text = self.processor.apply_chat_template(
-                        messages, tokenize=False, add_generation_prompt=True
-                    )
-                    image_inputs, video_inputs = process_vision_info(messages)
-                    inputs = self.processor(
-                        text=[text],
-                        images=image_inputs,
-                        videos=video_inputs,
-                        padding=True,
-                        return_tensors="pt",
-                    )
-                    inputs = inputs.to(self.device)
-                    
-                    if torch.cuda.is_available():
-                        torch.cuda.empty_cache()
-                        
-                    input_ids = inputs.input_ids.clone()
-                        
-                    generated_ids = self.model.generate(
-                        **inputs, 
-                        max_new_tokens=max_new_tokens, 
-                        temperature=temperature, 
-                        do_sample=temperature > 0,
-                        pad_token_id=self.processor.tokenizer.eos_token_id,
-                    )
-                    
-                    del inputs
-                    if torch.cuda.is_available():
-                        torch.cuda.empty_cache()
-                        
-                    generated_ids_trimmed = [
-                        out_ids[len(in_ids) :] for in_ids, out_ids in zip(input_ids, generated_ids)
-                    ]
-                    
-                    description = self.processor.batch_decode(
-                        generated_ids_trimmed, skip_special_tokens=True, clean_up_tokenization_spaces=False
-                    )[0]
-                    
-                    del generated_ids, generated_ids_trimmed, input_ids
-                    if torch.cuda.is_available():
-                        torch.cuda.empty_cache()
-                    
-                    results.append(f"文件: {os.path.basename(image_path)}\n描述: {description}\n")
-                    
+                text_input = self.processor.apply_chat_template(
+                    messages, tokenize=False, add_generation_prompt=True
+                )
+                image_inputs, video_inputs = process_vision_info(messages)
+                inputs = self.processor(
+                    text=[text_input],
+                    images=image_inputs,
+                    videos=video_inputs,
+                    padding=True,
+                    return_tensors="pt",
+                )
+                inputs = inputs.to(self.device)
+                
+                input_ids = inputs.input_ids.clone()
+                
+                import gc
+                gc.collect()
+                if torch.cuda.is_available():
+                    torch.cuda.empty_cache()
+                
+                generated_ids = self.model.generate(
+                    **inputs, 
+                    max_new_tokens=max_new_tokens, 
+                    temperature=temperature, 
+                    do_sample=temperature > 0,
+                    pad_token_id=self.processor.tokenizer.eos_token_id,
+                )
+                
+                del inputs
+                if torch.cuda.is_available():
+                    torch.cuda.empty_cache()
+                
+                generated_ids_trimmed = [
+                    out_ids[len(in_ids) :]
+                    for in_ids, out_ids in zip(input_ids, generated_ids)
+                ]
+                result = self.processor.batch_decode(
+                    generated_ids_trimmed,
+                    skip_special_tokens=True,
+                    clean_up_tokenization_spaces=False,
+                )
+                
+                del generated_ids, generated_ids_trimmed, input_ids
+                if torch.cuda.is_available():
+                    torch.cuda.empty_cache()
+                
+                description = result[0] if result else "No description generated"
+                
+                self.save_description(image_file, description)
+                
+                processed_count += 1
+                print(f"Processed: {os.path.basename(image_file)} - {description[:100]}...")
+                
             except Exception as e:
-                results.append(f"文件: {os.path.basename(image_path)}\n错误: {str(e)}\n")
-        
+                failed_count += 1
+                print(f"Failed to process {image_file}: {str(e)}")
+                continue
+
         if not keep_model_loaded:
+            del self.processor
             del self.model
+            self.processor = None
             self.model = None
             if torch.cuda.is_available():
                 torch.cuda.empty_cache()
+                torch.cuda.ipc_collect()
+            import gc
+            gc.collect()
+
+        log_message = f"Batch processing completed. Processed: {processed_count} images, Failed: {failed_count} images in directory '{batch_directory}'."
         
-        return ("\n".join(results),)
+        return (log_message,)

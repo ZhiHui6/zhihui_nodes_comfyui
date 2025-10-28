@@ -44,6 +44,7 @@ from .Nodes.Qwen3VL.MultiplePathsInput import MultiplePathsInput
 from .Nodes.Qwen3VL.ModelDownloader import ModelDownloader
 from .Nodes.Qwen3VL.PathSwitch import PathSwitch
 from .Nodes.ImageRotateTool import ImageRotateTool
+from .Nodes.ImageFormatConverter import ImageFormatConverter
 
 import os
 
@@ -94,6 +95,7 @@ NODE_CLASS_MAPPINGS = {
     "MultiplePathsInput": MultiplePathsInput,
     "ModelDownloader": ModelDownloader,
     "ImageRotateTool": ImageRotateTool,
+    "ImageFormatConverter": ImageFormatConverter,
 
 }
 
@@ -144,6 +146,7 @@ NODE_DISPLAY_NAME_MAPPINGS = {
     "ModelDownloader": "Qwen3-VL Model Downloader",
     "PathSwitch": "Qwen3-VL Path Switch",
     "ImageRotateTool": "Image Rotate Tool",
+    "ImageFormatConverter": "Image Format Converter",
 }
 
 WEB_DIRECTORY = os.path.dirname(os.path.abspath(__file__))

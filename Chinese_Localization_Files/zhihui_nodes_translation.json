@@ -660,7 +660,6 @@
         "widgets": {
             "user_prompt": "用户提示词输入",
             "system_prompt": "系统提示词输入",
-            "filter_thinking_process": "过滤思考过程开关",
             "model": "选择模型",
             "quantization": "量化设置",
             "temperature": "生成温度",
@@ -795,6 +794,22 @@
             "preset": "预设",
             "custom_angle": "自定义角度",
             "canvas_mode": "画布模式"
+        }
+    },
+    "ImageFormatConverter": {
+        "title": "图像格式转换器",
+        "description": "图像格式转换器：支持JPEG、PNG、WEBP、BMP、TIFF等多种格式之间的转换，适用于图像格式标准化和批量转换任。",
+        "outputs": {
+            "converted_image": "转换后图像",
+            "conversion_info": "转换信息"
+        },
+        "widgets": {
+            "output_format": "输出格式",
+            "quality": "质量",
+            "folder_path": "文件夹路径",
+            "optimize": "优化",
+            "progressive": "渐进式",
+            "lossless": "无损压缩"
         }
     }
 }
