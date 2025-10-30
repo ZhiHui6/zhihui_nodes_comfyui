@@ -51,7 +51,7 @@ class TagSelector:
     RETURN_TYPES = ("STRING",)
     RETURN_NAMES = ("tags",)
     FUNCTION = "process_tags"
-    CATEGORY = "Zhi.AI/text"
+    CATEGORY = "Zhi.AI/Generator"
     
     def process_tags(self, tag_edit, auto_random_tags, expand_mode, Expanded_result, expand_model="openai", unique_id=None, extra_pnginfo=None):
         if auto_random_tags:

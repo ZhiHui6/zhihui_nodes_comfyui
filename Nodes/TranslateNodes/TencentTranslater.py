@@ -38,7 +38,6 @@ class TencentTranslater:
         return input_types
 
     CATEGORY = "Zhi.AI/Translate"
-
     RETURN_TYPES = ("STRING",)
     RETURN_NAMES = ("Translation_Result",)
     FUNCTION = "translate_text"

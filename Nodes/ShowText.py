@@ -17,7 +17,7 @@ class ShowText:
     
     RETURN_TYPES = ("STRING",)
     FUNCTION = "notify"
-    CATEGORY = "Zhi.AI/text"
+    CATEGORY = "Zhi.AI/Text"
     DESCRIPTION = "Text Display: Used to display text content in the ComfyUI interface. Can receive any text input and display it visually on the node interface, convenient for debugging and viewing text processing results."
 
     def notify(self, text, unique_id=None, extra_pnginfo=None):

@@ -31,7 +31,7 @@ class ImageRotateTool:
 
     RETURN_TYPES = ("IMAGE",)
     FUNCTION = "rotate"
-    CATEGORY = "Zhi.AI/image"
+    CATEGORY = "Zhi.AI/Image"
 
     def rotate(self, image: torch.Tensor, preset: str, custom_angle: float, canvas_mode: str):
         batch, h, w, c = image.shape

@@ -7,6 +7,7 @@ import requests
 import base64
 from io import BytesIO
 from PIL import Image
+from datetime import datetime
 
 try:
     from openai import OpenAI
@@ -16,15 +17,75 @@ except ImportError:
     OPENAI_AVAILABLE = False
     OpenAI = None
 
+try:
+    from server import PromptServer
+    from aiohttp import web
+    PROMPT_SERVER_AVAILABLE = True
+except ImportError:
+    print("警告: 无法导入PromptServer，API配置功能将不可用")
+    PROMPT_SERVER_AVAILABLE = False
+    PromptServer = None
+    web = None
+
 current_dir = os.path.dirname(os.path.abspath(__file__))
 
 class Qwen3VLAPI:
     
     def __init__(self):
         self.config = self.load_config()
+        self.api_config_path = os.path.join(current_dir, "api_config.json")
+        self.api_config = self.load_api_config()
     
     def load_config(self):
         return self.get_default_config()
+    
+    def load_api_config(self):
+        """加载API配置文件"""
+        try:
+            if os.path.exists(self.api_config_path):
+                with open(self.api_config_path, 'r', encoding='utf-8') as f:
+                    return json.load(f)
+            else:
+                default_config = {
+                    "api_keys": {
+                        "SiliconFlow": {
+                            "api_key": "",
+                            "description": "SiliconFlow平台API密钥",
+                            "website": "https://siliconflow.cn",
+                            "docs": "https://docs.siliconflow.cn"
+                        },
+                        "ModelScope": {
+                            "api_key": "",
+                            "description": "ModelScope平台API密钥", 
+                            "website": "https://modelscope.cn",
+                            "docs": "https://modelscope.cn/docs"
+                        }
+                    },
+                    "config_version": "1.0",
+                    "last_updated": "",
+                    "notes": "此文件用于存储Qwen3VL API节点的API密钥配置。请妥善保管您的API密钥，不要将其分享给他人。"
+                }
+                self.save_api_config(default_config)
+                return default_config
+        except Exception as e:
+            print(f"加载API配置文件失败: {e}")
+            return {"api_keys": {}}
+    
+    def save_api_config(self, config):
+        try:
+            config["last_updated"] = datetime.now().isoformat()
+            with open(self.api_config_path, 'w', encoding='utf-8') as f:
+                json.dump(config, f, ensure_ascii=False, indent=4)
+            return True
+        except Exception as e:
+            print(f"保存API配置文件失败: {e}")
+            return False
+    
+    def get_api_key_from_config(self, platform):
+        try:
+            return self.api_config.get("api_keys", {}).get(platform, {}).get("api_key", "")
+        except:
+            return ""
     
     def get_default_config(self):
         return {
@@ -78,6 +139,11 @@ class Qwen3VLAPI:
                 "description": "Qwen3-VL image analysis node supporting multi-platform APIs"
             }
         }
+    
+    RETURN_TYPES = ("STRING", "STRING")
+    RETURN_NAMES = ("result", "status")
+    FUNCTION = "analyze_image"
+    CATEGORY = "Zhi.AI/Qwen3VL"
     
     def get_available_models(self):
         models = []
@@ -391,12 +457,6 @@ class Qwen3VLAPI:
                     "default": "SiliconFlow",
                     "tooltip": "Select the API platform to use for image analysis."
                 }),
-                "api_key": ("STRING", {
-                    "multiline": False,
-                    "default": "",
-                    "placeholder": "Enter your API key for the selected platform",
-                    "tooltip": "API key for authentication with the selected platform."
-                }),
                 "model": (available_models if available_models else ["Qwen-VL-Max", "Qwen-VL-Plus"], {
                     "default": available_models[0] if available_models else "Qwen-VL-Max",
                     "tooltip": "Select the vision-language model to use for analysis."
@@ -437,12 +497,6 @@ class Qwen3VLAPI:
                 }),
             }
         }
-    
-    RETURN_TYPES = ("STRING", "STRING")
-    RETURN_NAMES = ("analysis_result", "status_info")
-    FUNCTION = "analyze_image"
-    CATEGORY = "Zhi.AI/Qwen3VL"
-    OUTPUT_NODE = True
     
     def validate_input_exclusivity(self, images, batch_mode, batch_folder_path):
         has_image_input = images is not None
@@ -486,7 +540,7 @@ class Qwen3VLAPI:
         else:
             return user_prompt.strip()
 
-    def analyze_image(self, images, api_platform, api_key, model, system_prompt, user_prompt, batch_mode, batch_folder_path, max_tokens, temperature, seed):
+    def analyze_image(self, images, api_platform, model, system_prompt, user_prompt, batch_mode, batch_folder_path, max_tokens, temperature, seed):
         import random
         import time
         
@@ -503,10 +557,13 @@ class Qwen3VLAPI:
         timeout = 60
         
         try:
+            api_key = self.get_api_key_from_config(api_platform)
             if not api_key or api_key.strip() == "":
-                error_msg = f"Please enter API key for {api_platform}"
-                status_messages.append(f"❌ Error: {error_msg}")
+                error_msg = f"请在配置文件中设置{api_platform}平台的API密钥，或点击'配置API密钥'按钮进行配置"
+                status_messages.append(f"❌ 错误: {error_msg}")
                 return ("", "\n".join(status_messages))
+            else:
+                status_messages.append(f"✅ 使用配置文件中的API密钥")
             
             platform_config = self.get_platform_config(api_platform)
             if not platform_config:
@@ -648,3 +705,55 @@ class Qwen3VLAPI:
     @classmethod
     def IS_CHANGED(cls, **kwargs):
         return float("nan")
+
+if PROMPT_SERVER_AVAILABLE:
+    _api_instance = None
+    
+    def get_api_instance():
+        global _api_instance
+        if _api_instance is None:
+            _api_instance = Qwen3VLAPI()
+        return _api_instance
+    
+    @PromptServer.instance.routes.get("/zhihui_nodes/api_config")
+    async def get_api_config(request):
+        """获取API配置"""
+        try:
+            instance = get_api_instance()
+            config = instance.load_api_config()
+            return web.json_response(config)
+        except Exception as e:
+            print(f"获取API配置失败: {e}")
+            return web.json_response(
+                {"error": f"获取API配置失败: {str(e)}"}, 
+                status=500
+            )
+    
+    @PromptServer.instance.routes.post("/zhihui_nodes/api_config")
+    async def save_api_config(request):
+        """保存API配置"""
+        try:
+            instance = get_api_instance()
+            data = await request.json()
+            
+            if not isinstance(data, dict) or "api_keys" not in data:
+                return web.json_response(
+                    {"error": "无效的配置数据格式"}, 
+                    status=400
+                )
+            
+            success = instance.save_api_config(data)
+            if success:
+                instance.api_config = instance.load_api_config()
+                return web.json_response({"success": True, "message": "配置保存成功"})
+            else:
+                return web.json_response(
+                    {"error": "配置保存失败"}, 
+                    status=500
+                )
+        except Exception as e:
+            print(f"保存API配置失败: {e}")
+            return web.json_response(
+                {"error": f"保存API配置失败: {str(e)}"}, 
+                status=500
+            )

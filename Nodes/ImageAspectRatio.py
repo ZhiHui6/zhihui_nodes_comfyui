@@ -62,7 +62,7 @@ class ImageAspectRatio:
     RETURN_TYPES = ("INT", "INT")
     RETURN_NAMES = ("width", "height")
     FUNCTION = "get_dimensions"
-    CATEGORY = "Zhi.AI/Toolkit"
+    CATEGORY = "Zhi.AI/Image"
     DESCRIPTION = "Smart image aspect ratio setting node, supporting preset dimensions for multiple models like Qwen, Flux, Wan, SDXL, with quick selection of common ratios or custom sizes"
 
     def get_dimensions(self, preset_mode, aspect_ratio, custom_width=1328, custom_height=1328, aspect_lock=False):
