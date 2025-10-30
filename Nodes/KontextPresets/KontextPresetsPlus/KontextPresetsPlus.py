@@ -97,7 +97,7 @@ class KontextPresetsPlus:
     RETURN_TYPES = ("STRING",)
     RETURN_NAMES = ("prompt_content",)
     FUNCTION = "get_preset"
-    CATEGORY = "zhihui/generator"
+    CATEGORY = "Zhi.AI/Generator"
     DESCRIPTION = "Kontext Presets Plus: Provides a categorized preset library with complete information output, built-in AI expansion functionality, and custom content input. Suitable for advanced image editing and creative generation workflows."
     
     @classmethod

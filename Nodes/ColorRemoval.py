@@ -11,7 +11,7 @@ class ColorRemoval:
             },
         }
 
-    CATEGORY = "zhihui/image"
+    CATEGORY = "Zhi.AI/image"
     DESCRIPTION = "Color Removal Node: Converts color images to grayscale images, removing all color information while preserving luminance information. Suitable for creating black and white effects, image preprocessing, artistic style conversion and other scenarios."
 
     RETURN_TYPES = ("IMAGE",)

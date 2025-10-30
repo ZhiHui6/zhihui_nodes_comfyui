@@ -113,7 +113,7 @@ class SunoLyricsGenerator:
     RETURN_TYPES = ("STRING",)
     RETURN_NAMES = ("lyrics",)
     FUNCTION = "generate"
-    CATEGORY = "zhihui/Generator"
+    CATEGORY = "Zhi.AI/Generator"
     DESCRIPTION = "Suno AI Lyrics Generator: Online LLM-powered generator producing structured, singable lyrics with detailed meta-tags and sections ([Intro][Soft Guitar], [Verse 1][Piano], [Chorus][Soaring Vocals], etc.) guided by theme, language, vocal arrangement, style, mood, and genre."
 
     def _random_choice(self, value, options):

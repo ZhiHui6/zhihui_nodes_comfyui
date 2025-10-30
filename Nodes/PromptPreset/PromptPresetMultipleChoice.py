@@ -48,7 +48,7 @@ class PromptPresetMultipleChoice:
     RETURN_TYPES = ("STRING",)
     RETURN_NAMES = ("output_text",)
     FUNCTION = "execute"
-    CATEGORY = "zhihui/text"
+    CATEGORY = "Zhi.AI/text"
     DESCRIPTION = "Multiple Choice Prompt Preset: Provides 6 preset prompt options, each can be independently enabled or disabled. Supports master switch control, allows selecting multiple prompts for combined output, and supports external text parallel input."
 
     def execute(self, master_switch, prompt1_switch, prompt1_comment, prompt1, prompt2_switch, prompt2_comment, prompt2, prompt3_switch, prompt3_comment, prompt3, prompt4_switch, prompt4_comment, prompt4, prompt5_switch, prompt5_comment, prompt5, prompt6_switch, prompt6_comment, prompt6, parallel_text=""):

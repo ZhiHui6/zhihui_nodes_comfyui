@@ -309,16 +309,7 @@ This node collection contains numerous nodes with different functions, divided i
 </div>
 </td>
 </tr>
-<tr>
-<td><b>系统引导词加载器(基础版)</b><br><b>System Prompt Loader (Basic)</b><br><code>SystemPromptLoaderBase</code></td>
-<td>从预设文件夹动态加载系统级引导词（System Prompt），简化了节点功能，适合需要纯系统引导词的场景。<br>Dynamically loads system-level prompts from preset folders with simplified node functionality, suitable for scenarios requiring pure system prompts.<br><br>
-<div align="left">
-<a href="images/系统引导词加载器基础版.jpg" target="_blank">
-<img src="images/系统引导词加载器基础版.jpg" alt="系统引导词加载器基础版" width="45%"/>
-</a>
-</div>
-</td>
-</tr>
+
 <tr>
 <td><b>额外选项列表</b><br><b>Extra Options</b><br><code>ExtraOptions</code></td>
 <td>一个通用的额外选项列表，类似于 JoyCaption 的设计，设有总开关和独立的引导词输入框。适合添加辅助提示或控制参数，增强工作流的灵活性。<br>A universal extra options list similar to JoyCaption's design, with master switch and independent prompt input boxes. Suitable for adding auxiliary prompts or control parameters to enhance workflow flexibility.<br><br>
@@ -392,6 +383,12 @@ This node collection contains numerous nodes with different functions, divided i
 - <b>画布处理 | Canvas Processing</b>：可选择扩展画布或裁剪空白两种处理模式<br>Optional expand canvas or crop blank processing modes
 - <b>批量处理 | Batch Processing</b>：支持批量图像的同时处理<br>Supports simultaneous processing of batch images
 
+<br>
+<div align="left">
+<a href="images/Image Rotate Tool.jpg" target="_blank">
+<img src="images/Image Rotate Tool.jpg" alt="图像旋转工具" width="45%"/>
+</a>
+</div>
 </td>
 </tr>
 <tr>
@@ -406,6 +403,31 @@ This node collection contains numerous nodes with different functions, divided i
 <div align="left">
 <a href="images/图像对比.jpg" target="_blank">
 <img src="images/图像对比.jpg" alt="图像预览对比" width="45%"/>
+</a>
+</div>
+</td>
+</tr>
+<tr>
+<td><b>图像格式转换器</b><br><b>Image Format Converter</b><br><code>ImageFormatConverter</code></td>
+<td>
+
+专业的图像格式转换工具，支持批量转换多种图像格式，具备智能格式检测和高级压缩选项。<br>Professional image format conversion tool supporting batch conversion of multiple image formats with intelligent format detection and advanced compression options.
+
+<b>支持格式 | Supported Formats</b>：
+- <b>输出格式 | Output Formats</b>：JPEG、PNG、WEBP、BMP、TIFF<br>JPEG, PNG, WEBP, BMP, TIFF
+- <b>输入格式 | Input Formats</b>：自动检测所有常见图像格式<br>Automatically detects all common image formats
+
+<b>特点 | Features</b>：
+- <b>批量处理 | Batch Processing</b>：支持文件夹批量转换，自动创建输出目录<br>Supports folder batch conversion with automatic output directory creation
+- <b>质量控制 | Quality Control</b>：1-100可调质量参数，精确控制文件大小和画质<br>Adjustable quality parameter from 1-100 for precise control of file size and image quality
+- <b>高级选项 | Advanced Options</b>：支持优化压缩、渐进式编码、无损压缩<br>Supports optimization compression, progressive encoding, and lossless compression
+- <b>智能检测 | Smart Detection</b>：基于文件内容而非扩展名的格式检测<br>Format detection based on file content rather than file extension
+- <b>详细报告 | Detailed Reports</b>：提供转换过程的详细信息和统计数据<br>Provides detailed information and statistics of the conversion process
+
+<br>
+<div align="left">
+<a href="images/Image Format Converter.jpg" target="_blank">
+<img src="images/Image Format Converter.jpg" alt="图像格式转换器" width="45%"/>
 </a>
 </div>
 </td>
@@ -537,9 +559,23 @@ This node collection contains numerous nodes with different functions, divided i
 <th>功能描述 | Function Description</th>
 </tr>
 <tr>
+<td><b>Qwen3-VL基础版</b><br><b>Qwen3-VL Basic</b><br><code>Qwen3VLBasic</code></td>
+<td>
+基于阿里巴巴Qwen3-VL模型的基础视觉理解节点，提供简洁高效的图像和视频分析功能，支持多种模型版本和量化选项，为Qwen3-VL高级版简化而来的版本。<br>The foundational visual understanding node based on the Qwen3-VL model delivers streamlined and efficient image and video analysis capabilities. It supports multiple model variants and quantization options, serving as a simplified version derived from the Qwen3-VL Advanced Edition.
+
+<br>
+<div align="left">
+<a href="images/Qwen3-VL Basic.jpg" target="_blank">
+<img src="images/Qwen3-VL Basic.jpg" alt="Qwen3-VL基础版" width="45%"/>
+</a>
+</div>
+</td>
+</tr>
+
+<tr>
 <td><b>Qwen3-VL高级版</b><br><b>Qwen3-VL Advanced</b><br><code>Qwen3VLAdv</code></td>
 <td>
-基于阿里巴巴Qwen3-VL模型的高级视觉理解节点，支持图像和视频分析、OCR文字识别、场景描述等多种AI视觉任务，具备批量处理和多种量化选项。<br>Advanced vision understanding node based on Alibaba's Qwen3-VL model, supporting image and video analysis, OCR text recognition, scene description and other AI vision tasks, with batch processing and multiple quantization options.
+基于阿里巴巴Qwen3-VL模型的专业级视觉理解节点，集成众多预设提示词模板，支持智能批量处理、高级量化技术和思维链推理功能。提供从标签生成到创意分析的多种预设模式，具备解锁限制、多语言输出、批量处理等高级特性。<br>A professional-grade visual understanding node based on Alibaba's Qwen3-VL model, integrating numerous preset prompt templates. It supports intelligent batch processing, advanced quantization techniques, and chain-of-thought reasoning capabilities. Offering multiple preset modes from label generation to creative analysis, it features advanced functionalities such as unlocking restrictions, multilingual output, and batch processing.
 
 📖 **参数详解文档 | Parameter Guide**: [Qwen3VL_Parameters_Guide.md](doc/Qwen3VL_Parameters_Guide.md)
 
@@ -547,6 +583,28 @@ This node collection contains numerous nodes with different functions, divided i
 <div align="left">
 <a href="images/Qwen3VL高级版.jpg" target="_blank">
 <img src="images/Qwen3VL高级版.jpg" alt="Qwen3-VL Advanced" width="45%"/>
+</a>
+</div>
+</td>
+</tr>
+<tr>
+<td><b>Qwen3-VL在线版</b><br><b>Qwen3-VL API</b><br><code>Qwen3VLAPI</code></td>
+<td>
+基于云端API的Qwen3-VL视觉理解节点，支持多平台在线调用，无需本地部署模型即可享受强大的视觉分析能力。<br>Cloud-based Qwen3-VL vision understanding node supporting multi-platform online API calls, providing powerful visual analysis capabilities without local model deployment.
+
+<b>支持平台 | Supported Platforms</b>：
+- <b>SiliconFlow</b>：硅基流动平台<br>
+- <b>ModelScope</b>：魔搭社区平台<br>
+
+<b>核心特点 | Key Features</b>：
+- <b>云端部署 | Cloud Deployment</b>：无需本地GPU，通过API调用云端模型<br>No local GPU required, access cloud models via API
+- <b>多平台支持 | Multi-Platform Support</b>：支持SiliconFlow和ModelScope两大平台<br>Supports SiliconFlow and ModelScope platforms
+- <b>批量处理 | Batch Processing</b>：支持文件夹批量处理，自动保存结果<br>Supports folder batch processing with automatic result saving
+
+<br>
+<div align="left">
+<a href="images/Qwen3-VL API.jpg" target="_blank">
+<img src="images/Qwen3-VL API.jpg" alt="Qwen3-VL在线版" width="45%"/>
 </a>
 </div>
 </td>
@@ -617,7 +675,7 @@ This node collection contains numerous nodes with different functions, divided i
 </td>
 </tr>
 <tr>
-<td><b>Qwen3-VL路径切换器</b><br><b>Qwen3-VL Path Switch</b><br><code>PathSwitchDualMode</code></td>
+<td><b>Qwen3-VL路径切换器</b><br><b>Qwen3-VL Path Switch</b><br><code>PathSwitch</code></td>
 <td>
 双通道路径切换器，支持手动和自动两种切换模式。可在2个来自MultiplePathsInput节点的路径输入之间智能切换，支持注释标签便于管理。手动模式下可指定选择通道，自动模式下智能选择第一个非空输入，适用于工作流中的条件分支和动态切换。输出可直接连接到Qwen3-VL高级版的source_path输入。<br>Dual-channel path switcher supporting both manual and automatic switching modes. Can intelligently switch between 2 path inputs from MultiplePathsInput nodes, with annotation labels for easy management. Manual mode allows specifying channel selection, while automatic mode intelligently selects the first non-empty input, suitable for conditional branching and dynamic switching in workflows. Output can be directly connected to Qwen3-VL Advanced's source_path input.
 
@@ -663,7 +721,7 @@ This node collection contains numerous nodes with different functions, divided i
 </td>
 </tr>
 <tr>
-<td><b>Latent切换器(双模式)</b><br><b>Latent Switch Dual Mode</b><br><code>LatentSwitch</code></td>
+<td><b>Latent切换器(双模式)</b><br><b>Latent Switch Dual Mode</b><br><code>LatentSwitchDualMode</code></td>
 <td>支持3个Latent输入的双模式切换器，可通过下拉菜单手动选择输出，或启用自动模式智能检测单个有效输入。<br>Supports 3 Latent inputs with dual-mode switching, can manually select output through dropdown menu, or enable auto mode to intelligently detect single valid input.
 
 <br>
@@ -795,6 +853,25 @@ This node collection contains numerous nodes with different functions, divided i
 <img src="images/本地文件画廊.jpg" alt="本地文件画廊" width="45%"/>
 </a>
 </div>
+</td>
+</tr>
+<tr>
+<td><b>工作流暂停器</b><br><b>Pause Workflow</b><br><code>PauseWorkflow</code></td>
+<td>
+
+智能工作流控制节点，可在任意位置暂停工作流执行，等待用户交互后继续或取消执行。<br>Intelligent workflow control node that can pause workflow execution at any point, waiting for user interaction to continue or cancel execution.
+
+<b>特点 | Features</b>：
+- <b>通用输入 | Universal Input</b>：支持任意类型的数据输入和输出，可插入工作流的任何位置<br>Supports any type of data input and output, can be inserted at any position in the workflow
+- <b>交互式控制 | Interactive Control</b>：提供继续和取消两个操作选项<br>Provides continue and cancel operation options
+- <b>状态管理 | State Management</b>：智能管理每个节点实例的暂停状态<br>Intelligently manages the pause state of each node instance
+- <b>异常处理 | Exception Handling</b>：取消时抛出中断异常，安全终止工作流<br>Throws interrupt exception when cancelled, safely terminates workflow
+
+<b>使用场景 | Use Cases</b>：
+- 需要人工检查中间结果的工作流<br>Workflows requiring manual inspection of intermediate results
+- 调试和测试复杂工作流<br>Debugging and testing complex workflows
+- 需要用户确认的关键步骤<br>Critical steps requiring user confirmation
+
 </td>
 </tr>
 </table>

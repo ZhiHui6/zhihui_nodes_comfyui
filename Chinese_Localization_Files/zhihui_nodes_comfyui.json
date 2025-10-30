@@ -214,5 +214,9 @@
     "Unlock_Instruction_A":"解锁指令A",
     "Unlock_Instruction_B":"解锁指令B",
     "Expand Canvas":"扩展画布",
-    "Crop Blank":"裁剪空白"
+    "Crop Blank":"裁剪空白",
+    "user_prompt":"用户提示词",
+    "system_prompt":"系统提示词",
+    "SiliconFlow":"硅基流动",
+    "ModelScope":"魔搭社区"
 }

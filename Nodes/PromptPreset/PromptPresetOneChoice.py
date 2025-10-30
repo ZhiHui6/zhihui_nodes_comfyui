@@ -38,7 +38,7 @@ class PromptPresetOneChoice:
     RETURN_TYPES = ("STRING",)
     RETURN_NAMES = ("prompt",)
     FUNCTION = "execute"
-    CATEGORY = "zhihui/text"
+    CATEGORY = "Zhi.AI/text"
     DESCRIPTION = "Single Choice Prompt Preset: Provides 6 preset prompt options, users can select one for output. Each prompt can have comment annotations for easy management and identification of different prompt contents."
 
     def execute(self, prompt1_comment, prompt2_comment, prompt3_comment, prompt4_comment, prompt5_comment, prompt6_comment, prompt1, prompt2, prompt3, prompt4, prompt5, prompt6, select_prompt):

@@ -14,7 +14,7 @@ class MultiplePathsInput:
     RETURN_TYPES = ("PATH",)
     RETURN_NAMES = ("paths",)
     FUNCTION = "combine"
-    CATEGORY = "Comfyui_Qwen3VL"
+    CATEGORY = "Zhi.AI/Qwen3VL"
 
     @staticmethod
     def convert_path_to_json(file_path):

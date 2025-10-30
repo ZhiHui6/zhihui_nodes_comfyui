@@ -164,7 +164,7 @@ class SunoSongStylePromptGenerator:
     RETURN_TYPES = ("STRING",)
     RETURN_NAMES = ("prompt",)
     FUNCTION = "generate"
-    CATEGORY = "zhihui/Generator"
+    CATEGORY = "Zhi.AI/Generator"
     DESCRIPTION = "Suno AI Song Style Generator: Combines lyrical preferences with musical elements to generate structured Suno prompts for quickly building stylistically consistent songs in Suno."
 
     def _call_llm_api(self, text):

@@ -29,7 +29,7 @@ class PauseWorkflow:
     RETURN_TYPES = (any_type,)
     RETURN_NAMES = ("any",)
     FUNCTION = "execute"
-    CATEGORY = "zhihui/Toolkit"
+    CATEGORY = "Zhi.AI/Toolkit"
     DESCRIPTION = "Pauses workflow execution and waits for user interaction to continue or cancel."
     OUTPUT_NODE = True
 

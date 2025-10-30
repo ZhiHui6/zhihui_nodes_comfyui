@@ -47,7 +47,7 @@ class PhotographPromptGenerator:
     RETURN_TYPES = ("STRING","STRING","STRING")
     RETURN_NAMES =("template","tags","help")
     FUNCTION = "generate_text"
-    CATEGORY ="zhihui/Generator"
+    CATEGORY ="Zhi.AI/Generator"
     DESCRIPTION = "Photography Prompt Generator: Generates professional photography prompts based on preset photography parameters. Includes options for camera, lens, lighting, pose, clothing, and more, with support for custom template output format."
 
     def random_choice(self, selected_option, options):

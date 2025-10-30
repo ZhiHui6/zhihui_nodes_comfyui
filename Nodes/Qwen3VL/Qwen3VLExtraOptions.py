@@ -41,7 +41,7 @@ class Qwen3VLExtraOptions:
     RETURN_TYPES = ("QWEN3VL_EXTRA_OPTIONS",)
     RETURN_NAMES = ("extra_options",)
     FUNCTION = "generate_extra_options"
-    CATEGORY = "Comfyui_Qwen3VL"
+    CATEGORY = "Zhi.AI/Qwen3VL"
 
     def generate_extra_options(self, extra_options_control, refer_character_name, exclude_people_info, include_lighting, include_camera_angle,
                      include_watermark, include_JPEG_artifacts, include_exif, exclude_sexual,

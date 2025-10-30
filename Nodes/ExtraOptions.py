@@ -85,7 +85,7 @@ class ExtraOptions:
     RETURN_TYPES = ("STRING",)
     RETURN_NAMES = ("guide_output",)
     FUNCTION = "execute"
-    CATEGORY = "zhihui/text"
+    CATEGORY = "Zhi.AI/Text"
     DESCRIPTION = "Extra Options Node: Provides detailed guidance option configuration for image reverse engineering. Supports multiple reverse types (descriptive, training prompts, MidJourney prompts, etc.), and provides rich optional parameters to control output content details, such as lighting information, camera angles, composition styles, etc., suitable for precise image description and prompt generation."
 
     def execute(self, guide_text, reverse_type, options_master_switch, exclude_unchangeable_character_info_but_include_changeable_attributes=False, include_lighting_info=False, include_camera_angle_info=False, include_watermark_info=False, include_jpeg_artifacts_info=False, include_camera_details_for_photos=False, exclude_sexual_content_keep_pg=False, exclude_image_resolution=False, include_subjective_aesthetic_quality=False, include_composition_style_info=False, exclude_text_in_image=False, specify_depth_of_field=False, mention_lighting_sources=False, avoid_ambiguous_language=False, include_content_rating=False, describe_only_important_elements=False, exclude_artist_name_and_title=False, identify_image_orientation=False, use_vulgar_slang=False, avoid_polite_euphemisms=False, include_character_ages=False, include_camera_shot_types=False, exclude_mood_feelings=False, include_camera_vantage_height=False, mention_watermarks=False, avoid_meta_descriptive_phrases=False):

@@ -45,14 +45,18 @@ class Qwen3VLBasic:
         return {
             "required": {
                 "user_prompt": ("STRING", {
-                    "default": "Describe this image in detail.", 
+                    "default": "", 
                     "multiline": True,
-                    "tooltip": "用户自定义的提示词，用于指导模型生成特定内容"
+                    "tooltip": "Custom user prompt to guide the model in generating specific content"
                 }),
                 "system_prompt": ("STRING", {
                     "default": "", 
                     "multiline": True,
-                    "tooltip": "系统级提示词，用于设定模型的行为模式和角色定位"
+                    "tooltip": "System-level prompt to define the model's behavior pattern and role positioning"
+                }),
+                "remove_think_tags": ("BOOLEAN", {
+                    "default": False, 
+                    "tooltip": "When enabled, removes </think> tags and all content before them from output text, keeping only clean description text"
                 }),
                 "model": (
                     [
@@ -64,14 +68,14 @@ class Qwen3VLBasic:
                     ],
                     {
                         "default": "Qwen3-VL-8B-Instruct",
-                        "tooltip": "选择Qwen3-VL模型版本，包含4B/8B参数量和Instruct/Thinking两种类型"
+                        "tooltip": "Select Qwen3-VL model version, including 4B/8B parameter sizes and Instruct/Thinking types"
                     },
                 ),
                 "quantization": (
                     ["none", "4bit", "8bit"],
                     {
                         "default": "none",
-                        "tooltip": "模型量化设置，降低显存占用。8bit平衡性能与资源，4bit更节省显存但可能影响质量"
+                        "tooltip": "Model quantization settings to reduce VRAM usage. 8bit balances performance and resources, 4bit saves more VRAM but may affect quality"
                     },
                 ),
                 "temperature": (
@@ -81,7 +85,7 @@ class Qwen3VLBasic:
                         "min": 0, 
                         "max": 1, 
                         "step": 0.1,
-                        "tooltip": "控制生成文本的随机性，值越高越有创意，值越低越保守稳定"
+                        "tooltip": "Controls randomness of generated text. Higher values are more creative, lower values are more conservative and stable"
                     },
                 ),
                 "max_new_tokens": (
@@ -91,20 +95,20 @@ class Qwen3VLBasic:
                         "min": 128, 
                         "max": 8192, 
                         "step": 1,
-                        "tooltip": "生成文本的最大长度，值越大可生成越长的内容但消耗更多资源"
+                        "tooltip": "Maximum length of generated text. Higher values allow longer content but consume more resources"
                     },
                 ),
                 "min_resolution": (
                     "INT",
-                    {"default": 256, "min": 112, "max": 2048, "step": 1, "tooltip": "图像处理的最小分辨率，影响图像理解的细节程度和处理速度"},
+                    {"default": 256, "min": 112, "max": 2048, "step": 1, "tooltip": "Minimum resolution for image processing, affects detail level and processing speed"},
                 ),
                 "max_resolution": (
                     "INT", 
-                    {"default": 768, "min": 256, "max": 4096, "step": 1, "tooltip": "图像处理的最大分辨率，更高分辨率提供更多细节但消耗更多资源"},
+                    {"default": 768, "min": 256, "max": 4096, "step": 1, "tooltip": "Maximum resolution for image processing, higher resolution provides more detail but consumes more resources"},
                 ),
                 "seed": ("INT", {
                     "default": -1,
-                    "tooltip": "随机种子，控制生成结果的随机性。相同种子产生相同结果，-1为随机种子"
+                    "tooltip": "Random seed to control generation randomness. Same seed produces same results, -1 for random seed"
                 }),
                 "attention": (
                     [
@@ -114,45 +118,54 @@ class Qwen3VLBasic:
                     ],
                     {
                         "default": "sdpa",
-                        "tooltip": "注意力机制实现方式，影响性能和兼容性。sdpa为推荐选项"
+                        "tooltip": "Attention mechanism implementation, affects performance and compatibility. SDPA is the recommended option"
                     },
                 ),
                 "device": (
                     ["auto", "gpu", "cpu"],
                     {
                         "default": "auto",
-                        "tooltip": "计算设备选择。auto自动选择最佳设备，cuda使用GPU，cpu使用CPU"
+                        "tooltip": "Computing device selection. Auto automatically selects the best device, GPU uses GPU, CPU uses CPU"
                     },
                 ),
                 "keep_model_loaded": ("BOOLEAN", {
                     "default": False,
-                    "tooltip": "保持模型在内存中加载，提高后续处理速度但占用更多内存"
+                    "tooltip": "Keep model loaded in memory to improve subsequent processing speed but uses more memory"
                 }),
                 "batch_mode": ("BOOLEAN", {
                     "default": False,
-                    "tooltip": "批处理模式，启用后可处理指定目录下的多个图像文件"
+                    "tooltip": "Batch processing mode, when enabled can process multiple image files in specified directory"
                 }),
                 "batch_directory": ("STRING", {
                     "default": "",
-                    "tooltip": "批处理目录路径，指定包含待处理图像的文件夹路径"
+                    "tooltip": "Batch processing directory path, specify the folder path containing images to be processed"
                 }),
             },
             "optional": {
                 "source_path": ("PATH", {
-                    "tooltip": "源路径：指定要处理的图像或视频文件的路径。可以是本地文件路径或网络URL。当同时提供source_path和image时，优先使用source_path。支持常见的图像和视频格式。"
+                    "tooltip": "Source path: Specify the path to the image or video file to be processed. Can be a local file path or network URL. When both source_path and image are provided, source_path takes priority. Supports common image and video formats."
                 }), 
                 "image": ("IMAGE", {
-                    "tooltip": "图像输入：直接输入图像数据进行处理。通常来自其他ComfyUI节点的图像输出。当同时提供source_path和image时，source_path优先级更高。"
+                    "tooltip": "Image input: Direct input of image data for processing. Usually comes from image output of other ComfyUI nodes. When both source_path and image are provided, source_path has higher priority."
                 }),
             },
         }
 
     RETURN_TYPES = ("STRING",)
     FUNCTION = "inference"
-    CATEGORY = "Comfyui_Qwen3VL"
+    CATEGORY = "Zhi.AI/Qwen3VL"
 
     def _resolution_to_pixels(self, resolution):
         return resolution * resolution
+
+    def _remove_think_content(self, text):
+
+        if not isinstance(text, str):
+            return text
+            
+        if think_end_pos != -1:
+            return text[think_end_pos + len('</think>'):].strip()      
+        return text
 
     def inference(
         self,
@@ -172,6 +185,7 @@ class Qwen3VLBasic:
         attention="eager",
         batch_mode=False,
         batch_directory="",
+        remove_think_tags=False,
     ):
 
         if source_path is not None and image is not None:
@@ -208,7 +222,7 @@ class Qwen3VLBasic:
             return self.batch_inference(
                 user_prompt, batch_directory, model, quantization, keep_model_loaded,
                 temperature, max_new_tokens, min_pixels, max_pixels,
-                seed, attention, device, system_prompt
+                seed, attention, device, system_prompt, remove_think_tags
             )
         
         if seed != -1:
@@ -357,10 +371,13 @@ class Qwen3VLBasic:
             if torch.cuda.is_available():
                 torch.cuda.empty_cache()
 
-        return (result[0],)
+        final_result = result[0]
+        if remove_think_tags:
+            final_result = self._remove_think_content(final_result)
+
+        return (final_result,)
 
     def get_image_files(self, batch_directory):
-        """获取目录中的所有图像文件"""
         image_extensions = ('.png', '.jpg', '.jpeg', '.bmp', '.tiff', '.webp', '.gif')
         image_files = []
         
@@ -372,7 +389,6 @@ class Qwen3VLBasic:
         return sorted(image_files)
 
     def save_description(self, image_file, description):
-        """保存描述到文本文件"""
         txt_file = os.path.splitext(image_file)[0] + ".txt"
         with open(txt_file, 'w', encoding='utf-8') as f:
             f.write(description)
@@ -392,6 +408,7 @@ class Qwen3VLBasic:
         attention,
         device,
         system_prompt,
+        remove_think_tags=False,
     ):
         if seed != -1:
             torch.manual_seed(seed)
@@ -514,6 +531,9 @@ class Qwen3VLBasic:
                     torch.cuda.empty_cache()
                 
                 description = result[0] if result else "No description generated"
+                
+                if remove_think_tags:
+                    description = self._remove_think_content(description)
                 
                 self.save_description(image_file, description)
                 

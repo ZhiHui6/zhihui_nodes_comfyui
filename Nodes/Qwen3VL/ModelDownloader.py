@@ -37,7 +37,7 @@ class ModelDownloader:
     RETURN_TYPES = ("STRING",)
     RETURN_NAMES = ("info",)
     FUNCTION = "download_model"
-    CATEGORY = "Comfyui_Qwen3VL"
+    CATEGORY = "Zhi.AI/Qwen3VL"
 
     def get_platform_config(self, platform: str, model: str = None) -> Dict[str, Any]:
         configs = {

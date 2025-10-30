@@ -1,7 +1,5 @@
 # Qwen3-VL高级版节点参数详解
 
-## 📋 概述
-
 本文档详细解释了Qwen3-VL高级版节点中所有参数选项的含义和使用方法，帮助用户更好地理解和使用该节点的各项功能。
 
 ---
@@ -13,27 +11,27 @@
 - **默认值**：`Ignore`
 - **选项详解**：
   - `Ignore`：忽略预设，完全使用自定义提示词
-  - **提示词风格类**：
-    - `[Prompt Style]Tags`：生成干净的逗号分隔标签列表（最多50个）
-    - `[Prompt Style]Simple`：生成简单的单句描述
-    - `[Prompt Style]Detailed`：生成详细的艺术性描述（2-3句）
-    - `[Prompt Style]Extreme Detailed`：生成极其详细的沉浸式描述
-    - `[Prompt Style]Cinematic`：生成电影风格的专业描述
-  - **创意分析类**：
-    - `[Creative]Story`：以短篇小说开头的方式描述
-    - `[Creative]Detailed Analysis`：详细分析主体、服装、背景等各部分
-    - `[Creative]Summarize Video`：总结视频的关键事件和叙述要点
-    - `[Creative]Short Story`：创作受图像启发的想象故事
-    - `[Creative]Refine & Expand Prompt`：优化和扩展用户提示词
-  - **分析功能类**：
-    - `[Analysis]Explain`：解释图像中发生的事情
-    - `[Analysis]Scene`：描述场景和设置
-    - `[Analysis]Emotion`：描述情感或氛围
-    - `[Analysis]Style`：描述艺术或视觉风格
-    - `[Analysis]Location`：分析拍摄地点或场所
-    - `[Analysis]Technical`：提供技术分析（构图、光线等）
-  - **实用工具类**：
-    - `[Utility]Compare`：比较和对比图像中的不同元素
+  - **提示词风格类（Prompt Style）**：
+    - `[Prompt Style]Tags`：生成干净的逗号分隔标签列表（最多50个），适合AI绘图提示词
+    - `[Prompt Style]Simple`：生成简单的单句描述，适合快速概览
+    - `[Prompt Style]Detailed`：生成详细的艺术性描述（2-3句），平衡详细度和可读性
+    - `[Prompt Style]Extreme Detailed`：生成极其详细的沉浸式描述，包含丰富的视觉细节
+    - `[Prompt Style]Cinematic`：生成电影风格的专业描述，强调视觉冲击力和艺术效果
+  - **创意分析类（Creative）**：
+    - `[Creative]Story`：以短篇小说开头的方式描述，富有文学性和想象力
+    - `[Creative]Detailed Analysis`：详细分析主体、服装、背景等各部分，结构化描述
+    - `[Creative]Summarize Video`：总结视频的关键事件和叙述要点，适用于视频内容
+    - `[Creative]Short Story`：创作受图像启发的想象故事，发挥创意潜能
+    - `[Creative]Refine & Expand Prompt`：优化和扩展用户提示词，提升AI绘图效果
+  - **分析功能类（Analysis）**：
+    - `[Analysis]Explain`：解释图像中发生的事情，客观描述内容
+    - `[Analysis]Scene`：描述场景和设置，专注环境和背景
+    - `[Analysis]Emotion`：描述情感或氛围，分析情绪表达
+    - `[Analysis]Style`：描述艺术或视觉风格，分析美学特征
+    - `[Analysis]Location`：分析拍摄地点或场所，推测地理位置
+    - `[Analysis]Technical`：提供技术分析（构图、光线、色彩等），专业摄影视角
+  - **实用工具类（Utility）**：
+    - `[Utility]Compare`：比较和对比图像中的不同元素，突出差异和相似性
 
 ### **output_language（输出语言）**
 - **作用**：控制AI回答的语言类型
@@ -43,13 +41,11 @@
   - `Chinese`：强制使用中文回答
   - `english`：强制使用英文回答
   - `Chinese&English`：使用中英双语回答（先中文后英文）
-- **注意**：启用NSFW破限功能时，此选项会被忽略
 
 ### **user_prompt（用户提示词）**
 - **作用**：自定义分析指令，用户可以输入特定的分析需求
 - **类型**：多行文本输入
 - **使用建议**：
-  - 可以与预设提示词结合使用
   - 当preset_prompt为"Ignore"时，此项为主要分析指令
   - 支持复杂的多行指令
 
@@ -59,7 +55,7 @@
 - **使用场景**：
   - 定义AI的专业角色（如摄影师、艺术评论家等）
   - 设置特定的回答格式要求
-  - 启用NSFW破限时会被自动覆盖
+  - 启用解锁限制时会被自动覆盖
 
 ### **unlock_restrictions（解锁限制）**
 - **作用**：选择解锁限制模式
@@ -80,14 +76,14 @@
 ### **model（模型选择）**
 - **作用**：选择使用的Qwen3-VL模型版本
 - **选项详解**：
-  - **指令版本**：
-    - `Qwen3-VL-4B-Instruct`：4B参数指令优化版，速度快
-    - `Qwen3-VL-8B-Instruct`：8B参数指令优化版，质量高
-  - **思维链版本**：
-    - `Qwen3-VL-4B-Thinking`：4B思维链版本，逻辑推理强
-    - `Qwen3-VL-8B-Thinking`：8B思维链版本，分析深度好
-  - **特殊版本**：
-    - `Huihui-Qwen3-VL-8B-Instruct-abliterated`：特殊优化版本
+  - **指令版本（Instruct Models）**：
+    - `Qwen3-VL-4B-Instruct`：4B参数指令优化版，速度快，适合快速分析
+    - `Qwen3-VL-8B-Instruct`：8B参数指令优化版，质量高，平衡性能与效果
+  - **思维链版本（Thinking Models）**：
+    - `Qwen3-VL-4B-Thinking`：4B思维链版本，具备逻辑推理能力，可展示思考过程
+    - `Qwen3-VL-8B-Thinking`：8B思维链版本，深度分析能力强，推理过程详细
+  - **特殊版本（Special Models）**：
+    - `Huihui-Qwen3-VL-8B-Instruct-abliterated`：特殊优化版本，解除部分限制
 
 ### **quantization（量化设置）**
 - **作用**：模型压缩以节省显存占用
@@ -96,10 +92,17 @@
   - `none`：无量化，保持最高质量和精度
   - `4bit`：4位量化，大幅节省显存，轻微质量损失
   - `8bit`：8位量化，平衡显存占用和质量
-- **选择建议**：
-  - 显存充足：选择`none`
-  - 显存紧张：选择`8bit`或`4bit`
-  - 追求速度：选择`4bit`
+
+### **remove_think_tags（移除思考标签）**
+- **作用**：控制是否移除Thinking模型输出中的思考过程标签
+- **类型**：布尔值
+- **默认值**：`True`
+- **效果说明**：
+  - `True`：移除`<think>`和`</think>`标签及其包含的思考过程，只保留最终答案
+  - `False`：保留完整输出，包括思考过程和最终答案
+- **适用场景**：
+  - 仅在使用Thinking模型（如Qwen3-VL-4B-Thinking、Qwen3-VL-8B-Thinking）时有效
+  - 对于Instruct模型，此参数无影响
 
 ### **device（设备选择）**
 - **作用**：指定模型运行的硬件设备

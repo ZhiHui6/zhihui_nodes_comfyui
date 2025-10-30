@@ -129,7 +129,7 @@ class LocalFileGallery:
     RETURN_TYPES = ("IMAGE", "STRING")
     RETURN_NAMES = ("image_output", "text_content")
     FUNCTION = "get_media_outputs"
-    CATEGORY = "zhihui/Toolkit"
+    CATEGORY = "Zhi.AI/Toolkit"
     DESCRIPTION = "Local File Gallery Node: Used for browsing and selecting local image and text files. Supported image formats: jpg, jpeg, png, bmp, gif, webp; Supported text formats: txt, json, js. Selected images will be output as IMAGE type, text content will be output as STRING type."
 
     def get_media_outputs(self):

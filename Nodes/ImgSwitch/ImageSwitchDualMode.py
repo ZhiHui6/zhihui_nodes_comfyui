@@ -27,7 +27,7 @@ class ImageSwitchDualMode:
     RETURN_TYPES = ("IMAGE",)
     RETURN_NAMES = ("output_image",)
     FUNCTION = "execute"
-    CATEGORY = "zhihui/image"
+    CATEGORY = "Zhi.AI/Image"
     DESCRIPTION = "Image Switch: Select between multiple image inputs based on mode. In manual mode, select specific image by index. In auto mode, automatically output the only connected image. Suitable for conditional image selection and workflow branching control."
 
     def execute(self, mode, select_image, image1=None, image2=None, image3=None, image4=None,

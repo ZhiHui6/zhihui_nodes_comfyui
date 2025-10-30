@@ -61,7 +61,7 @@ class SystemPromptLoader:
     RETURN_TYPES = ("STRING",)
     RETURN_NAMES = ("system_prompt",)
     FUNCTION = "load_preset"
-    CATEGORY = "zhihui/Text"
+    CATEGORY = "Zhi.AI/Toolkit"
     OUTPUT_NODE = True
     DESCRIPTION = "System Prompt Loader: A simplified system prompt loader that loads system prompt templates directly from preset files. Supports various scenario presets, suitable for scenarios that require pure system prompt output without user prompt processing functionality."
 

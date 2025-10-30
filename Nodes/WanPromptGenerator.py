@@ -3,7 +3,7 @@ import requests
 import urllib.parse
 
 class WanPromptGenerator:
-    CATEGORY = "zhihui/Generator"
+    CATEGORY = "Zhi.AI/Generator"
     FUNCTION = "generate_prompt"
     RETURN_TYPES = ("STRING", "STRING")
     RETURN_NAMES = ("source_prompt", "prompt_output")

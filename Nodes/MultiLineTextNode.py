@@ -1,7 +1,7 @@
 from typing import Optional
 
 class MultiLineTextNode:
-    CATEGORY = "zhihui/Text"
+    CATEGORY = "Zhi.AI/Text"
     OUTPUT_NODE = True
     DESCRIPTION = "Multi-line Text Node: Used for inputting and processing multi-line text content. Supports enable/disable functionality, allows adding comments, suitable for long text content input and transmission."
         

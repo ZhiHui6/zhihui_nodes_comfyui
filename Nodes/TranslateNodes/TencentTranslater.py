@@ -37,7 +37,7 @@ class TencentTranslater:
         }
         return input_types
 
-    CATEGORY = "zhihui/Translate"
+    CATEGORY = "Zhi.AI/Translate"
 
     RETURN_TYPES = ("STRING",)
     RETURN_NAMES = ("Translation_Result",)

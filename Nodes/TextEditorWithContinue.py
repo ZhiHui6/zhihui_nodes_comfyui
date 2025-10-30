@@ -34,7 +34,7 @@ class TextEditorWithContinue:
     RETURN_TYPES = ("STRING", "STRING")
     RETURN_NAMES = ("text_output", "help_info")
     FUNCTION = "execute"
-    CATEGORY = "zhihui/Toolkit"
+    CATEGORY = "Zhi.AI/Toolkit"
     DESCRIPTION = "Pauses workflow execution, provides manual text synchronization and editable text area, continues when user clicks continue button. (Note: Manual synchronization is required after editing text.)"
 
     def execute(self, text, editable_text, unique_id=None, extra_pnginfo=None):

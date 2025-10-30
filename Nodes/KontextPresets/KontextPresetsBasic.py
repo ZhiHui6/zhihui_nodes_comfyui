@@ -70,7 +70,7 @@ class LoadKontextPresetsBasic:
     RETURN_TYPES = ("STRING",)
     RETURN_NAMES = ("prompt_content",)
     FUNCTION = "get_preset"
-    CATEGORY = "zhihui/generator"
+    CATEGORY = "Zhi.AI/Generator"
     DESCRIPTION = "Kontext Presets Basic: Provides various preset instructions for image editing and transformation, including scene teleport, camera movement, relighting, product photography, etc. Suitable for image style conversion and creative editing."
     
     @classmethod

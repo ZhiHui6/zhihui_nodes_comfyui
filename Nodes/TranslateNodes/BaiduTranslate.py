@@ -23,7 +23,7 @@ class BaiduTranslate:
     RETURN_TYPES = ("STRING",)
     RETURN_NAMES = ("translation_result",)
     FUNCTION = "translate"
-    CATEGORY = "zhihui/Translate"
+    CATEGORY = "Zhi.AI/Translate"
     DESCRIPTION = "Baidu Translate: Use Baidu Translate API for text translation. Supports Chinese-English mutual translation, automatic source language detection, and provides both plain text and background key loading methods. Suitable for multilingual prompt processing and internationalized content creation."
 
     def translate(self, enable_translate, key_loading, app_id, api_key, source_language, target_language, your_text):

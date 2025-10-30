@@ -1,9 +1,9 @@
 import { app } from "/scripts/app.js";
 
 app.registerExtension({
-    name: "Comfyui_Qwen3VL_Advanced.MultiplePathsInput",
+    name: "Comfyui_Qwen3VL.MultiplePathsInput",
     async beforeRegisterNodeDef(nodeType, nodeData, app) {
-        if (!nodeData?.category?.startsWith("Comfyui_Qwen3VL_Advanced")) {
+        if (!nodeData?.category?.startsWith("Comfyui_Qwen3VL")) {
             return;
         }
         

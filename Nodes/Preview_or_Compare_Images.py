@@ -50,7 +50,7 @@ except ImportError:
 class PreviewOrCompareImages(PreviewImage):
 
     NAME = "Preview or Compare Images"
-    CATEGORY = "zhihu/images"
+    CATEGORY = "Zhi.AI/images"
     FUNCTION = "compare_images"
     DESCRIPTION = "Preview a single image or compare two images side by side. Supports displaying one or two images with optional comparison functionality."
     OUTPUT_NODE = True

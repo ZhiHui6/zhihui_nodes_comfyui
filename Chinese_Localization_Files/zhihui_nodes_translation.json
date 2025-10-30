@@ -644,7 +644,7 @@
             "batch_mode": "批处理模式",
             "batch_directory": "批处理目录",
             "unlock_restrictions": "解锁限制",
-            "filter_thinking_process": "过滤思考过程"
+            "remove_think_tags": "移除思考标签"
         },
         "outputs": {
             "STRING": "字符串"
@@ -666,12 +666,13 @@
             "max_new_tokens": "最大生成令牌数",
             "min_resolution": "最小图像分辨率",
             "max_resolution": "最大图像分辨率",
-            "seed": "随机种子值",
-            "attention": "注意力机制类型",
-            "device": "运行设备",
+            "seed": "随机种子",
+            "attention": "注意力机制",
+            "device": "计算设备",
             "keep_model_loaded": "保持模型在内存中",
-            "batch_mode": "启用批处理模式",
-            "batch_directory": "批处理文件夹路径"
+            "remove_think_tags": "移除思考标签",
+            "batch_mode": "批处理模式",
+            "batch_directory": "批处理目录路径"
         },
         "outputs": {
             "STRING": "字符串"
@@ -751,9 +752,6 @@
     "MultiplePathsInput": {
         "title": "Qwen3-VL多路径输入",
         "description": "Qwen3-VL多路径输入：支持同时输入多个图像或视频文件路径，可动态调整输入数量，自动识别文件类型并转换为JSON格式，便于批量处理多媒体内容。",
-        "inputs": {
-            "path_1": "路径1"
-        },
         "widgets": {
             "inputcount": "输入数量"
         },
@@ -810,6 +808,29 @@
             "optimize": "优化",
             "progressive": "渐进式",
             "lossless": "无损压缩"
+        }
+    },
+    "Qwen3VLAPI": {
+        "title": "Qwen3-VL在线版",
+        "description": "基于Qwen3-VL多模态大语言模型的在线API图像理解节点，支持SiliconFlow和ModelScope等多个平台，可进行详细的图像描述、分析和理解，支持批处理模式和自定义提示词。",
+        "inputs": {
+            "images": "图像"
+        },
+        "widgets": {
+            "user_prompt": "用户提示词",
+            "system_prompt": "系统提示词",
+            "api_platform": "API平台",
+            "api_key": "API密钥",
+            "model": "模型",
+            "max_tokens": "最大令牌数",
+            "temperature": "温度",
+            "seed": "随机种子",
+            "batch_mode": "批处理模式",
+            "batch_folder_path": "批处理文件夹路径"
+        },
+        "outputs": {
+            "analysis_result": "分析结果",
+            "status_info": "状态信息"
         }
     }
 }

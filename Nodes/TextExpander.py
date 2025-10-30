@@ -2,7 +2,7 @@ import requests
 import urllib.parse
 
 class TextExpander:
-    CATEGORY = "zhihui/Text"
+    CATEGORY = "Zhi.AI/Generator"
     FUNCTION = "expand_text"
     
     RETURN_TYPES = ("STRING",)

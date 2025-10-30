@@ -20,7 +20,7 @@ class TriggerWordMerger:
     RETURN_TYPES = ("STRING",)
     RETURN_NAMES = ("text_output",)
     FUNCTION = "merge_text"
-    CATEGORY = "zhihui/Text"
+    CATEGORY = "Zhi.AI/Text"
     DESCRIPTION = "Trigger Word Merger: Intelligently merges trigger words with text input. Supports weight control by adding parentheses and weight values around trigger words, suitable for precise control of AI drawing prompts and text content combination processing."
 
     def merge_text(self, trigger_word, text_input=None, add_weight=False, weight_value=1.0):

@@ -25,7 +25,7 @@ class TextSwitchDualMode:
     RETURN_TYPES = ("STRING",)
     RETURN_NAMES = ("output_text",)
     FUNCTION = "execute"
-    CATEGORY = "zhihui/Text"
+    CATEGORY = "Zhi.AI/Text"
     DESCRIPTION = "Text Switch: Selects between text inputs based on boolean switch. Outputs text A when switch is True, text B when False. Suitable for conditional text selection and workflow branch control."
 
     def execute(self, mode, select_text, text1_comment, text2_comment, text3_comment, text4_comment,

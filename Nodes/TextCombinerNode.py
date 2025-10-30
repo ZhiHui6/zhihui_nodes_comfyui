@@ -2,7 +2,7 @@ from typing import Optional
 from comfy import utils
 
 class TextCombinerNode:
-    CATEGORY = "zhihui/Text"
+    CATEGORY = "Zhi.AI/Text"
     OUTPUT_NODE = True
     
     def __init__(self):

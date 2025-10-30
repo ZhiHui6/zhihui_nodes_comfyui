@@ -15,7 +15,7 @@ class TextModifier:
     RETURN_NAMES = ("text_output", "help") 
     FUNCTION = "substr"
     OUTPUT_NODE = False 
-    CATEGORY = "zhihui/Text"
+    CATEGORY = "Zhi.AI/Text"
     DESCRIPTION = "Text Modifier: Extracts text content between specified start and end text. Can delete specified strings and all text before or after them, enabling precise text extraction functionality."
     
     def __init__(self):

@@ -19,7 +19,7 @@ class ImageLoader:
             "required": {"image": (sorted(files), {"image_upload": True})},
         }
 
-    CATEGORY = "Comfyui_Qwen3VL"
+    CATEGORY = "Zhi.AI/Qwen3VL"
     RETURN_TYPES = ("PATH", "IMAGE", "MASK")
     RETURN_NAMES = ("image_path", "image", "mask")
     FUNCTION = "load_image"

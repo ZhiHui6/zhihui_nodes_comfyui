@@ -6,7 +6,7 @@ class PriorityImageSwitch:
     RETURN_TYPES = ("IMAGE",)
     RETURN_NAMES = ("output_image",)
     FUNCTION = "execute"
-    CATEGORY = "zhihui/image"
+    CATEGORY = "Zhi.AI/Image"
 
     def __init__(self):
         pass

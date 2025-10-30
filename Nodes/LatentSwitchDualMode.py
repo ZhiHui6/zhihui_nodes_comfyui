@@ -26,7 +26,7 @@ class LatentSwitchDualMode:
     RETURN_TYPES = ("LATENT",)
     RETURN_NAMES = ("output_latent",)
     FUNCTION = "execute"
-    CATEGORY = "zhihui/latent"
+    CATEGORY = "Zhi.AI/latent"
     DESCRIPTION = "Latent Switcher: Multi-channel latent switcher supporting manual and automatic modes. Can switch between 3 latent inputs, supports annotation tags for easy management, intelligently selects non-empty inputs in automatic mode, suitable for conditional branching and dynamic switching in workflows."
 
     def execute(self, mode, select_channel, Latent_1=None, Latent_2=None, Latent_3=None, 
