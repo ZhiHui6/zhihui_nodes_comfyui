@@ -69,6 +69,11 @@ class Qwen3VLAPI:
                             "api_key": "",
                             "selected_model": "Qwen3-VL-8B-Instruct",
                             "active": False
+                        },
+                        "Aliyun": {
+                            "api_key": "",
+                            "selected_model": "qwen3-vl-plus",
+                            "active": False
                         }
                     },
                     "custom_configs": {
@@ -241,6 +246,15 @@ class Qwen3VLAPI:
                         "max_tokens": 1000,
                         "temperature": 0.7
                     }
+                },
+                "Aliyun": {
+                    "name": "Aliyun",
+                    "api_base": "https://dashscope.aliyuncs.com/compatible-mode/v1/chat/completions",
+                    "models": shared_models,
+                    "default_params": {
+                        "max_tokens": 1000,
+                        "temperature": 0.7
+                    }
                 }
             },
             "default_prompts": {
@@ -383,6 +397,69 @@ class Qwen3VLAPI:
     def call_siliconflow_api(self, api_key, image_tensor, prompt, model, max_tokens, temperature, timeout=60):
         try:
             base_url = "https://api.siliconflow.cn/v1/chat/completions"
+            headers = {
+                "Authorization": f"Bearer {api_key}",
+                "Content-Type": "application/json"
+            }
+            
+            image_base64 = self.tensor_to_base64(image_tensor)
+            
+            data = {
+                "model": model,
+                "messages": [
+                    {
+                        "role": "user",
+                        "content": [
+                            {
+                                "type": "text",
+                                "text": prompt
+                            },
+                            {
+                                "type": "image_url",
+                                "image_url": {
+                                    "url": image_base64
+                                }
+                            }
+                        ]
+                    }
+                ],
+                "max_tokens": max_tokens,
+                "temperature": temperature,
+                "stream": False
+            }
+            
+            response = requests.post(base_url, headers=headers, json=data, timeout=timeout)
+            
+            if response.status_code == 200:
+                result = response.json()
+                if "choices" in result and len(result["choices"]) > 0:
+                    content = result["choices"][0]["message"]["content"]
+                    return content
+                else:
+                    raise Exception("API响应格式异常")
+            else:
+                error_msg = f"API请求失败，状态码: {response.status_code}"
+                try:
+                    error_detail = response.json()
+                    if "error" in error_detail:
+                        error_msg += f"，错误信息: {error_detail['error']}"
+                except:
+                    error_msg += f"，响应内容: {response.text}"
+                raise Exception(error_msg)
+                
+        except requests.exceptions.Timeout:
+            raise Exception("请求超时，请检查网络连接")
+        except requests.exceptions.RequestException as e:
+            raise Exception(f"网络请求异常 - {str(e)}")
+        except Exception as e:
+            if "API请求失败" in str(e) or "API响应格式" in str(e) or "请求超时" in str(e) or "网络请求异常" in str(e):
+                raise e
+            else:
+                raise Exception(f"意外错误: {str(e)}")
+    
+    def call_aliyun_bailian_api(self, api_key, image_tensor, prompt, model, max_tokens, temperature, timeout=60):
+        try:
+            base_url = "https://dashscope.aliyuncs.com/compatible-mode/v1/chat/completions"
             headers = {
                 "Authorization": f"Bearer {api_key}",
                 "Content-Type": "application/json"
@@ -684,7 +761,8 @@ class Qwen3VLAPI:
     def get_platform_config(self, platform_name):
         platform_mapping = {
             "SiliconFlow": "SiliconFlow",
-            "ModelScope": "ModelScope", 
+            "ModelScope": "ModelScope",
+            "Aliyun": "Aliyun"
         }
         platform_key = platform_mapping.get(platform_name)
         if platform_key:
@@ -727,7 +805,7 @@ class Qwen3VLAPI:
         timeout = 60
         
         try:
-            if config_mode == "完全自定义":
+            if config_mode == "Fully Custom":
                 config = self.load_api_config()
                 active_custom = config.get("active_custom", "custom_1")
                 
@@ -937,6 +1015,8 @@ class Qwen3VLAPI:
                 return self.call_siliconflow_api(api_key, image_tensor, prompt, model, max_tokens, temperature, timeout)
             elif platform_name == "ModelScope":
                 return self.call_modelscope_api(api_key, image_tensor, prompt, model, max_tokens, temperature, timeout)
+            elif platform_name == "aliyun":
+                return self.call_aliyun_bailian_api(api_key, image_tensor, prompt, model, max_tokens, temperature, timeout)
             else:
                 raise ValueError(f"不支持的平台: {platform_name}")
         except Exception as e:

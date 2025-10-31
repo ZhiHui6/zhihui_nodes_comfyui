@@ -12,7 +12,15 @@
             "website": "https://modelscope.cn",
             "docs": "https://modelscope.cn/docs/model-service/API-Inference/intro",
             "active": false,
-            "selected_model": "Qwen3-VL-8B-Thinking"
+            "selected_model": "Qwen3-VL-8B-Instruct"
+        },
+        "Aliyun": {
+            "api_key": "",
+            "website": "https://www.aliyun.com/",
+            "docs": "https://bailian.console.aliyun.com/?spm=5176.29619931.J_SEsSjsNv72yRuRFS2VknO.2.74cd405fVDTiYg&tab=api#/api",
+            "api_base": "https://dashscope.aliyuncs.com/compatible-mode/v1",
+            "active": false,
+            "selected_model": "qwen3-vl-plus"
         }
     },
     "custom_configs": {
@@ -41,5 +49,5 @@
     "active_platform": "SiliconFlow",
     "active_custom": "custom_1",
     "config_version": "3.0",
-    "last_updated": "2025-10-31T23:39:44.036400"
+    "last_updated": "2025-11-01T02:25:43.612999"
 }

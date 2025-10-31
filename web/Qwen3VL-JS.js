@@ -8,9 +8,10 @@ class APIConfigManager {
         this.isDialogOpen = false;     
         this.platformModels = {
             "ModelScope": [
+                "Qwen3-VL-8B-Instruct",
                 "Qwen3-VL-8B-Thinking",
-                "Qwen3-VL-235B-A22B-Instruct", 
-                "Qwen3-VL-8B-Instruct"
+                "Qwen3-VL-235B-A22B-Instruct"
+
             ],
             "SiliconFlow": [
                 "Qwen3-VL-8B-Instruct",
@@ -19,6 +20,18 @@ class APIConfigManager {
                 "Qwen3-VL-32B-Instruct",
                 "Qwen3-VL-30B-A3B-Thinking",
                 "Qwen3-VL-30B-A3B-Instruct"
+            ],
+            "Aliyun": [
+                "qwen3-vl-plus",
+                "qwen3-vl-flash",
+                "qwen3-vl-235b-a22b-thinking",
+                "qwen3-vl-235b-a22b-instruct",
+                "qwen3-vl-32b-thinking",
+                "qwen3-vl-32b-instruct",
+                "qwen3-vl-30b-a3b-thinking",
+                "qwen3-vl-30b-a3b-instruct",
+                "qwen3-vl-8b-thinking",
+                "qwen3-vl-8b-instruct"
             ]
         };
     }
@@ -94,6 +107,13 @@ class APIConfigManager {
                     api_key: "",
                     website: "https://modelscope.cn",
                     docs: "https://modelscope.cn/docs/model-service/API-Inference/intro",
+                    active: false
+                },
+                "Aliyun": {
+                    api_key: "",
+                    website: "https://www.aliyun.com/",
+                    docs: "https://bailian.console.aliyun.com/?spm=5176.29619931.J_SEsSjsNv72yRuRFS2VknO.2.74cd405fVDTiYg&tab=api#/api",
+                    api_base: "https://dashscope.aliyuncs.com/compatible-mode/v1",
                     active: false
                 }
             },
