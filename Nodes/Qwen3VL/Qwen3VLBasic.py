@@ -159,10 +159,10 @@ class Qwen3VLBasic:
         return resolution * resolution
 
     def _remove_think_content(self, text):
-
         if not isinstance(text, str):
             return text
-            
+
+        think_end_pos = text.find('</think>')
         if think_end_pos != -1:
             return text[think_end_pos + len('</think>'):].strip()      
         return text

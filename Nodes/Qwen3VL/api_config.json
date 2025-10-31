@@ -1,26 +1,27 @@
 {
     "api_keys": {
         "SiliconFlow": {
-            "api_key": "sk-zamouekuekflylpjghbohkwjrsfywkccokcviypemhhfdjpf",
+            "api_key": "",
             "website": "https://siliconflow.cn",
             "docs": "https://docs.siliconflow.cn/cn/userguide/quickstart#4-1-%E5%88%9B%E5%BB%BAapi-key",
             "active": false,
-            "selected_model": "Qwen3-VL-32B-Thinking"
+            "selected_model": "Qwen3-VL-8B-Instruct"
         },
         "ModelScope": {
-            "api_key": "ms-26b3060f-b2fe-490c-9c9e-1974fedbcd1b",
+            "api_key": "",
             "website": "https://modelscope.cn",
             "docs": "https://modelscope.cn/docs/model-service/API-Inference/intro",
             "active": false,
-            "selected_model": "Qwen3-VL-8B-Instruct"
+            "selected_model": "Qwen3-VL-8B-Thinking"
         }
     },
     "custom_configs": {
         "custom_1": {
-            "api_base": "https://api.siliconflow.cn/v1/chat/completions",
-            "model_name": "Pro/Qwen/Qwen2.5-VL-7B-Instruct",
-            "api_key": "sk-zamouekuekflylpjghbohkwjrsfywkccokcviypemhhfdjpf",
-            "name": "Qwen2.5-VL-7B-Instruct"
+            "name": "自定义配置1",
+            "api_base": "",
+            "model_name": "",
+            "api_key": "",
+            "active": false
         },
         "custom_2": {
             "name": "自定义配置2",
@@ -40,5 +41,5 @@
     "active_platform": "SiliconFlow",
     "active_custom": "custom_1",
     "config_version": "3.0",
-    "last_updated": "2025-10-31T20:50:15.282429"
+    "last_updated": "2025-10-31T23:39:44.036400"
 }

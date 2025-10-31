@@ -5,8 +5,7 @@ class APIConfigManager {
     constructor() {
         this.configPath = "custom_nodes/zhihui_nodes_comfyui/Nodes/Qwen3VL/api_config.json";
         this.config = null;
-        this.isDialogOpen = false;
-        
+        this.isDialogOpen = false;     
         this.platformModels = {
             "ModelScope": [
                 "Qwen3-VL-8B-Thinking",
@@ -135,7 +134,6 @@ class APIConfigManager {
         this.isDialogOpen = true;
         
         const config = await this.loadConfig();
-
         const overlay = document.createElement("div");
         overlay.className = "comfy-modal-overlay";
         overlay.style.cssText = `
@@ -219,8 +217,8 @@ class APIConfigManager {
                     </div>
                 </div>
                 
-                <div style="margin-top: 15px; display: flex; gap: 8px; justify-content: flex-end;">
-                    <button id="save-config" style="
+                <div style="margin-top: 15px; display: flex; gap: 8px; justify-content: space-between;">
+                    <button id="restore-default" style="
                         background: var(--comfy-input-bg);
                         border: 1px solid var(--border-color);
                         color: var(--input-text);
@@ -229,17 +227,32 @@ class APIConfigManager {
                         cursor: pointer;
                         font-size: 13px;
                         transition: all 0.2s ease;
-                    " onmouseover="this.style.background='#4488ff'; this.style.borderColor='#4488ff'; this.style.color='white';" 
-                      onmouseout="this.style.background='var(--comfy-input-bg)'; this.style.borderColor='var(--border-color)'; this.style.color='var(--input-text)';">保存</button>
-                    <button id="cancel-config" style="
-                        background: var(--comfy-input-bg);
-                        border: 1px solid var(--border-color);
-                        color: var(--input-text);
-                        padding: 6px 12px;
-                        border-radius: 4px;
-                        cursor: pointer;
-                        font-size: 13px;
-                    ">取消</button>
+                    " onmouseover="this.style.background='#ff6b35'; this.style.borderColor='#ff6b35'; this.style.color='white';" 
+                      onmouseout="this.style.background='var(--comfy-input-bg)'; this.style.borderColor='var(--border-color)'; this.style.color='var(--input-text)';">恢复默认</button>
+                    <div style="display: flex; gap: 8px;">
+                        <button id="save-config" style="
+                            background: var(--comfy-input-bg);
+                            border: 1px solid var(--border-color);
+                            color: var(--input-text);
+                            padding: 6px 12px;
+                            border-radius: 4px;
+                            cursor: pointer;
+                            font-size: 13px;
+                            transition: all 0.2s ease;
+                        " onmouseover="this.style.background='#4488ff'; this.style.borderColor='#4488ff'; this.style.color='white';" 
+                          onmouseout="this.style.background='var(--comfy-input-bg)'; this.style.borderColor='var(--border-color)'; this.style.color='var(--input-text)';">保存</button>
+                        <button id="cancel-config" style="
+                            background: var(--comfy-input-bg);
+                            border: 1px solid var(--border-color);
+                            color: var(--input-text);
+                            padding: 6px 12px;
+                            border-radius: 4px;
+                            cursor: pointer;
+                            font-size: 13px;
+                            transition: all 0.2s ease;
+                        " onmouseover="this.style.background='#ff4444'; this.style.borderColor='#ff4444'; this.style.color='white';" 
+                          onmouseout="this.style.background='var(--comfy-input-bg)'; this.style.borderColor='var(--border-color)'; this.style.color='var(--input-text)';">取消</button>
+                    </div>
                 </div>
             </div>
         `;
@@ -261,9 +274,11 @@ class APIConfigManager {
         };
 
         dialog.querySelector("#save-config").onclick = () => {
-            this.saveConfigFromDialog(dialog, () => {
-                closeDialog();
-            });
+            this.saveConfigFromDialog(dialog);
+        };
+
+        dialog.querySelector("#restore-default").onclick = () => {
+            this.restoreDefaultConfig(dialog);
         };
 
         dialog.querySelector("#cancel-config").onclick = closeDialog;
@@ -318,8 +333,7 @@ class APIConfigManager {
 
             const supportedModels = this.platformModels[platform] || [];
             const configuredModel = platformConfig.selected_model || "";
-            const selectedModel = supportedModels.includes(configuredModel) ? configuredModel : (supportedModels.length > 0 ? supportedModels[0] : "");
-            
+            const selectedModel = supportedModels.includes(configuredModel) ? configuredModel : (supportedModels.length > 0 ? supportedModels[0] : "");          
             const modelOptions = supportedModels.map(model => 
                 `<option value="${model}" ${model === selectedModel ? 'selected' : ''}>${model}</option>`
             ).join('');
@@ -406,7 +420,6 @@ class APIConfigManager {
         });
 
         container.appendChild(gridContainer);
-
         container.querySelectorAll('.password-toggle-btn').forEach(btn => {
             btn.addEventListener('click', () => {
                 const platform = btn.dataset.platform;
@@ -440,8 +453,6 @@ class APIConfigManager {
                 }
             });
         });
-
-
     }
 
     renderCustomConfigs(config) {
@@ -620,8 +631,6 @@ class APIConfigManager {
                 }
             });
         });
-
-
     }
 
     async saveConfigFromDialog(dialog, onSuccess = null) {
@@ -684,6 +693,20 @@ class APIConfigManager {
         } else {
             alert("配置保存失败，请检查网络连接或重试。");
         }
+    }
+
+    restoreDefaultConfig(dialog) {
+        if (!confirm("确定要恢复默认配置吗？这将清空所有当前设置。")) {
+            return;
+        }
+
+        const defaultConfig = this.getDefaultConfig();
+        
+        this.config = { ...defaultConfig };
+        this.renderPlatformConfigs(this.config);
+        this.renderCustomConfigs(this.config);
+
+        alert("已恢复默认配置！请点击保存按钮保存更改。");
     }
 }
 
