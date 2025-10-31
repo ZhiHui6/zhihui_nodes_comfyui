@@ -577,7 +577,7 @@ This node collection contains numerous nodes with different functions, divided i
 <td>
 基于阿里巴巴Qwen3-VL模型的专业级视觉理解节点，集成众多预设提示词模板，支持智能批量处理、高级量化技术和思维链推理功能。提供从标签生成到创意分析的多种预设模式，具备解锁限制、多语言输出、批量处理等高级特性。<br>A professional-grade visual understanding node based on Alibaba's Qwen3-VL model, integrating numerous preset prompt templates. It supports intelligent batch processing, advanced quantization techniques, and chain-of-thought reasoning capabilities. Offering multiple preset modes from label generation to creative analysis, it features advanced functionalities such as unlocking restrictions, multilingual output, and batch processing.
 
-📖 **参数详解文档 | Parameter Guide**: [Qwen3VL_Parameters_Guide.md](doc/Qwen3VL_Parameters_Guide.md)
+**参数详解文档 | Parameter Guide**: [Qwen3VL_Parameters_Guide.md](doc/Qwen3VL_Parameters_Guide.md)
 
 <br>
 <div align="left">
@@ -590,21 +590,24 @@ This node collection contains numerous nodes with different functions, divided i
 <tr>
 <td><b>Qwen3-VL在线版</b><br><b>Qwen3-VL API</b><br><code>Qwen3VLAPI</code></td>
 <td>
-基于云端API的Qwen3-VL视觉理解节点，支持多平台在线调用，无需本地部署模型即可享受强大的视觉分析能力。<br>Cloud-based Qwen3-VL vision understanding node supporting multi-platform online API calls, providing powerful visual analysis capabilities without local model deployment.
+功能强大的云端视觉理解节点，支持多平台在线API调用和批量图像分析，提供丰富的模型选择和灵活的配置方式。<br>Powerful cloud-based vision understanding node supporting multi-platform online API calls and batch image analysis, offering rich model selection and flexible configuration options.
 
 <b>支持平台 | Supported Platforms</b>：
-- <b>SiliconFlow</b>：硅基流动平台<br>
-- <b>ModelScope</b>：魔搭社区平台<br>
+- <b>硅基流动平台、魔搭社区平台、自定义API</b>
+SiliconFlow, ModelScope, Custom API
 
 <b>核心特点 | Key Features</b>：
 - <b>云端部署 | Cloud Deployment</b>：无需本地GPU，通过API调用云端模型<br>No local GPU required, access cloud models via API
-- <b>多平台支持 | Multi-Platform Support</b>：支持SiliconFlow和ModelScope两大平台<br>Supports SiliconFlow and ModelScope platforms
+- <b>双重配置模式 | Dual Configuration Modes</b>：平台预设和完全自定义两种模式<br>Platform presets and fully custom configuration modes
 - <b>批量处理 | Batch Processing</b>：支持文件夹批量处理，自动保存结果<br>Supports folder batch processing with automatic result saving
 
 <br>
 <div align="left">
 <a href="images/Qwen3-VL API.jpg" target="_blank">
 <img src="images/Qwen3-VL API.jpg" alt="Qwen3-VL在线版" width="45%"/>
+</a>
+<a href="images/Qwen3-VL API2.jpg" target="_blank">
+<img src="images/Qwen3-VL API2.jpg" alt="Qwen3-VL在线版2" width="45%"/>
 </a>
 </div>
 </td>

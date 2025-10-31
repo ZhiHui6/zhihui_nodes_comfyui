@@ -6,28 +6,69 @@ class APIConfigManager {
         this.configPath = "custom_nodes/zhihui_nodes_comfyui/Nodes/Qwen3VL/api_config.json";
         this.config = null;
         this.isDialogOpen = false;
+        
+        this.platformModels = {
+            "ModelScope": [
+                "Qwen3-VL-8B-Thinking",
+                "Qwen3-VL-235B-A22B-Instruct", 
+                "Qwen3-VL-8B-Instruct"
+            ],
+            "SiliconFlow": [
+                "Qwen3-VL-8B-Instruct",
+                "Qwen3-VL-8B-Thinking",
+                "Qwen3-VL-32B-Thinking",
+                "Qwen3-VL-32B-Instruct",
+                "Qwen3-VL-30B-A3B-Thinking",
+                "Qwen3-VL-30B-A3B-Instruct"
+            ]
+        };
     }
 
     async loadConfig() {
+        const defaultConfig = this.getDefaultConfig();
+        
         try {
-            const response = await api.fetchApi(`/zhihui_nodes/api_config`, {
+            const response = await api.fetchApi(`/zhihui_nodes/communication_config`, {
                 method: "GET"
             });
             if (response.ok) {
-                this.config = await response.json();
+                const fileConfig = await response.json();
+                this.config = { ...defaultConfig };
+                if (fileConfig.api_keys) {
+                    Object.keys(defaultConfig.api_keys).forEach(platform => {
+                        if (fileConfig.api_keys[platform]) {
+                            if (fileConfig.api_keys[platform].api_key) {
+                                this.config.api_keys[platform].api_key = fileConfig.api_keys[platform].api_key;
+                            }
+                            if (fileConfig.api_keys[platform].selected_model) {
+                                this.config.api_keys[platform].selected_model = fileConfig.api_keys[platform].selected_model;
+                            }
+                        }
+                    });
+                }
+                
+                if (fileConfig.active_platform) {
+                    this.config.active_platform = fileConfig.active_platform;
+                }
+                if (fileConfig.active_custom) {
+                    this.config.active_custom = fileConfig.active_custom;
+                }
+                if (fileConfig.custom_configs) {
+                    this.config.custom_configs = { ...this.config.custom_configs, ...fileConfig.custom_configs };
+                }
             } else {
-                this.config = this.getDefaultConfig();
+                this.config = defaultConfig;
             }
         } catch (error) {
             console.error("加载API配置失败:", error);
-            this.config = this.getDefaultConfig();
+            this.config = defaultConfig;
         }
         return this.config;
     }
 
     async saveConfig(config) {
         try {
-            const response = await api.fetchApi(`/zhihui_nodes/api_config`, {
+            const response = await api.fetchApi(`/zhihui_nodes/communication_config`, {
                 method: "POST",
                 headers: {
                     "Content-Type": "application/json"
@@ -46,30 +87,54 @@ class APIConfigManager {
             api_keys: {
                 SiliconFlow: {
                     api_key: "",
-                    description: "SiliconFlow平台API密钥",
                     website: "https://siliconflow.cn",
-                    docs: "https://docs.siliconflow.cn"
+                    docs: "https://docs.siliconflow.cn/cn/userguide/quickstart#4-1-%E5%88%9B%E5%BB%BAapi-key",
+                    active: false
                 },
                 ModelScope: {
                     api_key: "",
-                    description: "ModelScope平台API密钥",
                     website: "https://modelscope.cn",
-                    docs: "https://modelscope.cn/docs"
+                    docs: "https://modelscope.cn/docs/model-service/API-Inference/intro",
+                    active: false
                 }
             },
-            config_version: "1.0",
-            last_updated: "",
-            notes: "此文件用于存储Qwen3VL API节点的API密钥配置。请妥善保管您的API密钥，不要将其分享给他人。"
+            custom_configs: {
+                custom_1: {
+                    name: "",
+                    api_base: "",
+                    model_name: "",
+                    api_key: "",
+                    active: false
+                },
+                custom_2: {
+                    name: "",
+                    api_base: "",
+                    model_name: "",
+                    api_key: "",
+                    active: false
+                },
+                custom_3: {
+                    name: "",
+                    api_base: "",
+                    model_name: "",
+                    api_key: "",
+                    active: false
+                }
+            },
+            active_platform: "SiliconFlow",
+            active_custom: "custom_1",
+            config_version: "3.0"
         };
     }
 
-    showConfigDialog(buttonElement = null) {
+    async showConfigDialog(buttonElement = null) {
         if (this.isDialogOpen) {
             return;
         }
         
         this.isDialogOpen = true;
-        const config = this.config;
+        
+        const config = await this.loadConfig();
 
         const overlay = document.createElement("div");
         overlay.className = "comfy-modal-overlay";
@@ -88,26 +153,22 @@ class APIConfigManager {
         dialog.className = "comfy-modal";
         dialog.style.cssText = `
             position: fixed;
-            width: 400px;
+            width: 800px;
             height: auto;
             background: var(--comfy-menu-bg);
             border: 2px solid #4488ff;
             border-radius: 8px;
-            padding: 15px;
-            max-height: 70vh;
+            padding: 20px;
+            max-height: 80vh;
             overflow-y: auto;
             color: var(--input-text);
             display: block;
             z-index: 10000;
             box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
-            cursor: move;
+            left: 50%;
+            top: 50%;
+            transform: translate(-50%, -50%);
         `;
-
-        const dialogTop = (window.innerHeight - 400) / 2;
-        const dialogLeft = (window.innerWidth - 400) / 2;
-
-        dialog.style.top = Math.max(50, dialogTop) + 'px';
-        dialog.style.left = Math.max(50, dialogLeft) + 'px';
 
         dialog.innerHTML = `
             <h2 id="dialog-title" style="
@@ -115,21 +176,49 @@ class APIConfigManager {
                 color: var(--input-text);
                 user-select: none;
                 padding: 8px;
-                margin: -15px -15px 15px -15px;
+                margin: -20px -20px 15px -20px;
                 background: var(--comfy-input-bg);
                 border-bottom: 1px solid var(--border-color);
                 border-radius: 8px 8px 0 0;
                 text-align: center;
                 font-size: 16px;
-                cursor: move;
-            ">API密钥配置</h2>
+            ">通讯设置</h2>
             <div id="api-config-content">
                 <div style="margin-bottom: 15px;">
                     <p style="color: var(--descrip-text); font-size: 13px; margin: 0;">
                         配置各个平台的API密钥。配置后，节点将自动使用这些密钥，无需每次手动输入。
                     </p>
                 </div>
-                <div id="platform-configs"></div>
+                
+                <!-- 主配置区域 - 两行布局 -->
+                <div style="display: flex; flex-direction: column; gap: 20px;">
+                    <!-- 第一行：平台预设 -->
+                    <div style="flex: 1;">
+                        <h3 style="
+                            margin: 0 0 10px 0; 
+                            color: var(--input-text); 
+                            font-size: 14px; 
+                            font-weight: bold;
+                            border-bottom: 1px solid var(--border-color);
+                            padding-bottom: 5px;
+                        ">平台预设</h3>
+                        <div id="platform-configs"></div>
+                    </div>
+                    
+                    <!-- 第二行：自定义配置 -->
+                    <div style="flex: 1;">
+                        <h3 style="
+                            margin: 0 0 10px 0; 
+                            color: var(--input-text); 
+                            font-size: 14px; 
+                            font-weight: bold;
+                            border-bottom: 1px solid var(--border-color);
+                            padding-bottom: 5px;
+                        ">完全自定义</h3>
+                        <div id="custom-configs"></div>
+                    </div>
+                </div>
+                
                 <div style="margin-top: 15px; display: flex; gap: 8px; justify-content: flex-end;">
                     <button id="save-config" style="
                         background: var(--comfy-input-bg);
@@ -139,7 +228,9 @@ class APIConfigManager {
                         border-radius: 4px;
                         cursor: pointer;
                         font-size: 13px;
-                    ">保存</button>
+                        transition: all 0.2s ease;
+                    " onmouseover="this.style.background='#4488ff'; this.style.borderColor='#4488ff'; this.style.color='white';" 
+                      onmouseout="this.style.background='var(--comfy-input-bg)'; this.style.borderColor='var(--border-color)'; this.style.color='var(--input-text)';">保存</button>
                     <button id="cancel-config" style="
                         background: var(--comfy-input-bg);
                         border: 1px solid var(--border-color);
@@ -155,6 +246,9 @@ class APIConfigManager {
 
         document.body.appendChild(overlay);
         document.body.appendChild(dialog);
+        
+        this.renderPlatformConfigs(config);
+        this.renderCustomConfigs(config);
 
         const closeDialog = () => {
             if (overlay && overlay.parentNode) {
@@ -165,36 +259,6 @@ class APIConfigManager {
             }
             this.isDialogOpen = false;
         };
-
-        let isDragging = false;
-        let dragOffset = { x: 0, y: 0 };
-
-        const titleElement = dialog.querySelector('#dialog-title');
-        
-        titleElement.addEventListener('mousedown', (e) => {
-            isDragging = true;
-            dragOffset.x = e.clientX - dialog.offsetLeft;
-            dragOffset.y = e.clientY - dialog.offsetTop;
-            e.preventDefault();
-        });
-
-        document.addEventListener('mousemove', (e) => {
-            if (isDragging) {
-                const newLeft = Math.max(0, Math.min(e.clientX - dragOffset.x, window.innerWidth - dialog.offsetWidth));
-                const newTop = Math.max(0, Math.min(e.clientY - dragOffset.y, window.innerHeight - dialog.offsetHeight));
-                
-                dialog.style.left = newLeft + 'px';
-                dialog.style.top = newTop + 'px';
-            }
-        });
-
-        document.addEventListener('mouseup', () => {
-            isDragging = false;
-        });
-
-        this.loadConfig().then(config => {
-            this.renderPlatformConfigs(config);
-        });
 
         dialog.querySelector("#save-config").onclick = () => {
             this.saveConfigFromDialog(dialog, () => {
@@ -228,39 +292,105 @@ class APIConfigManager {
         const container = document.querySelector("#platform-configs");
         container.innerHTML = "";
 
+        const gridContainer = document.createElement("div");
+        gridContainer.style.cssText = `
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 12px;
+            width: 100%;
+        `;
+
+        const activePlatform = config.active_platform || "SiliconFlow";
+
         Object.entries(config.api_keys || {}).forEach(([platform, platformConfig]) => {
+            const isActive = activePlatform === platform;
+            
             const platformDiv = document.createElement("div");
             platformDiv.style.cssText = `
-                margin-bottom: 12px;
                 padding: 10px;
-                border: 1px solid var(--border-color);
+                border: 2px solid var(--border-color);
                 border-radius: 6px;
                 background: var(--comfy-input-bg);
+                min-height: 200px;
+                display: flex;
+                flex-direction: column;
             `;
 
+            const supportedModels = this.platformModels[platform] || [];
+            const configuredModel = platformConfig.selected_model || "";
+            const selectedModel = supportedModels.includes(configuredModel) ? configuredModel : (supportedModels.length > 0 ? supportedModels[0] : "");
+            
+            const modelOptions = supportedModels.map(model => 
+                `<option value="${model}" ${model === selectedModel ? 'selected' : ''}>${model}</option>`
+            ).join('');
+
             platformDiv.innerHTML = `
-                <h3 style="margin: 0 0 8px 0; color: var(--input-text); font-size: 14px;">${platform}</h3>
-                <p style="margin: 0 0 8px 0; color: var(--descrip-text); font-size: 11px;">
-                    ${platformConfig.description || ""}
-                </p>
-                <div style="margin-bottom: 8px;">
-                    <label style="display: block; margin-bottom: 4px; color: var(--input-text); font-size: 12px;">API密钥:</label>
-                    <input type="password" 
-                           data-platform="${platform}" 
-                           value="${platformConfig.api_key || ""}"
-                           placeholder="输入${platform}的API密钥"
-                           style="
-                               width: 100%;
-                               padding: 6px;
-                               border: 1px solid var(--border-color);
-                               border-radius: 4px;
-                               background: var(--comfy-input-bg);
-                               color: var(--input-text);
-                               box-sizing: border-box;
-                               font-size: 12px;
-                           ">
+                <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 8px;">
+                    <h3 style="margin: 0; color: var(--input-text); font-size: 14px;">${platform}</h3>
+                    <label style="display: flex; align-items: center; gap: 4px; cursor: pointer;">
+                        <input type="radio" 
+                               name="active_platform" 
+                               value="${platform}"
+                               ${isActive ? 'checked' : ''}
+                               style="margin: 0; accent-color: #22c55e;">
+                        <span style="font-size: 12px; color: ${isActive ? '#22c55e' : 'var(--input-text)'}; font-weight: ${isActive ? 'bold' : 'normal'};">激活</span>
+                    </label>
                 </div>
-                <div style="display: flex; gap: 8px; font-size: 11px;">
+                <div style="margin-bottom: 8px; flex: 1;">
+                    <label style="display: block; margin-bottom: 4px; color: var(--input-text); font-size: 12px;">模型选择:</label>
+                    <select data-platform-model="${platform}" 
+                            style="
+                                width: 100%;
+                                padding: 6px;
+                                border: 1px solid var(--border-color);
+                                border-radius: 4px;
+                                background: var(--comfy-input-bg);
+                                color: var(--input-text);
+                                font-size: 12px;
+                            ">
+                        ${modelOptions}
+                    </select>
+                </div>
+                <div style="margin-bottom: 8px; flex: 1;">
+                    <label style="display: block; margin-bottom: 4px; color: var(--input-text); font-size: 12px;">API密钥:</label>
+                    <div style="position: relative; display: flex; align-items: center;">
+                        <input type="password" 
+                               data-platform="${platform}" 
+                               value="${platformConfig.api_key || ""}"
+                               placeholder="输入${platform}的API密钥"
+                               style="
+                                   width: 100%;
+                                   padding: 6px 35px 6px 6px;
+                                   border: 1px solid var(--border-color);
+                                   border-radius: 4px;
+                                   background: var(--comfy-input-bg);
+                                   color: var(--input-text);
+                                   box-sizing: border-box;
+                                   font-size: 12px;
+                               ">
+                        <button type="button" 
+                                class="password-toggle-btn" 
+                                data-platform="${platform}"
+                                style="
+                                    position: absolute;
+                                    right: 8px;
+                                    background: none;
+                                    border: none;
+                                    cursor: pointer;
+                                    padding: 2px;
+                                    color: var(--input-text);
+                                    font-size: 14px;
+                                    opacity: 0.7;
+                                    transition: opacity 0.2s;
+                                "
+                                onmouseover="this.style.opacity='1'"
+                                onmouseout="this.style.opacity='0.7'"
+                                title="显示/隐藏密码">
+                            👁️
+                        </button>
+                    </div>
+                </div>
+                <div style="display: flex; gap: 8px; font-size: 11px; justify-content: center; margin-top: auto;">
                     <a href="${platformConfig.website || "#"}" target="_blank" 
                        style="color: var(--comfy-link-text); text-decoration: none;">
                        官网
@@ -272,20 +402,277 @@ class APIConfigManager {
                 </div>
             `;
 
-            container.appendChild(platformDiv);
+            gridContainer.appendChild(platformDiv);
         });
+
+        container.appendChild(gridContainer);
+
+        container.querySelectorAll('.password-toggle-btn').forEach(btn => {
+            btn.addEventListener('click', () => {
+                const platform = btn.dataset.platform;
+                const input = container.querySelector(`input[data-platform="${platform}"]`);
+                if (input.type === 'password') {
+                    input.type = 'text';
+                    btn.textContent = '🙈';
+                } else {
+                    input.type = 'password';
+                    btn.textContent = '👁️';
+                }
+            });
+        });
+
+        container.querySelectorAll('input[name="active_platform"]').forEach(radio => {
+            radio.addEventListener('change', () => {
+                container.querySelectorAll('input[name="active_platform"]').forEach(r => {
+                    const span = r.nextElementSibling;
+                    if (span) {
+                        span.style.color = 'var(--input-text)';
+                        span.style.fontWeight = 'normal';
+                    }
+                });
+                
+                if (radio.checked) {
+                    const span = radio.nextElementSibling;
+                    if (span) {
+                        span.style.color = '#22c55e';
+                        span.style.fontWeight = 'bold';
+                    }
+                }
+            });
+        });
+
+
+    }
+
+    renderCustomConfigs(config) {
+        const container = document.querySelector("#custom-configs");
+        container.innerHTML = "";
+
+        const customConfigs = config.custom_configs || {};
+        const activeCustom = config.active_custom || "custom_1";
+
+        const gridContainer = document.createElement("div");
+        gridContainer.style.cssText = `
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 12px;
+            width: 100%;
+        `;
+
+        ['custom_1', 'custom_2', 'custom_3'].forEach(customKey => {
+            const customConfig = customConfigs[customKey] || {};
+            const isActive = activeCustom === customKey;
+
+            const customDiv = document.createElement("div");
+            customDiv.style.cssText = `
+                padding: 10px;
+                border: 2px solid var(--border-color);
+                border-radius: 6px;
+                background: var(--comfy-input-bg);
+                min-height: 200px;
+                display: flex;
+                flex-direction: column;
+            `;
+
+            customDiv.innerHTML = `
+                <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 8px;">
+                    <h3 style="margin: 0; color: var(--input-text); font-size: 14px;">${customConfig.name || `自定义配置${customKey.slice(-1)}`}</h3>
+                    <label style="display: flex; align-items: center; gap: 4px; cursor: pointer;">
+                        <input type="radio" 
+                               name="active_custom" 
+                               value="${customKey}"
+                               ${isActive ? 'checked' : ''}
+                               style="margin: 0; accent-color: #22c55e;">
+                        <span style="font-size: 12px; color: ${isActive ? '#22c55e' : 'var(--input-text)'}; font-weight: ${isActive ? 'bold' : 'normal'};">激活</span>
+                    </label>
+                </div>
+                
+                <div style="margin-bottom: 8px; flex: 1;">
+                    <label style="display: block; margin-bottom: 4px; color: var(--input-text); font-size: 12px;">配置名称:</label>
+                    <input type="text" 
+                           data-custom="${customKey}_name" 
+                           value="${customConfig.name || `自定义配置${customKey.slice(-1)}`}"
+                           placeholder="配置名称"
+                           style="
+                               width: 100%;
+                               padding: 6px;
+                               border: 1px solid var(--border-color);
+                               border-radius: 4px;
+                               background: var(--comfy-input-bg);
+                               color: var(--input-text);
+                               box-sizing: border-box;
+                               font-size: 12px;
+                           ">
+                </div>
+                
+                <div style="margin-bottom: 8px; flex: 1;">
+                    <label style="display: block; margin-bottom: 4px; color: var(--input-text); font-size: 12px;">API地址:</label>
+                    <input type="text" 
+                           data-custom="${customKey}_api_base" 
+                           value="${customConfig.api_base || ""}"
+                           placeholder="https://api.example.com/v1/chat/completions"
+                           style="
+                               width: 100%;
+                               padding: 6px;
+                               border: 1px solid var(--border-color);
+                               border-radius: 4px;
+                               background: var(--comfy-input-bg);
+                               color: var(--input-text);
+                               box-sizing: border-box;
+                               font-size: 12px;
+                           ">
+                </div>
+                
+                <div style="margin-bottom: 8px; flex: 1;">
+                    <label style="display: block; margin-bottom: 4px; color: var(--input-text); font-size: 12px;">模型名称:</label>
+                    <input type="text" 
+                           data-custom="${customKey}_model_name" 
+                           value="${customConfig.model_name || ""}"
+                           placeholder="custom-model-name"
+                           style="
+                               width: 100%;
+                               padding: 6px;
+                               border: 1px solid var(--border-color);
+                               border-radius: 4px;
+                               background: var(--comfy-input-bg);
+                               color: var(--input-text);
+                               box-sizing: border-box;
+                               font-size: 12px;
+                           ">
+                </div>
+                
+                <div style="margin-bottom: 8px; flex: 1;">
+                    <label style="display: block; margin-bottom: 4px; color: var(--input-text); font-size: 12px;">API密钥:</label>
+                    <div style="position: relative; display: flex; align-items: center;">
+                        <input type="password" 
+                               data-custom="${customKey}_api_key" 
+                               value="${customConfig.api_key || ""}"
+                               placeholder="your-api-key-here"
+                               style="
+                                   width: 100%;
+                                   padding: 6px 35px 6px 6px;
+                                   border: 1px solid var(--border-color);
+                                   border-radius: 4px;
+                                   background: var(--comfy-input-bg);
+                                   color: var(--input-text);
+                                   box-sizing: border-box;
+                                   font-size: 12px;
+                               ">
+                        <button type="button" 
+                                class="custom-password-toggle-btn"
+                                data-custom="${customKey}"
+                                style="
+                                    position: absolute;
+                                    right: 8px;
+                                    background: none;
+                                    border: none;
+                                    cursor: pointer;
+                                    padding: 2px;
+                                    color: var(--input-text);
+                                    font-size: 14px;
+                                    opacity: 0.7;
+                                    transition: opacity 0.2s;
+                                "
+                                onmouseover="this.style.opacity='1'"
+                                onmouseout="this.style.opacity='0.7'"
+                                title="显示/隐藏密码">
+                            👁️
+                        </button>
+                    </div>
+                </div>
+            `;
+
+            gridContainer.appendChild(customDiv);
+        });
+
+        container.appendChild(gridContainer);
+
+        container.querySelectorAll('.custom-password-toggle-btn').forEach(btn => {
+            btn.addEventListener('click', () => {
+                const customKey = btn.dataset.custom;
+                const input = container.querySelector(`input[data-custom="${customKey}_api_key"]`);
+                if (input.type === 'password') {
+                    input.type = 'text';
+                    btn.textContent = '🙈';
+                } else {
+                    input.type = 'password';
+                    btn.textContent = '👁️';
+                }
+            });
+        });
+
+        container.querySelectorAll('input[name="active_custom"]').forEach(radio => {
+            radio.addEventListener('change', () => {
+                container.querySelectorAll('input[name="active_custom"]').forEach(r => {
+                    const span = r.nextElementSibling;
+                    if (span) {
+                        span.style.color = 'var(--input-text)';
+                        span.style.fontWeight = 'normal';
+                    }
+                });
+                
+                if (radio.checked) {
+                    const span = radio.nextElementSibling;
+                    if (span) {
+                        span.style.color = '#22c55e';
+                        span.style.fontWeight = 'bold';
+                    }
+                }
+            });
+        });
+
+
     }
 
     async saveConfigFromDialog(dialog, onSuccess = null) {
-        const inputs = dialog.querySelectorAll("input[data-platform]");
+        const platformInputs = dialog.querySelectorAll("input[data-platform]");
+        const platformModelSelects = dialog.querySelectorAll("select[data-platform-model]");
+        const customInputs = dialog.querySelectorAll("input[data-custom]");
         const newConfig = { ...this.config };
 
-        inputs.forEach(input => {
+        platformInputs.forEach(input => {
             const platform = input.dataset.platform;
             if (newConfig.api_keys[platform]) {
                 newConfig.api_keys[platform].api_key = input.value;
             }
         });
+
+        platformModelSelects.forEach(select => {
+            const platform = select.dataset.platformModel;
+            if (newConfig.api_keys[platform]) {
+                newConfig.api_keys[platform].selected_model = select.value;
+            }
+        });
+
+        if (!newConfig.custom_configs) {
+            newConfig.custom_configs = {};
+        }
+
+        customInputs.forEach(input => {
+            const field = input.dataset.custom;
+            const parts = field.split('_');
+            if (parts.length >= 3 && parts[0] === 'custom') {
+                const customKey = `${parts[0]}_${parts[1]}`; // custom_1, custom_2, custom_3
+                const fieldName = parts.slice(2).join('_'); // name, api_base, model_name, api_key
+                
+                if (['custom_1', 'custom_2', 'custom_3'].includes(customKey)) {
+                    if (!newConfig.custom_configs[customKey]) {
+                        newConfig.custom_configs[customKey] = {};
+                    }
+                    newConfig.custom_configs[customKey][fieldName] = input.value;
+                }
+            }
+        });
+
+        const activePlatformRadio = dialog.querySelector('input[name="active_platform"]:checked');
+        if (activePlatformRadio) {
+            newConfig.active_platform = activePlatformRadio.value;
+        }
+        
+        const activeCustomRadio = dialog.querySelector('input[name="active_custom"]:checked');
+        if (activeCustomRadio) {
+            newConfig.active_custom = activeCustomRadio.value;
+        }
 
         const success = await this.saveConfig(newConfig);
         if (success) {
@@ -316,8 +703,8 @@ app.registerExtension({
                 nodeType.prototype.onNodeCreated = function () {
                     const r = onNodeCreated ? onNodeCreated.apply(this, arguments) : undefined;
                     
-                    const configButton = this.addWidget("button", "配置API密钥", null, () => {
-                        const buttonElement = document.querySelector('.comfy-widget-value[value="配置API密钥"]');
+                    const configButton = this.addWidget("button", "Settings·设置", null, () => {
+                        const buttonElement = document.querySelector('.comfy-widget-value[value="Settings·设置"]');
                         apiConfigManager.showConfigDialog(buttonElement);
                     });
                     

@@ -817,11 +817,9 @@
             "images": "图像"
         },
         "widgets": {
+            "config_mode": "配置模式",
             "user_prompt": "用户提示词",
             "system_prompt": "系统提示词",
-            "api_platform": "API平台",
-            "api_key": "API密钥",
-            "model": "模型",
             "max_tokens": "最大令牌数",
             "temperature": "温度",
             "seed": "随机种子",
@@ -829,8 +827,9 @@
             "batch_folder_path": "批处理文件夹路径"
         },
         "outputs": {
-            "analysis_result": "分析结果",
-            "status_info": "状态信息"
+            "result":"结果",
+            "status":"状态"
+            
         }
     }
 }

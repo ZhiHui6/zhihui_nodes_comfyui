@@ -36,9 +36,9 @@ class PathSwitch:
             
             selected_path = paths[idx]
             if selected_path is None:
-                raise ValueError(f"Selected channel {select_channel} has no input")
+                raise ValueError(f"选择的通道 {select_channel} 没有输入")
                 
-        else:  # auto mode
+        else:
             selected_path = None
             for path in paths:
                 if path is not None:
@@ -46,6 +46,6 @@ class PathSwitch:
                     break
             
             if selected_path is None:
-                raise ValueError("No valid Path input found in automatic mode")
+                raise ValueError("在自动模式下未找到有效的路径输入")
         
         return (selected_path,)

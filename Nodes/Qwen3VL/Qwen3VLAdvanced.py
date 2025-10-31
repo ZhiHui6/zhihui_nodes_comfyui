@@ -515,11 +515,11 @@ class Qwen3VLAdvanced:
             torch.manual_seed(seed)
             
         if not os.path.exists(batch_directory):
-            return (f"Error: Directory '{batch_directory}' does not exist.",)
+            return (f"错误: 目录 '{batch_directory}' 不存在。",)
         
         image_files = self.get_image_files(batch_directory)
         if not image_files:
-            return (f"No image files found in directory '{batch_directory}'.",)
+            return (f"在目录 '{batch_directory}' 中未找到图片文件。",)
         
         model_exists, model_path, error_message = self.check_model_exists(model)
         if not model_exists:
@@ -634,7 +634,7 @@ class Qwen3VLAdvanced:
                     
             except Exception as e:
                 failed_count += 1
-                print(f"Failed to process {image_file}: {str(e)}")
+                print(f"处理失败 {image_file}: {str(e)}")
                 continue
 
         if not keep_model_loaded:
@@ -648,7 +648,7 @@ class Qwen3VLAdvanced:
             import gc
             gc.collect()
 
-        log_message = f"Batch processing completed. Processed: {processed_count} images, Failed: {failed_count} images in directory '{batch_directory}'."
+        log_message = f"批量处理完成。已处理: {processed_count} 张图片，失败: {failed_count} 张图片，目录: '{batch_directory}'。"
         
         return (log_message,)
     def _resolution_to_pixels(self, resolution):

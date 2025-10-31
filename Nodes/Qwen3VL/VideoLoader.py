@@ -35,6 +35,6 @@ class VideoLoader(ComfyNodeABC):
     @classmethod
     def VALIDATE_INPUTS(cls, file):
         if not folder_paths.exists_annotated_filepath(file):
-            return "Invalid video file: {}".format(file)
+            return "无效的视频文件: {}".format(file)
 
         return True

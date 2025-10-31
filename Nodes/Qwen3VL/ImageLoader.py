@@ -6,6 +6,10 @@ import numpy as np
 from PIL import Image, ImageOps
 
 class ImageLoader:
+    CATEGORY = "Zhi.AI/Qwen3VL"
+    RETURN_TYPES = ("PATH", "IMAGE", "MASK")
+    RETURN_NAMES = ("image_path", "image", "mask")
+    FUNCTION = "load_image"
     @classmethod
     def INPUT_TYPES(s):
         input_dir = folder_paths.get_input_directory()
@@ -19,38 +23,23 @@ class ImageLoader:
             "required": {"image": (sorted(files), {"image_upload": True})},
         }
 
-    CATEGORY = "Zhi.AI/Qwen3VL"
-    RETURN_TYPES = ("PATH", "IMAGE", "MASK")
-    RETURN_NAMES = ("image_path", "image", "mask")
-    FUNCTION = "load_image"
-
     def load_image(self, image):
         image_path = folder_paths.get_annotated_filepath(image)
         
-        # Load image using PIL
         img = Image.open(image_path)
         
-        # Handle different image modes
         if img.mode == 'RGBA':
-            # Extract alpha channel for mask
             alpha = img.split()[-1]
-            # Convert alpha to mask tensor (1 channel, values 0-1)
             mask_array = np.array(alpha).astype(np.float32) / 255.0
-            mask = torch.from_numpy(mask_array)[None, None, :, :]  # [1, 1, H, W]
-            
-            # Convert RGBA to RGB for image output
+            mask = torch.from_numpy(mask_array)[None, None, :, :]   
             img_rgb = img.convert('RGB')
         else:
-            # Convert to RGB if not already
             img_rgb = img.convert('RGB')
-            
-            # Create default mask (all white/opaque)
             mask_array = np.ones((img_rgb.height, img_rgb.width), dtype=np.float32)
-            mask = torch.from_numpy(mask_array)[None, None, :, :]  # [1, 1, H, W]
+            mask = torch.from_numpy(mask_array)[None, None, :, :]
         
-        # Convert PIL image to tensor
         img_array = np.array(img_rgb).astype(np.float32) / 255.0
-        image_tensor = torch.from_numpy(img_array)[None, :, :, :]  # [1, H, W, C]
+        image_tensor = torch.from_numpy(img_array)[None, :, :, :]
         
         return (image_path, image_tensor, mask)
 
@@ -65,6 +54,6 @@ class ImageLoader:
     @classmethod
     def VALIDATE_INPUTS(s, image):
         if not folder_paths.exists_annotated_filepath(image):
-            return "Invalid image file: {}".format(image)
+            return "无效的图片文件: {}".format(image)
 
         return True
