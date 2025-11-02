@@ -49,13 +49,6 @@ class Qwen3VLAPI:
                 with open(self.api_config_path, 'r', encoding='utf-8') as f:
                     config = json.load(f)
                 
-                current_version = config.get("config_version", "1.0")
-                if current_version != "3.0":
-                    print("检测到旧版本配置文件，正在升级...")
-                    config = self._upgrade_config(config)
-                    self.save_api_config(config)
-                    print("配置文件升级完成")
-                
                 return config
             else:
                 default_config = {
@@ -101,8 +94,6 @@ class Qwen3VLAPI:
                     },
                     "active_platform": "SiliconFlow",
                     "active_custom": "custom_1",
-                    "config_version": "3.0",
-                    "last_updated": "",
                     "notes": "此文件用于存储Qwen3VL API节点的通讯配置。包括平台预设的API密钥和完全自定义的配置信息。请妥善保管您的API密钥，不要将其分享给他人。"
                 }
                 self.save_api_config(default_config)
@@ -139,8 +130,6 @@ class Qwen3VLAPI:
             },
             "active_platform": "SiliconFlow",
             "active_custom": "custom_1",
-            "config_version": "3.0",
-            "last_updated": old_config.get("last_updated", ""),
             "notes": "此文件用于存储Qwen3VL API节点的通讯配置。包括平台预设的API密钥和完全自定义的配置信息。请妥善保管您的API密钥，不要将其分享给他人。"
         }
         
@@ -174,7 +163,6 @@ class Qwen3VLAPI:
     
     def save_api_config(self, config):
         try:
-            config["last_updated"] = datetime.now().isoformat()
             with open(self.api_config_path, 'w', encoding='utf-8') as f:
                 json.dump(config, f, ensure_ascii=False, indent=4)
             return True
@@ -749,8 +737,9 @@ class Qwen3VLAPI:
         has_image_input = images is not None
         has_batch_folder = batch_mode and batch_folder_path and batch_folder_path.strip()
         
-        if has_image_input and has_batch_folder:
-            raise ValueError("⚠️ 输入冲突：不能同时使用图片输入端口和批量文件夹模式！\n\n请选择以下其中一种方式：\n• 使用图片输入端口：请关闭批量模式\n• 启用批量模式：请设置文件夹路径并断开图片输入端口")
+
+        if batch_mode and has_image_input:
+            raise ValueError("⚠️ 输入冲突：不能同时使用图片输入端口和批量模式！\n\n请选择以下其中一种方式：\n• 使用图片输入端口：请关闭批量模式\n• 启用批量模式：请断开图片输入端口并设置文件夹路径")
         
         if batch_mode and not has_batch_folder and not has_image_input:
             raise ValueError("⚠️ 批量模式配置错误：已启用批量模式但未提供图片源！\n\n请选择以下其中一种方式：\n• 设置批量文件夹路径\n• 连接图片输入端口并关闭批量模式")
