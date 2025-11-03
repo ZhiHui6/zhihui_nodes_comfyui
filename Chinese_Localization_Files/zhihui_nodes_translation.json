@@ -831,5 +831,19 @@
             "status":"状态"
             
         }
+    },
+    "FreeLoraLoader": {
+        "title": "自由LORA加载器",
+        "description": "自由LORA加载器：可以加载任意路径的LORA模型文件，支持跨路径访问和可视化文件浏览。提供强大的文件管理功能，支持多种LORA格式，包括LoRA、LyCORIS和Textual Inversion等。",
+        "inputs": {
+            "model": "模型",
+            "strength_model": "模型强度"
+        },
+        "outputs": {
+            "model": "模型"
+        },
+        "widgets": {
+            "strength_model": "模型强度"
+        }
     }
 }

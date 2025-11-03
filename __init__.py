@@ -46,6 +46,7 @@ from .Nodes.Qwen3VL.PathSwitch import PathSwitch
 from .Nodes.ImageRotateTool import ImageRotateTool
 from .Nodes.ImageFormatConverter import ImageFormatConverter
 from .Nodes.Qwen3VL.Qwen3VLAPI import Qwen3VLAPI
+from .Nodes.FreeLoraLoader.FreeLoraLoader import FreeLoraLoader
 
 import os
 
@@ -98,6 +99,7 @@ NODE_CLASS_MAPPINGS = {
     "ImageRotateTool": ImageRotateTool,
     "ImageFormatConverter": ImageFormatConverter,
     "Qwen3VLAPI": Qwen3VLAPI,
+    "FreeLoraLoader": FreeLoraLoader,
 }
 
 NODE_DISPLAY_NAME_MAPPINGS = {
@@ -149,6 +151,7 @@ NODE_DISPLAY_NAME_MAPPINGS = {
     "ImageRotateTool": "Image Rotate Tool",
     "ImageFormatConverter": "Image Format Converter",
     "Qwen3VLAPI": "Qwen3-VL API",
+    "FreeLoraLoader": "Free LoRA Loader",
 }
 
 WEB_DIRECTORY = os.path.dirname(os.path.abspath(__file__))
