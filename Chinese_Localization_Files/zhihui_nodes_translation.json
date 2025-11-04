@@ -818,6 +818,7 @@
         },
         "widgets": {
             "config_mode": "配置模式",
+            "llm_mode": "大语言模型模式",
             "user_prompt": "用户提示词",
             "system_prompt": "系统提示词",
             "max_tokens": "最大令牌数",

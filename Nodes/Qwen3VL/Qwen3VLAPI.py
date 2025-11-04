@@ -220,42 +220,20 @@ class Qwen3VLAPI:
                 "SiliconFlow": {
                     "name": "SiliconFlow",
                     "api_base": "https://api.siliconflow.cn/v1/chat/completions",
-                    "models": shared_models,
-                    "default_params": {
-                        "max_tokens": 1000,
-                        "temperature": 0.7
-                    }
+                    "models": shared_models
                 },
                 "ModelScope": {
                     "name": "ModelScope",
                     "api_base": "https://api-inference.modelscope.cn/v1",
-                    "models": shared_models,
-                    "default_params": {
-                        "max_tokens": 1000,
-                        "temperature": 0.7
-                    }
+                    "models": shared_models
                 },
                 "Aliyun": {
                     "name": "Aliyun",
-                    "api_base": "https://dashscope.aliyuncs.com/compatible-mode/v1/chat/completions",
-                    "models": shared_models,
-                    "default_params": {
-                        "max_tokens": 1000,
-                        "temperature": 0.7
-                    }
+                    "api_base": "https://dashscope.aliyuncs.com/compatible-mode/v1",
+                    "models": shared_models
                 }
             },
-            "default_prompts": {
-                "image_description": "Please describe this image in detail, including main objects, scene, colors, composition and other elements.",
-                "image_analysis": "Please analyze this image, including its visual elements, possible meanings, emotional expression and artistic features.",
-                "creative_writing": "Based on this image, please create an interesting story or describe a scene.",
-                "technical_analysis": "Please analyze this image from a technical perspective, including shooting techniques, lighting usage, composition methods, etc."
-            },
-            "ui_config": {
-                "category": "Zhi.AI/Qwen3VL_API",
-                "display_name": "Qwen3-VL Online",
-                "description": "Qwen3-VL image analysis node supporting multi-platform APIs"
-            }
+            
         }
     
     def get_available_models(self):
@@ -390,25 +368,20 @@ class Qwen3VLAPI:
                 "Content-Type": "application/json"
             }
             
-            image_base64 = self.tensor_to_base64(image_tensor)
-            
+            content_items = [{"type": "text", "text": prompt}]
+            if image_tensor is not None:
+                image_base64 = self.tensor_to_base64(image_tensor)
+                content_items.append({
+                    "type": "image_url",
+                    "image_url": {"url": image_base64}
+                })
+
             data = {
                 "model": model,
                 "messages": [
                     {
                         "role": "user",
-                        "content": [
-                            {
-                                "type": "text",
-                                "text": prompt
-                            },
-                            {
-                                "type": "image_url",
-                                "image_url": {
-                                    "url": image_base64
-                                }
-                            }
-                        ]
+                        "content": content_items
                     }
                 ],
                 "max_tokens": max_tokens,
@@ -447,66 +420,46 @@ class Qwen3VLAPI:
     
     def call_aliyun_bailian_api(self, api_key, image_tensor, prompt, model, max_tokens, temperature, timeout=60):
         try:
-            base_url = "https://dashscope.aliyuncs.com/compatible-mode/v1/chat/completions"
-            headers = {
-                "Authorization": f"Bearer {api_key}",
-                "Content-Type": "application/json"
-            }
-            
-            image_base64 = self.tensor_to_base64(image_tensor)
-            
-            data = {
-                "model": model,
-                "messages": [
-                    {
-                        "role": "user",
-                        "content": [
-                            {
-                                "type": "text",
-                                "text": prompt
-                            },
-                            {
-                                "type": "image_url",
-                                "image_url": {
-                                    "url": image_base64
-                                }
-                            }
-                        ]
-                    }
-                ],
-                "max_tokens": max_tokens,
-                "temperature": temperature,
-                "stream": False
-            }
-            
-            response = requests.post(base_url, headers=headers, json=data, timeout=timeout)
-            
-            if response.status_code == 200:
-                result = response.json()
-                if "choices" in result and len(result["choices"]) > 0:
-                    content = result["choices"][0]["message"]["content"]
-                    return content
-                else:
-                    raise Exception("API响应格式异常")
-            else:
-                error_msg = f"API请求失败，状态码: {response.status_code}"
-                try:
-                    error_detail = response.json()
-                    if "error" in error_detail:
-                        error_msg += f"，错误信息: {error_detail['error']}"
-                except:
-                    error_msg += f"，响应内容: {response.text}"
-                raise Exception(error_msg)
-                
-        except requests.exceptions.Timeout:
-            raise Exception("请求超时，请检查网络连接")
-        except requests.exceptions.RequestException as e:
-            raise Exception(f"网络请求异常 - {str(e)}")
+            if not OPENAI_AVAILABLE:
+                raise Exception("使用阿里云百炼需要安装 OpenAI Python SDK。请执行: pip install openai")
+
+            client = OpenAI(
+                base_url='https://dashscope.aliyuncs.com/compatible-mode/v1',
+                api_key=api_key
+            )
+
+            content_items = [{
+                'type': 'text',
+                'text': prompt,
+            }]
+
+            if image_tensor is not None:
+                image_base64 = self.tensor_to_base64(image_tensor)
+                if image_base64.startswith('data:image/'):
+                    image_base64 = image_base64.split(',', 1)[1]
+                content_items.append({
+                    'type': 'image_url',
+                    'image_url': {
+                        'url': f"data:image/png;base64,{image_base64}",
+                    },
+                })
+
+            messages = [{
+                'role': 'user',
+                'content': content_items,
+            }]
+
+            response = client.chat.completions.create(
+                model=model,
+                messages=messages,
+                max_tokens=max_tokens,
+                temperature=temperature,
+                stream=False
+            )
+
+            return response.choices[0].message.content
         except Exception as e:
-            if "API请求失败" in str(e) or "API响应格式" in str(e) or "请求超时" in str(e) or "网络请求异常" in str(e):
-                raise e
-            else:
-                raise Exception(f"意外错误: {str(e)}")
+            raise Exception(f"OpenAI兼容调用失败: {str(e)}")
     
     def call_modelscope_api(self, api_key, image_tensor, prompt, model, max_tokens, temperature, timeout=60):
         try:
@@ -557,30 +510,23 @@ class Qwen3VLAPI:
     
     def _call_modelscope_with_requests(self, api_key, image_tensor, prompt, model, max_tokens, temperature, timeout=60):
         try:
-            image_base64 = self.tensor_to_base64(image_tensor)
-            
             headers = {
                 "Authorization": f"Bearer {api_key}",
                 "Content-Type": "application/json"
             }
             
-            messages = []
-            
-            messages.append({
+            content_items = [{"type": "text", "text": prompt}]
+            if image_tensor is not None:
+                image_base64 = self.tensor_to_base64(image_tensor)
+                content_items.append({
+                    "type": "image_url",
+                    "image_url": {"url": image_base64}
+                })
+
+            messages = [{
                 "role": "user",
-                "content": [
-                    {
-                        "type": "text",
-                        "text": prompt
-                    },
-                    {
-                        "type": "image_url",
-                        "image_url": {
-                            "url": image_base64
-                        }
-                    }
-                ]
-            })
+                "content": content_items
+            }]
             
             data = {
                 "model": model,
@@ -610,67 +556,57 @@ class Qwen3VLAPI:
         except Exception as e:
             raise Exception(f"Requests调用失败: {str(e)}")
     
+    def _normalize_openai_base_url(self, api_base: str) -> str:
+        try:
+            if not api_base:
+                return api_base
+            url = api_base.strip()
+            if url.endswith('/chat/completions'):
+                url = url.rsplit('/chat/completions', 1)[0]
+            return url.rstrip('/')
+        except Exception:
+            return api_base
+
     def call_custom_api(self, api_base, api_key, image_tensor, prompt, model, max_tokens, temperature, timeout=60):
         try:
-            headers = {
-                "Authorization": f"Bearer {api_key}",
-                "Content-Type": "application/json"
-            }
-            
-            image_base64 = self.tensor_to_base64(image_tensor)
-            
-            data = {
-                "model": model,
-                "messages": [
-                    {
-                        "role": "user",
-                        "content": [
-                            {
-                                "type": "text",
-                                "text": prompt
-                            },
-                            {
-                                "type": "image_url",
-                                "image_url": {
-                                    "url": image_base64
-                                }
-                            }
-                        ]
-                    }
-                ],
-                "max_tokens": max_tokens,
-                "temperature": temperature,
-                "stream": False
-            }
-            
-            response = requests.post(api_base, headers=headers, json=data, timeout=timeout)
-            
-            if response.status_code == 200:
-                result = response.json()
-                if "choices" in result and len(result["choices"]) > 0:
-                    content = result["choices"][0]["message"]["content"]
-                    return content
-                else:
-                    raise Exception("API响应格式异常")
-            else:
-                error_msg = f"API请求失败，状态码: {response.status_code}"
-                try:
-                    error_detail = response.json()
-                    if "error" in error_detail:
-                        error_msg += f"，错误信息: {error_detail['error']}"
-                except:
-                    error_msg += f"，响应内容: {response.text}"
-                raise Exception(error_msg)
-                
-        except requests.exceptions.Timeout:
-            raise Exception("请求超时，请检查网络连接")
-        except requests.exceptions.RequestException as e:
-            raise Exception(f"网络请求异常 - {str(e)}")
+            if not OPENAI_AVAILABLE:
+                raise Exception("完全自定义模式需要安装 OpenAI Python SDK。请执行: pip install openai")
+            client = OpenAI(
+                base_url=self._normalize_openai_base_url(api_base),
+                api_key=api_key
+            )
+
+            content_items = [{
+                'type': 'text',
+                'text': prompt,
+            }]
+            if image_tensor is not None:
+                image_base64 = self.tensor_to_base64(image_tensor)
+                if image_base64.startswith('data:image/'):
+                    image_base64 = image_base64.split(',', 1)[1]
+                content_items.append({
+                    'type': 'image_url',
+                    'image_url': {
+                        'url': f"data:image/png;base64,{image_base64}",
+                    },
+                })
+
+            messages = [{
+                'role': 'user',
+                'content': content_items,
+            }]
+
+            response = client.chat.completions.create(
+                model=model,
+                messages=messages,
+                max_tokens=max_tokens,
+                temperature=temperature,
+                stream=False
+            )
+
+            return response.choices[0].message.content
         except Exception as e:
-            if "API请求失败" in str(e) or "API响应格式" in str(e) or "请求超时" in str(e) or "网络请求异常" in str(e):
-                raise e
-            else:
-                raise Exception(f"意外错误: {str(e)}")
+            raise Exception(f"OpenAI兼容调用失败: {str(e)}")
     
     @classmethod
     def INPUT_TYPES(cls):
@@ -682,6 +618,10 @@ class Qwen3VLAPI:
                 "config_mode": (["Platform Presets", "Fully Custom"], {
                     "default": "Platform Presets",
                     "tooltip": "Select configuration mode: Platform Preset uses built-in platform settings, Fully Custom allows manual setup of all parameters."
+                }),
+                "llm_mode": ("BOOLEAN", {
+                    "default": False,
+                    "tooltip": "启用大语言模型模式（允许无图片，纯文本对话）"
                 }),
                 "user_prompt": ("STRING", {
                     "multiline": True,
@@ -733,11 +673,13 @@ class Qwen3VLAPI:
             }
         }
     
-    def validate_input_exclusivity(self, images, batch_mode, batch_folder_path):
+    def validate_input_exclusivity(self, images, batch_mode, batch_folder_path, llm_mode=False):
+
+        if llm_mode:
+            return
         has_image_input = images is not None
         has_batch_folder = batch_mode and batch_folder_path and batch_folder_path.strip()
         
-
         if batch_mode and has_image_input:
             raise ValueError("⚠️ 输入冲突：不能同时使用图片输入端口和批量模式！\n\n请选择以下其中一种方式：\n• 使用图片输入端口：请关闭批量模式\n• 启用批量模式：请断开图片输入端口并设置文件夹路径")
         
@@ -777,13 +719,13 @@ class Qwen3VLAPI:
         else:
             return user_prompt.strip()
 
-    def analyze_image(self, config_mode, system_prompt, user_prompt, batch_mode, batch_folder_path, max_tokens, temperature, seed, images=None):
+    def analyze_image(self, config_mode, system_prompt, user_prompt, batch_mode, batch_folder_path, max_tokens, temperature, seed, images=None, llm_mode=False):
         import random
         import time
         
         status_messages = []
         
-        self.validate_input_exclusivity(images, batch_mode, batch_folder_path)
+        self.validate_input_exclusivity(images, batch_mode, batch_folder_path, llm_mode)
         
         if seed != -1:
             random.seed(seed)
@@ -871,13 +813,37 @@ class Qwen3VLAPI:
             
             final_prompt = self.get_final_prompt(system_prompt, user_prompt)
             
+            if llm_mode:
+                status_messages.append("🔄 正在进行纯文本对话模式调用…")
+                try:
+                    result = self._process_single_image(
+                        platform_name, api_key, None, final_prompt, 
+                        api_model_name, max_tokens, temperature, timeout, api_base
+                    )
+                    status_messages.append("✅ 文本对话完成")
+                    return (result, "\n".join(status_messages))
+                except Exception as e:
+                    error_msg = f"文本对话失败: {str(e)}"
+                    status_messages.append(f"❌ 错误: {error_msg}")
+                    return ("", "\n".join(status_messages))
+
             if not batch_mode:
                 status_messages.append("🔄 正在处理单张图片...")
                 
                 if images is None:
-                    error_msg = "单图模式下必须提供图片输入"
-                    status_messages.append(f"❌ 错误: {error_msg}")
-                    return ("", "\n".join(status_messages))
+
+                    status_messages.append("ℹ️ 未提供图片输入，改为纯文本对话模式")
+                    try:
+                        result = self._process_single_image(
+                            platform_name, api_key, None, final_prompt, 
+                            api_model_name, max_tokens, temperature, timeout, api_base
+                        )
+                        status_messages.append("✅ 文本对话完成")
+                        return (result, "\n".join(status_messages))
+                    except Exception as e:
+                        error_msg = f"文本对话失败: {str(e)}"
+                        status_messages.append(f"❌ 错误: {error_msg}")
+                        return ("", "\n".join(status_messages))
                 
                 if len(images.shape) == 4 and images.shape[0] > 0:
                     image_tensor = images[0:1]
@@ -1004,7 +970,7 @@ class Qwen3VLAPI:
                 return self.call_siliconflow_api(api_key, image_tensor, prompt, model, max_tokens, temperature, timeout)
             elif platform_name == "ModelScope":
                 return self.call_modelscope_api(api_key, image_tensor, prompt, model, max_tokens, temperature, timeout)
-            elif platform_name == "aliyun":
+            elif platform_name == "Aliyun":
                 return self.call_aliyun_bailian_api(api_key, image_tensor, prompt, model, max_tokens, temperature, timeout)
             else:
                 raise ValueError(f"不支持的平台: {platform_name}")

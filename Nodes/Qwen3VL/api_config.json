@@ -47,5 +47,6 @@
         }
     },
     "active_platform": "SiliconFlow",
-    "active_custom": "custom_1"
+    "active_custom": "custom_1",
+    "config_version": "3.0"
 }
