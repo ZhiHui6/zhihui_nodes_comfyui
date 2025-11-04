@@ -461,38 +461,42 @@ class Qwen3VLAPI:
         except Exception as e:
             raise Exception(f"OpenAI兼容调用失败: {str(e)}")
     
-    def call_modelscope_api(self, api_key, image_tensor, prompt, model, max_tokens, temperature, timeout=60):
+    def call_modelscope_api(self, api_key, image_tensor, prompt, model, max_tokens, temperature, timeout=60, api_base=None):
         try:
+            base_url = self._normalize_openai_base_url(api_base) if api_base else 'https://api-inference.modelscope.cn/v1'
             if OPENAI_AVAILABLE:
-                return self._call_modelscope_with_openai(api_key, image_tensor, prompt, model, max_tokens, temperature, timeout)
+                return self._call_modelscope_with_openai(api_key, image_tensor, prompt, model, max_tokens, temperature, timeout, base_url)
             else:
-                return self._call_modelscope_with_requests(api_key, image_tensor, prompt, model, max_tokens, temperature, timeout)
+                return self._call_modelscope_with_requests(api_key, image_tensor, prompt, model, max_tokens, temperature, timeout, base_url)
                 
         except Exception as e:
             raise Exception(f"ModelScope API调用失败: {str(e)}")
     
-    def _call_modelscope_with_openai(self, api_key, image_tensor, prompt, model, max_tokens, temperature, timeout=60):
+    def _call_modelscope_with_openai(self, api_key, image_tensor, prompt, model, max_tokens, temperature, timeout=60, api_base=None):
         try:
-            image_base64 = self.tensor_to_base64(image_tensor)
-            if image_base64.startswith('data:image/'):
-                image_base64 = image_base64.split(',', 1)[1]
-            
             client = OpenAI(
-                base_url='https://api-inference.modelscope.cn/v1',
+                base_url=(api_base or 'https://api-inference.modelscope.cn/v1'),
                 api_key=api_key
             )
-            
-            messages = [{
-                'role': 'user',
-                'content': [{
-                    'type': 'text',
-                    'text': prompt,
-                }, {
+
+            content_items = [{
+                'type': 'text',
+                'text': prompt,
+            }]
+            if image_tensor is not None:
+                image_base64 = self.tensor_to_base64(image_tensor)
+                if image_base64.startswith('data:image/'):
+                    image_base64 = image_base64.split(',', 1)[1]
+                content_items.append({
                     'type': 'image_url',
                     'image_url': {
                         'url': f"data:image/png;base64,{image_base64}",
                     },
-                }],
+                })
+
+            messages = [{
+                'role': 'user',
+                'content': content_items,
             }]
             
             response = client.chat.completions.create(
@@ -508,7 +512,7 @@ class Qwen3VLAPI:
         except Exception as e:
             raise Exception(f"OpenAI客户端调用失败: {str(e)}")
     
-    def _call_modelscope_with_requests(self, api_key, image_tensor, prompt, model, max_tokens, temperature, timeout=60):
+    def _call_modelscope_with_requests(self, api_key, image_tensor, prompt, model, max_tokens, temperature, timeout=60, api_base=None):
         try:
             headers = {
                 "Authorization": f"Bearer {api_key}",
@@ -520,7 +524,7 @@ class Qwen3VLAPI:
                 image_base64 = self.tensor_to_base64(image_tensor)
                 content_items.append({
                     "type": "image_url",
-                    "image_url": {"url": image_base64}
+                    "image_url": {"url": f"data:image/png;base64,{image_base64}"}
                 })
 
             messages = [{
@@ -535,8 +539,9 @@ class Qwen3VLAPI:
                 "temperature": temperature
             }
             
+            endpoint_base = (api_base or 'https://api-inference.modelscope.cn/v1').rstrip('/')
             response = requests.post(
-                "https://api-inference.modelscope.cn/v1/chat/completions",
+                f"{endpoint_base}/chat/completions",
                 headers=headers,
                 json=data,
                 timeout=timeout
@@ -969,7 +974,7 @@ class Qwen3VLAPI:
             elif platform_name == "SiliconFlow":
                 return self.call_siliconflow_api(api_key, image_tensor, prompt, model, max_tokens, temperature, timeout)
             elif platform_name == "ModelScope":
-                return self.call_modelscope_api(api_key, image_tensor, prompt, model, max_tokens, temperature, timeout)
+                return self.call_modelscope_api(api_key, image_tensor, prompt, model, max_tokens, temperature, timeout, api_base)
             elif platform_name == "Aliyun":
                 return self.call_aliyun_bailian_api(api_key, image_tensor, prompt, model, max_tokens, temperature, timeout)
             else:
