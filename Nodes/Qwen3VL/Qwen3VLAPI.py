@@ -243,7 +243,7 @@ class Qwen3VLAPI:
                 models.append(model_info["display_name"])
         return list(set(models))
     
-    def tensor_to_base64(self, tensor):
+    def tensor_to_base64(self, tensor, size_limitation=None):
         if tensor.max() <= 1.0:
             tensor = tensor * 255.0
         
@@ -255,6 +255,22 @@ class Qwen3VLAPI:
         
         image_array = tensor.cpu().numpy().astype(np.uint8)
         image = Image.fromarray(image_array)
+
+        try:
+            if size_limitation is not None:
+                target = int(size_limitation)
+                if target > 0:
+                    target = min(target, 2500)
+                    w, h = image.size
+                    long_edge = max(w, h)
+                    
+                    if long_edge > target:
+                        scale = target / float(long_edge)
+                        new_w = max(1, int(round(w * scale)))
+                        new_h = max(1, int(round(h * scale)))
+                        image = image.resize((new_w, new_h), Image.LANCZOS)
+        except Exception:
+            pass
         
         buffer = BytesIO()
         image.save(buffer, format="PNG")
@@ -286,6 +302,102 @@ class Qwen3VLAPI:
             
         except Exception as e:
             raise RuntimeError(f"加载图片失败 {image_path}: {str(e)}")
+
+    def load_image_from_source_path(self, source_path):
+        try:
+            if not isinstance(source_path, str) or not source_path.strip():
+                raise ValueError("source_path 不能为空")
+
+            path = source_path.strip()
+            if path.lower().startswith("http://") or path.lower().startswith("https://"):
+                resp = requests.get(path, timeout=30)
+                resp.raise_for_status()
+                img = Image.open(BytesIO(resp.content))
+                if img.mode != 'RGB':
+                    img = img.convert('RGB')
+                img_arr = np.array(img).astype(np.float32) / 255.0
+                tensor = torch.from_numpy(img_arr).permute(2, 0, 1).unsqueeze(0)
+                return tensor
+            else:
+                return self.load_image_from_path(path)
+        except Exception as e:
+            raise RuntimeError(f"从源路径加载图片失败: {str(e)}")
+
+    def path_or_url_to_base64_image(self, src, size_limitation=None):
+        try:
+            if not isinstance(src, str) or not src.strip():
+                raise ValueError("无效的图片路径或URL")
+            s = src.strip()
+            if s.lower().startswith("http://") or s.lower().startswith("https://"):
+                resp = requests.get(s, timeout=30)
+                resp.raise_for_status()
+                img = Image.open(BytesIO(resp.content))
+            else:
+                if not os.path.exists(s):
+                    raise FileNotFoundError(f"图片文件未找到: {s}")
+                img = Image.open(s)
+            if img.mode != 'RGB':
+                img = img.convert('RGB')
+
+            try:
+                if size_limitation is not None:
+                    target = int(size_limitation)
+                    if target > 0:
+                        target = min(target, 2500)
+                        w, h = img.size
+                        long_edge = max(w, h)
+
+                        if long_edge > target:
+                            scale = target / float(long_edge)
+                            new_w = max(1, int(round(w * scale)))
+                            new_h = max(1, int(round(h * scale)))
+                            img = img.resize((new_w, new_h), Image.LANCZOS)
+            except Exception:
+                pass
+            buf = BytesIO()
+            img.save(buf, format='PNG')
+            img_b64 = base64.b64encode(buf.getvalue()).decode()
+            return f"data:image/png;base64,{img_b64}"
+        except Exception as e:
+            raise RuntimeError(f"编码图片失败 {src}: {str(e)}")
+
+    def build_content_items_from_source(self, source_path, prompt, size_limitation=None):
+        """构建 OpenAI 兼容的 content_items 列表，支持多图。视频暂不支持。"""
+        content_items = [{
+            'type': 'text',
+            'text': prompt,
+        }]
+        video_count = 0
+        try:
+            if isinstance(source_path, list):
+                for item in source_path:
+                    if not isinstance(item, dict):
+                        continue
+                    typ = item.get('type')
+                    if typ == 'image':
+                        img_src = item.get('image')
+                        img_b64 = self.path_or_url_to_base64_image(img_src, size_limitation)
+                        content_items.append({
+                            'type': 'image_url',
+                            'image_url': {'url': img_b64}
+                        })
+                    elif typ == 'video':
+                        video_count += 1
+                    elif typ == 'text':
+                        extra_text = item.get('text')
+                        if isinstance(extra_text, str) and extra_text.strip():
+                            content_items[0]['text'] = content_items[0]['text'] + " " + extra_text.strip()
+            elif isinstance(source_path, str) and source_path.strip():
+                img_b64 = self.path_or_url_to_base64_image(source_path.strip(), size_limitation)
+                content_items.append({
+                    'type': 'image_url',
+                    'image_url': {'url': img_b64}
+                })
+            else:
+                raise ValueError("source_path 为空或类型不支持")
+        except Exception as e:
+            raise RuntimeError(f"从源路径构建内容失败: {str(e)}")
+        return content_items, video_count
     
     def parse_batch_paths(self, batch_paths_str):
         if not batch_paths_str or not batch_paths_str.strip():
@@ -360,7 +472,7 @@ class Qwen3VLAPI:
         with open(txt_file, 'w', encoding='utf-8') as f:
             f.write(description)
     
-    def call_siliconflow_api(self, api_key, image_tensor, prompt, model, max_tokens, temperature, timeout=60):
+    def call_siliconflow_api(self, api_key, image_tensor, prompt, model, max_tokens, temperature, timeout=60, sampling_params=None, size_limitation=None):
         try:
             base_url = "https://api.siliconflow.cn/v1/chat/completions"
             headers = {
@@ -370,7 +482,7 @@ class Qwen3VLAPI:
             
             content_items = [{"type": "text", "text": prompt}]
             if image_tensor is not None:
-                image_base64 = self.tensor_to_base64(image_tensor)
+                image_base64 = self.tensor_to_base64(image_tensor, size_limitation)
                 content_items.append({
                     "type": "image_url",
                     "image_url": {"url": image_base64}
@@ -388,6 +500,11 @@ class Qwen3VLAPI:
                 "temperature": temperature,
                 "stream": False
             }
+            if sampling_params:
+                for k in ("top_p", "presence_penalty", "frequency_penalty"):
+                    v = sampling_params.get(k)
+                    if v is not None:
+                        data[k] = v
             
             response = requests.post(base_url, headers=headers, json=data, timeout=timeout)
             
@@ -417,8 +534,63 @@ class Qwen3VLAPI:
                 raise e
             else:
                 raise Exception(f"意外错误: {str(e)}")
+
+    def call_siliconflow_api_with_content(self, api_key, content_items, model, max_tokens, temperature, timeout=60, sampling_params=None):
+        try:
+            base_url = "https://api.siliconflow.cn/v1/chat/completions"
+            headers = {
+                "Authorization": f"Bearer {api_key}",
+                "Content-Type": "application/json"
+            }
+
+            data = {
+                "model": model,
+                "messages": [
+                    {
+                        "role": "user",
+                        "content": content_items
+                    }
+                ],
+                "max_tokens": max_tokens,
+                "temperature": temperature,
+                "stream": False
+            }
+            if sampling_params:
+                for k in ("top_p", "presence_penalty", "frequency_penalty"):
+                    v = sampling_params.get(k)
+                    if v is not None:
+                        data[k] = v
+
+            response = requests.post(base_url, headers=headers, json=data, timeout=timeout)
+
+            if response.status_code == 200:
+                result = response.json()
+                if "choices" in result and len(result["choices"]) > 0:
+                    content = result["choices"][0]["message"]["content"]
+                    return content
+                else:
+                    raise Exception("API响应格式异常")
+            else:
+                error_msg = f"API请求失败，状态码: {response.status_code}"
+                try:
+                    error_detail = response.json()
+                    if "error" in error_detail:
+                        error_msg += f"，错误信息: {error_detail['error']}"
+                except:
+                    error_msg += f"，响应内容: {response.text}"
+                raise Exception(error_msg)
+
+        except requests.exceptions.Timeout:
+            raise Exception("请求超时，请检查网络连接")
+        except requests.exceptions.RequestException as e:
+            raise Exception(f"网络请求异常 - {str(e)}")
+        except Exception as e:
+            if "API请求失败" in str(e) or "API响应格式" in str(e) or "请求超时" in str(e) or "网络请求异常" in str(e):
+                raise e
+            else:
+                raise Exception(f"意外错误: {str(e)}")
     
-    def call_aliyun_bailian_api(self, api_key, image_tensor, prompt, model, max_tokens, temperature, timeout=60):
+    def call_aliyun_bailian_api(self, api_key, image_tensor, prompt, model, max_tokens, temperature, timeout=60, sampling_params=None, size_limitation=None):
         try:
             if not OPENAI_AVAILABLE:
                 raise Exception("使用阿里云百炼需要安装 OpenAI Python SDK。请执行: pip install openai")
@@ -434,7 +606,7 @@ class Qwen3VLAPI:
             }]
 
             if image_tensor is not None:
-                image_base64 = self.tensor_to_base64(image_tensor)
+                image_base64 = self.tensor_to_base64(image_tensor, size_limitation)
                 if image_base64.startswith('data:image/'):
                     image_base64 = image_base64.split(',', 1)[1]
                 content_items.append({
@@ -449,30 +621,37 @@ class Qwen3VLAPI:
                 'content': content_items,
             }]
 
+            extra_kwargs = {}
+            if sampling_params:
+                for k in ("top_p", "presence_penalty", "frequency_penalty"):
+                    v = sampling_params.get(k)
+                    if v is not None:
+                        extra_kwargs[k] = v
             response = client.chat.completions.create(
                 model=model,
                 messages=messages,
                 max_tokens=max_tokens,
                 temperature=temperature,
-                stream=False
+                stream=False,
+                **extra_kwargs
             )
 
             return response.choices[0].message.content
         except Exception as e:
             raise Exception(f"OpenAI兼容调用失败: {str(e)}")
     
-    def call_modelscope_api(self, api_key, image_tensor, prompt, model, max_tokens, temperature, timeout=60, api_base=None):
+    def call_modelscope_api(self, api_key, image_tensor, prompt, model, max_tokens, temperature, timeout=60, api_base=None, sampling_params=None, size_limitation=None):
         try:
             base_url = self._normalize_openai_base_url(api_base) if api_base else 'https://api-inference.modelscope.cn/v1'
             if OPENAI_AVAILABLE:
-                return self._call_modelscope_with_openai(api_key, image_tensor, prompt, model, max_tokens, temperature, timeout, base_url)
+                return self._call_modelscope_with_openai(api_key, image_tensor, prompt, model, max_tokens, temperature, timeout, base_url, sampling_params, size_limitation)
             else:
-                return self._call_modelscope_with_requests(api_key, image_tensor, prompt, model, max_tokens, temperature, timeout, base_url)
+                return self._call_modelscope_with_requests(api_key, image_tensor, prompt, model, max_tokens, temperature, timeout, base_url, sampling_params, size_limitation)
                 
         except Exception as e:
             raise Exception(f"ModelScope API调用失败: {str(e)}")
-    
-    def _call_modelscope_with_openai(self, api_key, image_tensor, prompt, model, max_tokens, temperature, timeout=60, api_base=None):
+
+    def _call_modelscope_with_openai(self, api_key, image_tensor, prompt, model, max_tokens, temperature, timeout=60, api_base=None, sampling_params=None, size_limitation=None):
         try:
             client = OpenAI(
                 base_url=(api_base or 'https://api-inference.modelscope.cn/v1'),
@@ -484,7 +663,7 @@ class Qwen3VLAPI:
                 'text': prompt,
             }]
             if image_tensor is not None:
-                image_base64 = self.tensor_to_base64(image_tensor)
+                image_base64 = self.tensor_to_base64(image_tensor, size_limitation)
                 if image_base64.startswith('data:image/'):
                     image_base64 = image_base64.split(',', 1)[1]
                 content_items.append({
@@ -499,20 +678,58 @@ class Qwen3VLAPI:
                 'content': content_items,
             }]
             
+            extra_kwargs = {}
+            if sampling_params:
+                for k in ("top_p", "presence_penalty", "frequency_penalty"):
+                    v = sampling_params.get(k)
+                    if v is not None:
+                        extra_kwargs[k] = v
             response = client.chat.completions.create(
                 model=model,
                 messages=messages,
                 max_tokens=max_tokens,
                 temperature=temperature,
-                stream=False
+                stream=False,
+                **extra_kwargs
             )
             
             return response.choices[0].message.content
             
         except Exception as e:
             raise Exception(f"OpenAI客户端调用失败: {str(e)}")
+
+    def _call_modelscope_with_openai_content(self, api_key, content_items, model, max_tokens, temperature, timeout=60, api_base=None, sampling_params=None):
+        try:
+            client = OpenAI(
+                base_url=(api_base or 'https://api-inference.modelscope.cn/v1'),
+                api_key=api_key
+            )
+
+            messages = [{
+                'role': 'user',
+                'content': content_items,
+            }]
+
+            extra_kwargs = {}
+            if sampling_params:
+                for k in ("top_p", "presence_penalty", "frequency_penalty"):
+                    v = sampling_params.get(k)
+                    if v is not None:
+                        extra_kwargs[k] = v
+            response = client.chat.completions.create(
+                model=model,
+                messages=messages,
+                max_tokens=max_tokens,
+                temperature=temperature,
+                stream=False,
+                **extra_kwargs
+            )
+
+            return response.choices[0].message.content
+        except Exception as e:
+            raise Exception(f"OpenAI客户端调用失败: {str(e)}")
     
-    def _call_modelscope_with_requests(self, api_key, image_tensor, prompt, model, max_tokens, temperature, timeout=60, api_base=None):
+    def _call_modelscope_with_requests(self, api_key, image_tensor, prompt, model, max_tokens, temperature, timeout=60, api_base=None, sampling_params=None, size_limitation=None):
         try:
             headers = {
                 "Authorization": f"Bearer {api_key}",
@@ -521,7 +738,7 @@ class Qwen3VLAPI:
             
             content_items = [{"type": "text", "text": prompt}]
             if image_tensor is not None:
-                image_base64 = self.tensor_to_base64(image_tensor)
+                image_base64 = self.tensor_to_base64(image_tensor, size_limitation)
                 content_items.append({
                     "type": "image_url",
                     "image_url": {"url": f"data:image/png;base64,{image_base64}"}
@@ -538,6 +755,11 @@ class Qwen3VLAPI:
                 "max_tokens": max_tokens,
                 "temperature": temperature
             }
+            if sampling_params:
+                for k in ("top_p", "presence_penalty", "frequency_penalty"):
+                    v = sampling_params.get(k)
+                    if v is not None:
+                        data[k] = v
             
             endpoint_base = (api_base or 'https://api-inference.modelscope.cn/v1').rstrip('/')
             response = requests.post(
@@ -560,6 +782,51 @@ class Qwen3VLAPI:
             raise Exception(f"API请求超时 ({timeout} 秒)")
         except Exception as e:
             raise Exception(f"Requests调用失败: {str(e)}")
+
+    def _call_modelscope_with_requests_content(self, api_key, content_items, model, max_tokens, temperature, timeout=60, api_base=None, sampling_params=None):
+        try:
+            headers = {
+                "Authorization": f"Bearer {api_key}",
+                "Content-Type": "application/json"
+            }
+
+            messages = [{
+                "role": "user",
+                "content": content_items
+            }]
+
+            data = {
+                "model": model,
+                "messages": messages,
+                "max_tokens": max_tokens,
+                "temperature": temperature
+            }
+            if sampling_params:
+                for k in ("top_p", "presence_penalty", "frequency_penalty"):
+                    v = sampling_params.get(k)
+                    if v is not None:
+                        data[k] = v
+
+            endpoint_base = (self._normalize_openai_base_url(api_base) or 'https://api-inference.modelscope.cn/v1').rstrip('/')
+            response = requests.post(
+                f"{endpoint_base}/chat/completions",
+                headers=headers,
+                json=data,
+                timeout=timeout
+            )
+
+            if response.status_code == 200:
+                result = response.json()
+                if "choices" in result and len(result["choices"]) > 0:
+                    return result["choices"][0]["message"]["content"]
+                else:
+                    raise Exception("API响应格式错误")
+            else:
+                raise Exception(f"API请求失败，状态码: {response.status_code}，响应: {response.text}")
+        except requests.exceptions.Timeout:
+            raise Exception(f"API请求超时 ({timeout} 秒)")
+        except Exception as e:
+            raise Exception(f"Requests调用失败: {str(e)}")
     
     def _normalize_openai_base_url(self, api_base: str) -> str:
         try:
@@ -572,7 +839,7 @@ class Qwen3VLAPI:
         except Exception:
             return api_base
 
-    def call_custom_api(self, api_base, api_key, image_tensor, prompt, model, max_tokens, temperature, timeout=60):
+    def call_custom_api(self, api_base, api_key, image_tensor, prompt, model, max_tokens, temperature, timeout=60, sampling_params=None, size_limitation=None):
         try:
             if not OPENAI_AVAILABLE:
                 raise Exception("完全自定义模式需要安装 OpenAI Python SDK。请执行: pip install openai")
@@ -586,7 +853,7 @@ class Qwen3VLAPI:
                 'text': prompt,
             }]
             if image_tensor is not None:
-                image_base64 = self.tensor_to_base64(image_tensor)
+                image_base64 = self.tensor_to_base64(image_tensor, size_limitation)
                 if image_base64.startswith('data:image/'):
                     image_base64 = image_base64.split(',', 1)[1]
                 content_items.append({
@@ -601,12 +868,86 @@ class Qwen3VLAPI:
                 'content': content_items,
             }]
 
+            extra_kwargs = {}
+            if sampling_params:
+                for k in ("top_p", "presence_penalty", "frequency_penalty"):
+                    v = sampling_params.get(k)
+                    if v is not None:
+                        extra_kwargs[k] = v
             response = client.chat.completions.create(
                 model=model,
                 messages=messages,
                 max_tokens=max_tokens,
                 temperature=temperature,
-                stream=False
+                stream=False,
+                **extra_kwargs
+            )
+
+            return response.choices[0].message.content
+        except Exception as e:
+            raise Exception(f"OpenAI兼容调用失败: {str(e)}")
+
+    def call_custom_api_with_content(self, api_base, api_key, content_items, model, max_tokens, temperature, timeout=60, sampling_params=None):
+        try:
+            if not OPENAI_AVAILABLE:
+                raise Exception("完全自定义模式需要安装 OpenAI Python SDK。请执行: pip install openai")
+            client = OpenAI(
+                base_url=self._normalize_openai_base_url(api_base),
+                api_key=api_key
+            )
+
+            messages = [{
+                'role': 'user',
+                'content': content_items,
+            }]
+
+            extra_kwargs = {}
+            if sampling_params:
+                for k in ("top_p", "presence_penalty", "frequency_penalty"):
+                    v = sampling_params.get(k)
+                    if v is not None:
+                        extra_kwargs[k] = v
+            response = client.chat.completions.create(
+                model=model,
+                messages=messages,
+                max_tokens=max_tokens,
+                temperature=temperature,
+                stream=False,
+                **extra_kwargs
+            )
+
+            return response.choices[0].message.content
+        except Exception as e:
+            raise Exception(f"OpenAI兼容调用失败: {str(e)}")
+
+    def call_aliyun_bailian_api_with_content(self, api_key, content_items, model, max_tokens, temperature, timeout=60, sampling_params=None):
+        try:
+            if not OPENAI_AVAILABLE:
+                raise Exception("使用阿里云百炼需要安装 OpenAI Python SDK。请执行: pip install openai")
+
+            client = OpenAI(
+                base_url='https://dashscope.aliyuncs.com/compatible-mode/v1',
+                api_key=api_key
+            )
+
+            messages = [{
+                'role': 'user',
+                'content': content_items,
+            }]
+
+            extra_kwargs = {}
+            if sampling_params:
+                for k in ("top_p", "presence_penalty", "frequency_penalty"):
+                    v = sampling_params.get(k)
+                    if v is not None:
+                        extra_kwargs[k] = v
+            response = client.chat.completions.create(
+                model=model,
+                messages=messages,
+                max_tokens=max_tokens,
+                temperature=temperature,
+                stream=False,
+                **extra_kwargs
             )
 
             return response.choices[0].message.content
@@ -620,14 +961,6 @@ class Qwen3VLAPI:
         
         return {
             "required": {
-                "config_mode": (["Platform Presets", "Fully Custom"], {
-                    "default": "Platform Presets",
-                    "tooltip": "Select configuration mode: Platform Preset uses built-in platform settings, Fully Custom allows manual setup of all parameters."
-                }),
-                "llm_mode": ("BOOLEAN", {
-                    "default": False,
-                    "tooltip": "启用大语言模型模式（允许无图片，纯文本对话）"
-                }),
                 "user_prompt": ("STRING", {
                     "multiline": True,
                     "default": "",
@@ -640,7 +973,25 @@ class Qwen3VLAPI:
                     "placeholder": "system prompt",
                     "tooltip": "System prompt to guide the AI's behavior and response style."
                 }),
-
+                "access_method": (["Platform Presets", "Fully Custom"], {
+                    "default": "Platform Presets",
+                    "tooltip": "Select configuration mode: Platform Preset uses built-in platform settings, Fully Custom allows manual setup of all parameters."
+                }),
+                "llm_mode": ("BOOLEAN", {
+                    "default": False,
+                    "tooltip": "Enable LLM mode. This will allow the model to generate text responses based on the input prompt."
+                }),
+                "aggressive_creative": ("BOOLEAN", {
+                    "default": False,
+                    "tooltip": "Enable aggressive creative mode. This will apply high randomness and diverse sampling in LLM mode."
+                }),
+                "size_limitation": ("INT", {
+                    "default": 0,
+                    "min": 0,
+                    "max": 2500,
+                    "step": 1,
+                    "tooltip": "以长边为准的缩放尺寸（像素）。0 表示不缩放，上限 2500 像素。图像输入端口、batch mode、多路径输入端口均受此设置影响。"
+                }),
                 "max_tokens": ("INT", {
                     "default": 2048,
                     "min": 256,
@@ -672,27 +1023,40 @@ class Qwen3VLAPI:
                 }),
             },
             "optional": {
+                "source_path": ("PATH", {
+                    "tooltip": "Source path: 本地图片/URL，或由多路径节点输出的多图列表；与 images 和 batch_mode 互斥。"
+                }),
                 "images": ("IMAGE", {
                     "tooltip": "Input images for analysis."
                 }),
             }
         }
     
-    def validate_input_exclusivity(self, images, batch_mode, batch_folder_path, llm_mode=False):
+    def validate_input_exclusivity(self, images, batch_mode, batch_folder_path, llm_mode=False, source_path=None):
 
         if llm_mode:
             return
         has_image_input = images is not None
+        has_source_path = (source_path is not None) and (str(source_path).strip() != "")
         has_batch_folder = batch_mode and batch_folder_path and batch_folder_path.strip()
         
-        if batch_mode and has_image_input:
-            raise ValueError("⚠️ 输入冲突：不能同时使用图片输入端口和批量模式！\n\n请选择以下其中一种方式：\n• 使用图片输入端口：请关闭批量模式\n• 启用批量模式：请断开图片输入端口并设置文件夹路径")
+        if has_image_input and has_source_path:
+            raise ValueError("⚠️ 输入冲突：source_path 和 images 不能同时连接！\n\n请选择以下其中一种方式：\n• 使用图片输入端口：请断开 source_path\n• 使用源路径输入：请断开 images 端口")
         
-        if batch_mode and not has_batch_folder and not has_image_input:
+        if batch_mode and (has_image_input or has_source_path):
+            conflicts = []
+            if has_source_path:
+                conflicts.append("source_path")
+            if has_image_input:
+                conflicts.append("images")
+            conflict_list = "、".join(conflicts)
+            raise ValueError(f"⚠️ 输入冲突：批量模式与以下输入端口冲突：{conflict_list}！\n\n请选择以下其中一种方式：\n• 启用批量模式：请断开 {conflict_list} 并设置文件夹路径\n• 使用单张图片处理：请关闭批量模式")
+        
+        if batch_mode and not has_batch_folder and not has_image_input and not has_source_path:
             raise ValueError("⚠️ 批量模式配置错误：已启用批量模式但未提供图片源！\n\n请选择以下其中一种方式：\n• 设置批量文件夹路径\n• 连接图片输入端口并关闭批量模式")
         
-        if not batch_mode and not has_image_input:
-            raise ValueError("⚠️ 缺少图片输入：未检测到任何图片输入源！\n\n请选择以下其中一种方式：\n• 连接图片输入端口\n• 启用批量模式并设置文件夹路径")
+        if not batch_mode and not has_image_input and not has_source_path:
+            raise ValueError("⚠️ 缺少图片输入：未检测到任何图片输入源！\n\n请选择以下其中一种方式：\n• 连接图片输入端口\n• 使用源路径输入\n• 启用批量模式并设置文件夹路径")
 
     def get_platform_config(self, platform_name):
         platform_mapping = {
@@ -724,13 +1088,13 @@ class Qwen3VLAPI:
         else:
             return user_prompt.strip()
 
-    def analyze_image(self, config_mode, system_prompt, user_prompt, batch_mode, batch_folder_path, max_tokens, temperature, seed, images=None, llm_mode=False):
+    def analyze_image(self, access_method, system_prompt, user_prompt, batch_mode, batch_folder_path, max_tokens, temperature, seed, images=None, llm_mode=False, aggressive_creative=False, source_path=None, size_limitation=0):
         import random
         import time
         
         status_messages = []
         
-        self.validate_input_exclusivity(images, batch_mode, batch_folder_path, llm_mode)
+        self.validate_input_exclusivity(images, batch_mode, batch_folder_path, llm_mode, source_path)
         
         if seed != -1:
             random.seed(seed)
@@ -741,7 +1105,7 @@ class Qwen3VLAPI:
         timeout = 60
         
         try:
-            if config_mode == "Fully Custom":
+            if access_method == "Fully Custom":
                 config = self.load_api_config()
                 active_custom = config.get("active_custom", "custom_1")
                 
@@ -821,9 +1185,12 @@ class Qwen3VLAPI:
             if llm_mode:
                 status_messages.append("🔄 正在进行纯文本对话模式调用…")
                 try:
+                    effective_temperature, sampling_params = self._prepare_sampling(llm_mode, aggressive_creative, temperature, seed)
+                    if aggressive_creative:
+                        status_messages.append("✨ Aggressive Creative Mode enabled: applying high-random sampling")
                     result = self._process_single_image(
                         platform_name, api_key, None, final_prompt, 
-                        api_model_name, max_tokens, temperature, timeout, api_base
+                        api_model_name, max_tokens, effective_temperature, timeout, api_base, sampling_params, size_limitation
                     )
                     status_messages.append("✅ 文本对话完成")
                     return (result, "\n".join(status_messages))
@@ -833,15 +1200,46 @@ class Qwen3VLAPI:
                     return ("", "\n".join(status_messages))
 
             if not batch_mode:
-                status_messages.append("🔄 正在处理单张图片...")
+                status_messages.append("🔄 正在处理图片...")
                 
+                if images is None and source_path is not None:
+                    try:
+                        status_messages.append("🔗 检测到源路径输入，正在构建多图内容...")
+                        content_items, video_count = self.build_content_items_from_source(source_path, final_prompt, size_limitation)
+                        if video_count > 0:
+                            status_messages.append("⚠️ 检测到视频源，外部API模式暂不支持视频，将忽略视频内容。")
+                        if access_method == "Fully Custom":
+                            if not api_base:
+                                raise ValueError("自定义模式下必须提供API基础地址")
+                            result = self.call_custom_api_with_content(api_base, api_key, content_items, api_model_name, max_tokens, temperature, timeout, None)
+                        elif platform_name == "SiliconFlow":
+                            result = self.call_siliconflow_api_with_content(api_key, content_items, api_model_name, max_tokens, temperature, timeout, None)
+                        elif platform_name == "ModelScope":
+                            if OPENAI_AVAILABLE:
+                                result = self._call_modelscope_with_openai_content(api_key, content_items, api_model_name, max_tokens, temperature, timeout, api_base, None)
+                            else:
+                                result = self._call_modelscope_with_requests_content(api_key, content_items, api_model_name, max_tokens, temperature, timeout, api_base, None)
+                        elif platform_name == "Aliyun":
+                            result = self.call_aliyun_bailian_api_with_content(api_key, content_items, api_model_name, max_tokens, temperature, timeout, None)
+                        else:
+                            raise ValueError(f"不支持的平台: {platform_name}")
+                        status_messages.append("✅ 多图内容分析完成")
+                        return (result, "\n".join(status_messages))
+                    except Exception as e:
+                        error_msg = f"源路径多图处理失败: {str(e)}"
+                        status_messages.append(f"❌ 错误: {error_msg}")
+                        return ("", "\n".join(status_messages))
+
                 if images is None:
 
                     status_messages.append("ℹ️ 未提供图片输入，改为纯文本对话模式")
                     try:
+                        effective_temperature, sampling_params = self._prepare_sampling(True, aggressive_creative, temperature, seed)
+                        if aggressive_creative:
+                            status_messages.append("✨ Aggressive Creative Mode enabled: applying high-random sampling")
                         result = self._process_single_image(
                             platform_name, api_key, None, final_prompt, 
-                            api_model_name, max_tokens, temperature, timeout, api_base
+                            api_model_name, max_tokens, effective_temperature, timeout, api_base, sampling_params, size_limitation
                         )
                         status_messages.append("✅ 文本对话完成")
                         return (result, "\n".join(status_messages))
@@ -858,7 +1256,7 @@ class Qwen3VLAPI:
                 try:
                     result = self._process_single_image(
                         platform_name, api_key, image_tensor, final_prompt, 
-                        api_model_name, max_tokens, temperature, timeout, api_base
+                        api_model_name, max_tokens, temperature, timeout, api_base, {}, size_limitation
                     )
                     status_messages.append("✅ 图片分析完成")
                     return (result, "\n".join(status_messages))
@@ -893,7 +1291,7 @@ class Qwen3VLAPI:
                                 
                                 result = self._process_single_image(
                                     platform_name, api_key, image_tensor, final_prompt,
-                                    api_model_name, max_tokens, temperature, timeout, api_base
+                                    api_model_name, max_tokens, temperature, timeout, api_base, {}, size_limitation
                                 )
                                 
                                 self.save_description(image_path, result)
@@ -934,7 +1332,7 @@ class Qwen3VLAPI:
                             
                             result = self._process_single_image(
                                 platform_name, api_key, image_tensor, final_prompt,
-                                api_model_name, max_tokens, temperature, timeout, api_base
+                                api_model_name, max_tokens, temperature, timeout, api_base, {}, size_limitation
                             )
                             
                             results.append(f"图片 {i+1}/{total_images}:\n{result}")
@@ -965,22 +1363,39 @@ class Qwen3VLAPI:
             status_messages.append(f"❌ 严重错误: {error_msg}")
             return ("", "\n".join(status_messages))
     
-    def _process_single_image(self, platform_name, api_key, image_tensor, prompt, model, max_tokens, temperature, timeout, api_base=None):
+    def _process_single_image(self, platform_name, api_key, image_tensor, prompt, model, max_tokens, temperature, timeout, api_base=None, sampling_params=None, size_limitation=None):
         try:
             if platform_name == "自定义":
                 if not api_base:
                     raise ValueError("自定义模式下必须提供API基础地址")
-                return self.call_custom_api(api_base, api_key, image_tensor, prompt, model, max_tokens, temperature, timeout)
+                return self.call_custom_api(api_base, api_key, image_tensor, prompt, model, max_tokens, temperature, timeout, sampling_params, size_limitation)
             elif platform_name == "SiliconFlow":
-                return self.call_siliconflow_api(api_key, image_tensor, prompt, model, max_tokens, temperature, timeout)
+                return self.call_siliconflow_api(api_key, image_tensor, prompt, model, max_tokens, temperature, timeout, sampling_params, size_limitation)
             elif platform_name == "ModelScope":
-                return self.call_modelscope_api(api_key, image_tensor, prompt, model, max_tokens, temperature, timeout, api_base)
+                return self.call_modelscope_api(api_key, image_tensor, prompt, model, max_tokens, temperature, timeout, api_base, sampling_params, size_limitation)
             elif platform_name == "Aliyun":
-                return self.call_aliyun_bailian_api(api_key, image_tensor, prompt, model, max_tokens, temperature, timeout)
+                return self.call_aliyun_bailian_api(api_key, image_tensor, prompt, model, max_tokens, temperature, timeout, sampling_params, size_limitation)
             else:
                 raise ValueError(f"不支持的平台: {platform_name}")
         except Exception as e:
             raise Exception(f"API调用失败: {str(e)}")
+
+    def _prepare_sampling(self, llm_mode, creative_mode, temperature, seed):
+        import random
+        import time
+        params = {}
+        effective_temperature = temperature
+        if llm_mode and creative_mode:
+            rnd = random.Random()
+            try:
+                rnd.seed(time.time_ns() ^ os.getpid())
+            except Exception:
+                rnd.seed(time.time() * 1000)
+            effective_temperature = max(0.1, min(2.0, rnd.uniform(1.4, 2.0)))
+            params["top_p"] = rnd.uniform(0.85, 1.0)
+            params["presence_penalty"] = rnd.uniform(0.6, 1.2)
+            params["frequency_penalty"] = rnd.uniform(0.5, 1.1)
+        return effective_temperature, params
     
     @classmethod
     def IS_CHANGED(cls, **kwargs):

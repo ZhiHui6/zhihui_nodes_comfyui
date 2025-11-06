@@ -75,10 +75,10 @@ class Qwen3VLAdvanced:
     def INPUT_TYPES(s):
         return {
             "required": {
-                "preset_prompt": (list(QWEN_PROMPT_TYPES.keys()), {"default": "Ignore", "tooltip": "选择预设的提示词模板，包含标签生成、详细描述、创意分析等多种模式"}),
-                "output_language": (["Ignore", "Chinese", "english", "Chinese&English"], {"default": "Ignore", "tooltip": "设置输出语言，可选择中文、英文或双语输出"}),             
                 "user_prompt": ("STRING", {"default": "", "multiline": True, "tooltip": "用户自定义的提示词，用于指导模型生成特定内容"}),
                 "system_prompt": ("STRING", {"default": "", "multiline": True, "tooltip": "系统级提示词，用于设定模型的行为模式和角色定位"}),
+                "preset_prompt": (list(QWEN_PROMPT_TYPES.keys()), {"default": "Ignore", "tooltip": "选择预设的提示词模板，包含标签生成、详细描述、创意分析等多种模式"}),
+                "output_language": (["Ignore", "Chinese", "english", "Chinese&English"], {"default": "Ignore", "tooltip": "设置输出语言，可选择中文、英文或双语输出"}),             
                 "remove_think_tags": ("BOOLEAN", {"default": False, "tooltip": "启用后将删除输出文本中</think>标签及其之前的所有内容，保留纯净的描述文本"}),
                 "unlock_restrictions": (
                     [

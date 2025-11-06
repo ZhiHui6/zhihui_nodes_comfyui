@@ -51,6 +51,7 @@ class SystemPromptLoader:
         
         return {
             "required": {
+                "enable_node": ("BOOLEAN", {"default": True}),
                 "system_preset": (preset_options, ),
             },
             }
@@ -65,7 +66,11 @@ class SystemPromptLoader:
     OUTPUT_NODE = True
     DESCRIPTION = "System Prompt Loader: A simplified system prompt loader that loads system prompt templates directly from preset files. Supports various scenario presets, suitable for scenarios that require pure system prompt output without user prompt processing functionality."
 
-    def load_preset(self, system_preset):
+    def load_preset(self, enable_node, system_preset):
+        
+        if enable_node is False:
+            return ("",)
+
         system_prompt_content = ""
         
         if system_preset in ["Preset folder not found", "No preset files found"]:

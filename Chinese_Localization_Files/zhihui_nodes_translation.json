@@ -12,7 +12,7 @@
     "MultiLineTextNode": {
         "title": "多行文本节点",
         "description": "多行文本节点：用于输入和处理多行文本内容。支持启用/禁用功能，允许添加注释，适用于长文本内容输入和传输。",
-        "inputs": {
+        "widgets": {
             "enable_node": "启用节点",
             "comment": "注释",
             "text_content": "文本内容"
@@ -284,11 +284,12 @@
     "SystemPromptLoader": {
         "title": "系统提示词加载器",
         "description": "系统提示词加载器：简化的系统提示词加载器，直接从预设文件加载系统提示词模板。支持各种场景预设，适用于需要纯系统提示词输出而无需用户提示词处理功能的场景。",
-        "widgets": {
-            "system_preset": "系统预设"
-        },
         "outputs": {
             "system_prompt": "系统提示词"
+        },
+        "widgets": {
+            "system_preset": "系统预设",
+            "enable_node": "启用节点"
         }
     },
     "USMSharpen": {
@@ -732,7 +733,8 @@
         "title": "Qwen3-VL图像加载器",
         "description": "Qwen3-VL图像加载器：用于加载和处理图像文件，支持多种图像格式（JPG、PNG、BMP、TIFF、WebP等），为Qwen3-VL模型提供图像输入。",
         "widgets": {
-            "image": "图像"
+            "image": "图像",
+            "enable_node": "启用节点"
         },
         "outputs": {
             "PATH": "路径"
@@ -742,7 +744,8 @@
         "title": "Qwen3-VL视频加载器",
         "description": "Qwen3-VL视频加载器：用于加载和处理视频文件，支持多种视频格式（MP4、AVI、MOV、MKV等），为Qwen3-VL模型提供视频输入和路径信息。",
         "widgets": {
-            "file": "文件"
+            "file": "文件",
+            "enable_node": "启用节点"
         },
         "outputs": {
             "VIDEO": "视频",
@@ -769,8 +772,8 @@
         "widgets": {
             "mode": "模式",
             "select_channel": "选择通道",
-            "Path_1_comment": "Path_1备注",
-            "Path_2_comment": "Path_2备注"
+            "Path_1_comment": "路径1备注",
+            "Path_2_comment": "路径2备注"
         },
         "outputs": {
             "output_path": "输出路径"
@@ -814,18 +817,33 @@
         "title": "Qwen3-VL在线版",
         "description": "基于Qwen3-VL多模态大语言模型的在线API图像理解节点，支持SiliconFlow和ModelScope等多个平台，可进行详细的图像描述、分析和理解，支持批处理模式和自定义提示词。",
         "inputs": {
-            "images": "图像"
+            "images": "图像",
+            "source_path": "源路径"
         },
         "widgets": {
-            "config_mode": "配置模式",
-            "llm_mode": "大语言模型模式",
+            "llm_mode": "语言模型模式",
+            "aggressive_creative": "激进创意",
             "user_prompt": "用户提示词",
             "system_prompt": "系统提示词",
             "max_tokens": "最大令牌数",
             "temperature": "温度",
             "seed": "随机种子",
             "batch_mode": "批处理模式",
-            "batch_folder_path": "批处理文件夹路径"
+            "batch_folder_path": "批处理文件夹路径",
+            "access_method": "接入方式",
+            "size_limitation": "尺寸限制"
+        },
+        "tooltips": {
+            "config_mode": "选择配置模式：平台预设使用内置平台设置，完全自定义允许手动设置所有参数",
+            "llm_mode": "启用大语言模型模式（允许无图片，纯文本对话）",
+            "aggressive_creative_mode": "激进创意模式：在LLM模式下应用高随机性和多样化采样",
+            "user_prompt": "用于图像分析的用户提示词。描述您想了解的关于图像的内容",
+            "system_prompt": "系统提示词，用于指导AI的行为和响应风格",
+            "max_tokens": "生成响应中的最大令牌数",
+            "temperature": "控制文本生成随机性的温度参数。较低值=更专注，较高值=更有创意",
+            "seed": "随机种子，用于可重现的结果。使用-1表示随机种子",
+            "batch_mode": "启用批处理模式",
+            "batch_folder_path": "包含用于批处理的图像的文件夹路径"
         },
         "outputs": {
             "result":"结果",
