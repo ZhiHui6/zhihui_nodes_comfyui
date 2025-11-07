@@ -15,7 +15,6 @@ class VideoLoader(ComfyNodeABC):
         files = folder_paths.filter_files_content_types(files, ["video"])
         return {
             "required": {
-                "enable_node": ("BOOLEAN", {"default": True}),
                 "file": (sorted(files), {"video_upload": True, "video_preview": True}),
             },
         }
@@ -25,10 +24,7 @@ class VideoLoader(ComfyNodeABC):
     RETURN_NAMES = ("VIDEO", "PATH")
     FUNCTION = "load_video"
 
-    def load_video(self, file, enable_node=True):
-        if not enable_node:
-            return (None, "")
-            
+    def load_video(self, file):
         video_path = folder_paths.get_annotated_filepath(file)
         return (InputImpl.VideoFromFile(video_path), video_path)
 

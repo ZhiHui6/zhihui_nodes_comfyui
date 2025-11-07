@@ -48,7 +48,16 @@ class Qwen3VLAPI:
             if os.path.exists(self.api_config_path):
                 with open(self.api_config_path, 'r', encoding='utf-8') as f:
                     config = json.load(f)
-                
+                # 迁移到统一的 active_target 字段（兼容旧配置）
+                if "active_target" not in config:
+                    ap = config.get("active_platform")
+                    ac = config.get("active_custom")
+                    if ap:
+                        config["active_target"] = ap
+                    elif ac:
+                        config["active_target"] = ac
+                    else:
+                        config["active_target"] = "SiliconFlow"
                 return config
             else:
                 default_config = {
@@ -92,15 +101,14 @@ class Qwen3VLAPI:
                             "active": False
                         }
                     },
-                    "active_platform": "SiliconFlow",
-                    "active_custom": "custom_1",
+                    "active_target": "SiliconFlow",
                     "notes": "此文件用于存储Qwen3VL API节点的通讯配置。包括平台预设的API密钥和完全自定义的配置信息。请妥善保管您的API密钥，不要将其分享给他人。"
                 }
                 self.save_api_config(default_config)
                 return default_config
         except Exception as e:
             print(f"加载API配置文件失败: {e}")
-            return {"api_keys": {}, "custom_configs": {}}
+            return {"api_keys": {}, "custom_configs": {}, "active_target": "SiliconFlow"}
     
     def _upgrade_config(self, old_config):
         new_config = {
@@ -128,17 +136,16 @@ class Qwen3VLAPI:
                     "active": False
                 }
             },
-            "active_platform": "SiliconFlow",
-            "active_custom": "custom_1",
+            "active_target": "SiliconFlow",
             "notes": "此文件用于存储Qwen3VL API节点的通讯配置。包括平台预设的API密钥和完全自定义的配置信息。请妥善保管您的API密钥，不要将其分享给他人。"
         }
         
         old_active_config = old_config.get("active_config", {})
         if old_active_config:
             if old_active_config.get("type") == "platform":
-                new_config["active_platform"] = old_active_config.get("name", "SiliconFlow")
+                new_config["active_target"] = old_active_config.get("name", "SiliconFlow")
             elif old_active_config.get("type") == "custom":
-                new_config["active_custom"] = old_active_config.get("name", "custom_1")
+                new_config["active_target"] = old_active_config.get("name", "custom_1")
         
         old_custom_configs = old_config.get("custom_configs", {})
         for key in ["custom_1", "custom_2", "custom_3"]:
@@ -973,10 +980,6 @@ class Qwen3VLAPI:
                     "placeholder": "system prompt",
                     "tooltip": "System prompt to guide the AI's behavior and response style."
                 }),
-                "access_method": (["Platform Presets", "Fully Custom"], {
-                    "default": "Platform Presets",
-                    "tooltip": "Select configuration mode: Platform Preset uses built-in platform settings, Fully Custom allows manual setup of all parameters."
-                }),
                 "llm_mode": ("BOOLEAN", {
                     "default": False,
                     "tooltip": "Enable LLM mode. This will allow the model to generate text responses based on the input prompt."
@@ -986,7 +989,7 @@ class Qwen3VLAPI:
                     "tooltip": "Enable aggressive creative mode. This will apply high randomness and diverse sampling in LLM mode."
                 }),
                 "size_limitation": ("INT", {
-                    "default": 0,
+                    "default": 1080,
                     "min": 0,
                     "max": 2500,
                     "step": 1,
@@ -1088,7 +1091,7 @@ class Qwen3VLAPI:
         else:
             return user_prompt.strip()
 
-    def analyze_image(self, access_method, system_prompt, user_prompt, batch_mode, batch_folder_path, max_tokens, temperature, seed, images=None, llm_mode=False, aggressive_creative=False, source_path=None, size_limitation=0):
+    def analyze_image(self, user_prompt, system_prompt, llm_mode, aggressive_creative, size_limitation, max_tokens, temperature, seed, batch_mode, batch_folder_path, source_path=None, images=None):
         import random
         import time
         
@@ -1105,82 +1108,75 @@ class Qwen3VLAPI:
         timeout = 60
         
         try:
-            if access_method == "Fully Custom":
-                config = self.load_api_config()
-                active_custom = config.get("active_custom", "custom_1")
-                
-                custom_config = config.get("custom_configs", {}).get(active_custom, {})
-                
+            config = self.load_api_config()
+            active_target = config.get("active_target", "SiliconFlow")
+            is_custom = isinstance(active_target, str) and active_target.startswith("custom_")
+
+            if is_custom:
+                custom_config = config.get("custom_configs", {}).get(active_target, {})
                 if not custom_config:
                     custom_configs = config.get("custom_configs", {})
-                    custom_config = None
                     for key in ["custom_1", "custom_2", "custom_3"]:
                         if key in custom_configs and custom_configs[key].get("api_key"):
                             custom_config = custom_configs[key]
+                            active_target = key
                             break
-                    
                     if not custom_config:
                         custom_config = custom_configs.get("custom_1", {})
-                
-                custom_api_key = custom_config.get("api_key", "")
-                custom_api_base = custom_config.get("api_base", "")
-                custom_model_name = custom_config.get("model_name", "")
+                        active_target = "custom_1"
+
+                custom_api_key = custom_config.get("api_key", "").strip()
+                custom_api_base = custom_config.get("api_base", "").strip()
+                custom_model_name = custom_config.get("model_name", "").strip()
                 custom_name = custom_config.get("name", "自定义配置")
-                
-                if not custom_api_key or custom_api_key.strip() == "":
-                    error_msg = "完全自定义模式下必须在通讯配置界面中设置API密钥"
+
+                if not custom_api_key:
+                    error_msg = "自定义配置下必须在通讯配置界面中设置API密钥"
                     status_messages.append(f"❌ 错误: {error_msg}")
                     return ("", "\n".join(status_messages))
-                
-                if not custom_api_base or custom_api_base.strip() == "":
-                    error_msg = "完全自定义模式下必须在通讯配置界面中设置API基础地址"
+                if not custom_api_base:
+                    error_msg = "自定义配置下必须在通讯配置界面中设置API基础地址"
                     status_messages.append(f"❌ 错误: {error_msg}")
                     return ("", "\n".join(status_messages))
-                
-                if not custom_model_name or custom_model_name.strip() == "":
-                    error_msg = "完全自定义模式下必须在通讯配置界面中设置模型名称"
+                if not custom_model_name:
+                    error_msg = "自定义配置下必须在通讯配置界面中设置模型名称"
                     status_messages.append(f"❌ 错误: {error_msg}")
                     return ("", "\n".join(status_messages))
-                
-                api_key = custom_api_key.strip()
-                api_base = custom_api_base.strip()
-                api_model_name = custom_model_name.strip()
+
+                api_key = custom_api_key
+                api_base = custom_api_base
+                api_model_name = custom_model_name
                 platform_name = "自定义"
-                
-                status_messages.append(f"✅ 使用完全自定义配置: {custom_name}")
+
+                status_messages.append(f"✅ 使用自定义配置: {custom_name}")
                 status_messages.append(f"✅ API地址: {api_base}")
                 status_messages.append(f"✅ 模型: {api_model_name}")
-                
             else:
-                config = self.load_api_config()
-                active_platform = config.get("active_platform", "SiliconFlow")
-                
-                selected_platform = active_platform
-                
+                selected_platform = active_target
                 platform_config_data = config.get("api_keys", {}).get(selected_platform, {})
-                api_key = platform_config_data.get("api_key", "")
+                api_key = platform_config_data.get("api_key", "").strip()
                 selected_model = platform_config_data.get("selected_model", "Qwen3-VL-8B-Instruct")
-                
-                if not api_key or api_key.strip() == "":
+
+                if not api_key:
                     error_msg = f"请在配置文件中设置{selected_platform}平台的API密钥，或点击'打开通讯配置界面'按钮进行配置"
                     status_messages.append(f"❌ 错误: {error_msg}")
                     return ("", "\n".join(status_messages))
-                
+
                 platform_config = self.get_platform_config(selected_platform)
                 if not platform_config:
                     error_msg = f"不支持的平台: {selected_platform}"
                     status_messages.append(f"❌ 错误: {error_msg}")
                     return ("", "\n".join(status_messages))
-                
+
                 api_base = platform_config.get("api_base", "")
                 api_model_name = self.get_model_api_name(selected_platform, selected_model)
                 platform_name = selected_platform
-                
+
                 status_messages.append(f"✅ 使用配置文件中的API密钥")
                 status_messages.append(f"✅ 平台: {selected_platform}")
                 status_messages.append(f"✅ 模型: {selected_model} ({api_model_name})")
             
-            final_prompt = self.get_final_prompt(system_prompt, user_prompt)
+                final_prompt = self.get_final_prompt(system_prompt, user_prompt)
             
             if llm_mode:
                 status_messages.append("🔄 正在进行纯文本对话模式调用…")
@@ -1208,9 +1204,9 @@ class Qwen3VLAPI:
                         content_items, video_count = self.build_content_items_from_source(source_path, final_prompt, size_limitation)
                         if video_count > 0:
                             status_messages.append("⚠️ 检测到视频源，外部API模式暂不支持视频，将忽略视频内容。")
-                        if access_method == "Fully Custom":
+                        if platform_name == "自定义":
                             if not api_base:
-                                raise ValueError("自定义模式下必须提供API基础地址")
+                                raise ValueError("自定义配置下必须提供API基础地址")
                             result = self.call_custom_api_with_content(api_base, api_key, content_items, api_model_name, max_tokens, temperature, timeout, None)
                         elif platform_name == "SiliconFlow":
                             result = self.call_siliconflow_api_with_content(api_key, content_items, api_model_name, max_tokens, temperature, timeout, None)

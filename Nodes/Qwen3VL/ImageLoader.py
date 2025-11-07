@@ -21,18 +21,11 @@ class ImageLoader:
         ]
         return {
             "required": {
-                "enable_node": ("BOOLEAN", {"default": True}),
                 "image": (sorted(files), {"image_upload": True}),
             },
         }
 
-    def load_image(self, image, enable_node=True):
-        if not enable_node:
-            
-            empty_image = torch.zeros((1, 64, 64, 3), dtype=torch.float32)
-            empty_mask = torch.zeros((1, 1, 64, 64), dtype=torch.float32)
-            return ("", empty_image, empty_mask)
-            
+    def load_image(self, image):
         image_path = folder_paths.get_annotated_filepath(image)
         
         img = Image.open(image_path)
