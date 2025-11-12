@@ -16,15 +16,16 @@
 
 ### **核心功能特色 | Core Function Features**
 
-- 🔄 **双语翻译节点**：提供百度翻译、腾讯翻译、免费在线翻译三节点，支持中英文本双向转换。
+- 🔄 **双语翻译节点**：提供百度翻译、腾讯翻译、免费在线翻译三节点，支持中英文本双向转换。<br>
 **Bilingual Translation Nodes**: Provides three translation nodes - Baidu Translate, Tencent Translate, and Free Online Translate, supporting bidirectional Chinese-English text conversion.
 
-- 📝 **全面文本处理**：提供多行文本编辑、文本合并分离、内容提取修改、语言过滤等5类文本操作节点。**Comprehensive Text Processing**: Provides 5 categories of text operation nodes including multi-line text editing, text merging and separation, content extraction and modification, language filtering, etc.
+- 📝 **全面文本处理**：提供多行文本编辑、文本合并分离、内容提取修改、语言过滤等5类文本操作节点。<br>
+  **Comprehensive Text Processing**: Provides 5 categories of text operation nodes including multi-line text editing, text merging and separation, content extraction and modification, language filtering, etc.
 
-- 🎯 **智能提示词系统**：标签选择器、Kontext预设增强版、摄影提示词生成器、万相视频提示词生成器等专业的提示词生成工具。
+- 🎯 **智能提示词系统**：标签选择器、Kontext预设增强版、摄影提示词生成器、万相视频提示词生成器等专业的提示词生成工具。<br>
 **Intelligent Prompt System**: Professional prompt generation tools including Kontext Presets Enhanced, Photography Prompt Generator, WAN Video Prompt Generator, etc.
 
-- 🖼️ **实用图像工具**：支持多算法图像缩放、智能切换、颜色移除等等。
+- 🖼️ **实用图像工具**：支持多算法图像缩放、智能切换、颜色移除等等。<br>
 **Practical Image Tools**: Supports multi-algorithm image scaling, intelligent switching, color removal, and more.
 
 ## ⭐ 明星节点 | Featured Nodes
@@ -70,14 +71,14 @@
 </tr>
 </table>
 
-💡 **使用建议**：新用户建议从 **标签选择器** 和 **万相视频提示词生成器** 开始体验，这两个节点能够快速提升您的创作效率和作品质量。
-**Usage Recommendation**: New users are recommended to start with **TagSelector** and **Wan Prompt Generator**, these two nodes can quickly improve your creative efficiency and work quality.
+💡 **使用建议**：新用户建议从 **标签选择器** 开始体验，快速提升您的创作灵感和效率。<br>
+**Usage Recommendation**: New users are encouraged to start with the **Tag Selector** to quickly boost your creative inspiration and efficiency.
 
 ---
 
 ## 🛠️ 节点功能说明 | Node Function Description
 
-本节点集包含众多功能各异的节点，分为以下几个主要类别：
+本节点集包含众多功能各异的节点，分为以下几个主要类别：<br>
 This node collection contains numerous nodes with different functions, divided into the following main categories:
 
 ### 📝 文本处理类节点 | Text Processing Nodes
@@ -137,11 +138,16 @@ This node collection contains numerous nodes with different functions, divided i
 使用多种LLM模型对输入文本进行智能扩写和创意增强，支持字符量控制和自定义系统引导词。<br>Uses multiple LLM models for intelligent expansion and creative enhancement of input text, supporting character count control and custom system prompts.
 
 <b>特点 | Features</b>：
-- <b>多模型支持 | Multi-model Support</b>：支持claude、deepseek、gemini、openai、mistral、qwen-coder、llama、sur、unity、searchgpt、evil等11种AI模型<br>Supports 11 AI models including claude, deepseek, gemini, openai, mistral, qwen-coder, llama, sur, unity, searchgpt, evil
-- <b>字符量控制 | Character Count Control</b>：可精确控制输出文本的字符数量，确保生成内容符合要求<br>Precisely controls the character count of output text, ensuring generated content meets requirements
-- <b>创意温度调节 | Creative Temperature Control</b>：通过温度参数控制生成内容的创意程度（0.1-2.0）<br>Controls the creativity level of generated content through temperature parameters (0.1-2.0)
-- <b>系统引导词 | System Prompts</b>：支持自定义系统引导词，引导AI生成特定风格的内容<br>Supports custom system prompts to guide AI in generating content with specific styles
-- <b>灵活输入 | Flexible Input</b>：支持直接输入系统引导词或通过外部节点加载<br>Supports direct input of system prompts or loading through external nodes
+- <b>多模型支持 | Multi-model Support</b>：支持claude、deepseek、gemini、openai、mistral、qwen-coder、llama、sur、unity、searchgpt、evil等11种AI模型<br>
+Supports 11 AI models including claude, deepseek, gemini, openai, mistral, qwen-coder, llama, sur, unity, searchgpt, evil
+- <b>字符量控制 | Character Count Control</b>：可精确控制输出文本的字符数量，确保生成内容符合要求<br>
+Precisely controls the character count of output text, ensuring generated content meets requirements
+- <b>创意温度调节 | Creative Temperature Control</b>：通过温度参数控制生成内容的创意程度（0.1-2.0）<br>
+Controls the creativity level of generated content through temperature parameters (0.1-2.0)
+- <b>系统引导词 | System Prompts</b>：支持自定义系统引导词，引导AI生成特定风格的内容<br>
+Supports custom system prompts to guide AI in generating content with specific styles
+- <b>灵活输入 | Flexible Input</b>：支持直接输入系统引导词或通过外部节点加载<br>
+Supports direct input of system prompts or loading through external nodes
 
 <div align="left">
 <a href="images/提示词扩展(通用).jpg" target="_blank">
@@ -544,6 +550,35 @@ This node collection contains numerous nodes with different functions, divided i
 <div align="left">
 <a href="images/Song Style Prompt Generator.jpg" target="_blank">
 <img src="images/Song Style Prompt Generator.jpg" alt="Suno歌曲风格提示词生成器" width="45%"/>
+</a>
+</div>
+
+</td>
+</tr>
+</table>
+
+### 📁 模型加载器类节点 | Model Loader Nodes
+
+<table>
+<tr>
+<th width="30%">节点名称 | Node Name</th>
+<th>功能描述 | Function Description</th>
+</tr>
+<tr>
+<td><b>自由检查点加载器</b><br><b>Free Checkpoint Loader</b><br><code>FreeCheckpointLoader</code></td>
+<td>
+突破传统限制的高级模型加载器，支持自定义路径管理和动态模型发现，通过Web界面实现路径的添加和管理。<br>An advanced model loader that breaks through traditional limitations, supporting custom path management and dynamic model discovery. Paths can be added and managed through a web interface.
+<b>核心功能 | Core Features</b>：
+- <b>自定义路径支持 | Custom Path Support</b>：通过Web界面添加和管理任意路径下的模型文件<br>Add and manage model files in arbitrary paths through web interface
+- <b>智能路径扫描 | Intelligent Path Scanning</b>：自动扫描指定路径发现可用模型并更新列表<br>Automatically scans specified paths to discover available models and update the list
+
+<br>
+<div align="left">
+<a href="images/Free Checkpoint Loader1.jpg" target="_blank">
+<img src="images/Free Checkpoint Loader1.jpg" alt="自由检查点加载器1" width="45%"/>
+</a>
+<a href="images/Free Checkpoint Loader2.jpg" target="_blank">
+<img src="images/Free Checkpoint Loader2.jpg" alt="自由检查点加载器2" width="45%"/>
 </a>
 </div>
 

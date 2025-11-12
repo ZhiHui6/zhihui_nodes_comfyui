@@ -847,22 +847,22 @@
         },
         "outputs": {
             "result":"结果",
-            "status":"状态"
-            
+            "status":"状态"   
         }
     },
-    "FreeLoraLoader": {
-        "title": "自由LORA加载器",
-        "description": "自由LORA加载器：可以加载任意路径的LORA模型文件，支持跨路径访问和可视化文件浏览。提供强大的文件管理功能，支持多种LORA格式，包括LoRA、LyCORIS和Textual Inversion等。",
+    "FreeCheckpointLoader": {
+        "title": "自由检查点加载器",
+        "description": "通过Web界面加载支持自定义路径的扩散模型检查点",
         "inputs": {
-            "model": "模型",
-            "strength_model": "模型强度"
+            "ckpt_name": "CKPT名称"
         },
         "outputs": {
-            "model": "模型"
+            "MODEL": "模型",
+            "CLIP": "CLIP", 
+            "VAE": "VAE"
         },
-        "widgets": {
-            "strength_model": "模型强度"
+        "tooltips": {
+            "ckpt_name": "要加载的检查点（模型）名称，支持从自定义路径扫描的模型文件"
         }
     }
 }

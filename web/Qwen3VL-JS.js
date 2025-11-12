@@ -58,7 +58,6 @@ class APIConfigManager {
                         }
                     });
                 }
-                // 统一激活目标，兼容旧配置
                 if (fileConfig.active_target) {
                     this.config.active_target = fileConfig.active_target;
                 } else if (fileConfig.active_platform) {
@@ -259,7 +258,6 @@ class APIConfigManager {
         document.body.appendChild(dialog);
         
         this.renderPlatformConfigs(config);
-        // 自定义配置并入平台服务配置，不再单独渲染
         this.attachActiveTargetHandlers(dialog);
 
         const closeDialog = () => {
@@ -321,7 +319,7 @@ class APIConfigManager {
             const isActive = activeTarget === platform;
             
             const platformDiv = document.createElement("div");
-            const condensedPlatforms = ["SiliconFlow", "ModelScope", "Aliyun"]; // 自适应高度的平台
+            const condensedPlatforms = ["SiliconFlow", "ModelScope", "Aliyun"];
             const isCondensed = condensedPlatforms.includes(platform);
             platformDiv.style.cssText = `
                 padding: 10px;
@@ -442,7 +440,6 @@ class APIConfigManager {
                 </div>
             `;
 
-            // 标记卡片属性与初始值，用于脏检测
             platformDiv.dataset.cardType = "platform";
             platformDiv.dataset.cardKey = platform;
             platformDiv.dataset.initialModel = selectedModel;
@@ -451,7 +448,6 @@ class APIConfigManager {
             gridContainer.appendChild(platformDiv);
         });
 
-        // 并入：渲染自定义配置卡片
         const customConfigs = config.custom_configs || {};
         ['custom_1', 'custom_2', 'custom_3'].forEach(customKey => {
             const customConfig = customConfigs[customKey] || {};
@@ -601,7 +597,6 @@ class APIConfigManager {
                 </div>
             `;
 
-            // 标记卡片属性与初始值，用于脏检测
             customDiv.dataset.cardType = "custom";
             customDiv.dataset.cardKey = customKey;
             customDiv.dataset.initialName = customConfig.name || `自定义配置${customKey.slice(-1)}`;
@@ -653,7 +648,6 @@ class APIConfigManager {
             });
         });
 
-        // 动态保存按钮与脏检测：平台卡片
         container.querySelectorAll('[data-card-type="platform"]').forEach(card => {
             const key = card.dataset.cardKey;
             const selectEl = card.querySelector(`select[data-platform-model="${key}"]`);
@@ -696,12 +690,10 @@ class APIConfigManager {
                 if (keyInput && card.dataset.initialApiKey !== undefined) {
                     keyInput.value = card.dataset.initialApiKey;
                 }
-                // 重置后隐藏保存栏
                 saveContainer.style.visibility = 'hidden';
             });
         });
 
-        // 动态保存按钮与脏检测：自定义卡片
         container.querySelectorAll('[data-card-type="custom"]').forEach(card => {
             const key = card.dataset.cardKey;
             const nameInput = card.querySelector(`input[data-custom="${key}_name"]`);
@@ -755,12 +747,10 @@ class APIConfigManager {
                 if (apiKey && card.dataset.initialApiKey !== undefined) {
                     apiKey.value = card.dataset.initialApiKey;
                 }
-                // 重置后隐藏保存栏
                 saveContainer.style.visibility = 'hidden';
             });
         });
 
-        // 聚焦高亮边框
         gridContainer.addEventListener('focusin', (e) => {
             const interactiveEl = e.target.closest('input, select, button');
             if (!interactiveEl) return;
@@ -982,14 +972,12 @@ class APIConfigManager {
         radios.forEach(radio => {
             radio.addEventListener('change', async () => {
                 updateAll();
-                // 即时生效：更新 active_target 并保存
                 const newTarget = radio.value;
                 if (newTarget && self.config) {
                     const newConfig = { ...self.config, active_target: newTarget };
                     const ok = await self.saveConfig(newConfig);
                     if (ok) {
                         self.config.active_target = newTarget;
-                        // 轻量提示（不打断）
                         console.log(`active_target 已更新为 ${newTarget}`);
                     } else {
                         console.warn('激活更新失败，请稍后重试。');
@@ -997,7 +985,6 @@ class APIConfigManager {
                 }
             });
         });
-        // 初始化一次，避免出现多个绿色标签
         updateAll();
     }
 
@@ -1065,8 +1052,8 @@ class APIConfigManager {
             const field = input.dataset.custom;
             const parts = field.split('_');
             if (parts.length >= 3 && parts[0] === 'custom') {
-                const customKey = `${parts[0]}_${parts[1]}`; // custom_1, custom_2, custom_3
-                const fieldName = parts.slice(2).join('_'); // name, api_base, model_name, api_key
+                const customKey = `${parts[0]}_${parts[1]}`;
+                const fieldName = parts.slice(2).join('_');
                 
                 if (['custom_1', 'custom_2', 'custom_3'].includes(customKey)) {
                     if (!newConfig.custom_configs[customKey]) {

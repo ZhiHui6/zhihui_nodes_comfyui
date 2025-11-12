@@ -46,7 +46,7 @@ from .Nodes.Qwen3VL.PathSwitch import PathSwitch
 from .Nodes.ImageRotateTool import ImageRotateTool
 from .Nodes.ImageFormatConverter import ImageFormatConverter
 from .Nodes.Qwen3VL.Qwen3VLAPI import Qwen3VLAPI
-from .Nodes.FreeLoraLoader.FreeLoraLoader import FreeLoraLoader
+from .Nodes.FreeLoaders.FreeCheckpointLoader import FreeCheckpointLoader
 
 import os
 
@@ -99,7 +99,7 @@ NODE_CLASS_MAPPINGS = {
     "ImageRotateTool": ImageRotateTool,
     "ImageFormatConverter": ImageFormatConverter,
     "Qwen3VLAPI": Qwen3VLAPI,
-    "FreeLoraLoader": FreeLoraLoader,
+    "FreeCheckpointLoader": FreeCheckpointLoader,
 }
 
 NODE_DISPLAY_NAME_MAPPINGS = {
@@ -151,9 +151,9 @@ NODE_DISPLAY_NAME_MAPPINGS = {
     "ImageRotateTool": "Image Rotate Tool",
     "ImageFormatConverter": "Image Format Converter",
     "Qwen3VLAPI": "Qwen3-VL API",
-    "FreeLoraLoader": "Free LoRA Loader",
+    "FreeCheckpointLoader": "Free Checkpoint Loader",
 }
 
-WEB_DIRECTORY = os.path.dirname(os.path.abspath(__file__))
+WEB_DIRECTORY = os.path.join(os.path.dirname(os.path.abspath(__file__)), "web")
 
 __all__ = ['NODE_CLASS_MAPPINGS', 'NODE_DISPLAY_NAME_MAPPINGS', "WEB_DIRECTORY"]
