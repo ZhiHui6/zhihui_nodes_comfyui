@@ -1,1 +1,1208 @@
-{"id":"5a56acff-5d7f-4fb2-aa4d-4a032dbfc6de","revision":0,"last_node_id":49,"last_link_id":35,"nodes":[{"id":24,"type":"QwenLoader","pos":[380,-1240],"size":[350,120],"flags":{},"order":0,"mode":0,"inputs":[{"label":"model","localized_name":"model","name":"model","type":"COMBO","widget":{"name":"model"},"link":null},{"label":"load_device","localized_name":"load_device","name":"load_device","type":"COMBO","widget":{"name":"load_device"},"link":null},{"label":"precision","localized_name":"precision","name":"precision","type":"COMBO","widget":{"name":"precision"},"link":null}],"outputs":[{"label":"QWENMODEL","localized_name":"QWENMODEL","name":"QWENMODEL","type":"QWENMODEL","links":[12]}],"properties":{"cnr_id":"ComfyUI-WanVideoWrapper","ver":"78a7e20838a8944cbbfee0d58abd886a1d34ed76","Node name for S&R":"QwenLoader","enableTabs":false,"tabWidth":65,"tabXOffset":10,"hasSecondTab":false,"secondTabText":"Send Back","secondTabOffset":80,"secondTabWidth":65,"widget_ue_connectable":{}},"widgets_values":["Qwen2.5_3B_instruct_bf16.safetensors","main_device","bf16"]},{"id":9,"type":"WanPromptGenerator","pos":[390,-680],"size":[360,641],"flags":{},"order":1,"mode":0,"inputs":[{"label":"自定义系统提示","localized_name":"custom_system_prompt","name":"custom_system_prompt","shape":7,"type":"STRING","link":null},{"localized_name":"启用节点","name":"enable_node","shape":7,"type":"BOOLEAN","widget":{"name":"enable_node"},"link":null},{"localized_name":"主体类型","name":"subject_type","shape":7,"type":"COMBO","widget":{"name":"subject_type"},"link":null},{"localized_name":"角色情感","name":"character_emotion","shape":7,"type":"COMBO","widget":{"name":"character_emotion"},"link":null},{"localized_name":"动作姿态","name":"action_pose","shape":7,"type":"COMBO","widget":{"name":"action_pose"},"link":null},{"localized_name":"场景类型","name":"scene_type","shape":7,"type":"COMBO","widget":{"name":"scene_type"},"link":null},{"localized_name":"光源","name":"light_source","shape":7,"type":"COMBO","widget":{"name":"light_source"},"link":null},{"localized_name":"光线类型","name":"light_type","shape":7,"type":"COMBO","widget":{"name":"light_type"},"link":null},{"localized_name":"时间段","name":"time_period","shape":7,"type":"COMBO","widget":{"name":"time_period"},"link":null},{"localized_name":"镜头类型","name":"shot_type","shape":7,"type":"COMBO","widget":{"name":"shot_type"},"link":null},{"localized_name":"构图","name":"composition","shape":7,"type":"COMBO","widget":{"name":"composition"},"link":null},{"localized_name":"镜头焦距","name":"lens_focal_length","shape":7,"type":"COMBO","widget":{"name":"lens_focal_length"},"link":null},{"localized_name":"相机角度","name":"camera_angle","shape":7,"type":"COMBO","widget":{"name":"camera_angle"},"link":null},{"localized_name":"镜头类型","name":"lens_type","shape":7,"type":"COMBO","widget":{"name":"lens_type"},"link":null},{"localized_name":"色调","name":"color_tone","shape":7,"type":"COMBO","widget":{"name":"color_tone"},"link":null},{"localized_name":"相机运动","name":"camera_movement","shape":7,"type":"COMBO","widget":{"name":"camera_movement"},"link":null},{"localized_name":"运动类型","name":"motion_type","shape":7,"type":"COMBO","widget":{"name":"motion_type"},"link":null},{"localized_name":"视觉风格","name":"visual_style","shape":7,"type":"COMBO","widget":{"name":"visual_style"},"link":null},{"localized_name":"特殊效果","name":"special_effect","shape":7,"type":"COMBO","widget":{"name":"special_effect"},"link":null},{"localized_name":"预设组合","name":"preset_combination","shape":7,"type":"COMBO","widget":{"name":"preset_combination"},"link":null},{"localized_name":"添加前缀","name":"add_prefix","shape":7,"type":"BOOLEAN","widget":{"name":"add_prefix"},"link":null},{"localized_name":"启用扩写","name":"enable_expansion","shape":7,"type":"BOOLEAN","widget":{"name":"enable_expansion"},"link":null},{"localized_name":"模型品牌","name":"model_brand","shape":7,"type":"COMBO","widget":{"name":"model_brand"},"link":null},{"localized_name":"补充文本","name":"supplementary_text","shape":7,"type":"STRING","widget":{"name":"supplementary_text"},"link":null},{"label":"自定系统引导词","localized_name":"自定系统引导词","name":"自定系统引导词","shape":7,"type":"STRING","link":null}],"outputs":[{"label":"源提示词","localized_name":"source_prompt","name":"source_prompt","type":"STRING","links":[2,34]},{"label":"提示词输出","localized_name":"prompt_output","name":"prompt_output","type":"STRING","links":null}],"properties":{"aux_id":"ZhiHui6/zhihui_nodes_comfyui","ver":"27c9d64fa8a24ff6e5b832beb4387600d870897a","Node name for S&R":"WanPromptGenerator","enableTabs":false,"tabWidth":65,"tabXOffset":10,"hasSecondTab":false,"secondTabText":"Send Back","secondTabOffset":80,"secondTabWidth":65,"widget_ue_connectable":{}},"widgets_values":[false,"随机","随机","随机","随机","随机","随机","随机","随机","随机","随机","随机","随机","随机","随机","随机","随机","随机","不使用预设",false,false,"openai",""]},{"id":46,"type":"WanPromptGenerator","pos":[1610,-1120],"size":[330,636],"flags":{},"order":14,"mode":0,"inputs":[{"label":"自定义系统提示","localized_name":"custom_system_prompt","name":"custom_system_prompt","shape":7,"type":"STRING","link":29},{"localized_name":"启用节点","name":"enable_node","shape":7,"type":"BOOLEAN","widget":{"name":"enable_node"},"link":null},{"localized_name":"主体类型","name":"subject_type","shape":7,"type":"COMBO","widget":{"name":"subject_type"},"link":null},{"localized_name":"角色情感","name":"character_emotion","shape":7,"type":"COMBO","widget":{"name":"character_emotion"},"link":null},{"localized_name":"动作姿态","name":"action_pose","shape":7,"type":"COMBO","widget":{"name":"action_pose"},"link":null},{"localized_name":"场景类型","name":"scene_type","shape":7,"type":"COMBO","widget":{"name":"scene_type"},"link":null},{"localized_name":"光源","name":"light_source","shape":7,"type":"COMBO","widget":{"name":"light_source"},"link":null},{"localized_name":"光线类型","name":"light_type","shape":7,"type":"COMBO","widget":{"name":"light_type"},"link":null},{"localized_name":"时间段","name":"time_period","shape":7,"type":"COMBO","widget":{"name":"time_period"},"link":null},{"localized_name":"镜头类型","name":"shot_type","shape":7,"type":"COMBO","widget":{"name":"shot_type"},"link":null},{"localized_name":"构图","name":"composition","shape":7,"type":"COMBO","widget":{"name":"composition"},"link":null},{"localized_name":"镜头焦距","name":"lens_focal_length","shape":7,"type":"COMBO","widget":{"name":"lens_focal_length"},"link":null},{"localized_name":"相机角度","name":"camera_angle","shape":7,"type":"COMBO","widget":{"name":"camera_angle"},"link":null},{"localized_name":"镜头类型","name":"lens_type","shape":7,"type":"COMBO","widget":{"name":"lens_type"},"link":null},{"localized_name":"色调","name":"color_tone","shape":7,"type":"COMBO","widget":{"name":"color_tone"},"link":null},{"localized_name":"相机运动","name":"camera_movement","shape":7,"type":"COMBO","widget":{"name":"camera_movement"},"link":null},{"localized_name":"运动类型","name":"motion_type","shape":7,"type":"COMBO","widget":{"name":"motion_type"},"link":null},{"localized_name":"视觉风格","name":"visual_style","shape":7,"type":"COMBO","widget":{"name":"visual_style"},"link":null},{"localized_name":"特殊效果","name":"special_effect","shape":7,"type":"COMBO","widget":{"name":"special_effect"},"link":null},{"localized_name":"预设组合","name":"preset_combination","shape":7,"type":"COMBO","widget":{"name":"preset_combination"},"link":null},{"localized_name":"添加前缀","name":"add_prefix","shape":7,"type":"BOOLEAN","widget":{"name":"add_prefix"},"link":null},{"localized_name":"启用扩写","name":"enable_expansion","shape":7,"type":"BOOLEAN","widget":{"name":"enable_expansion"},"link":null},{"localized_name":"模型品牌","name":"model_brand","shape":7,"type":"COMBO","widget":{"name":"model_brand"},"link":null},{"localized_name":"补充文本","name":"supplementary_text","shape":7,"type":"STRING","widget":{"name":"supplementary_text"},"link":null}],"outputs":[{"label":"源提示词","localized_name":"source_prompt","name":"source_prompt","type":"STRING","links":[27]},{"label":"提示词输出","localized_name":"prompt_output","name":"prompt_output","type":"STRING","links":[28]}],"properties":{"aux_id":"ZhiHui6/zhihui_nodes_comfyui","ver":"96e4f1cfd665ecfa4d328241148840cf4115b108","Node name for S&R":"WanPromptGenerator"},"widgets_values":[true,"随机","随机","随机","随机","随机","随机","随机","随机","随机","随机","随机","随机","随机","随机","随机","随机","随机","不使用预设",true,true,"openai-large",""]},{"id":44,"type":"ShowText","pos":[1960,-1240],"size":[400,230],"flags":{},"order":17,"mode":0,"inputs":[{"label":"文本","localized_name":"text","name":"text","type":"STRING","link":27}],"outputs":[{"label":"字符串","localized_name":"字符串","name":"STRING","shape":6,"type":"STRING","links":null}],"properties":{"aux_id":"ZhiHui6/zhihui_nodes_comfyui","ver":"96e4f1cfd665ecfa4d328241148840cf4115b108","Node name for S&R":"ShowText"},"widgets_values":[]},{"id":40,"type":"Note","pos":[1960,-700],"size":[400,120],"flags":{},"order":4,"mode":0,"inputs":[],"outputs":[],"properties":{"widget_ue_connectable":{}},"widgets_values":["⚠️自行将“万相视频提示词生成器”的输出端与万相2.2工作流中的Clip提示词输入框连接即可组成完整的工作流。"],"color":"#432","bgcolor":"#653"},{"id":45,"type":"ShowText","pos":[1960,-950],"size":[400,200],"flags":{},"order":18,"mode":0,"inputs":[{"label":"文本","localized_name":"text","name":"text","type":"STRING","link":28}],"outputs":[{"label":"字符串","localized_name":"字符串","name":"STRING","shape":6,"type":"STRING","links":null}],"properties":{"aux_id":"ZhiHui6/zhihui_nodes_comfyui","ver":"96e4f1cfd665ecfa4d328241148840cf4115b108","Node name for S&R":"ShowText"},"widgets_values":[]},{"id":47,"type":"SystemPromptLoader","pos":[390,-1780],"size":[340,60],"flags":{},"order":5,"mode":0,"inputs":[{"localized_name":"系统预设","name":"system_preset","type":"COMBO","widget":{"name":"system_preset"},"link":null}],"outputs":[{"label":"系统提示词","localized_name":"system_prompt","name":"system_prompt","type":"STRING","links":[30,31]}],"properties":{"aux_id":"ZhiHui6/zhihui_nodes_comfyui","ver":"96e4f1cfd665ecfa4d328241148840cf4115b108","Node name for S&R":"SystemPromptLoader"},"widgets_values":["中文预设/生视频扩写/万相提示词优化"]},{"id":32,"type":"ShowText|pysssss","pos":[390,-1670],"size":[340,320],"flags":{},"order":12,"mode":0,"inputs":[{"localized_name":"text","name":"text","type":"STRING","link":31}],"outputs":[{"label":"字符串","localized_name":"字符串","name":"STRING","shape":6,"type":"STRING","links":null}],"properties":{"cnr_id":"comfyui-custom-scripts","ver":"aac13aa7ce35b07d43633c3bbe654a38c00d74f5","Node name for S&R":"ShowText|pysssss","enableTabs":false,"tabWidth":65,"tabXOffset":10,"hasSecondTab":false,"secondTabText":"Send Back","secondTabOffset":80,"secondTabWidth":65,"widget_ue_connectable":{}},"widgets_values":["你是万相2.2视频提示词优化专家，请将用户提供的文本详细地扩写出更多丰富的细节，转换为专业的视频生成提示词。\n\n规则：\n1.输出格式：中文逗号分隔，总长度300-500个字符。\n2.必须包含：光线类型+时间段+景别\n3.根据内容自动添加：构图、色调、运镜、风格等。\n\n元素选择：\n光线：日光/人工光/月光/火光/柔光/硬光/顶光/侧光/背光/边缘光\n时间：白天/夜晚/黄昏/日落/日出/黎明\n景别：特写/中近景/中景/全景/远景\n运镜：推镜头/拉镜头/跟拍/环绕/手持\n色调：暖色调/冷色调/高饱和度/低饱和度\n\n示例：\n输入：一个女孩在海边\n输出：日落，柔光，边缘光，中景，一个女孩站在海边凝望远方，海浪轻轻拍打，暖色调\n\n直接输出结果，无需解释。"]},{"id":26,"type":"WanVideoPromptExtender","pos":[740,-1600],"size":[340,252],"flags":{},"order":13,"mode":0,"inputs":[{"label":"qwen","localized_name":"qwen","name":"qwen","type":"QWENMODEL","link":13},{"label":"custom_system_prompt","localized_name":"custom_system_prompt","name":"custom_system_prompt","shape":7,"type":"STRING","link":30},{"label":"prompt","localized_name":"prompt","name":"prompt","type":"STRING","widget":{"name":"prompt"},"link":null},{"label":"max_new_tokens","localized_name":"max_new_tokens","name":"max_new_tokens","type":"INT","widget":{"name":"max_new_tokens"},"link":null},{"label":"device","localized_name":"device","name":"device","type":"COMBO","widget":{"name":"device"},"link":null},{"label":"force_offload","localized_name":"force_offload","name":"force_offload","type":"BOOLEAN","widget":{"name":"force_offload"},"link":null},{"label":"system_prompt","localized_name":"system_prompt","name":"system_prompt","shape":7,"type":"COMBO","widget":{"name":"system_prompt"},"link":null},{"label":"seed","localized_name":"seed","name":"seed","shape":7,"type":"INT","widget":{"name":"seed"},"link":null}],"outputs":[{"label":"STRING","localized_name":"字符串","name":"STRING","type":"STRING","links":[15]}],"properties":{"cnr_id":"ComfyUI-WanVideoWrapper","ver":"78a7e20838a8944cbbfee0d58abd886a1d34ed76","Node name for S&R":"WanVideoPromptExtender","enableTabs":false,"tabWidth":65,"tabXOffset":10,"hasSecondTab":false,"secondTabText":"Send Back","secondTabOffset":80,"secondTabWidth":65,"widget_ue_connectable":{}},"widgets_values":["一位女教师",512,"gpu",true,"T2V Movie Director (Chinese)",[false,true],"randomize"]},{"id":28,"type":"easy showAnything","pos":[1090,-1780],"size":[350,230],"flags":{},"order":16,"mode":0,"inputs":[{"label":"输入任何","localized_name":"输入任何","name":"anything","shape":7,"type":"*","link":15}],"outputs":[{"localized_name":"输出","name":"output","type":"*","links":null}],"properties":{"cnr_id":"comfyui-easy-use","ver":"717092a3ceb51c474b5b3f77fc188979f0db9d67","Node name for S&R":"easy showAnything","enableTabs":false,"tabWidth":65,"tabXOffset":10,"hasSecondTab":false,"secondTabText":"Send Back","secondTabOffset":80,"secondTabWidth":65,"widget_ue_connectable":{}},"widgets_values":["日出，人工光，顶光，中近景，一位女教师站在教室中央，手中拿着粉笔，眼神温柔，充满关爱，暖色调，推镜头，拉镜头，跟拍，风格温暖柔和"]},{"id":39,"type":"Note","pos":[1090,-1500],"size":[350,90],"flags":{},"order":6,"mode":0,"inputs":[],"outputs":[],"properties":{"widget_ue_connectable":{}},"widgets_values":["⚠️自行将Wan Video Prompt Extender的输出端与万相2.2工作流中的Clip提示词输入框连接即可组成完整的工作流。"],"color":"#432","bgcolor":"#653"},{"id":27,"type":"QwenLoader","pos":[740,-1780],"size":[340,120],"flags":{},"order":7,"mode":0,"inputs":[{"label":"model","localized_name":"model","name":"model","type":"COMBO","widget":{"name":"model"},"link":null},{"label":"load_device","localized_name":"load_device","name":"load_device","type":"COMBO","widget":{"name":"load_device"},"link":null},{"label":"precision","localized_name":"precision","name":"precision","type":"COMBO","widget":{"name":"precision"},"link":null}],"outputs":[{"label":"QWENMODEL","localized_name":"QWENMODEL","name":"QWENMODEL","type":"QWENMODEL","links":[13]}],"properties":{"cnr_id":"ComfyUI-WanVideoWrapper","ver":"78a7e20838a8944cbbfee0d58abd886a1d34ed76","Node name for S&R":"QwenLoader","enableTabs":false,"tabWidth":65,"tabXOffset":10,"hasSecondTab":false,"secondTabText":"Send Back","secondTabOffset":80,"secondTabWidth":65,"widget_ue_connectable":{}},"widgets_values":["Qwen2.5_3B_instruct_bf16.safetensors","main_device","bf16"]},{"id":42,"type":"SystemPromptLoader","pos":[1600,-1240],"size":[340,60],"flags":{},"order":8,"mode":0,"inputs":[{"localized_name":"系统预设","name":"system_preset","type":"COMBO","widget":{"name":"system_preset"},"link":null}],"outputs":[{"label":"系统提示词","localized_name":"system_prompt","name":"system_prompt","type":"STRING","links":[29]}],"properties":{"aux_id":"ZhiHui6/zhihui_nodes_comfyui","ver":"96e4f1cfd665ecfa4d328241148840cf4115b108","Node name for S&R":"SystemPromptLoader"},"widgets_values":["中文预设/生视频扩写/万相提示词优化"]},{"id":48,"type":"SystemPromptLoader","pos":[380,-1060],"size":[340,60],"flags":{},"order":9,"mode":0,"inputs":[{"localized_name":"系统预设","name":"system_preset","type":"COMBO","widget":{"name":"system_preset"},"link":null}],"outputs":[{"label":"系统提示词","localized_name":"system_prompt","name":"system_prompt","type":"STRING","links":[32]}],"properties":{"aux_id":"ZhiHui6/zhihui_nodes_comfyui","ver":"96e4f1cfd665ecfa4d328241148840cf4115b108","Node name for S&R":"SystemPromptLoader"},"widgets_values":["中文预设/生视频扩写/万相提示词优化"]},{"id":21,"type":"MultiLineTextNode","pos":[390,-940],"size":[340,190],"flags":{},"order":2,"mode":0,"inputs":[{"label":"启用节点","localized_name":"enable_node","name":"enable_node","type":"BOOLEAN","widget":{"name":"enable_node"},"link":null},{"label":"注释","localized_name":"comment","name":"comment","type":"STRING","widget":{"name":"comment"},"link":null},{"label":"文本内容","localized_name":"text_content","name":"text_content","type":"STRING","widget":{"name":"text_content"},"link":null}],"outputs":[{"label":"文本输出","localized_name":"text_output","name":"text_output","type":"STRING","links":[33]}],"properties":{"aux_id":"ZhiHui6/zhihui_nodes_comfyui","ver":"59026c974ca2688cb2fe0e21b22e0fd084cf4fd4","Node name for S&R":"MultiLineTextNode","enableTabs":false,"tabWidth":65,"tabXOffset":10,"hasSecondTab":false,"secondTabText":"Send Back","secondTabOffset":80,"secondTabWidth":65,"widget_ue_connectable":{}},"widgets_values":["用户提示词",true,"年轻美丽的教师"]},{"id":49,"type":"TextSwitchDualMode","pos":[800,-940],"size":[210,238],"flags":{},"order":11,"mode":0,"inputs":[{"label":"文本1","localized_name":"text1","name":"text1","shape":7,"type":"STRING","link":33},{"label":"文本2","localized_name":"text2","name":"text2","shape":7,"type":"STRING","link":34},{"label":"文本3","localized_name":"text3","name":"text3","shape":7,"type":"STRING","link":null},{"label":"文本4","localized_name":"text4","name":"text4","shape":7,"type":"STRING","link":null},{"localized_name":"mode","name":"mode","type":"COMBO","widget":{"name":"mode"},"link":null},{"localized_name":"select_text","name":"select_text","type":"COMBO","widget":{"name":"select_text"},"link":null},{"localized_name":"text1_comment","name":"text1_comment","type":"STRING","widget":{"name":"text1_comment"},"link":null},{"localized_name":"text2_comment","name":"text2_comment","type":"STRING","widget":{"name":"text2_comment"},"link":null},{"localized_name":"text3_comment","name":"text3_comment","type":"STRING","widget":{"name":"text3_comment"},"link":null},{"localized_name":"text4_comment","name":"text4_comment","type":"STRING","widget":{"name":"text4_comment"},"link":null}],"outputs":[{"label":"输出文本","localized_name":"output_text","name":"output_text","type":"STRING","links":[35]}],"properties":{"aux_id":"ZhiHui6/zhihui_nodes_comfyui","ver":"96e4f1cfd665ecfa4d328241148840cf4115b108","Node name for S&R":"TextSwitchDualMode"},"widgets_values":["manual","1","","","",""]},{"id":19,"type":"WanVideoPromptExtender","pos":[1140,-1230],"size":[430,252],"flags":{},"order":15,"mode":0,"inputs":[{"label":"qwen","localized_name":"qwen","name":"qwen","type":"QWENMODEL","link":12},{"label":"custom_system_prompt","localized_name":"custom_system_prompt","name":"custom_system_prompt","shape":7,"type":"STRING","link":32},{"label":"prompt","localized_name":"prompt","name":"prompt","type":"STRING","widget":{"name":"prompt"},"link":35},{"label":"max_new_tokens","localized_name":"max_new_tokens","name":"max_new_tokens","type":"INT","widget":{"name":"max_new_tokens"},"link":null},{"label":"device","localized_name":"device","name":"device","type":"COMBO","widget":{"name":"device"},"link":null},{"label":"force_offload","localized_name":"force_offload","name":"force_offload","type":"BOOLEAN","widget":{"name":"force_offload"},"link":null},{"label":"system_prompt","localized_name":"system_prompt","name":"system_prompt","shape":7,"type":"COMBO","widget":{"name":"system_prompt"},"link":null},{"label":"seed","localized_name":"seed","name":"seed","shape":7,"type":"INT","widget":{"name":"seed"},"link":null}],"outputs":[{"label":"STRING","localized_name":"字符串","name":"STRING","type":"STRING","links":[3]}],"properties":{"cnr_id":"ComfyUI-WanVideoWrapper","ver":"78a7e20838a8944cbbfee0d58abd886a1d34ed76","Node name for S&R":"WanVideoPromptExtender","enableTabs":false,"tabWidth":65,"tabXOffset":10,"hasSecondTab":false,"secondTabText":"Send Back","secondTabOffset":80,"secondTabWidth":65,"widget_ue_connectable":{}},"widgets_values":["",512,"gpu",true,"T2V Movie Director (Chinese)",[false,true],"randomize"]},{"id":20,"type":"easy showAnything","pos":[1140,-920],"size":[430,360],"flags":{},"order":19,"mode":0,"inputs":[{"label":"输入任何","localized_name":"输入任何","name":"anything","shape":7,"type":"*","link":3}],"outputs":[{"localized_name":"输出","name":"output","type":"*","links":null}],"properties":{"cnr_id":"comfyui-easy-use","ver":"717092a3ceb51c474b5b3f77fc188979f0db9d67","Node name for S&R":"easy showAnything","enableTabs":false,"tabWidth":65,"tabXOffset":10,"hasSecondTab":false,"secondTabText":"Send Back","secondTabOffset":80,"secondTabWidth":65,"widget_ue_connectable":{}},"widgets_values":["日出，自然光，顶光，中近景，年轻美丽的教师站在教室中央，手中拿着粉笔，温暖色调，推镜头展现她的专注神情"]},{"id":18,"type":"easy showAnything","pos":[770,-480],"size":[350,430],"flags":{},"order":10,"mode":0,"inputs":[{"label":"输入任何","localized_name":"输入任何","name":"anything","shape":7,"type":"*","link":2}],"outputs":[{"localized_name":"输出","name":"output","type":"*","links":null}],"properties":{"cnr_id":"comfyui-easy-use","ver":"717092a3ceb51c474b5b3f77fc188979f0db9d67","Node name for S&R":"easy showAnything","enableTabs":false,"tabWidth":65,"tabXOffset":10,"hasSecondTab":false,"secondTabText":"Send Back","secondTabOffset":80,"secondTabWidth":65,"widget_ue_connectable":{}},"widgets_values":[""]},{"id":34,"type":"Note","pos":[1160,-160],"size":[400,110],"flags":{},"order":3,"mode":0,"inputs":[],"outputs":[],"properties":{"widget_ue_connectable":{}},"widgets_values":["⚠️自行将Wan Video Prompt Extender的输出端与万相2.2工作流中的Clip提示词输入框连接即可组成完整的工作流。"],"color":"#432","bgcolor":"#653"}],"links":[[2,9,0,18,0,"*"],[3,19,0,20,0,"*"],[12,24,0,19,0,"QWENMODEL"],[13,27,0,26,0,"QWENMODEL"],[15,26,0,28,0,"*"],[27,46,0,44,0,"STRING"],[28,46,1,45,0,"STRING"],[29,42,0,46,0,"STRING"],[30,47,0,26,1,"STRING"],[31,47,0,32,0,"STRING"],[32,48,0,19,1,"STRING"],[33,21,0,49,0,"STRING"],[34,9,0,49,1,"STRING"],[35,49,0,19,2,"STRING"]],"groups":[{"id":1,"title":"【简单】Wan Video Prompt Extender + 系统引导词加载器(基础版)","bounding":[370,-1880,1080,540],"color":"#3f789e","font_size":24,"flags":{}},{"id":2,"title":"【进阶】万相视频提示词生成器 + 系统引导词加载器(基础版) + Wan Video Prompt Extender","bounding":[370,-1330,1210,1300],"color":"#3f789e","font_size":24,"flags":{}},{"id":3,"title":"万相视频提示词生成器 + 系统引导词加载器(基础版)","bounding":[1590,-1330,780,860],"color":"#3f789e","font_size":24,"flags":{}}],"config":{},"extra":{"ds":{"scale":1.1,"offset":[-405.382371059772,1871.85797092658]},"ue_links":[],"links_added_by_ue":[]},"version":0.4}
+{
+  "id": "5a56acff-5d7f-4fb2-aa4d-4a032dbfc6de",
+  "revision": 0,
+  "last_node_id": 54,
+  "last_link_id": 40,
+  "nodes": [
+    {
+      "id": 47,
+      "type": "SystemPromptLoader",
+      "pos": [
+        -700,
+        -10
+      ],
+      "size": [
+        280,
+        82
+      ],
+      "flags": {},
+      "order": 0,
+      "mode": 0,
+      "inputs": [],
+      "outputs": [
+        {
+          "label": "系统提示词",
+          "name": "system_prompt",
+          "type": "STRING",
+          "links": [
+            30,
+            36
+          ]
+        }
+      ],
+      "properties": {
+        "aux_id": "ZhiHui6/zhihui_nodes_comfyui",
+        "ver": "96e4f1cfd665ecfa4d328241148840cf4115b108",
+        "Node name for S&R": "SystemPromptLoader",
+        "ue_properties": {
+          "widget_ue_connectable": {
+            "system_preset": true
+          },
+          "version": "7.4.1",
+          "input_ue_unconnectable": {}
+        }
+      },
+      "widgets_values": [
+        "中文预设/生视频扩写/万相提示词优化",
+        "图片反推/AI作图指导"
+      ],
+      "shape": 1
+    },
+    {
+      "id": 27,
+      "type": "QwenLoader",
+      "pos": [
+        -410,
+        -10
+      ],
+      "size": [
+        340,
+        120
+      ],
+      "flags": {},
+      "order": 1,
+      "mode": 0,
+      "inputs": [],
+      "outputs": [
+        {
+          "label": "QWENMODEL",
+          "name": "QWENMODEL",
+          "type": "QWENMODEL",
+          "links": [
+            13
+          ]
+        }
+      ],
+      "properties": {
+        "cnr_id": "ComfyUI-WanVideoWrapper",
+        "ver": "78a7e20838a8944cbbfee0d58abd886a1d34ed76",
+        "Node name for S&R": "QwenLoader",
+        "enableTabs": false,
+        "tabWidth": 65,
+        "tabXOffset": 10,
+        "hasSecondTab": false,
+        "secondTabText": "Send Back",
+        "secondTabOffset": 80,
+        "secondTabWidth": 65,
+        "ue_properties": {
+          "version": "7.4.1",
+          "widget_ue_connectable": {},
+          "input_ue_unconnectable": {}
+        }
+      },
+      "widgets_values": [
+        "Qwen2.5_3B_instruct_bf16.safetensors",
+        "main_device",
+        "bf16"
+      ],
+      "shape": 1
+    },
+    {
+      "id": 26,
+      "type": "WanVideoPromptExtender",
+      "pos": [
+        -410,
+        170
+      ],
+      "size": [
+        340,
+        260
+      ],
+      "flags": {},
+      "order": 9,
+      "mode": 0,
+      "inputs": [
+        {
+          "label": "qwen",
+          "name": "qwen",
+          "type": "QWENMODEL",
+          "link": 13
+        },
+        {
+          "label": "custom_system_prompt",
+          "name": "custom_system_prompt",
+          "shape": 7,
+          "type": "STRING",
+          "link": 30
+        }
+      ],
+      "outputs": [
+        {
+          "label": "STRING",
+          "name": "STRING",
+          "type": "STRING",
+          "links": [
+            37
+          ]
+        }
+      ],
+      "properties": {
+        "cnr_id": "ComfyUI-WanVideoWrapper",
+        "ver": "78a7e20838a8944cbbfee0d58abd886a1d34ed76",
+        "Node name for S&R": "WanVideoPromptExtender",
+        "enableTabs": false,
+        "tabWidth": 65,
+        "tabXOffset": 10,
+        "hasSecondTab": false,
+        "secondTabText": "Send Back",
+        "secondTabOffset": 80,
+        "secondTabWidth": 65,
+        "ue_properties": {
+          "version": "7.4.1",
+          "widget_ue_connectable": {},
+          "input_ue_unconnectable": {}
+        }
+      },
+      "widgets_values": [
+        "一位女教师",
+        512,
+        "gpu",
+        true,
+        "T2V Movie Director (Chinese)",
+        [
+          false,
+          true
+        ],
+        "randomize"
+      ],
+      "shape": 1
+    },
+    {
+      "id": 50,
+      "type": "ShowText",
+      "pos": [
+        -700,
+        130
+      ],
+      "size": [
+        280,
+        300
+      ],
+      "flags": {},
+      "order": 8,
+      "mode": 0,
+      "inputs": [
+        {
+          "label": "文本",
+          "name": "text",
+          "type": "STRING",
+          "link": 36
+        }
+      ],
+      "outputs": [
+        {
+          "label": "字符串",
+          "name": "STRING",
+          "shape": 6,
+          "type": "STRING",
+          "links": null
+        }
+      ],
+      "properties": {
+        "aux_id": "ZhiHui6/zhihui_nodes_comfyui",
+        "ver": "d6e90457634211f9a9c9ab230ce9a078930e2986",
+        "Node name for S&R": "ShowText",
+        "ue_properties": {
+          "widget_ue_connectable": {},
+          "input_ue_unconnectable": {},
+          "version": "7.4.1"
+        }
+      },
+      "widgets_values": [],
+      "shape": 1
+    },
+    {
+      "id": 9,
+      "type": "WanPromptGenerator",
+      "pos": [
+        -690,
+        580
+      ],
+      "size": [
+        340,
+        640
+      ],
+      "flags": {},
+      "order": 2,
+      "mode": 0,
+      "inputs": [
+        {
+          "label": "自定义系统提示",
+          "name": "custom_system_prompt",
+          "shape": 7,
+          "type": "STRING",
+          "link": null
+        },
+        {
+          "label": "自定系统引导词",
+          "name": "自定系统引导词",
+          "shape": 7,
+          "type": "STRING",
+          "link": null
+        }
+      ],
+      "outputs": [
+        {
+          "label": "源提示词",
+          "name": "source_prompt",
+          "type": "STRING",
+          "links": [
+            38
+          ]
+        },
+        {
+          "label": "提示词输出",
+          "name": "prompt_output",
+          "type": "STRING",
+          "links": null
+        }
+      ],
+      "properties": {
+        "aux_id": "ZhiHui6/zhihui_nodes_comfyui",
+        "ver": "27c9d64fa8a24ff6e5b832beb4387600d870897a",
+        "Node name for S&R": "WanPromptGenerator",
+        "enableTabs": false,
+        "tabWidth": 65,
+        "tabXOffset": 10,
+        "hasSecondTab": false,
+        "secondTabText": "Send Back",
+        "secondTabOffset": 80,
+        "secondTabWidth": 65,
+        "ue_properties": {
+          "version": "7.4.1",
+          "widget_ue_connectable": {},
+          "input_ue_unconnectable": {}
+        }
+      },
+      "widgets_values": [
+        false,
+        "随机",
+        "随机",
+        "随机",
+        "随机",
+        "随机",
+        "随机",
+        "随机",
+        "随机",
+        "随机",
+        "随机",
+        "随机",
+        "随机",
+        "随机",
+        "随机",
+        "随机",
+        "随机",
+        "随机",
+        "不使用预设",
+        false,
+        false,
+        "openai",
+        ""
+      ],
+      "shape": 1
+    },
+    {
+      "id": 24,
+      "type": "QwenLoader",
+      "pos": [
+        380,
+        580
+      ],
+      "size": [
+        340,
+        110
+      ],
+      "flags": {},
+      "order": 3,
+      "mode": 0,
+      "inputs": [],
+      "outputs": [
+        {
+          "label": "QWENMODEL",
+          "name": "QWENMODEL",
+          "type": "QWENMODEL",
+          "links": [
+            12
+          ]
+        }
+      ],
+      "properties": {
+        "cnr_id": "ComfyUI-WanVideoWrapper",
+        "ver": "78a7e20838a8944cbbfee0d58abd886a1d34ed76",
+        "Node name for S&R": "QwenLoader",
+        "enableTabs": false,
+        "tabWidth": 65,
+        "tabXOffset": 10,
+        "hasSecondTab": false,
+        "secondTabText": "Send Back",
+        "secondTabOffset": 80,
+        "secondTabWidth": 65,
+        "ue_properties": {
+          "version": "7.4.1",
+          "widget_ue_connectable": {},
+          "input_ue_unconnectable": {}
+        }
+      },
+      "widgets_values": [
+        "Qwen2.5_3B_instruct_bf16.safetensors",
+        "main_device",
+        "bf16"
+      ],
+      "shape": 1
+    },
+    {
+      "id": 48,
+      "type": "SystemPromptLoader",
+      "pos": [
+        380,
+        750
+      ],
+      "size": [
+        340,
+        82
+      ],
+      "flags": {},
+      "order": 4,
+      "mode": 0,
+      "inputs": [],
+      "outputs": [
+        {
+          "label": "系统提示词",
+          "name": "system_prompt",
+          "type": "STRING",
+          "links": [
+            32
+          ]
+        }
+      ],
+      "properties": {
+        "aux_id": "ZhiHui6/zhihui_nodes_comfyui",
+        "ver": "96e4f1cfd665ecfa4d328241148840cf4115b108",
+        "Node name for S&R": "SystemPromptLoader",
+        "ue_properties": {
+          "widget_ue_connectable": {
+            "system_preset": true
+          },
+          "version": "7.4.1",
+          "input_ue_unconnectable": {}
+        }
+      },
+      "widgets_values": [
+        "中文预设/生视频扩写/万相提示词优化",
+        "图片反推/AI作图指导"
+      ],
+      "shape": 1
+    },
+    {
+      "id": 49,
+      "type": "TextSwitchDualMode",
+      "pos": [
+        30,
+        980
+      ],
+      "size": [
+        340,
+        240
+      ],
+      "flags": {},
+      "order": 13,
+      "mode": 0,
+      "inputs": [
+        {
+          "label": "文本1",
+          "name": "text1",
+          "shape": 7,
+          "type": "STRING",
+          "link": 33
+        },
+        {
+          "label": "文本2",
+          "name": "text2",
+          "shape": 7,
+          "type": "STRING",
+          "link": 39
+        },
+        {
+          "label": "文本3",
+          "name": "text3",
+          "shape": 7,
+          "type": "STRING",
+          "link": null
+        },
+        {
+          "label": "文本4",
+          "name": "text4",
+          "shape": 7,
+          "type": "STRING",
+          "link": null
+        }
+      ],
+      "outputs": [
+        {
+          "label": "输出文本",
+          "name": "output_text",
+          "type": "STRING",
+          "links": [
+            35
+          ]
+        }
+      ],
+      "properties": {
+        "aux_id": "ZhiHui6/zhihui_nodes_comfyui",
+        "ver": "96e4f1cfd665ecfa4d328241148840cf4115b108",
+        "Node name for S&R": "TextSwitchDualMode",
+        "ue_properties": {
+          "widget_ue_connectable": {
+            "mode": true,
+            "select_text": true,
+            "text1_comment": true,
+            "text2_comment": true,
+            "text3_comment": true,
+            "text4_comment": true
+          },
+          "version": "7.4.1",
+          "input_ue_unconnectable": {}
+        }
+      },
+      "widgets_values": [
+        "auto",
+        "1",
+        "Wan Video Prompt Extender用户提示词",
+        "万相视频提示词生成器",
+        "",
+        ""
+      ],
+      "shape": 1
+    },
+    {
+      "id": 21,
+      "type": "MultiLineTextNode",
+      "pos": [
+        30,
+        580
+      ],
+      "size": [
+        340,
+        340
+      ],
+      "flags": {},
+      "order": 5,
+      "mode": 0,
+      "inputs": [],
+      "outputs": [
+        {
+          "label": "文本输出",
+          "name": "text_output",
+          "type": "STRING",
+          "links": [
+            33
+          ]
+        }
+      ],
+      "properties": {
+        "aux_id": "ZhiHui6/zhihui_nodes_comfyui",
+        "ver": "59026c974ca2688cb2fe0e21b22e0fd084cf4fd4",
+        "Node name for S&R": "MultiLineTextNode",
+        "enableTabs": false,
+        "tabWidth": 65,
+        "tabXOffset": 10,
+        "hasSecondTab": false,
+        "secondTabText": "Send Back",
+        "secondTabOffset": 80,
+        "secondTabWidth": 65,
+        "ue_properties": {
+          "version": "7.4.1",
+          "widget_ue_connectable": {},
+          "input_ue_unconnectable": {}
+        }
+      },
+      "widgets_values": [
+        "用户提示词",
+        "用户提示词",
+        "年轻美丽的教师"
+      ],
+      "shape": 1
+    },
+    {
+      "id": 53,
+      "type": "ShowText",
+      "pos": [
+        -340,
+        580
+      ],
+      "size": [
+        340,
+        640
+      ],
+      "flags": {},
+      "order": 10,
+      "mode": 0,
+      "inputs": [
+        {
+          "label": "文本",
+          "name": "text",
+          "type": "STRING",
+          "link": 38
+        }
+      ],
+      "outputs": [
+        {
+          "label": "字符串",
+          "name": "STRING",
+          "shape": 6,
+          "type": "STRING",
+          "links": [
+            39
+          ]
+        }
+      ],
+      "properties": {
+        "aux_id": "ZhiHui6/zhihui_nodes_comfyui",
+        "ver": "d6e90457634211f9a9c9ab230ce9a078930e2986",
+        "Node name for S&R": "ShowText",
+        "ue_properties": {
+          "widget_ue_connectable": {},
+          "input_ue_unconnectable": {},
+          "version": "7.4.1"
+        }
+      },
+      "widgets_values": [],
+      "shape": 1
+    },
+    {
+      "id": 19,
+      "type": "WanVideoPromptExtender",
+      "pos": [
+        380,
+        890
+      ],
+      "size": [
+        340,
+        330
+      ],
+      "flags": {},
+      "order": 16,
+      "mode": 0,
+      "inputs": [
+        {
+          "label": "qwen",
+          "name": "qwen",
+          "type": "QWENMODEL",
+          "link": 12
+        },
+        {
+          "label": "custom_system_prompt",
+          "name": "custom_system_prompt",
+          "shape": 7,
+          "type": "STRING",
+          "link": 32
+        },
+        {
+          "label": "prompt",
+          "name": "prompt",
+          "type": "STRING",
+          "widget": {
+            "name": "prompt"
+          },
+          "link": 35
+        }
+      ],
+      "outputs": [
+        {
+          "label": "STRING",
+          "name": "STRING",
+          "type": "STRING",
+          "links": [
+            40
+          ]
+        }
+      ],
+      "properties": {
+        "cnr_id": "ComfyUI-WanVideoWrapper",
+        "ver": "78a7e20838a8944cbbfee0d58abd886a1d34ed76",
+        "Node name for S&R": "WanVideoPromptExtender",
+        "enableTabs": false,
+        "tabWidth": 65,
+        "tabXOffset": 10,
+        "hasSecondTab": false,
+        "secondTabText": "Send Back",
+        "secondTabOffset": 80,
+        "secondTabWidth": 65,
+        "ue_properties": {
+          "version": "7.4.1",
+          "widget_ue_connectable": {},
+          "input_ue_unconnectable": {}
+        }
+      },
+      "widgets_values": [
+        "",
+        512,
+        "gpu",
+        true,
+        "T2V Movie Director (Chinese)",
+        [
+          false,
+          true
+        ],
+        "randomize"
+      ],
+      "shape": 1
+    },
+    {
+      "id": 42,
+      "type": "SystemPromptLoader",
+      "pos": [
+        -700,
+        -900
+      ],
+      "size": [
+        330,
+        82
+      ],
+      "flags": {},
+      "order": 6,
+      "mode": 0,
+      "inputs": [],
+      "outputs": [
+        {
+          "label": "系统提示词",
+          "name": "system_prompt",
+          "type": "STRING",
+          "links": [
+            29
+          ]
+        }
+      ],
+      "properties": {
+        "aux_id": "ZhiHui6/zhihui_nodes_comfyui",
+        "ver": "96e4f1cfd665ecfa4d328241148840cf4115b108",
+        "Node name for S&R": "SystemPromptLoader",
+        "ue_properties": {
+          "widget_ue_connectable": {
+            "system_preset": true
+          },
+          "version": "7.4.1",
+          "input_ue_unconnectable": {}
+        }
+      },
+      "widgets_values": [
+        "中文预设/生视频扩写/万相提示词优化",
+        "图片反推/AI作图指导"
+      ],
+      "shape": 1
+    },
+    {
+      "id": 46,
+      "type": "WanPromptGenerator",
+      "pos": [
+        -700,
+        -760
+      ],
+      "size": [
+        330,
+        640
+      ],
+      "flags": {},
+      "order": 11,
+      "mode": 0,
+      "inputs": [
+        {
+          "label": "自定义系统提示",
+          "name": "custom_system_prompt",
+          "shape": 7,
+          "type": "STRING",
+          "link": 29
+        }
+      ],
+      "outputs": [
+        {
+          "label": "源提示词",
+          "name": "source_prompt",
+          "type": "STRING",
+          "links": [
+            27
+          ]
+        },
+        {
+          "label": "提示词输出",
+          "name": "prompt_output",
+          "type": "STRING",
+          "links": [
+            28
+          ]
+        }
+      ],
+      "properties": {
+        "aux_id": "ZhiHui6/zhihui_nodes_comfyui",
+        "ver": "96e4f1cfd665ecfa4d328241148840cf4115b108",
+        "Node name for S&R": "WanPromptGenerator",
+        "ue_properties": {
+          "widget_ue_connectable": {
+            "enable_node": true,
+            "subject_type": true,
+            "character_emotion": true,
+            "action_pose": true,
+            "scene_type": true,
+            "light_source": true,
+            "light_type": true,
+            "time_period": true,
+            "shot_type": true,
+            "composition": true,
+            "lens_focal_length": true,
+            "camera_angle": true,
+            "lens_type": true,
+            "color_tone": true,
+            "camera_movement": true,
+            "motion_type": true,
+            "visual_style": true,
+            "special_effect": true,
+            "preset_combination": true,
+            "add_prefix": true,
+            "enable_expansion": true,
+            "model_brand": true,
+            "supplementary_text": true
+          },
+          "version": "7.4.1",
+          "input_ue_unconnectable": {}
+        }
+      },
+      "widgets_values": [
+        true,
+        "随机",
+        "随机",
+        "随机",
+        "随机",
+        "随机",
+        "随机",
+        "随机",
+        "随机",
+        "随机",
+        "随机",
+        "随机",
+        "随机",
+        "随机",
+        "随机",
+        "随机",
+        "随机",
+        "随机",
+        "不使用预设",
+        true,
+        true,
+        "openai-large",
+        ""
+      ],
+      "shape": 1
+    },
+    {
+      "id": 44,
+      "type": "ShowText",
+      "pos": [
+        -360,
+        -900
+      ],
+      "size": [
+        400,
+        210
+      ],
+      "flags": {},
+      "order": 14,
+      "mode": 0,
+      "inputs": [
+        {
+          "label": "文本",
+          "name": "text",
+          "type": "STRING",
+          "link": 27
+        }
+      ],
+      "outputs": [
+        {
+          "label": "字符串",
+          "name": "STRING",
+          "shape": 6,
+          "type": "STRING",
+          "links": null
+        }
+      ],
+      "properties": {
+        "aux_id": "ZhiHui6/zhihui_nodes_comfyui",
+        "ver": "96e4f1cfd665ecfa4d328241148840cf4115b108",
+        "Node name for S&R": "ShowText",
+        "ue_properties": {
+          "widget_ue_connectable": {},
+          "version": "7.4.1",
+          "input_ue_unconnectable": {}
+        }
+      },
+      "widgets_values": [],
+      "shape": 1
+    },
+    {
+      "id": 51,
+      "type": "ShowText",
+      "pos": [
+        -60,
+        -10
+      ],
+      "size": [
+        410,
+        440
+      ],
+      "flags": {},
+      "order": 12,
+      "mode": 0,
+      "inputs": [
+        {
+          "label": "文本",
+          "name": "text",
+          "type": "STRING",
+          "link": 37
+        }
+      ],
+      "outputs": [
+        {
+          "label": "字符串",
+          "name": "STRING",
+          "shape": 6,
+          "type": "STRING",
+          "links": null
+        }
+      ],
+      "properties": {
+        "aux_id": "ZhiHui6/zhihui_nodes_comfyui",
+        "ver": "d6e90457634211f9a9c9ab230ce9a078930e2986",
+        "Node name for S&R": "ShowText",
+        "ue_properties": {
+          "widget_ue_connectable": {},
+          "input_ue_unconnectable": {},
+          "version": "7.4.1"
+        }
+      },
+      "widgets_values": [],
+      "color": "#232",
+      "bgcolor": "#353",
+      "shape": 1
+    },
+    {
+      "id": 54,
+      "type": "ShowText",
+      "pos": [
+        730,
+        580
+      ],
+      "size": [
+        430,
+        640
+      ],
+      "flags": {},
+      "order": 17,
+      "mode": 0,
+      "inputs": [
+        {
+          "label": "文本",
+          "name": "text",
+          "type": "STRING",
+          "link": 40
+        }
+      ],
+      "outputs": [
+        {
+          "label": "字符串",
+          "name": "STRING",
+          "shape": 6,
+          "type": "STRING",
+          "links": []
+        }
+      ],
+      "properties": {
+        "aux_id": "ZhiHui6/zhihui_nodes_comfyui",
+        "ver": "d6e90457634211f9a9c9ab230ce9a078930e2986",
+        "Node name for S&R": "ShowText",
+        "ue_properties": {
+          "widget_ue_connectable": {},
+          "input_ue_unconnectable": {},
+          "version": "7.4.1"
+        }
+      },
+      "widgets_values": [],
+      "color": "#232",
+      "bgcolor": "#353",
+      "shape": 1
+    },
+    {
+      "id": 45,
+      "type": "ShowText",
+      "pos": [
+        -360,
+        -630
+      ],
+      "size": [
+        400,
+        510
+      ],
+      "flags": {},
+      "order": 15,
+      "mode": 0,
+      "inputs": [
+        {
+          "label": "文本",
+          "name": "text",
+          "type": "STRING",
+          "link": 28
+        }
+      ],
+      "outputs": [
+        {
+          "label": "字符串",
+          "name": "STRING",
+          "shape": 6,
+          "type": "STRING",
+          "links": null
+        }
+      ],
+      "properties": {
+        "aux_id": "ZhiHui6/zhihui_nodes_comfyui",
+        "ver": "96e4f1cfd665ecfa4d328241148840cf4115b108",
+        "Node name for S&R": "ShowText",
+        "ue_properties": {
+          "widget_ue_connectable": {},
+          "version": "7.4.1",
+          "input_ue_unconnectable": {}
+        }
+      },
+      "widgets_values": [],
+      "color": "#232",
+      "bgcolor": "#353",
+      "shape": 1
+    },
+    {
+      "id": 52,
+      "type": "Note",
+      "pos": [
+        -710,
+        -1140
+      ],
+      "size": [
+        760,
+        140
+      ],
+      "flags": {},
+      "order": 7,
+      "mode": 0,
+      "inputs": [],
+      "outputs": [],
+      "properties": {
+        "ue_properties": {
+          "version": "7.4.1",
+          "widget_ue_connectable": {},
+          "input_ue_unconnectable": {}
+        }
+      },
+      "widgets_values": [
+        "⚠️节点安装：\n- [潪AI节点包]\nhttps://github.com/ZhiHui6/zhihui_nodes_comfyu\n\n- [WanVideoWrapper节点包]\nhttps://github.com/kijai/ComfyUI-WanVideoWrapper\n\n⚠️本工作流只做生成万相所用的提示词作为示例参考，非完整万相视频生成工作流，需自行整合套用到用户自己的实际工作流当中。\n（绿色标识节点中的输出端与万相工作流中的Clip提示词输入框连接即可）"
+      ],
+      "color": "#432",
+      "bgcolor": "#653",
+      "shape": 1
+    }
+  ],
+  "links": [
+    [
+      12,
+      24,
+      0,
+      19,
+      0,
+      "QWENMODEL"
+    ],
+    [
+      13,
+      27,
+      0,
+      26,
+      0,
+      "QWENMODEL"
+    ],
+    [
+      27,
+      46,
+      0,
+      44,
+      0,
+      "STRING"
+    ],
+    [
+      28,
+      46,
+      1,
+      45,
+      0,
+      "STRING"
+    ],
+    [
+      29,
+      42,
+      0,
+      46,
+      0,
+      "STRING"
+    ],
+    [
+      30,
+      47,
+      0,
+      26,
+      1,
+      "STRING"
+    ],
+    [
+      32,
+      48,
+      0,
+      19,
+      1,
+      "STRING"
+    ],
+    [
+      33,
+      21,
+      0,
+      49,
+      0,
+      "STRING"
+    ],
+    [
+      35,
+      49,
+      0,
+      19,
+      2,
+      "STRING"
+    ],
+    [
+      36,
+      47,
+      0,
+      50,
+      0,
+      "STRING"
+    ],
+    [
+      37,
+      26,
+      0,
+      51,
+      0,
+      "STRING"
+    ],
+    [
+      38,
+      9,
+      0,
+      53,
+      0,
+      "STRING"
+    ],
+    [
+      39,
+      53,
+      0,
+      49,
+      1,
+      "STRING"
+    ],
+    [
+      40,
+      19,
+      0,
+      54,
+      0,
+      "STRING"
+    ]
+  ],
+  "groups": [
+    {
+      "id": 1,
+      "title": "【简单】Wan Video Prompt Extender + 系统引导词加载器(基础版)",
+      "bounding": [
+        -710,
+        -100,
+        1070,
+        540
+      ],
+      "color": "#3f789e",
+      "font_size": 24,
+      "flags": {}
+    },
+    {
+      "id": 2,
+      "title": "【进阶】万相视频提示词生成器 + 系统引导词加载器(基础版) + Wan Video Prompt Extender",
+      "bounding": [
+        -710,
+        450,
+        1890,
+        790
+      ],
+      "color": "#3f789e",
+      "font_size": 24,
+      "flags": {}
+    },
+    {
+      "id": 3,
+      "title": "万相视频提示词生成器 + 系统引导词加载器(基础版)",
+      "bounding": [
+        -710,
+        -990,
+        760,
+        880
+      ],
+      "color": "#3f789e",
+      "font_size": 24,
+      "flags": {}
+    },
+    {
+      "id": 4,
+      "title": "Wan Video Prompt Extender",
+      "bounding": [
+        20,
+        490,
+        1150,
+        740
+      ],
+      "color": "#3f789e",
+      "font_size": 24,
+      "flags": {}
+    },
+    {
+      "id": 5,
+      "title": "万相视频提示词生成器",
+      "bounding": [
+        -700,
+        490,
+        710,
+        740
+      ],
+      "color": "#3f789e",
+      "font_size": 24,
+      "flags": {}
+    }
+  ],
+  "config": {},
+  "extra": {
+    "ds": {
+      "scale": 0.6209213230591554,
+      "offset": [
+        2072.143523486975,
+        1247.7689688753092
+      ]
+    },
+    "ue_links": [],
+    "links_added_by_ue": [],
+    "frontendVersion": "1.28.8",
+    "VHS_latentpreview": true,
+    "VHS_latentpreviewrate": 0,
+    "VHS_MetadataImage": true,
+    "VHS_KeepIntermediate": true
+  },
+  "version": 0.4
+}

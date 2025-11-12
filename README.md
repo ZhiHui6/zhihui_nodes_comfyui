@@ -138,16 +138,16 @@ This node collection contains numerous nodes with different functions, divided i
 使用多种LLM模型对输入文本进行智能扩写和创意增强，支持字符量控制和自定义系统引导词。<br>Uses multiple LLM models for intelligent expansion and creative enhancement of input text, supporting character count control and custom system prompts.
 
 <b>特点 | Features</b>：
-- <b>多模型支持 | Multi-model Support</b>：支持claude、deepseek、gemini、openai、mistral、qwen-coder、llama、sur、unity、searchgpt、evil等11种AI模型<br>
-Supports 11 AI models including claude, deepseek, gemini, openai, mistral, qwen-coder, llama, sur, unity, searchgpt, evil
-- <b>字符量控制 | Character Count Control</b>：可精确控制输出文本的字符数量，确保生成内容符合要求<br>
-Precisely controls the character count of output text, ensuring generated content meets requirements
-- <b>创意温度调节 | Creative Temperature Control</b>：通过温度参数控制生成内容的创意程度（0.1-2.0）<br>
-Controls the creativity level of generated content through temperature parameters (0.1-2.0)
-- <b>系统引导词 | System Prompts</b>：支持自定义系统引导词，引导AI生成特定风格的内容<br>
-Supports custom system prompts to guide AI in generating content with specific styles
-- <b>灵活输入 | Flexible Input</b>：支持直接输入系统引导词或通过外部节点加载<br>
-Supports direct input of system prompts or loading through external nodes
+- <b>多模型支持</b>：支持claude、deepseek、gemini、openai、mistral、qwen-coder、llama、sur、unity、searchgpt、evil等11种AI模型<br>
+Multi-model Support: Supports 11 AI models including claude, deepseek, gemini, openai, mistral, qwen-coder, llama, sur, unity, searchgpt, evil
+- <b>字符量控制</b>：可精确控制输出文本的字符数量，确保生成内容符合要求<br>
+Character Count Control:Precisely controls the character count of output text, ensuring generated content meets requirements
+- <b>创意温度调节</b>：通过温度参数控制生成内容的创意程度（0.1-2.0）<br>
+Creative Temperature Control:Controls the creativity level of generated content through temperature parameters (0.1-2.0)
+- <b>系统引导词</b>：支持自定义系统引导词，引导AI生成特定风格的内容<br>
+System Prompts: Supports custom system prompts to guide AI in generating content with specific styles
+- <b>灵活输入</b>：支持直接输入系统引导词或通过外部节点加载<br>
+Flexible Input: Supports direct input of system prompts or loading through external nodes 
 
 <div align="left">
 <a href="images/提示词扩展(通用).jpg" target="_blank">
@@ -173,13 +173,18 @@ Supports direct input of system prompts or loading through external nodes
 <td>交互式文本编辑节点，暂停工作流执行并提供可编辑文本区域，用户可在运行时修改文本内容，点击继续按钮恢复工作流执行。<br>Interactive text editing node that pauses workflow execution and provides an editable text area, allowing users to modify text content at runtime and resume workflow execution by clicking the continue button.
 
 <b>特点 | Features</b>：
-- <b>工作流暂停 | Workflow Pause</b>：自动暂停工作流执行，等待用户交互<br>Automatically pauses workflow execution, waiting for user interaction
-- <b>实时编辑 | Real-time Editing</b>：提供可编辑文本区域，支持多行文本编辑<br>Provides editable text area with multi-line text editing support
-- <b>手动同步 | Manual Sync</b>：编辑后需手动点击同步按钮更新内容<br>Requires manual sync button click to update content after editing
+- <b>工作流暂停</b>：自动暂停工作流执行，等待用户交互<br>
+Workflow Pause: Automatically pauses workflow execution, waiting for user interaction
+- <b>实时编辑</b>：提供可编辑文本区域，支持多行文本编辑<br>
+Real-time Editing: Provides editable text area with multi-line text editing support
+- <b>手动同步</b>：编辑后需手动点击同步按钮更新内容<br>
+Manual Sync: Requires manual sync button click to update content after editing   
 
 <b>使用场景 | Use Cases</b>：
-- 工作流中需要人工干预和文本调整的场景<br>Scenarios requiring manual intervention and text adjustment in workflows
-- 提示词的实时优化和调试<br>Real-time optimization and debugging of prompts
+- 工作流中需要人工干预和文本调整的场景<br>
+Scenarios requiring manual intervention and text adjustment in workflows
+- 提示词的实时优化和调试<br>
+Real-time optimization and debugging of prompts
 
 <br>
 <div align="left">
@@ -218,11 +223,14 @@ Supports direct input of system prompts or loading through external nodes
 提供专业的图像变换预设，内置免费在线扩写功能，支持用户自定义预设，为图像编辑提供创意指导。<br>Provides professional image transformation presets with built-in free online expansion functionality, supports user-defined presets, and offers creative guidance for image editing.
 
 <b>特点 | Features</b>：
-- <b>丰富预设库 | Rich Preset Library</b>：包含20余项专业预设<br>Contains 20+ professional presets
-
-- <b>双预设库 | Dual Preset Libraries</b>：支持默认预设和用户自定义预设，用户可自由新增更多创意预设，通过分类标识区分预设来源。<a href="doc/Kontext_Presets_User_File_Instructions.md" style="font-weight:bold;color:yellow;">用户预设使用说明</a><br>Supports both default presets and user-defined presets, users can freely add more creative presets, distinguished by category identifiers. <a href="doc/Kontext_Presets_User_File_Instructions.md" style="font-weight:bold;color:yellow;">User Preset Usage Guide</a>
-- <b>智能扩写 | Intelligent Expansion</b>：支持多种LLM模型（OpenAI、Mistral、Qwen等）对预设内容进行创意扩写<br>Supports multiple LLM models (OpenAI, Mistral, Qwen, etc.) for creative expansion of preset content
-- <b>灵活输出 | Flexible Output</b>：支持输出原始预设内容、完整信息或AI扩写后的内容<br>Supports output of original preset content, complete information, or AI-expanded content
+- <b>丰富预设库</b>：包含20余项专业预设<br>
+<b>Rich Preset Library:</b> Contains 20+ professional presets
+- <b>双预设库</b>：支持默认预设和用户自定义预设，用户可自由新增更多创意预设，通过分类标识区分预设来源。<a href="doc/Kontext_Presets_User_File_Instructions.md" style="font-weight:bold;color:yellow;">用户预设使用说明</a><br>
+<b>Dual Preset Libraries:</b> Supports both default presets and user-defined presets, users can freely add more creative presets, distinguished by category identifiers. <a href="doc/Kontext_Presets_User_File_Instructions.md" style="font-weight:bold;color:yellow;">User Preset Usage Guide</a>
+- <b>智能扩写</b>：支持多种LLM模型（OpenAI、Mistral、Qwen等）对预设内容进行创意扩写<br>
+<b>Intelligent Expansion:</b> Supports multiple LLM models (OpenAI, Mistral, Qwen, etc.) for creative expansion of preset content
+- <b>灵活输出</b>：支持输出原始预设内容、完整信息或AI扩写后的内容<br>
+<b>Flexible Output:</b> Supports output of original preset content, complete information, or AI-expanded content
 
 <div align="left">
 <a href="images/Kontext预设增强版节点展示.jpg" target="_blank">
@@ -241,9 +249,12 @@ Supports direct input of system prompts or loading through external nodes
 根据预设的摄影要素（如相机、镜头、光照、场景等）组合生成专业的摄影风格提示词。<br>Generates professional photography style prompts by combining preset photography elements (such as cameras, lenses, lighting, scenes, etc.).
 
 <b>特点 | Features</b>：
-- 支持从自定义文本文件加载选项，灵活扩展<br>Supports loading options from custom text files for flexible expansion
-- 支持随机选择，增加创意多样性<br>Supports random selection to increase creative diversity
-- 输出模板可自定义，适应不同的摄影风格需求<br>Customizable output templates to adapt to different photography style requirements
+- 支持从自定义文本文件加载选项，灵活扩展<br>
+Supports loading options from custom text files for flexible expansion
+- 支持随机选择，增加创意多样性<br>
+Supports random selection to increase creative diversity
+- 输出模板可自定义，适应不同的摄影风格需求<br>
+Customizable output templates to adapt to different photography style requirements
 
 <div align="left">
 <a href="images/摄影提示词生成器.jpg" target="_blank">
@@ -259,9 +270,12 @@ Supports direct input of system prompts or loading through external nodes
 基于万相2.2官方文档编写的全能型提示词生成器，支持自定义和预设两种组合方法，涵盖运镜、场景、光线、构图等16个维度的专业视频提示词生成。<br>Comprehensive prompt generator based on Wan 2.2 official documentation, supports both custom and preset combination methods, covering 16 professional dimensions including camera movement, scenes, lighting, composition for professional video prompt generation.
 
 <b>特点 | Features</b>：
-- <b>双模式切换 | Dual Mode Switching</b>：支持自定义组合和预设组合模式，通过开关按钮一键切换<br>Supports both custom and preset combination modes, one-click switching through toggle buttons
-- <b>多维度选择 | Multi-dimensional Selection</b>：涵盖主体类型、场景类型、光源类型、光线类型、时间段、景别、构图、镜头焦段、机位角度、镜头类型、色调、运镜方式、人物情绪、运动类型、视觉风格、特效镜头、动作姿势17个专业维度<br>Covers 17 professional dimensions including subject type, scene type, light source type, lighting type, time period, shot size, composition, lens focal length, camera angle, lens type, color tone, camera movement, character emotion, motion type, visual style, special effects shots, action poses
-- <b>智能扩写 | Intelligent Expansion</b>：支持多种LLM模型（OpenAI、Claude、DeepSeek、Gemini等）免费在线扩写<br>Supports multiple LLM models (OpenAI, Claude, DeepSeek, Gemini, etc.) for free online expansion
+- <b>双模式切换</b>：支持自定义组合和预设组合模式，通过开关按钮一键切换<br>
+<b>Dual Mode Switching:</b> Supports both custom and preset combination modes, one-click switching through toggle buttons
+- <b>多维度选择</b>：涵盖主体类型、场景类型、光源类型、光线类型、时间段、景别、构图、镜头焦段、机位角度、镜头类型、色调、运镜方式、人物情绪、运动类型、视觉风格、特效镜头、动作姿势17个专业维度<br>
+<b>Multi-dimensional Selection:</b> Covers 17 professional dimensions including subject type, scene type, light source type, lighting type, time period, shot size, composition, lens focal length, camera angle, lens type, color tone, camera movement, character emotion, motion type, visual style, special effects shots, action poses
+- <b>智能扩写</b>：支持多种LLM模型（OpenAI、Claude、DeepSeek、Gemini等）免费在线扩写<br>
+<b>Intelligent Expansion:</b> Supports multiple LLM models (OpenAI, Claude, DeepSeek, Gemini, etc.) for free online expansion
 
 <div align="left">
 <a href="images/万相视频提示词生成器.jpg" target="_blank">
@@ -339,11 +353,15 @@ Supports direct input of system prompts or loading through external nodes
 <td>智能图像宽高比设置工具，支持多种预设模式和自定义尺寸配置。<br>Intelligent image aspect ratio setting tool, supporting multiple preset modes and custom size configurations.
 
 <b>特点 | Features</b>：
-- <b>多预设支持 | Multi-preset Support</b>：内置Qwen、Flux、Wan、SDXL等主流模型的专用宽高比预设<br>Built-in dedicated aspect ratio presets for mainstream models like Qwen, Flux, Wan, SDXL
+- <b>多预设支持</b>：内置Qwen、Flux、Wan、SDXL等主流模型的专用宽高比预设<br>
+Built-in dedicated aspect ratio presets for mainstream models like Qwen, Flux, Wan, SDXL
 
-- <b>自定义模式 | Custom Mode</b>：支持完全自定义的宽度和高度设置<br>Supports fully customizable width and height settings
-- <b>宽高比锁定 | Aspect Ratio Lock</b>：提供宽高比锁定功能，修改一个维度时自动调整另一个维度<br>Provides aspect ratio lock function, automatically adjusts the other dimension when modifying one
-- <b>智能切换 | Smart Switching</b>：根据选择的预设模式自动显示对应的宽高比选项<br>Automatically displays corresponding aspect ratio options based on selected preset mode
+- <b>自定义模式</b>：支持完全自定义的宽度和高度设置<br>
+<b>Custom Mode:</b> Supports fully customizable width and height settings
+- <b>宽高比锁定</b>：提供宽高比锁定功能，修改一个维度时自动调整另一个维度<br>
+<b>Aspect Ratio Lock:</b> Provides aspect ratio lock function, automatically adjusts the other dimension when modifying one
+- <b>智能切换</b>：根据选择的预设模式自动显示对应的宽高比选项<br>
+<b>Smart Switching:</b> Automatically displays corresponding aspect ratio options based on selected preset mode
 
 <br>
 <div align="left">
@@ -383,11 +401,16 @@ Supports direct input of system prompts or loading through external nodes
 专业的图像旋转和翻转工具，支持预设角度和自定义角度旋转。<br>Professional image rotation and flip tool supporting preset angles and custom angle rotation.
 
 <b>特点 | Features</b>：
-- <b>预设旋转 | Preset Rotation</b>：提供90°、180°、270°、360°快速旋转选项<br>Provides 90°, 180°, 270°, 360° quick rotation options
-- <b>翻转功能 | Flip Functions</b>：支持垂直翻转和水平翻转操作<br>Supports vertical flip and horizontal flip operations
-- <b>自定义角度 | Custom Angle</b>：支持-360°到360°范围内的精确角度旋转<br>Supports precise angle rotation within -360° to 360° range
-- <b>画布处理 | Canvas Processing</b>：可选择扩展画布或裁剪空白两种处理模式<br>Optional expand canvas or crop blank processing modes
-- <b>批量处理 | Batch Processing</b>：支持批量图像的同时处理<br>Supports simultaneous processing of batch images
+- <b>预设旋转</b>：提供90°、180°、270°、360°快速旋转选项<br>
+Preset Rotation: Provides 90°, 180°, 270°, 360° quick rotation options
+- <b>翻转功能</b>：支持垂直翻转和水平翻转操作<br>
+<b>Flip Functions:</b> Supports vertical flip and horizontal flip operations
+- <b>自定义角度</b>：支持-360°到360°范围内的精确角度旋转<br>
+<b>Custom Angle:</b> Supports precise angle rotation within -360° to 360° range
+- <b>画布处理</b>：可选择扩展画布或裁剪空白两种处理模式<br>
+<b>Canvas Processing:</b> Optional expand canvas or crop blank processing modes
+- <b>批量处理</b>：支持批量图像的同时处理<br>
+<b>Batch Processing:</b> Supports simultaneous processing of batch images
 
 <br>
 <div align="left">
@@ -402,8 +425,10 @@ Supports direct input of system prompts or loading through external nodes
 <td>多功能图像预览和对比节点，支持单张图像预览或两张图像的并排对比显示。image_1为必需输入，image_2为可选输入，当提供两张图像时自动启用对比模式。<br>Multi-functional image preview and comparison node that supports single image preview or side-by-side comparison of two images. image_1 is required input, image_2 is optional input, automatically enables comparison mode when two images are provided.
 
 <b>特点 | Features</b>：
-- <b>双模式智能切换 | Dual-mode Smart Switching</b>：根据输入单图或双图自动切换预览或对比模式<br>Automatically switches between preview or comparison mode based on single or dual image inputs
-- <b>交互式对比 | Interactive Comparison</b>：鼠标悬停时显示滑动分割线进行直观对比<br>Shows sliding divider for intuitive comparison when mouse hovers over the node
+- <b>双模式智能切换</b>：根据输入单图或双图自动切换预览或对比模式<br>
+<b>Dual-mode Smart Switching:</b> Automatically switches between preview or comparison mode based on single or dual image inputs
+- <b>交互式对比</b>：鼠标悬停时显示滑动分割线进行直观对比<br>
+<b>Interactive Comparison:</b> Shows sliding divider for intuitive comparison when mouse hovers over the node
 
 <br>
 <div align="left">
@@ -420,15 +445,22 @@ Supports direct input of system prompts or loading through external nodes
 专业的图像格式转换工具，支持批量转换多种图像格式，具备智能格式检测和高级压缩选项。<br>Professional image format conversion tool supporting batch conversion of multiple image formats with intelligent format detection and advanced compression options.
 
 <b>支持格式 | Supported Formats</b>：
-- <b>输出格式 | Output Formats</b>：JPEG、PNG、WEBP、BMP、TIFF<br>JPEG, PNG, WEBP, BMP, TIFF
-- <b>输入格式 | Input Formats</b>：自动检测所有常见图像格式<br>Automatically detects all common image formats
+- <b>输出格式</b>：JPEG、PNG、WEBP、BMP、TIFF<br>
+Output Formats: JPEG, PNG, WEBP, BMP, TIFF
+- <b>输入格式</b>：自动检测所有常见图像格式<br>
+Input Formats: Automatically detects all common image formats
 
 <b>特点 | Features</b>：
-- <b>批量处理 | Batch Processing</b>：支持文件夹批量转换，自动创建输出目录<br>Supports folder batch conversion with automatic output directory creation
-- <b>质量控制 | Quality Control</b>：1-100可调质量参数，精确控制文件大小和画质<br>Adjustable quality parameter from 1-100 for precise control of file size and image quality
-- <b>高级选项 | Advanced Options</b>：支持优化压缩、渐进式编码、无损压缩<br>Supports optimization compression, progressive encoding, and lossless compression
-- <b>智能检测 | Smart Detection</b>：基于文件内容而非扩展名的格式检测<br>Format detection based on file content rather than file extension
-- <b>详细报告 | Detailed Reports</b>：提供转换过程的详细信息和统计数据<br>Provides detailed information and statistics of the conversion process
+- <b>批量处理</b>：支持文件夹批量转换，自动创建输出目录<br>
+<b>Batch Processing:</b> Supports folder batch conversion with automatic output directory creation
+- <b>质量控制</b>：1-100可调质量参数，精确控制文件大小和画质<br>
+Quality Control: Adjustable quality parameter from 1-100 for precise control of file size and image quality
+- <b>高级选项</b>：支持优化压缩、渐进式编码、无损压缩<br>
+<b>Advanced Options:</b> Supports optimization compression, progressive encoding, and lossless compression
+- <b>智能检测</b>：基于文件内容而非扩展名的格式检测<br>
+<b>Smart Detection:</b> Format detection based on file content rather than file extension
+- <b>详细报告</b>：提供转换过程的详细信息和统计数据<br>
+Detailed Reports: Provides detailed information and statistics of the conversion process
 
 <br>
 <div align="left">
@@ -452,9 +484,11 @@ Supports direct input of system prompts or loading through external nodes
 <td>
 
 为图像添加逼真的胶片颗粒效果，营造经典胶片质感。<br>Adds realistic film grain effects to images, creating classic film texture.
-- <b>双分布模式</b>：支持高斯分布（自然胶片噪点）和平均分布（数字均匀噪点）<br><b>Dual Distribution Modes</b>: Supports Gaussian distribution (natural film noise) and uniform distribution (digital uniform noise)
+- <b>双分布模式</b>：支持高斯分布（自然胶片噪点）和平均分布（数字均匀噪点）<br>
+<b>Dual Distribution Modes</b>: Supports Gaussian distribution (natural film noise) and uniform distribution (digital uniform noise)
 
-- <b>饱和度混合</b>：独立控制彩色/单色颗粒比例，实现从彩色胶片到黑白胶片的平滑过渡<br><b>Saturation Blending</b>: Independent control of color/monochrome grain ratio, achieving smooth transition from color film to black and white film
+- <b>饱和度混合</b>：独立控制彩色/单色颗粒比例，实现从彩色胶片到黑白胶片的平滑过渡<br>
+<b>Saturation Blending</b>: Independent control of color/monochrome grain ratio, achieving smooth transition from color film to black and white film
 
 <br>
 <div align="left">
@@ -569,8 +603,10 @@ Supports direct input of system prompts or loading through external nodes
 <td>
 突破传统限制的高级模型加载器，支持自定义路径管理和动态模型发现，通过Web界面实现路径的添加和管理。<br>An advanced model loader that breaks through traditional limitations, supporting custom path management and dynamic model discovery. Paths can be added and managed through a web interface.
 <b>核心功能 | Core Features</b>：
-- <b>自定义路径支持 | Custom Path Support</b>：通过Web界面添加和管理任意路径下的模型文件<br>Add and manage model files in arbitrary paths through web interface
-- <b>智能路径扫描 | Intelligent Path Scanning</b>：自动扫描指定路径发现可用模型并更新列表<br>Automatically scans specified paths to discover available models and update the list
+- <b>自定义路径支持</b>：通过Web界面添加和管理任意路径下的模型文件<br>
+ <b>Custom Path Support:</b> Add and manage model files in arbitrary paths through web interface
+- <b>智能路径扫描</b>：自动扫描指定路径发现可用模型并更新列表<br>
+ <b>Intelligent Path Scanning:</b> Automatically scans specified paths to discover available models and update the list
 
 <br>
 <div align="left">
@@ -632,9 +668,12 @@ Supports direct input of system prompts or loading through external nodes
 SiliconFlow, ModelScope, Custom API
 
 <b>核心特点 | Key Features</b>：
-- <b>云端部署 | Cloud Deployment</b>：无需本地GPU，通过API调用云端模型<br>No local GPU required, access cloud models via API
-- <b>双重配置模式 | Dual Configuration Modes</b>：平台预设和完全自定义两种模式<br>Platform presets and fully custom configuration modes
-- <b>批量处理 | Batch Processing</b>：支持文件夹批量处理，自动保存结果<br>Supports folder batch processing with automatic result saving
+- <b>云端部署</b>：无需本地GPU，通过API调用云端模型<br>
+Cloud Deployment: No local GPU required, access cloud models via API
+- <b>双重配置模式</b>：平台预设和完全自定义两种模式<br>
+Dual Configuration Modes: Platform presets and fully custom configuration modes
+- <b>批量处理</b>：支持文件夹批量处理，自动保存结果<br>
+Batch Processing: Supports folder batch processing with automatic result saving
 
 <br>
 <div align="left">
@@ -741,11 +780,16 @@ SiliconFlow, ModelScope, Custom API
 新一代智能标签管理系统，集成海量预设标签库、自定义标签功能和内置AI扩写能力，提供前所未有的标签选择体验，快速构建复杂提示词，提升创作效率。<br>Next-generation intelligent tag management system, integrating massive preset tag library, custom tag functionality, and built-in AI expansion capabilities, providing an unprecedented tag selection experience, quickly building complex prompts and improving creative efficiency.
 
 <b>核心功能 | Core Features</b>：
-- <b>标签分类丰富 | Comprehensive Tag Categories</b>：涵盖常规标签、艺术题材、人物属性、场景环境等全方位分类<br>Covers comprehensive categories including general tags, artistic themes, character attributes, scene environments, etc.
-- <b>自定义标签管理 | Custom Tag Management</b>：支持添加、编辑、删除个人专属标签，打造个性化标签库<br>Support adding, editing, and deleting personal exclusive tags, building personalized tag library
-- <b>智能搜索定位 | Smart Search & Positioning</b>：支持关键词搜索，快速找到目标标签<br>Keyword search support, quickly find target tags
-- <b>实时选择统计 | Real-time Selection Statistics</b>：动态显示已选标签数量和详细列表<br>Dynamically display selected tag count and detailed list
-- <b>随机标签生成 | Random Tag Generation</b>：智能随机标签生成功能，支持按分类权重和数量配置自动生成多样化标签组合<br>Intelligent random tag generation, supporting automatic generation of diverse tag combinations based on category weights and quantity configuration
+- <b>标签分类丰富：</b>涵盖常规标签、艺术题材、人物属性、场景环境等全方位分类<br>
+<b>Comprehensive Tag Categories:</b> Covers comprehensive categories including general tags, artistic themes, character attributes, scene environments, etc.
+- <b>自定义标签管理：</b>支持添加、编辑、删除个人专属标签，打造个性化标签库<br>
+<b>Custom Tag Management:</b> Support adding, editing, and deleting personal exclusive tags, building personalized tag library
+- <b>智能搜索定位：</b>支持关键词搜索，快速找到目标标签<br>
+<b>Smart Search & Positioning:</b> Keyword search support, quickly find target tags
+- <b>实时选择统计：</b>动态显示已选标签数量和详细列表<br>
+<b>Real-time Selection Statistics:</b> Dynamically display selected tag count and detailed list
+- <b>随机标签生成：</b>智能随机标签生成功能，支持按分类权重和数量配置自动生成多样化标签组合<br>
+<b>Random Tag Generation:</b> Intelligent random tag generation, supporting automatic generation of diverse tag combinations based on category weights and quantity configuration
 - <b>内置AI扩写 | Built-in AI Expansion</b>：一键智能扩写功能，支持标签式和自然语言式两种扩写模式<br>One-click intelligent expansion feature, supporting both tag-style and natural language expansion modes
 <br>
 <div align="left">
@@ -799,8 +843,10 @@ SiliconFlow, ModelScope, Custom API
 <td>智能优先级图像切换节点，当同时接入图像A和图像B端口时，优先输出B端口的内容；如果B端口无输入，则输出图像A端口的内容；如果两个端口都无输入，则弹出提示要求至少连接一个输入端口。<br>Intelligent priority image switching node. When both image A and image B ports are connected, it prioritizes output from port B; if port B has no input, it outputs from image A port; if both ports have no input, it prompts to connect at least one input port.
 
 <b>特点 | Features</b>：
-- <b>优先级控制 | Priority Control</b>：图像B端口优先级高于图像A端口<br>Image B port has higher priority than image A port
-- <b>智能切换 | Smart Switching</b>：自动检测输入状态，无缝切换输出，减少手动切换操作<br>Automatically detects input status, seamlessly switches output, reducing manual switching operations
+- <b>优先级控制</b>：图像B端口优先级高于图像A端口<br>
+<b>Priority Control:</b> Image B port has higher priority than image A port
+- <b>智能切换</b>：自动检测输入状态，无缝切换输出，减少手动切换操作<br>
+<b>Smart Switching:</b> Automatically detects input status, seamlessly switches output, reducing manual switching operations
 
 <br>
 <div align="left">
@@ -815,13 +861,16 @@ SiliconFlow, ModelScope, Custom API
 
 提供在线翻译服务，支持中英文互译和源语言自动检测。<br>Provides online translation services, supporting bidirectional Chinese-English translation and automatic source language detection.
 
-<b>密钥加载 | Key Loading</b>：
-- <b>明文加载 | Plain Text Loading</b>：直接在节点中输入 <code>APP_ID</code> 和 <code>API_KEY</code><br>Directly input <code>APP_ID</code> and <code>API_KEY</code> in the node
+<b>密钥加载</b>：
+- <b>明文加载</b>：直接在节点中输入 <code>APP_ID</code> 和 <code>API_KEY</code><br>
+<b>Plain Text Loading:</b> Directly input <code>APP_ID</code> and <code>API_KEY</code> in the node
 
-- <b>后台加载 | Background Loading</b>：从配置文件读取密钥，保护隐私安全<br>Read keys from configuration file to protect privacy and security
+- <b>后台加载</b>：从配置文件读取密钥，保护隐私安全<br>
+<b>Background Loading:</b> Read keys from configuration file to protect privacy and security
 
-<b>注意 | Note</b>：
-- 需在<a href="https://api.fanyi.baidu.com/">百度翻译开放平台</a>注册并获取密钥<br>Need to register and obtain keys at <a href="https://api.fanyi.baidu.com/">Baidu Translate Open Platform</a>
+<b>注意</b>：
+- 需在<a href="https://api.fanyi.baidu.com/">百度翻译开放平台</a>注册并获取密钥<br>
+<b>Note:</b> Need to register and obtain keys at <a href="https://api.fanyi.baidu.com/">Baidu Translate Open Platform</a>
 
 - 使用此节点需要网络连接<br>Network connection required for this node
 - 后台加载方式需要先修改配置文件"baidu_translate_config.json"后重启ComfyUI。（配置文件路径：...\custom_nodes\zhihui_nodes_comfyui\Nodes\Translate）<br>Background loading requires modifying the configuration file "baidu_translate_config.json" before restarting ComfyUI. (Config file path: ...\custom_nodes\zhihui_nodes_comfyui\Nodes\Translate)
@@ -840,10 +889,13 @@ SiliconFlow, ModelScope, Custom API
 免费在线翻译服务，支持中英文双向翻译和自动语言检测。<br>Free online translation service supporting bidirectional Chinese-English translation and automatic language detection.
 
 <b>特点 | Features</b>：
-- <b>免费使用 | Free to Use</b>：无需注册或API密钥，开箱即用<br>No registration or API key required, ready to use out of the box
+- <b>免费使用</b>：无需注册或API密钥，开箱即用<br>
+<b>Free to Use:</b> No registration or API key required, ready to use out of the box
 
-- <b>多模型支持 | Multi-model Support</b>：提供11种AI模型选择（OpenAI、Claude、DeepSeek、Gemini等）<br>Provides 11 AI model options (OpenAI, Claude, DeepSeek, Gemini, etc.)
-- <b>注意 | Note</b>：使用此节点需要网络连接<br>Network connection required for this node
+- <b>多模型支持</b>：提供11种AI模型选择（OpenAI、Claude、DeepSeek、Gemini等）<br>
+Multi-model Support: Provides 11 AI model options (OpenAI, Claude, DeepSeek, Gemini, etc.)
+- <b>注意</b>：使用此节点需要网络连接<br>
+<b>Note: </b>Network connection required for this node
 
 <div align="left">
 <a href="images/中英文翻译器.jpg" target="_blank">
@@ -859,11 +911,14 @@ SiliconFlow, ModelScope, Custom API
 使用腾讯云翻译API进行文本翻译，支持自动语言检测和中英文互译。<br>Uses Tencent Cloud Translation API for text translation, supporting automatic language detection and bidirectional Chinese-English translation.
 
 <b>特点 | Features</b>：
-- <b>高质量翻译 | High-Quality Translation</b>：基于腾讯云专业翻译引擎，提供准确可靠的翻译结果<br>Based on Tencent Cloud professional translation engine, providing accurate and reliable translation results
+- <b>高质量翻译</b>：基于腾讯云专业翻译引擎，提供准确可靠的翻译结果<br>
+<b>High-Quality Translation:</b> Based on Tencent Cloud professional translation engine, providing accurate and reliable translation results
 
-- <b>简单易用 | Easy to Use</b>：无需配置API密钥，开箱即用<br>No API key configuration required, ready to use out of the box
+- <b>简单易用</b>：无需配置API密钥，开箱即用<br>
+<b>Simple to Use:</b> No API key configuration required, ready to use out of the box
 
-- <b>注意 | Note</b>：使用此节点需要网络连接<br>Network connection required for this node
+- <b>注意</b>：使用此节点需要网络连接<br>
+<b>Note:</b> Network connection required for this node
 
 <div align="left">
 <a href="images/腾讯翻译.jpg" target="_blank">
@@ -883,8 +938,10 @@ SiliconFlow, ModelScope, Custom API
 - <b>文本格式 | Text Formats</b>：txt, json, js
 
 <b>特点 | Features</b>：
-- <b>可视化界面 | Visual Interface</b>：提供友好的文件浏览器界面<br>Provides a user-friendly file browser interface
-- <b>缩略图支持 | Thumbnail Support</b>：快速预览图片内容<br>Quick preview of image content
+- <b>可视化界面</b>：提供友好的文件浏览器界面<br>
+<b>Visual Interface:</b> Provides a user-friendly file browser interface
+- <b>缩略图支持</b>：快速预览图片内容<br>
+<b>Thumbnail Support:</b> Quick preview of image content
 
 <div align="left">
 <a href="images/本地文件画廊.jpg" target="_blank">
@@ -900,15 +957,14 @@ SiliconFlow, ModelScope, Custom API
 智能工作流控制节点，可在任意位置暂停工作流执行，等待用户交互后继续或取消执行。<br>Intelligent workflow control node that can pause workflow execution at any point, waiting for user interaction to continue or cancel execution.
 
 <b>特点 | Features</b>：
-- <b>通用输入 | Universal Input</b>：支持任意类型的数据输入和输出，可插入工作流的任何位置<br>Supports any type of data input and output, can be inserted at any position in the workflow
-- <b>交互式控制 | Interactive Control</b>：提供继续和取消两个操作选项<br>Provides continue and cancel operation options
-- <b>状态管理 | State Management</b>：智能管理每个节点实例的暂停状态<br>Intelligently manages the pause state of each node instance
-- <b>异常处理 | Exception Handling</b>：取消时抛出中断异常，安全终止工作流<br>Throws interrupt exception when cancelled, safely terminates workflow
-
-<b>使用场景 | Use Cases</b>：
-- 需要人工检查中间结果的工作流<br>Workflows requiring manual inspection of intermediate results
-- 调试和测试复杂工作流<br>Debugging and testing complex workflows
-- 需要用户确认的关键步骤<br>Critical steps requiring user confirmation
+- <b>通用输入</b>：支持任意类型的数据输入和输出，可插入工作流的任何位置<br>
+<b>Universal Input:</b> Supports any type of data input and output, can be inserted at any position in the workflow
+- <b>交互式控制</b>：提供继续和取消两个操作选项<br>
+<b>Interactive Control:</b> Provides continue and cancel operation options
+- <b>状态管理</b>：智能管理每个节点实例的暂停状态<br>
+<b>State Management:</b> Intelligently manages the pause state of each node instance
+- <b>异常处理</b>：取消时抛出中断异常，安全终止工作流<br>
+<b>Exception Handling:</b> Throws interrupt exception when cancelled, safely terminates workflow
 
 </td>
 </tr>
