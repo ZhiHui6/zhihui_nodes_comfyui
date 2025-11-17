@@ -47,6 +47,8 @@ from .Nodes.ImageRotateTool import ImageRotateTool
 from .Nodes.ImageFormatConverter import ImageFormatConverter
 from .Nodes.Qwen3VL.Qwen3VLAPI import Qwen3VLAPI
 from .Nodes.FreeLoaders.FreeCheckpointLoader import FreeCheckpointLoader
+from .Nodes.Sa2VA.Sa2VAAdvanced import Sa2VAAdvanced
+from .Nodes.Sa2VA.Sa2VASegmentationPreset import Sa2VASegmentationPreset
 
 import os
 
@@ -100,6 +102,8 @@ NODE_CLASS_MAPPINGS = {
     "ImageFormatConverter": ImageFormatConverter,
     "Qwen3VLAPI": Qwen3VLAPI,
     "FreeCheckpointLoader": FreeCheckpointLoader,
+    "Sa2VAAdvanced": Sa2VAAdvanced,
+    "Sa2VASegmentationPreset": Sa2VASegmentationPreset,
 }
 
 NODE_DISPLAY_NAME_MAPPINGS = {
@@ -152,6 +156,8 @@ NODE_DISPLAY_NAME_MAPPINGS = {
     "ImageFormatConverter": "Image Format Converter",
     "Qwen3VLAPI": "Qwen3-VL API",
     "FreeCheckpointLoader": "Free Checkpoint Loader",
+    "Sa2VAAdvanced": "Sa2VA Advanced",
+    "Sa2VASegmentationPreset": "Sa2VA Segmentation Preset",
 }
 
 WEB_DIRECTORY = os.path.join(os.path.dirname(os.path.abspath(__file__)), "web")

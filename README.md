@@ -764,6 +764,48 @@ Batch Processing: Supports folder batch processing with automatic result saving
 </div>
 </td>
 </tr>
+
+<tr>
+<td><b>Sa2VA高级版</b><br><b>Sa2VA Advanced</b><br><code>Sa2VAAdvanced</code></td>
+<td>
+基于字节跳动Sa2VA模型的专业级图像分割节点，提供精确的智能分割功能，支持多种模型版本和量化配置。通过自然语言提示词控制分割区域，实现对图像中特定对象的精准分割，输出高质量的遮罩数据。<br>Professional-grade image segmentation node based on ByteDance's Sa2VA model, providing precise intelligent segmentation capabilities. Supports multiple model variants and quantization configurations. Controls segmentation regions through natural language prompts, achieving precise segmentation of specific objects in images and outputting high-quality mask data.
+
+<b>核心功能 | Core Features</b>：
+- <b>智能分割</b>：基于自然语言提示词进行精确的图像对象分割<br>
+<b>Intelligent Segmentation:</b> Precise image object segmentation based on natural language prompts
+- <b>多模型支持</b>：支持多种Sa2VA模型版本，包括InternVL3和Qwen系列<br>
+<b>Multi-Model Support:</b> Supports various Sa2VA model variants, including InternVL3 and Qwen series
+- <b>量化优化</b>：提供4bit和8bit量化选项，优化性能和资源使用<br>
+<b>Quantization Optimization:</b> Provides 4bit and 8bit quantization options to optimize performance and resource usage
+- <b>Flash Attention</b>：支持Flash Attention技术，提升推理效率<br>
+<b>Flash Attention:</b> Supports Flash Attention technology to improve inference efficiency
+- <b>模型管理</b>：内置模型下载和管理功能，支持本地缓存<br>
+<b>Model Management:</b> Built-in model download and management functionality with local caching support
+<br>
+<div align="left">
+<a href="images/Sa2VA Advanced1.jpg" target="_blank">
+<img src="images/Sa2VA Advanced1.jpg" alt="Sa2VA高级版-界面1" width="45%"/>
+</a>
+<a href="images/Sa2VA Advanced2.jpg" target="_blank">
+<img src="images/Sa2VA Advanced2.jpg" alt="Sa2VA高级版-界面2" width="45%"/>
+</a>
+</div>
+</td>
+</tr>
+<tr>
+<td><b>Sa2VA分割预设</b><br><b>Sa2VA Segmentation Preset</b><br><code>Sa2VASegmentationPreset</code></td>
+<td>
+提供交互式分割预设选择的工具节点，可在界面中选择常见部位/对象并生成中文分割提示文本输出，用于驱动 Sa2VA 高级版的分割。将本节点的 <code>segmentation_preset</code> 输出连接到 Sa2VA 高级版的同名输入即可生效。若该输入为空，Sa2VA 高级版将改用字符串输入框中的 <code>segmentation_prompt</code>。<br>
+Tool node that provides interactive segmentation preset selection. Choose common parts/objects in UI to generate a Chinese segmentation prompt text, which drives Sa2VA Advanced. Connect this node's <code>segmentation_preset</code> output to the same-named input of Sa2VA Advanced. If that input is empty, Sa2VA Advanced falls back to the string input <code>segmentation_prompt</code>.
+
+<br>
+<div align="left">
+<a href="images/Sa2VA Segmentation Preset.jpg" target="_blank">
+<img src="images/Sa2VA Segmentation Preset.jpg" alt="Sa2VA分割预设" width="45%"/>
+</a>
+</div>
+</td>
+</tr>
 </table>
 
 ### ⚙️ 逻辑与工具类节点 | Logic and Utility Nodes
@@ -1017,3 +1059,22 @@ pip install -r requirements.txt
 </div>
 
 如果您有任何想法或建议，请随时提出 Issue 或 Pull Request。<br>If you have any ideas or suggestions, please feel free to submit an Issue or Pull Request.
+#### Sa2VA 节点组说明 | Sa2VA Node Group
+
+- 组成：<code>Sa2VAAdvanced</code> + <code>Sa2VASegmentationPreset</code>
+- 输入：
+  - <code>image</code> 图像输入（必连）
+  - <code>segmentation_preset</code>（可选）：来自预设节点的分割提示文本；优先级高于 <code>segmentation_prompt</code>
+  - <code>segmentation_prompt</code>（可选）：自由文本分割提示。当 <code>segmentation_preset</code> 为空时使用
+- 控件与参数：
+  - <code>model_name</code> 模型选择，支持 Sa2VA InternVL3/Qwen/Qwen3-VL 系列
+  - <code>quantization</code> 可选 4bit/8bit；<code>use_flash_attn</code> 提升推理效率
+  - <code>keep_model_loaded</code> 控制模型常驻与释放
+  - <code>mask_threshold</code> 控制二值化阈值
+  - <code>image_scaling</code> 字符串参数，按长边缩放：范围 <code>512–2048</code>，步进 <code>1</code>；仅当目标值小于原图长边时执行等比缩小；<code>0</code> 或空字符串不缩放
+- 输出：
+  - 第1输出 <code>image</code>：尺寸为 <code>[1,H,W,3]</code> 的 <code>float32</code> 0–1 张量，分辨率与缩放后保持一致
+  - 第2输出 <code>mask</code>：尺寸为 <code>[1,H,W]</code> 的 <code>float32</code> 张量；当无分割结果时会输出同尺寸的空遮罩
+- 连接建议：
+  - 将 <code>Sa2VASegmentationPreset.segmentation_preset</code> → <code>Sa2VAAdvanced.segmentation_preset</code>
+  - 将输入图像 → <code>Sa2VAAdvanced.image</code>；从输出获取 <code>image</code> 与 <code>mask</code> 进行后续处理

@@ -864,5 +864,35 @@
         "tooltips": {
             "ckpt_name": "要加载的检查点（模型）名称，支持从自定义路径扫描的模型文件"
         }
+    },
+    "Sa2VAAdvanced": {
+        "title": "Sa2VA高级版",
+        "description": "图像分割与视觉解析，支持 4bit/8bit 量化",
+        "inputs": {
+            "image": "图像输入",
+            "segmentation_preset": "分割预设"
+        },
+        "widgets": {
+            "model_name": "模型名称",
+            "mask_threshold": "遮罩阈值",
+            "quantization": "量化",
+            "use_flash_attn": "启用Flash注意力",
+            "keep_model_loaded": "保持模型常驻",
+            "image_scaling": "图像缩放"
+        },
+        "outputs": {
+            "image": "图像输出",
+            "mask": "遮罩"
+        }
+    },
+    "Sa2VASegmentationPreset": {
+        "title": "Sa2VA分割预设",
+        "description": "分割预设选择：在界面中选择需要分割的部位或对象，生成中文分割提示文本并返回。",
+        "widgets": {
+            "enable_node": "启用节点"
+        },
+        "outputs": {
+            "segmentation_preset": "分割预设"
+        }
     }
 }

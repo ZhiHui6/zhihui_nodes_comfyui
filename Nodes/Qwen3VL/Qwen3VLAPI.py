@@ -1176,7 +1176,7 @@ class Qwen3VLAPI:
                 status_messages.append(f"✅ 平台: {selected_platform}")
                 status_messages.append(f"✅ 模型: {selected_model} ({api_model_name})")
             
-                final_prompt = self.get_final_prompt(system_prompt, user_prompt)
+            final_prompt = self.get_final_prompt(system_prompt, user_prompt)
             
             if llm_mode:
                 status_messages.append("🔄 正在进行纯文本对话模式调用…")

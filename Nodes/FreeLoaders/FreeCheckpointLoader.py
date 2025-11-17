@@ -15,6 +15,8 @@ import comfy.utils
 class FreeCheckpointLoader:
     custom_checkpoint_paths: Dict[str, List[str]] = {}
     custom_model_lists: Dict[str, List[str]] = {}
+    # 显示名到真实路径的映射（每个节点独立）
+    custom_model_maps: Dict[str, Dict[str, str]] = {}
     
     @classmethod
     def INPUT_TYPES(s):
@@ -38,19 +40,22 @@ class FreeCheckpointLoader:
                     if isinstance(raw_paths, list):
                         paths.extend([p for p in raw_paths if isinstance(p, str)])
                 checkpoint_extensions = ['.safetensors', '.ckpt', '.pt', '.pth']
-                model_set = set()
+                display_set = set()
                 for p in set(paths):
                     if p and os.path.exists(p) and os.path.isdir(p):
                         try:
-                            for file in os.listdir(p):
-                                file_path = os.path.join(p, file)
-                                if os.path.isfile(file_path):
-                                    ext = os.path.splitext(file)[1].lower()
-                                    if ext in checkpoint_extensions:
-                                        model_set.add(file)
+                            for root, _, files in os.walk(p):
+                                for file in files:
+                                    full = os.path.join(root, file)
+                                    if os.path.isfile(full):
+                                        ext = os.path.splitext(file)[1].lower()
+                                        if ext in checkpoint_extensions:
+                                            rel = os.path.relpath(full, p)
+                                            display = rel.replace('/', '\\')
+                                            display_set.add(display)
                         except Exception:
                             pass
-                return sorted(model_set)
+                return sorted(display_set)
             except Exception:
                 return []
 
@@ -66,7 +71,45 @@ class FreeCheckpointLoader:
         except Exception:
             pass
 
-        allowed = sorted(set(persisted_models + cached_models))
+        # 扫描默认 checkpoints 目录以包含相对路径显示
+        def _load_default_checkpoints() -> List[str]:
+            try:
+                checkpoint_extensions = ['.safetensors', '.ckpt', '.pt', '.pth']
+                dirs = folder_paths.get_folder_paths("checkpoints")
+            except Exception:
+                dirs = []
+            names: List[str] = []
+            for d in dirs:
+                if not d or not os.path.isdir(d):
+                    continue
+                try:
+                    for root, _, files in os.walk(d):
+                        for file in files:
+                            ext = os.path.splitext(file)[1].lower()
+                            if ext in checkpoint_extensions:
+                                full = os.path.join(root, file)
+                                rel = os.path.relpath(full, d)
+                                names.append(rel.replace('/', '\\'))
+                except Exception:
+                    pass
+            # 保持顺序但去重
+            seen = set()
+            result = []
+            for n in names:
+                if n not in seen:
+                    seen.add(n)
+                    result.append(n)
+            return sorted(result)
+
+        default_ckpts = _load_default_checkpoints()
+
+        # 组合允许列表（显示名包含子目录）
+        allowed = []
+        for x in persisted_models + cached_models + default_ckpts:
+            if isinstance(x, str) and x.strip():
+                allowed.append(x)
+        # 去重并排序
+        allowed = sorted(list({x: None for x in allowed}.keys()))
         
         return {
             "required": {
@@ -111,16 +154,56 @@ class FreeCheckpointLoader:
         
         node_id = getattr(self, 'id', None)
         
+        def _norm_display(s: str) -> str:
+            try:
+                return str(s).strip().replace('/', '\\')
+            except Exception:
+                return s
+
         def _search_in_paths(paths: List[str]) -> Optional[str]:
-            for custom_path in paths or []:
-                if custom_path and os.path.exists(custom_path):
-                    for ext in ['.safetensors', '.ckpt', '.pt', '.pth']:
-                        full_path = os.path.join(custom_path, ckpt_name + ext)
-                        if os.path.isfile(full_path):
-                            return full_path
-                        full_path2 = os.path.join(custom_path, ckpt_name)
-                        if os.path.isfile(full_path2):
-                            return full_path2
+            # 支持显示名包含子目录，例如 "XL\\model.safetensors"
+            normalized_input = _norm_display(ckpt_name)
+            name_base, name_ext = os.path.splitext(normalized_input)
+            checkpoint_extensions = ['.safetensors', '.ckpt', '.pt', '.pth']
+
+            # 1) 尝试映射表（若存在）
+            if node_id and node_id in FreeCheckpointLoader.custom_model_maps:
+                mapping = FreeCheckpointLoader.custom_model_maps.get(node_id, {})
+                full = mapping.get(normalized_input)
+                if full and os.path.isfile(full):
+                    return full
+
+            # 2) 直接拼接相对路径到各根目录
+            parts = [p for p in normalized_input.split('\\') if p]
+            for base in paths or []:
+                try:
+                    candidate = os.path.join(base, *parts)
+                    if os.path.isfile(candidate):
+                        ext = os.path.splitext(candidate)[1].lower()
+                        if ext in checkpoint_extensions:
+                            return candidate
+                except Exception:
+                    pass
+
+            # 3) 回退为全量遍历匹配：相对路径或仅文件名/不含扩展
+            target_names = {normalized_input}
+            if not name_ext:
+                for ext in checkpoint_extensions:
+                    target_names.add(normalized_input + ext)
+            for base in paths or []:
+                if base and os.path.exists(base):
+                    try:
+                        for root, _, files in os.walk(base):
+                            for file in files:
+                                full_path = os.path.join(root, file)
+                                rel = os.path.relpath(full_path, base).replace('/', '\\')
+                                # 完整相对路径匹配或仅文件名/不含扩展匹配
+                                if rel == normalized_input or os.path.splitext(rel)[0] == name_base or file in target_names or os.path.splitext(file)[0] == name_base:
+                                    ext = os.path.splitext(file)[1].lower()
+                                    if ext in checkpoint_extensions:
+                                        return full_path
+                    except Exception:
+                        pass
             return None
 
         if node_id and node_id in self.custom_checkpoint_paths:
@@ -166,26 +249,31 @@ class FreeCheckpointLoader:
                     "models": []
                 }
             
-            checkpoint_extensions = ['.safetensors', '.ckpt']
+            checkpoint_extensions = ['.safetensors', '.ckpt', '.pt', '.pth']
             existing = cls.custom_checkpoint_paths.get(node_id, [])
             if path not in existing:
                 existing.append(path)
             cls.custom_checkpoint_paths[node_id] = existing
-
-            model_set = set()
+            # 构建显示名 -> 真实路径的映射
+            model_map: Dict[str, str] = {}
+            display_set = set()
             for p in existing:
                 if p and os.path.exists(p) and os.path.isdir(p):
                     try:
-                        for file in os.listdir(p):
-                            file_path = os.path.join(p, file)
-                            if os.path.isfile(file_path):
-                                file_ext = os.path.splitext(file)[1].lower()
-                                if file_ext in checkpoint_extensions:
-                                    model_set.add(file)
+                        for root, _, files in os.walk(p):
+                            for file in files:
+                                full = os.path.join(root, file)
+                                if os.path.isfile(full):
+                                    ext = os.path.splitext(file)[1].lower()
+                                    if ext in checkpoint_extensions:
+                                        rel = os.path.relpath(full, p).replace('/', '\\')
+                                        display_set.add(rel)
+                                        model_map[rel] = full
                     except Exception:
                         pass
-            models = sorted(model_set)
+            models = sorted(display_set)
             cls.custom_model_lists[node_id] = models
+            cls.custom_model_maps[node_id] = model_map
 
             return {
                 "success": True,
@@ -210,24 +298,29 @@ class FreeCheckpointLoader:
     @classmethod
     def scan_multiple_paths(cls, paths: List[str], node_id: str) -> Dict[str, Any]:
         try:
-            checkpoint_extensions = ['.safetensors', '.ckpt']
+            checkpoint_extensions = ['.safetensors', '.ckpt', '.pt', '.pth']
             valid_paths = []
-            model_set = set()
+            display_set = set()
+            model_map: Dict[str, str] = {}
             for p in (paths or []):
                 if p and os.path.exists(p) and os.path.isdir(p):
                     valid_paths.append(p)
                     try:
-                        for file in os.listdir(p):
-                            file_path = os.path.join(p, file)
-                            if os.path.isfile(file_path):
-                                file_ext = os.path.splitext(file)[1].lower()
-                                if file_ext in checkpoint_extensions:
-                                    model_set.add(file)
+                        for root, _, files in os.walk(p):
+                            for file in files:
+                                full = os.path.join(root, file)
+                                if os.path.isfile(full):
+                                    ext = os.path.splitext(file)[1].lower()
+                                    if ext in checkpoint_extensions:
+                                        rel = os.path.relpath(full, p).replace('/', '\\')
+                                        display_set.add(rel)
+                                        model_map[rel] = full
                     except Exception:
                         pass
-            models = sorted(model_set)
+            models = sorted(display_set)
             cls.custom_checkpoint_paths[node_id] = valid_paths
             cls.custom_model_lists[node_id] = models
+            cls.custom_model_maps[node_id] = model_map
             return {
                 "success": True,
                 "error": "",
@@ -261,15 +354,17 @@ class FreeCheckpointLoader:
                     "model_count": 0,
                     "models": []
                 }
-            checkpoint_extensions = ['.safetensors', '.ckpt']
+            checkpoint_extensions = ['.safetensors', '.ckpt', '.pt', '.pth']
             models = []
             try:
-                for file in os.listdir(path):
-                    file_path = os.path.join(path, file)
-                    if os.path.isfile(file_path):
-                        file_ext = os.path.splitext(file)[1].lower()
-                        if file_ext in checkpoint_extensions:
-                            models.append(file)
+                for root, _, files in os.walk(path):
+                    for file in files:
+                        full = os.path.join(root, file)
+                        if os.path.isfile(full):
+                            ext = os.path.splitext(file)[1].lower()
+                            if ext in checkpoint_extensions:
+                                rel = os.path.relpath(full, path).replace('/', '\\')
+                                models.append(rel)
             except Exception:
                 pass
             models.sort()
@@ -565,9 +660,13 @@ def register_free_checkpoint_loader_routes():
                         "error": f"写入文件失败: {str(e)} / Failed to write file: {str(e)}"
                     })
 
+                # 保存后立即扫描并返回模型列表
+                result = FreeCheckpointLoader.scan_multiple_paths(new_record["paths"], node_id)
                 return web.json_response({
                     "success": True,
                     "paths": new_record["paths"],
+                    "models": result.get("models", []),
+                    "model_count": result.get("model_count", 0),
                 })
             except Exception as e:
                 return web.json_response({
@@ -673,18 +772,66 @@ def register_free_checkpoint_loader_routes():
                 data = await request.json()
                 raw_node_id = data.get("node_id", "")
                 node_id = str(raw_node_id).strip()
-                
+                raw_paths = data.get("paths", None)
+
                 if not node_id:
                     return web.json_response({
                         "success": False,
                         "error": "缺少必要参数 / Missing required parameters",
                     })
-                
-                custom_models = FreeCheckpointLoader.get_custom_models_for_node(node_id)
+
+                def _normalize_paths(raw):
+                    try:
+                        if raw is None:
+                            return None
+                        if isinstance(raw, list):
+                            return [str(p).strip() for p in raw if str(p).strip()]
+                        if isinstance(raw, str):
+                            p = str(raw).strip()
+                            return [p] if p else []
+                    except Exception:
+                        pass
+                    return None
+
+                provided_paths = _normalize_paths(raw_paths)
+                if provided_paths:
+                    result = FreeCheckpointLoader.scan_multiple_paths(provided_paths, node_id)
+                    return web.json_response({
+                        "success": True,
+                        "models": result.get("models", []),
+                        "count": result.get("model_count", 0),
+                        "paths": result.get("paths", provided_paths),
+                    })
+
+                # 未提供 paths 时，优先使用已缓存的模型；若为空则从保存文件加载并扫描
+                cached = FreeCheckpointLoader.get_custom_models_for_node(node_id)
+                if cached:
+                    return web.json_response({
+                        "success": True,
+                        "models": cached,
+                        "count": len(cached),
+                    })
+
+                ensure_saved_paths_file()
+                try:
+                    with open(SAVED_PATHS_FILE, 'r', encoding='utf-8') as f:
+                        saved_data = json.load(f)
+                except Exception:
+                    saved_data = {}
+
+                paths = []
+                if isinstance(saved_data, dict) and "paths" in saved_data:
+                    paths = saved_data.get("paths") or []
+                else:
+                    entry = saved_data.get(node_id) or {}
+                    paths = entry.get("paths") or []
+
+                result = FreeCheckpointLoader.scan_multiple_paths(paths, node_id)
                 return web.json_response({
                     "success": True,
-                    "models": custom_models,
-                    "count": len(custom_models),
+                    "models": result.get("models", []),
+                    "count": result.get("model_count", 0),
+                    "paths": result.get("paths", paths),
                 })
             except Exception as e:
                 return web.json_response({

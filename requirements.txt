@@ -1,5 +1,4 @@
 opencv-python
-torch
 torchvision
 torchaudio
 numpy
@@ -13,6 +12,7 @@ optimum
 av
 qwen-vl-utils
 bitsandbytes
+torch>=2.0.0
 transformers>=4.57.0
 triton-windows; sys_platform == 'win32'
 triton; sys_platform == 'linux'

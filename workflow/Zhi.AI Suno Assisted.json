@@ -1,1 +1,748 @@
-{"id":"652ddb6c-caa3-4353-a0db-bf1db089c730","revision":0,"last_node_id":16,"last_link_id":11,"nodes":[{"id":12,"type":"Note","pos":[-9440,-2340],"size":[240,90],"flags":{"pinned":true},"order":0,"mode":0,"inputs":[],"outputs":[],"properties":{"ue_properties":{"widget_ue_connectable":{},"version":"7.4.1","input_ue_unconnectable":{}}},"widgets_values":["说说你的歌词创意：\n例如：一首关于纯洁爱神的歌。"],"color":"#432","bgcolor":"#653","shape":1},{"id":5,"type":"SunoLyricsGenerator","pos":[-9170,-2010],"size":[400,320],"flags":{"pinned":true},"order":4,"mode":0,"inputs":[{"label":"歌词创意","localized_name":"preference","name":"preference","type":"STRING","widget":{"name":"preference"},"link":5},{"label":"Theme","localized_name":"主题","name":"Theme","type":"COMBO","widget":{"name":"Theme"},"link":null},{"label":"Lyrics Language","localized_name":"歌词语言","name":"Lyrics Language","type":"COMBO","widget":{"name":"Lyrics Language"},"link":null},{"label":"Vocal Arrangement","localized_name":"演唱编制","name":"Vocal Arrangement","type":"COMBO","widget":{"name":"Vocal Arrangement"},"link":null},{"label":"Lyrics Style","localized_name":"歌词风格","name":"Lyrics Style","type":"COMBO","widget":{"name":"Lyrics Style"},"link":null},{"label":"Mood","localized_name":"情绪","name":"Mood","type":"COMBO","widget":{"name":"Mood"},"link":null},{"label":"Style/Genre","localized_name":"风格/流派","name":"Style/Genre","type":"COMBO","widget":{"name":"Style/Genre"},"link":null},{"label":"Output_original_text","localized_name":"输出原文","name":"Output_original_text","type":"BOOLEAN","widget":{"name":"Output_original_text"},"link":null}],"outputs":[{"label":"歌词","localized_name":"lyrics","name":"lyrics","type":"STRING","links":[4]}],"properties":{"Node name for S&R":"SunoLyricsGenerator","aux_id":"ZhiHui6/zhihui_nodes_comfyui","ver":"d27c8aa578e30acb5aef51e819f3810bc563aa06","ue_properties":{"widget_ue_connectable":{"preference":true,"Theme":true,"Lyrics Language":true,"Vocal Arrangement":true,"Lyrics Style":true,"Mood":true,"Style/Genre":true,"Output_original_text":true},"version":"7.4.1","input_ue_unconnectable":{}}},"widgets_values":["","Love","简体中文 (Simplified Chinese)","Duet (Two vocalists)","Poetic imagery","Romantic","Pop",false],"color":"#223","bgcolor":"#335","shape":1},{"id":10,"type":"SunoSongStylePromptGenerator","pos":[-9170,-2520],"size":[258.751953125,400],"flags":{"pinned":true},"order":5,"mode":0,"inputs":[{"label":"preference","localized_name":"偏好","name":"preference","type":"STRING","widget":{"name":"preference"},"link":10},{"label":"Theme","localized_name":"主题","name":"Theme","type":"COMBO","widget":{"name":"Theme"},"link":null},{"label":"Melody","localized_name":"旋律","name":"Melody","type":"COMBO","widget":{"name":"Melody"},"link":null},{"label":"Harmony","localized_name":"和声","name":"Harmony","type":"COMBO","widget":{"name":"Harmony"},"link":null},{"label":"Rhythm","localized_name":"节奏","name":"Rhythm","type":"COMBO","widget":{"name":"Rhythm"},"link":null},{"label":"Structure or Form","localized_name":"结构或形式","name":"Structure or Form","type":"COMBO","widget":{"name":"Structure or Form"},"link":null},{"label":"Instrumentation","localized_name":"配器","name":"Instrumentation","type":"COMBO","widget":{"name":"Instrumentation"},"link":null},{"label":"Style/Genre","localized_name":"风格/流派","name":"Style/Genre","type":"COMBO","widget":{"name":"Style/Genre"},"link":null},{"label":"Emotion","localized_name":"情绪","name":"Emotion","type":"COMBO","widget":{"name":"Emotion"},"link":null},{"label":"Dynamics","localized_name":"动态","name":"Dynamics","type":"COMBO","widget":{"name":"Dynamics"},"link":null},{"label":"Production","localized_name":"制作","name":"Production","type":"COMBO","widget":{"name":"Production"},"link":null},{"label":"Originality and Creativity","localized_name":"原创性和创造力","name":"Originality and Creativity","type":"COMBO","widget":{"name":"Originality and Creativity"},"link":null},{"label":"Vocal Style and Performance","localized_name":"声乐风格和表现力","name":"Vocal Style and Performance","type":"COMBO","widget":{"name":"Vocal Style and Performance"},"link":null},{"localized_name":"输出原文","name":"Output_original_text","type":"BOOLEAN","widget":{"name":"Output_original_text"},"link":null}],"outputs":[{"label":"提示词","localized_name":"prompt","name":"prompt","type":"STRING","links":[8]}],"properties":{"Node name for S&R":"SunoSongStylePromptGenerator","aux_id":"ZhiHui6/zhihui_nodes_comfyui","ver":"d27c8aa578e30acb5aef51e819f3810bc563aa06","ue_properties":{"widget_ue_connectable":{"preference":true,"Theme":true,"Melody":true,"Harmony":true,"Rhythm":true,"Structure or Form":true,"Instrumentation":true,"Style/Genre":true,"Emotion":true,"Dynamics":true,"Production":true,"Originality and Creativity":true,"Vocal Style and Performance":true,"Output_original_text":true},"version":"7.4.1","input_ue_unconnectable":{}}},"widgets_values":["","Random","Random","Random","Random","Random","Random","Random","Random","Random","Random","Random","Random",false],"color":"#223","bgcolor":"#335","shape":1},{"id":8,"type":"ShowText","pos":[-8900,-2520],"size":[270,400],"flags":{"pinned":true},"order":7,"mode":0,"inputs":[{"label":"文本","localized_name":"text","name":"text","type":"STRING","link":8}],"outputs":[{"label":"字符串","localized_name":"字符串","name":"STRING","shape":6,"type":"STRING","links":[1,9]}],"properties":{"Node name for S&R":"ShowText","aux_id":"ZhiHui6/zhihui_nodes_comfyui","ver":"d27c8aa578e30acb5aef51e819f3810bc563aa06","ue_properties":{"widget_ue_connectable":{},"version":"7.4.1","input_ue_unconnectable":{}}},"widgets_values":[],"shape":1},{"id":16,"type":"ShowText","pos":[-8400,-2290],"size":[370,170],"flags":{"pinned":true},"order":1,"mode":0,"inputs":[{"label":"文本","localized_name":"text","name":"text","type":"STRING","link":null}],"outputs":[{"label":"字符串","localized_name":"字符串","name":"STRING","shape":6,"type":"STRING","links":null}],"properties":{"Node name for S&R":"ShowText","ue_properties":{"widget_ue_connectable":{},"version":"7.4.1","input_ue_unconnectable":{}},"aux_id":"ZhiHui6/zhihui_nodes_comfyui","ver":"d27c8aa578e30acb5aef51e819f3810bc563aa06"},"widgets_values":[],"shape":1},{"id":9,"type":"TextModifier","pos":[-8620,-2290],"size":[210,170],"flags":{"pinned":true},"order":9,"mode":0,"inputs":[{"label":"文本输入","localized_name":"text_input","name":"text_input","type":"STRING","link":9},{"localized_name":"起始文本","name":"start_text","type":"STRING","widget":{"name":"start_text"},"link":null},{"localized_name":"结束文本","name":"end_text","type":"STRING","widget":{"name":"end_text"},"link":null}],"outputs":[{"label":"文本输出","localized_name":"text_output","name":"text_output","type":"STRING","links":[3]},{"label":"帮助信息","localized_name":"help","name":"help","type":"STRING","links":null}],"properties":{"Node name for S&R":"TextModifier","aux_id":"ZhiHui6/zhihui_nodes_comfyui","ver":"d27c8aa578e30acb5aef51e819f3810bc563aa06","ue_properties":{"widget_ue_connectable":{"start_text":true,"end_text":true},"version":"7.4.1","input_ue_unconnectable":{}}},"widgets_values":["  ",""],"shape":1},{"id":1,"type":"TextModifier","pos":[-8620,-2520],"size":[210,170],"flags":{"pinned":true},"order":8,"mode":0,"inputs":[{"label":"文本输入","localized_name":"text_input","name":"text_input","type":"STRING","link":1},{"localized_name":"起始文本","name":"start_text","type":"STRING","widget":{"name":"start_text"},"link":null},{"localized_name":"结束文本","name":"end_text","type":"STRING","widget":{"name":"end_text"},"link":null}],"outputs":[{"label":"文本输出","localized_name":"text_output","name":"text_output","type":"STRING","links":[]},{"label":"帮助信息","localized_name":"help","name":"help","type":"STRING","links":null}],"properties":{"Node name for S&R":"TextModifier","aux_id":"ZhiHui6/zhihui_nodes_comfyui","ver":"d27c8aa578e30acb5aef51e819f3810bc563aa06","ue_properties":{"widget_ue_connectable":{"start_text":true,"end_text":true},"version":"7.4.1","input_ue_unconnectable":{}}},"widgets_values":["","song style: "],"shape":1},{"id":3,"type":"ShowText","pos":[-8400,-2520],"size":[370,170],"flags":{"pinned":true},"order":10,"mode":0,"inputs":[{"label":"文本","localized_name":"text","name":"text","type":"STRING","link":3}],"outputs":[{"label":"字符串","localized_name":"字符串","name":"STRING","shape":6,"type":"STRING","links":null}],"properties":{"Node name for S&R":"ShowText","aux_id":"ZhiHui6/zhihui_nodes_comfyui","ver":"d27c8aa578e30acb5aef51e819f3810bc563aa06","ue_properties":{"widget_ue_connectable":{},"version":"7.4.1","input_ue_unconnectable":{}}},"widgets_values":[],"shape":1},{"id":4,"type":"ShowText","pos":[-8760,-2010],"size":[730,320],"flags":{"pinned":true},"order":6,"mode":0,"inputs":[{"label":"文本","localized_name":"text","name":"text","type":"STRING","link":4}],"outputs":[{"label":"字符串","localized_name":"字符串","name":"STRING","shape":6,"type":"STRING","links":[]}],"properties":{"Node name for S&R":"ShowText","aux_id":"ZhiHui6/zhihui_nodes_comfyui","ver":"d27c8aa578e30acb5aef51e819f3810bc563aa06","ue_properties":{"widget_ue_connectable":{},"version":"7.4.1","input_ue_unconnectable":{}}},"widgets_values":[],"shape":1},{"id":13,"type":"Fast Groups Bypasser (rgthree)","pos":[-9440,-2540],"size":[240,110],"flags":{"pinned":true},"order":2,"mode":0,"inputs":[],"outputs":[{"label":"可选连接","name":"OPT_CONNECTION","type":"*","links":null}],"properties":{"matchColors":"","matchTitle":"#","showNav":false,"showAllGraphs":true,"sort":"position","customSortAlphabet":"","toggleRestriction":"default","ue_properties":{"widget_ue_connectable":{},"input_ue_unconnectable":{},"version":"7.4.1"}},"color":"#2a363b","bgcolor":"#3f5159","shape":1},{"id":11,"type":"MultiLineTextNode","pos":[-9440,-2190],"size":[240,500],"flags":{"pinned":true},"order":3,"mode":0,"inputs":[{"label":"启用节点","localized_name":"启用节点","name":"enable_node","type":"BOOLEAN","widget":{"name":"enable_node"},"link":null},{"label":"注释","localized_name":"注释","name":"comment","type":"STRING","widget":{"name":"comment"},"link":null},{"label":"文本内容","localized_name":"文本内容","name":"text_content","type":"STRING","widget":{"name":"text_content"},"link":null}],"outputs":[{"label":"文本输出","localized_name":"text_output","name":"text_output","type":"STRING","links":[5,10]}],"properties":{"Node name for S&R":"MultiLineTextNode","aux_id":"ZhiHui6/zhihui_nodes_comfyui","ver":"d27c8aa578e30acb5aef51e819f3810bc563aa06","ue_properties":{"widget_ue_connectable":{"enable_node":true,"comment":true,"text_content":true},"version":"7.4.1","input_ue_unconnectable":{}}},"widgets_values":[true,"说说你的偏好","a song about Lesbian."],"color":"#232","bgcolor":"#353","shape":1}],"links":[[1,8,0,1,0,"STRING"],[3,9,0,3,0,"STRING"],[4,5,0,4,0,"STRING"],[5,11,0,5,0,"STRING"],[8,10,0,8,0,"STRING"],[9,8,0,9,0,"STRING"],[10,11,0,10,0,"STRING"]],"groups":[{"id":1,"title":"📄#歌词生成","bounding":[-9180,-2100,1160,420],"color":"#88A","font_size":24,"flags":{"pinned":true}},{"id":2,"title":"🎼#歌曲风格生成","bounding":[-9180,-2610,1160,500],"color":"#A88","font_size":24,"flags":{"pinned":true}},{"id":3,"title":"💬基础描述","bounding":[-9450,-2410,260,730],"color":"#3f789e","font_size":24,"flags":{"pinned":true}},{"id":5,"title":"🎵潪AI Suno歌曲辅助生成","bounding":[-9450,-2710,1430,90],"color":"#b58b2a","font_size":64,"flags":{"pinned":true}},{"id":6,"title":"🔌组开关","bounding":[-9450,-2610,260,190],"color":"#a1309b","font_size":24,"flags":{"pinned":true}}],"config":{},"extra":{"ds":{"scale":0.8954302432552624,"offset":[10487.330921743926,2908.803755380932]},"ue_links":[],"links_added_by_ue":[]},"version":0.4}
+{
+  "id": "652ddb6c-caa3-4353-a0db-bf1db089c730",
+  "revision": 0,
+  "last_node_id": 16,
+  "last_link_id": 13,
+  "nodes": [
+    {
+      "id": 12,
+      "type": "Note",
+      "pos": [
+        -9440,
+        -2340
+      ],
+      "size": [
+        240,
+        90
+      ],
+      "flags": {
+        "pinned": true
+      },
+      "order": 0,
+      "mode": 0,
+      "inputs": [],
+      "outputs": [],
+      "properties": {
+        "ue_properties": {
+          "widget_ue_connectable": {},
+          "version": "7.4.1",
+          "input_ue_unconnectable": {}
+        }
+      },
+      "widgets_values": [
+        "说说你的歌词创意：\n例如：一首关于纯洁爱神的歌。"
+      ],
+      "color": "#432",
+      "bgcolor": "#653",
+      "shape": 1
+    },
+    {
+      "id": 5,
+      "type": "SunoLyricsGenerator",
+      "pos": [
+        -9170,
+        -2010
+      ],
+      "size": [
+        400,
+        320
+      ],
+      "flags": {
+        "pinned": true
+      },
+      "order": 3,
+      "mode": 0,
+      "inputs": [
+        {
+          "label": "歌词创意",
+          "name": "preference",
+          "type": "STRING",
+          "widget": {
+            "name": "preference"
+          },
+          "link": 5
+        }
+      ],
+      "outputs": [
+        {
+          "label": "歌词",
+          "name": "lyrics",
+          "type": "STRING",
+          "links": [
+            4
+          ]
+        }
+      ],
+      "properties": {
+        "Node name for S&R": "SunoLyricsGenerator",
+        "aux_id": "ZhiHui6/zhihui_nodes_comfyui",
+        "ver": "d27c8aa578e30acb5aef51e819f3810bc563aa06",
+        "ue_properties": {
+          "widget_ue_connectable": {
+            "preference": true,
+            "Theme": true,
+            "Lyrics Language": true,
+            "Vocal Arrangement": true,
+            "Lyrics Style": true,
+            "Mood": true,
+            "Style/Genre": true,
+            "Output_original_text": true
+          },
+          "version": "7.4.1",
+          "input_ue_unconnectable": {}
+        }
+      },
+      "widgets_values": [
+        "",
+        "Love",
+        "简体中文 (Simplified Chinese)",
+        "Duet (Two vocalists)",
+        "Poetic imagery",
+        "Romantic",
+        "Pop",
+        false
+      ],
+      "color": "#223",
+      "bgcolor": "#335",
+      "shape": 1
+    },
+    {
+      "id": 10,
+      "type": "SunoSongStylePromptGenerator",
+      "pos": [
+        -9170,
+        -2520
+      ],
+      "size": [
+        258.751953125,
+        400
+      ],
+      "flags": {
+        "pinned": true
+      },
+      "order": 4,
+      "mode": 0,
+      "inputs": [
+        {
+          "label": "preference",
+          "name": "preference",
+          "type": "STRING",
+          "widget": {
+            "name": "preference"
+          },
+          "link": 10
+        }
+      ],
+      "outputs": [
+        {
+          "label": "提示词",
+          "name": "prompt",
+          "type": "STRING",
+          "links": [
+            8
+          ]
+        }
+      ],
+      "properties": {
+        "Node name for S&R": "SunoSongStylePromptGenerator",
+        "aux_id": "ZhiHui6/zhihui_nodes_comfyui",
+        "ver": "d27c8aa578e30acb5aef51e819f3810bc563aa06",
+        "ue_properties": {
+          "widget_ue_connectable": {
+            "preference": true,
+            "Theme": true,
+            "Melody": true,
+            "Harmony": true,
+            "Rhythm": true,
+            "Structure or Form": true,
+            "Instrumentation": true,
+            "Style/Genre": true,
+            "Emotion": true,
+            "Dynamics": true,
+            "Production": true,
+            "Originality and Creativity": true,
+            "Vocal Style and Performance": true,
+            "Output_original_text": true
+          },
+          "version": "7.4.1",
+          "input_ue_unconnectable": {}
+        }
+      },
+      "widgets_values": [
+        "",
+        "Random",
+        "Random",
+        "Random",
+        "Random",
+        "Random",
+        "Random",
+        "Random",
+        "Random",
+        "Random",
+        "Random",
+        "Random",
+        "Random",
+        false
+      ],
+      "color": "#223",
+      "bgcolor": "#335",
+      "shape": 1
+    },
+    {
+      "id": 8,
+      "type": "ShowText",
+      "pos": [
+        -8900,
+        -2520
+      ],
+      "size": [
+        270,
+        400
+      ],
+      "flags": {
+        "pinned": true
+      },
+      "order": 6,
+      "mode": 0,
+      "inputs": [
+        {
+          "label": "文本",
+          "name": "text",
+          "type": "STRING",
+          "link": 8
+        }
+      ],
+      "outputs": [
+        {
+          "label": "字符串",
+          "name": "STRING",
+          "shape": 6,
+          "type": "STRING",
+          "links": [
+            1,
+            9
+          ]
+        }
+      ],
+      "properties": {
+        "Node name for S&R": "ShowText",
+        "aux_id": "ZhiHui6/zhihui_nodes_comfyui",
+        "ver": "d27c8aa578e30acb5aef51e819f3810bc563aa06",
+        "ue_properties": {
+          "widget_ue_connectable": {},
+          "version": "7.4.1",
+          "input_ue_unconnectable": {}
+        }
+      },
+      "widgets_values": [],
+      "shape": 1
+    },
+    {
+      "id": 16,
+      "type": "ShowText",
+      "pos": [
+        -8400,
+        -2290
+      ],
+      "size": [
+        370,
+        170
+      ],
+      "flags": {
+        "pinned": true
+      },
+      "order": 10,
+      "mode": 0,
+      "inputs": [
+        {
+          "label": "文本",
+          "name": "text",
+          "type": "STRING",
+          "link": 13
+        }
+      ],
+      "outputs": [
+        {
+          "label": "字符串",
+          "name": "STRING",
+          "shape": 6,
+          "type": "STRING",
+          "links": null
+        }
+      ],
+      "properties": {
+        "Node name for S&R": "ShowText",
+        "ue_properties": {
+          "widget_ue_connectable": {},
+          "version": "7.4.1",
+          "input_ue_unconnectable": {}
+        },
+        "aux_id": "ZhiHui6/zhihui_nodes_comfyui",
+        "ver": "d27c8aa578e30acb5aef51e819f3810bc563aa06"
+      },
+      "widgets_values": [],
+      "shape": 1
+    },
+    {
+      "id": 9,
+      "type": "TextModifier",
+      "pos": [
+        -8620,
+        -2290
+      ],
+      "size": [
+        210,
+        170
+      ],
+      "flags": {
+        "pinned": true
+      },
+      "order": 8,
+      "mode": 0,
+      "inputs": [
+        {
+          "label": "文本输入",
+          "name": "text_input",
+          "type": "STRING",
+          "link": 9
+        }
+      ],
+      "outputs": [
+        {
+          "label": "文本输出",
+          "name": "text_output",
+          "type": "STRING",
+          "links": [
+            13
+          ]
+        },
+        {
+          "label": "帮助信息",
+          "name": "help",
+          "type": "STRING",
+          "links": null
+        }
+      ],
+      "properties": {
+        "Node name for S&R": "TextModifier",
+        "aux_id": "ZhiHui6/zhihui_nodes_comfyui",
+        "ver": "d27c8aa578e30acb5aef51e819f3810bc563aa06",
+        "ue_properties": {
+          "widget_ue_connectable": {
+            "start_text": true,
+            "end_text": true
+          },
+          "version": "7.4.1",
+          "input_ue_unconnectable": {}
+        }
+      },
+      "widgets_values": [
+        "  ",
+        ""
+      ],
+      "shape": 1
+    },
+    {
+      "id": 1,
+      "type": "TextModifier",
+      "pos": [
+        -8620,
+        -2520
+      ],
+      "size": [
+        210,
+        170
+      ],
+      "flags": {
+        "pinned": true
+      },
+      "order": 7,
+      "mode": 0,
+      "inputs": [
+        {
+          "label": "文本输入",
+          "name": "text_input",
+          "type": "STRING",
+          "link": 1
+        }
+      ],
+      "outputs": [
+        {
+          "label": "文本输出",
+          "name": "text_output",
+          "type": "STRING",
+          "links": [
+            12
+          ]
+        },
+        {
+          "label": "帮助信息",
+          "name": "help",
+          "type": "STRING",
+          "links": null
+        }
+      ],
+      "properties": {
+        "Node name for S&R": "TextModifier",
+        "aux_id": "ZhiHui6/zhihui_nodes_comfyui",
+        "ver": "d27c8aa578e30acb5aef51e819f3810bc563aa06",
+        "ue_properties": {
+          "widget_ue_connectable": {
+            "start_text": true,
+            "end_text": true
+          },
+          "version": "7.4.1",
+          "input_ue_unconnectable": {}
+        }
+      },
+      "widgets_values": [
+        "",
+        "song style: "
+      ],
+      "shape": 1
+    },
+    {
+      "id": 3,
+      "type": "ShowText",
+      "pos": [
+        -8400,
+        -2520
+      ],
+      "size": [
+        370,
+        170
+      ],
+      "flags": {
+        "pinned": true
+      },
+      "order": 9,
+      "mode": 0,
+      "inputs": [
+        {
+          "label": "文本",
+          "name": "text",
+          "type": "STRING",
+          "link": 12
+        }
+      ],
+      "outputs": [
+        {
+          "label": "字符串",
+          "name": "STRING",
+          "shape": 6,
+          "type": "STRING",
+          "links": null
+        }
+      ],
+      "properties": {
+        "Node name for S&R": "ShowText",
+        "aux_id": "ZhiHui6/zhihui_nodes_comfyui",
+        "ver": "d27c8aa578e30acb5aef51e819f3810bc563aa06",
+        "ue_properties": {
+          "widget_ue_connectable": {},
+          "version": "7.4.1",
+          "input_ue_unconnectable": {}
+        }
+      },
+      "widgets_values": [],
+      "shape": 1
+    },
+    {
+      "id": 4,
+      "type": "ShowText",
+      "pos": [
+        -8760,
+        -2010
+      ],
+      "size": [
+        730,
+        320
+      ],
+      "flags": {
+        "pinned": true
+      },
+      "order": 5,
+      "mode": 0,
+      "inputs": [
+        {
+          "label": "文本",
+          "name": "text",
+          "type": "STRING",
+          "link": 4
+        }
+      ],
+      "outputs": [
+        {
+          "label": "字符串",
+          "name": "STRING",
+          "shape": 6,
+          "type": "STRING",
+          "links": []
+        }
+      ],
+      "properties": {
+        "Node name for S&R": "ShowText",
+        "aux_id": "ZhiHui6/zhihui_nodes_comfyui",
+        "ver": "d27c8aa578e30acb5aef51e819f3810bc563aa06",
+        "ue_properties": {
+          "widget_ue_connectable": {},
+          "version": "7.4.1",
+          "input_ue_unconnectable": {}
+        }
+      },
+      "widgets_values": [],
+      "shape": 1
+    },
+    {
+      "id": 13,
+      "type": "Fast Groups Bypasser (rgthree)",
+      "pos": [
+        -9440,
+        -2540
+      ],
+      "size": [
+        240,
+        110
+      ],
+      "flags": {
+        "pinned": true
+      },
+      "order": 1,
+      "mode": 0,
+      "inputs": [],
+      "outputs": [
+        {
+          "label": "可选连接",
+          "name": "OPT_CONNECTION",
+          "type": "*",
+          "links": null
+        }
+      ],
+      "properties": {
+        "matchColors": "",
+        "matchTitle": "#",
+        "showNav": false,
+        "showAllGraphs": true,
+        "sort": "position",
+        "customSortAlphabet": "",
+        "toggleRestriction": "default",
+        "ue_properties": {
+          "widget_ue_connectable": {},
+          "input_ue_unconnectable": {},
+          "version": "7.4.1"
+        }
+      },
+      "color": "#2a363b",
+      "bgcolor": "#3f5159",
+      "shape": 1
+    },
+    {
+      "id": 11,
+      "type": "MultiLineTextNode",
+      "pos": [
+        -9440,
+        -2190
+      ],
+      "size": [
+        240,
+        500
+      ],
+      "flags": {
+        "pinned": true
+      },
+      "order": 2,
+      "mode": 0,
+      "inputs": [],
+      "outputs": [
+        {
+          "label": "文本输出",
+          "name": "text_output",
+          "type": "STRING",
+          "links": [
+            5,
+            10
+          ]
+        }
+      ],
+      "properties": {
+        "Node name for S&R": "MultiLineTextNode",
+        "aux_id": "ZhiHui6/zhihui_nodes_comfyui",
+        "ver": "d27c8aa578e30acb5aef51e819f3810bc563aa06",
+        "ue_properties": {
+          "widget_ue_connectable": {
+            "enable_node": true,
+            "comment": true,
+            "text_content": true
+          },
+          "version": "7.4.1",
+          "input_ue_unconnectable": {}
+        }
+      },
+      "widgets_values": [
+        true,
+        "说说你的偏好",
+        "a song about Lesbian."
+      ],
+      "color": "#232",
+      "bgcolor": "#353",
+      "shape": 1
+    }
+  ],
+  "links": [
+    [
+      1,
+      8,
+      0,
+      1,
+      0,
+      "STRING"
+    ],
+    [
+      4,
+      5,
+      0,
+      4,
+      0,
+      "STRING"
+    ],
+    [
+      5,
+      11,
+      0,
+      5,
+      0,
+      "STRING"
+    ],
+    [
+      8,
+      10,
+      0,
+      8,
+      0,
+      "STRING"
+    ],
+    [
+      9,
+      8,
+      0,
+      9,
+      0,
+      "STRING"
+    ],
+    [
+      10,
+      11,
+      0,
+      10,
+      0,
+      "STRING"
+    ],
+    [
+      12,
+      1,
+      0,
+      3,
+      0,
+      "STRING"
+    ],
+    [
+      13,
+      9,
+      0,
+      16,
+      0,
+      "STRING"
+    ]
+  ],
+  "groups": [
+    {
+      "id": 1,
+      "title": "📄#歌词生成",
+      "bounding": [
+        -9180,
+        -2100,
+        1160,
+        420
+      ],
+      "color": "#88A",
+      "font_size": 24,
+      "flags": {
+        "pinned": true
+      }
+    },
+    {
+      "id": 2,
+      "title": "🎼#歌曲风格生成",
+      "bounding": [
+        -9180,
+        -2610,
+        1160,
+        500
+      ],
+      "color": "#A88",
+      "font_size": 24,
+      "flags": {
+        "pinned": true
+      }
+    },
+    {
+      "id": 3,
+      "title": "💬基础描述",
+      "bounding": [
+        -9450,
+        -2410,
+        260,
+        730
+      ],
+      "color": "#3f789e",
+      "font_size": 24,
+      "flags": {
+        "pinned": true
+      }
+    },
+    {
+      "id": 5,
+      "title": "🎵潪AI Suno歌曲辅助生成",
+      "bounding": [
+        -9450,
+        -2710,
+        1430,
+        90
+      ],
+      "color": "#b58b2a",
+      "font_size": 64,
+      "flags": {
+        "pinned": true
+      }
+    },
+    {
+      "id": 6,
+      "title": "🔌组开关",
+      "bounding": [
+        -9450,
+        -2610,
+        260,
+        190
+      ],
+      "color": "#a1309b",
+      "font_size": 24,
+      "flags": {
+        "pinned": true
+      }
+    }
+  ],
+  "config": {},
+  "extra": {
+    "ds": {
+      "scale": 0.984973267580789,
+      "offset": [
+        9671.753227629142,
+        2730.1736875781066
+      ]
+    },
+    "ue_links": [],
+    "links_added_by_ue": [],
+    "frontendVersion": "1.28.8"
+  },
+  "version": 0.4
+}
