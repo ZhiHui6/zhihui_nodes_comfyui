@@ -41,7 +41,6 @@ from .Nodes.Qwen3VL.Qwen3VLExtraOptions import Qwen3VLExtraOptions
 from .Nodes.Qwen3VL.ImageLoader import ImageLoader
 from .Nodes.Qwen3VL.VideoLoader import VideoLoader
 from .Nodes.Qwen3VL.MultiplePathsInput import MultiplePathsInput
-from .Nodes.Qwen3VL.ModelDownloader import ModelDownloader
 from .Nodes.Qwen3VL.PathSwitch import PathSwitch
 from .Nodes.ImageRotateTool import ImageRotateTool
 from .Nodes.ImageFormatConverter import ImageFormatConverter
@@ -97,7 +96,6 @@ NODE_CLASS_MAPPINGS = {
     "ImageLoader": ImageLoader,
     "VideoLoader": VideoLoader,
     "MultiplePathsInput": MultiplePathsInput,
-    "ModelDownloader": ModelDownloader,
     "ImageRotateTool": ImageRotateTool,
     "ImageFormatConverter": ImageFormatConverter,
     "Qwen3VLAPI": Qwen3VLAPI,
@@ -150,7 +148,6 @@ NODE_DISPLAY_NAME_MAPPINGS = {
     "ImageLoader": "Qwen3-VL Image Loader",
     "VideoLoader": "Qwen3-VL Video Loader",
     "MultiplePathsInput": "Qwen3-VL Multiple Paths Input",
-    "ModelDownloader": "Qwen3-VL Model Downloader",
     "PathSwitch": "Qwen3-VL Path Switch",
     "ImageRotateTool": "Image Rotate Tool",
     "ImageFormatConverter": "Image Format Converter",

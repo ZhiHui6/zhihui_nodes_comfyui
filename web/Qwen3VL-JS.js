@@ -1112,7 +1112,7 @@ app.registerExtension({
                 nodeType.prototype.onNodeCreated = function () {
                     const r = onNodeCreated ? onNodeCreated.apply(this, arguments) : undefined;
                     
-                    const configButton = this.addWidget("button", "Settings·设置", null, () => {
+                    const configButton = this.addWidget("button", "⚙️模型管理·Model Manager", null, () => {
                         const buttonElement = document.querySelector('.comfy-widget-value[value="Settings·设置"]');
                         apiConfigManager.showConfigDialog(buttonElement);
                     });

@@ -1,0 +1,6 @@
+{
+  "cache_dir": "",
+  "provider": "modelscope",
+  "hf_mirror_url": "https://hf-mirror.com",
+  "use_default_cache": true
+}

@@ -1,4 +1,6 @@
 import os
+import asyncio
+import time
 import torch
 import folder_paths
 from torchvision.transforms import ToPILImage
@@ -11,6 +13,97 @@ import model_management
 from qwen_vl_utils import process_vision_info
 from pathlib import Path
 import re
+try:
+    from server import PromptServer
+    from aiohttp import web
+    _PS_OK = True
+except Exception:
+    PromptServer = None
+    web = None
+    _PS_OK = False
+_THIS_DIR = os.path.dirname(os.path.abspath(__file__))
+_QWEN_CONFIG_PATH = os.path.join(_THIS_DIR, "qwen3vl_config.json")
+_QWEN_MODEL_MAP = {
+    "Qwen3-VL-4B-Instruct": "Qwen/Qwen3-VL-4B-Instruct",
+    "Qwen3-VL-4B-Thinking": "Qwen/Qwen3-VL-4B-Thinking",
+    "Qwen3-VL-8B-Instruct": "Qwen/Qwen3-VL-8B-Instruct",
+    "Qwen3-VL-8B-Thinking": "Qwen/Qwen3-VL-8B-Thinking",
+    "Huihui-Qwen3-VL-8B-Instruct-abliterated": "ayumix5/Huihui-Qwen3-VL-8B-Instruct-abliterated",
+    "Qwen3-VL-4B-Instruct-FP8": "Qwen/Qwen3-VL-4B-Instruct-FP8",
+    "Qwen3-VL-4B-Thinking-FP8": "Qwen/Qwen3-VL-4B-Thinking-FP8",
+    "Qwen3-VL-8B-Instruct-FP8": "Qwen/Qwen3-VL-8B-Instruct-FP8",
+    "Qwen3-VL-8B-Thinking-FP8": "Qwen/Qwen3-VL-8B-Thinking-FP8",
+    "Qwen3-VL-32B-Instruct": "Qwen/Qwen3-VL-32B-Instruct",
+    "Qwen3-VL-32B-Thinking": "Qwen/Qwen3-VL-32B-Thinking",
+    "Qwen3-VL-32B-Instruct-FP8": "Qwen/Qwen3-VL-32B-Instruct-FP8",
+    "Qwen3-VL-32B-Thinking-FP8": "Qwen/Qwen3-VL-32B-Thinking-FP8",
+}
+def _qwen_default_config():
+    return {
+        "cache_dir": "",
+        "provider": "huggingface",
+        "hf_mirror_url": "https://hf-mirror.com",
+        "use_default_cache": True,
+    }
+def _qwen_load_config():
+    try:
+        if os.path.exists(_QWEN_CONFIG_PATH):
+            import json
+            with open(_QWEN_CONFIG_PATH, "r", encoding="utf-8") as f:
+                data = json.load(f)
+            base = _qwen_default_config()
+            base.update(data if isinstance(data, dict) else {})
+            return base
+    except Exception:
+        pass
+    return _qwen_default_config()
+def _qwen_save_config(cfg):
+    try:
+        import json
+        with open(_QWEN_CONFIG_PATH, "w", encoding="utf-8") as f:
+            json.dump(cfg, f, ensure_ascii=False, indent=2)
+        return True
+    except Exception:
+        return False
+def _qwen_default_cache_dir():
+    try:
+        ckpt_dirs = folder_paths.get_folder_paths("checkpoints")
+        if ckpt_dirs:
+            models_dir = os.path.dirname(ckpt_dirs[0])
+            pg_dir = os.path.join(models_dir, "prompt_generator")
+            try:
+                os.makedirs(pg_dir, exist_ok=True)
+            except Exception:
+                pass
+            return pg_dir
+    except Exception:
+        pass
+    return os.path.join(os.path.expanduser("~"), "ComfyUI", "models", "prompt_generator")
+def _qwen_cleanup_model_dir(path):
+    try:
+        import shutil
+        if not os.path.isdir(path):
+            return
+        for name in os.listdir(path):
+            p = os.path.join(path, name)
+            if os.path.isdir(p):
+                if name.startswith("models--") or name.startswith("datasets--") or name in ("snapshots", "refs", ".cache", ".huggingface", "__pycache__"):
+                    try:
+                        shutil.rmtree(p, ignore_errors=True)
+                    except Exception:
+                        pass
+    except Exception:
+        pass
+_QWEN_PROGRESS = {
+    "status": "idle",
+    "downloaded_bytes": 0,
+    "total_bytes": 0,
+    "percent": 0.0,
+    "speed_bps": 0.0,
+    "started_at": 0.0,
+}
+_QWEN_CANCELLED = False
+_QWEN_PAUSED = False
 
 QWEN_PROMPT_TYPES = {
     "Ignore": "",
@@ -52,12 +145,12 @@ class Qwen3VLAdvanced:
         )
         
         if not os.path.exists(model_path):
-            error_msg = f"模型 '{model}' 未找到！请使用 'ModelDownloader' 模型下载器节点下载Qwen3-VL模型。"
+            error_msg = f"模型 '{model}' 未找到！请使用管理界面下载Qwen3-VL模型。"
             return False, model_path, error_msg
         
         config_file = os.path.join(model_path, "config.json")
         if not os.path.exists(config_file):
-            error_msg = f"模型 '{model}' 文件不完整！请使用 'ModelDownloader' 模型下载器节点重新下载Qwen3-VL模型。"
+            error_msg = f"模型 '{model}' 文件不完整！请使用管理界面重新下载Qwen3-VL模型。"
             return False, model_path, error_msg
         
         return True, model_path, None
@@ -92,11 +185,19 @@ class Qwen3VLAdvanced:
                     [
                         "Qwen3-VL-4B-Instruct",
                         "Qwen3-VL-4B-Thinking",
+                        "Qwen3-VL-4B-Instruct-FP8",
+                        "Qwen3-VL-4B-Thinking-FP8",
                         "Qwen3-VL-8B-Instruct",
                         "Qwen3-VL-8B-Thinking",
+                        "Qwen3-VL-8B-Instruct-FP8",
+                        "Qwen3-VL-8B-Thinking-FP8",
+                        "Qwen3-VL-32B-Instruct",
+                        "Qwen3-VL-32B-Thinking",
+                        "Qwen3-VL-32B-Instruct-FP8",
+                        "Qwen3-VL-32B-Thinking-FP8",
                         "Huihui-Qwen3-VL-8B-Instruct-abliterated",
                     ],
-                    {"default": "Qwen3-VL-8B-Instruct", "tooltip": "选择Qwen3-VL模型版本，包含4B/8B参数量和Instruct/Thinking两种类型"},
+                    {"default": "Qwen3-VL-8B-Instruct", "tooltip": "选择Qwen3-VL模型版本，包含4B/8B/32B参数量和Instruct/Thinking两种类型"},
                 ),
                 "quantization": (
                     ["none", "4bit", "8bit"],
@@ -666,3 +767,342 @@ class Qwen3VLAdvanced:
             return filtered_text
         else:
             return text
+
+if _PS_OK:
+    @PromptServer.instance.routes.get("/zhihui_nodes/qwen3vl/config")
+    async def qwen_get_config(request):
+        try:
+            cfg = _qwen_load_config()
+            cfg["default_cache_dir"] = _qwen_default_cache_dir()
+            return web.json_response(cfg)
+        except Exception as e:
+            return web.json_response({"error": str(e)}, status=500)
+
+    @PromptServer.instance.routes.post("/zhihui_nodes/qwen3vl/config")
+    async def qwen_set_config(request):
+        try:
+            data = await request.json()
+            cfg = _qwen_load_config()
+            if isinstance(data, dict):
+                for k in ["provider", "hf_mirror_url", "cache_dir", "use_default_cache"]:
+                    if k in data:
+                        cfg[k] = data[k]
+            ok = _qwen_save_config(cfg)
+            if ok:
+                return web.json_response({"success": True})
+            return web.json_response({"success": False}, status=500)
+        except Exception as e:
+            return web.json_response({"error": str(e)}, status=500)
+
+    @PromptServer.instance.routes.get("/zhihui_nodes/qwen3vl/progress")
+    async def qwen_get_progress(request):
+        try:
+            st = dict(_QWEN_PROGRESS)
+            if st.get("status") == "downloading":
+                mon = st.get("monitor_dir")
+                if mon and os.path.isdir(mon):
+                    downloaded = 0
+                    for root, _dirs, files in os.walk(mon):
+                        for f in files:
+                            fp = os.path.join(root, f)
+                            try:
+                                downloaded += os.path.getsize(fp)
+                            except Exception:
+                                pass
+                    st["downloaded_bytes"] = downloaded
+                    total = int(st.get("total_bytes", 0) or 0)
+                    if total > 0:
+                        st["percent"] = min(100.0, (downloaded * 100.0) / total)
+                    started_at = _QWEN_PROGRESS.get("started_at")
+                    if started_at:
+                        dt = max(1e-6, time.time() - float(started_at))
+                        st["speed_bps"] = downloaded / dt
+            return web.json_response(st)
+        except Exception as e:
+            return web.json_response({"error": str(e)}, status=500)
+
+    @PromptServer.instance.routes.get("/zhihui_nodes/qwen3vl/check_model")
+    async def qwen_check_model(request):
+        try:
+            q = request.rel_url.query
+            name = str(q.get("model", "") or "").split("/")[-1]
+            base_dir = _qwen_default_cache_dir()
+            candidate = os.path.join(base_dir, name)
+            exists = _qwen_is_valid_model_dir(candidate)
+            return web.json_response({"exists": exists, "path": candidate})
+        except Exception as e:
+            return web.json_response({"error": str(e)}, status=500)
+
+    @PromptServer.instance.routes.post("/zhihui_nodes/qwen3vl/download")
+    async def qwen_download(request):
+        try:
+            data = await request.json()
+            model_name = str(data.get("model_name") or "").strip()
+            provider = str(data.get("provider") or "").strip()
+            cfg = _qwen_load_config()
+            if provider:
+                cfg["provider"] = provider
+            _qwen_save_config(cfg)
+            import shutil, time
+            repo_id = _QWEN_MODEL_MAP.get(model_name) or f"qwen/{model_name}"
+            if model_name == "Huihui-Qwen3-VL-8B-Instruct-abliterated":
+                if cfg.get("provider") == "modelscope":
+                    repo_id = "ayumix5/Huihui-Qwen3-VL-8B-Instruct-abliterated"
+                else:
+                    repo_id = "huihui-ai/Huihui-Qwen3-VL-8B-Instruct-abliterated"
+            display_name = repo_id.split("/")[-1] if isinstance(repo_id, str) else "QwenModel"
+            base_dir = _qwen_default_cache_dir()
+            target_dir = os.path.join(base_dir, display_name)
+            if os.path.isdir(target_dir):
+                try:
+                    exists_nonempty = False
+                    for _r, _d, files in os.walk(target_dir):
+                        if files:
+                            exists_nonempty = True
+                            break
+                    if exists_nonempty:
+                        return web.json_response({"error": "模型已存在，请先删除后再下载"}, status=400)
+                except Exception:
+                    return web.json_response({"error": "模型已存在，请先删除后再下载"}, status=400)
+            try:
+                os.makedirs(target_dir, exist_ok=True)
+            except Exception:
+                pass
+            def do_download():
+                global _QWEN_CANCELLED, _QWEN_PAUSED
+                _QWEN_CANCELLED = False
+                _QWEN_PAUSED = False
+                local_dir = None
+                try:
+                    from huggingface_hub import snapshot_download, HfApi
+                    from huggingface_hub.utils import tqdm as hub_tqdm
+                    _QWEN_PROGRESS.update({
+                        "status": "downloading",
+                        "downloaded_bytes": 0,
+                        "total_bytes": 0,
+                        "percent": 0.0,
+                        "speed_bps": 0.0,
+                        "started_at": time.time(),
+                    })
+                    try:
+                        api = HfApi()
+                        info = api.repo_info(repo_id, repo_type="model", files_metadata=True)
+                        sizes = []
+                        for s in getattr(info, "siblings", []):
+                            sz = getattr(s, "size", None)
+                            if sz is None:
+                                lfs = getattr(s, "lfs", None)
+                                sz = getattr(lfs, "size", None) if lfs is not None else None
+                            if isinstance(sz, int) and sz > 0:
+                                sizes.append(sz)
+                        _QWEN_PROGRESS["total_bytes"] = sum(sizes)
+                    except Exception:
+                        pass
+                    class ProgressTqdm(hub_tqdm):
+                        def update(self, n=1):
+                            if _QWEN_CANCELLED:
+                                raise KeyboardInterrupt("cancelled")
+                            try:
+                                dt = max(1e-6, time.time() - float(_QWEN_PROGRESS.get("started_at", time.time())))
+                                total = int(_QWEN_PROGRESS.get("total_bytes", 0) or 0)
+                                mon = _QWEN_PROGRESS.get("monitor_dir")
+                                if mon and os.path.isdir(mon):
+                                    done = 0
+                                    for root, _dirs, files in os.walk(mon):
+                                        for f in files:
+                                            fp = os.path.join(root, f)
+                                            try:
+                                                done += os.path.getsize(fp)
+                                            except Exception:
+                                                pass
+                                    _QWEN_PROGRESS["downloaded_bytes"] = done
+                                    if total > 0:
+                                        _QWEN_PROGRESS["percent"] = min(100.0, (done * 100.0) / total)
+                                    _QWEN_PROGRESS["speed_bps"] = done / dt
+                            except Exception:
+                                pass
+                            return super().update(n)
+                    download_dir = target_dir
+                    _QWEN_PROGRESS["monitor_dir"] = download_dir
+                    try:
+                        if cfg.get("provider") == "modelscope":
+                            from modelscope.hub.snapshot_download import snapshot_download as ms_snapshot_download
+                            dl_dir = ms_snapshot_download(repo_id, cache_dir=download_dir)
+                            try:
+                                if _QWEN_PROGRESS.get("total_bytes", 0) <= 0:
+                                    total = 0
+                                    for root, _dirs, files in os.walk(download_dir):
+                                        for f in files:
+                                            fp = os.path.join(root, f)
+                                            try:
+                                                total += os.path.getsize(fp)
+                                            except Exception:
+                                                pass
+                                    _QWEN_PROGRESS["total_bytes"] = total
+                                if os.path.isdir(dl_dir):
+                                    if os.path.abspath(dl_dir) != os.path.abspath(target_dir):
+                                        shutil.copytree(dl_dir, target_dir, dirs_exist_ok=True)
+                                    local_dir = target_dir
+                                try:
+                                    if dl_dir and os.path.isdir(dl_dir) and os.path.abspath(dl_dir) != os.path.abspath(target_dir):
+                                        shutil.rmtree(dl_dir, ignore_errors=True)
+                                except Exception:
+                                    pass
+                            except Exception:
+                                pass
+                        else:
+                            hf_kwargs = {"repo_id": repo_id, "local_dir": download_dir, "cache_dir": download_dir, "local_dir_use_symlinks": False, "tqdm_class": ProgressTqdm}
+                            if cfg.get("hf_mirror_url"):
+                                hf_kwargs["hf_endpoint"] = str(cfg.get("hf_mirror_url"))
+                            dl_dir = snapshot_download(**hf_kwargs)
+                            try:
+                                if _QWEN_PROGRESS.get("total_bytes", 0) <= 0:
+                                    total = 0
+                                    for root, _dirs, files in os.walk(download_dir):
+                                        for f in files:
+                                            fp = os.path.join(root, f)
+                                            try:
+                                                total += os.path.getsize(fp)
+                                            except Exception:
+                                                pass
+                                    _QWEN_PROGRESS["total_bytes"] = total
+                                if os.path.isdir(dl_dir):
+                                    if os.path.abspath(dl_dir) != os.path.abspath(target_dir):
+                                        shutil.copytree(dl_dir, target_dir, dirs_exist_ok=True)
+                                    local_dir = target_dir
+                                try:
+                                    _qwen_cleanup_model_dir(target_dir)
+                                except Exception:
+                                    pass
+                            except Exception:
+                                pass
+                    except Exception:
+                        pass
+                    valid = os.path.isdir(target_dir) and os.path.isfile(os.path.join(target_dir, "config.json"))
+                    if valid:
+                        try:
+                            _QWEN_PROGRESS.update({"status": "done", "percent": 100.0})
+                            _QWEN_PROGRESS.pop("monitor_dir", None)
+                        except Exception:
+                            pass
+                        return {"success": True, "local_dir": target_dir}
+                    else:
+                        try:
+                            _QWEN_PROGRESS.update({"status": "error"})
+                        except Exception:
+                            pass
+                        try:
+                            import shutil
+                            if os.path.isdir(target_dir):
+                                empty = True
+                                for _r, _d, files in os.walk(target_dir):
+                                    if files:
+                                        empty = False
+                                        break
+                                if empty:
+                                    shutil.rmtree(target_dir, ignore_errors=True)
+                        except Exception:
+                            pass
+                        return {"error": "下载失败：目标目录为空或缺少必需文件"}
+                except KeyboardInterrupt:
+                    try:
+                        if _QWEN_PAUSED:
+                            _QWEN_PROGRESS.update({"status": "paused"})
+                            return {"paused": True}
+                        else:
+                            _QWEN_PROGRESS.update({"status": "stopped"})
+                            return {"stopped": True}
+                    except Exception:
+                        return {"stopped": True}
+                except Exception as e:
+                    try:
+                        _QWEN_PROGRESS.update({"status": "error"})
+                    except Exception:
+                        pass
+                    return {"error": str(e)}
+            loop = asyncio.get_event_loop()
+            result = await loop.run_in_executor(None, do_download)
+            if isinstance(result, dict) and result.get("error"):
+                return web.json_response(result, status=400)
+            return web.json_response(result)
+        except Exception as e:
+            return web.json_response({"error": str(e)}, status=500)
+
+    @PromptServer.instance.routes.post("/zhihui_nodes/qwen3vl/control")
+    async def qwen_control(request):
+        try:
+            global _QWEN_CANCELLED, _QWEN_PAUSED
+            data = await request.json()
+            action = str(data.get("action") or "").strip().lower()
+            if action == "pause":
+                _QWEN_PAUSED = True
+                _QWEN_CANCELLED = True
+                return web.json_response({"success": True, "status": "paused"})
+            elif action == "stop":
+                _QWEN_PAUSED = False
+                _QWEN_CANCELLED = True
+                return web.json_response({"success": True, "status": "stopped"})
+            elif action == "resume":
+                _QWEN_PAUSED = False
+                _QWEN_CANCELLED = False
+                return web.json_response({"success": True, "status": "resumed"})
+            return web.json_response({"error": "invalid action"}, status=400)
+        except Exception as e:
+            return web.json_response({"error": str(e)}, status=500)
+
+    @PromptServer.instance.routes.get("/zhihui_nodes/qwen3vl/list_models")
+    async def qwen_list_models(request):
+        try:
+            base_dir = _qwen_default_cache_dir()
+            models = []
+            if os.path.isdir(base_dir):
+                try:
+                    for name in os.listdir(base_dir):
+                        p = os.path.join(base_dir, name)
+                        if os.path.isdir(p):
+                            size = 0
+                            try:
+                                for root, _dirs, files in os.walk(p):
+                                    for f in files:
+                                        fp = os.path.join(root, f)
+                                        try:
+                                            size += os.path.getsize(fp)
+                                        except Exception:
+                                            pass
+                            except Exception:
+                                pass
+                            valid = os.path.isfile(os.path.join(p, "config.json"))
+                            models.append({"name": name, "path": p, "size_bytes": int(size), "valid": bool(valid)})
+                except Exception:
+                    pass
+            return web.json_response({"success": True, "base_dir": base_dir, "models": models})
+        except Exception as e:
+            return web.json_response({"error": str(e)}, status=500)
+
+    @PromptServer.instance.routes.post("/zhihui_nodes/qwen3vl/delete_model")
+    async def qwen_delete_model(request):
+        try:
+            data = await request.json()
+            name = str(data.get("name") or "").strip()
+            if not name:
+                return web.json_response({"error": "缺少模型名称"}, status=400)
+            base_dir = _qwen_default_cache_dir()
+            target = os.path.join(base_dir, name)
+            try:
+                bd_abs = os.path.abspath(base_dir)
+                tg_abs = os.path.abspath(target)
+            except Exception:
+                bd_abs = base_dir
+                tg_abs = target
+            if not tg_abs.startswith(bd_abs):
+                return web.json_response({"error": "非法路径"}, status=400)
+            if not os.path.isdir(target):
+                return web.json_response({"error": "目录不存在"}, status=404)
+            try:
+                import shutil
+                shutil.rmtree(target)
+            except Exception as e:
+                return web.json_response({"error": f"删除失败: {e}"}, status=500)
+            return web.json_response({"success": True})
+        except Exception as e:
+            return web.json_response({"error": str(e)}, status=500)

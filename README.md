@@ -1,6 +1,9 @@
-# 🎨 zhihui-nodes-comfyui / 潪AI ComfyUI 节点包
+# 🎨 zhihui-nodes-comfyui / 潪AI ComfyUI 节点包 
 [![GitHub](https://img.shields.io/badge/GitHub-zhihui--nodes--comfyui-blue?style=for-the-badge&logo=github)](https://github.com/ZhiHui6/zhihui_nodes_comfyui) [![License](https://img.shields.io/badge/License-MIT-green?style=for-the-badge)](LICENSE) [![ComfyUI](https://img.shields.io/badge/ComfyUI-Compatible-orange?style=for-the-badge)](https://github.com/comfyanonymous/ComfyUI)
 ---
+
+最新版本：`v0.8.0`（2025-11-18），完整更新日志：查看<a href="CHANGELOG.md">`CHANGELOG.md`</a>
+Latest version: `v0.8.0` (2025-11-18), full update log: view <a href="CHANGELOG.md">`CHANGELOG.md`</a>
 
 ## 📖 项目介绍 | Project Introduction
 
@@ -739,19 +742,6 @@ Batch Processing: Supports folder batch processing with automatic result saving
 </td>
 </tr>
 <tr>
-<td><b>Qwen3-VL模型下载器</b><br><b>Qwen3-VL Model Downloader</b><br><code>ModelDownloader</code></td>
-<td>
-自动下载和管理Qwen3-VL模型的工具节点，支持从HuggingFace、ModelScope等平台下载不同版本的模型。<br>Tool node for automatically downloading and managing Qwen3-VL models, supporting downloads from HuggingFace, ModelScope and other platforms for different model versions.
-
-<br>
-<div align="left">
-<a href="images/Qwen3-VL Model Downloader.jpg" target="_blank">
-<img src="images/Qwen3-VL Model Downloader.jpg" alt="Qwen3-VL Model Downloader" width="45%"/>
-</a>
-</div>
-</td>
-</tr>
-<tr>
 <td><b>Qwen3-VL路径切换器</b><br><b>Qwen3-VL Path Switch</b><br><code>PathSwitch</code></td>
 <td>
 双通道路径切换器，支持手动和自动两种切换模式。可在2个来自MultiplePathsInput节点的路径输入之间智能切换，支持注释标签便于管理。手动模式下可指定选择通道，自动模式下智能选择第一个非空输入，适用于工作流中的条件分支和动态切换。输出可直接连接到Qwen3-VL高级版的source_path输入。<br>Dual-channel path switcher supporting both manual and automatic switching modes. Can intelligently switch between 2 path inputs from MultiplePathsInput nodes, with annotation labels for easy management. Manual mode allows specifying channel selection, while automatic mode intelligently selects the first non-empty input, suitable for conditional branching and dynamic switching in workflows. Output can be directly connected to Qwen3-VL Advanced's source_path input.
@@ -1059,22 +1049,3 @@ pip install -r requirements.txt
 </div>
 
 如果您有任何想法或建议，请随时提出 Issue 或 Pull Request。<br>If you have any ideas or suggestions, please feel free to submit an Issue or Pull Request.
-#### Sa2VA 节点组说明 | Sa2VA Node Group
-
-- 组成：<code>Sa2VAAdvanced</code> + <code>Sa2VASegmentationPreset</code>
-- 输入：
-  - <code>image</code> 图像输入（必连）
-  - <code>segmentation_preset</code>（可选）：来自预设节点的分割提示文本；优先级高于 <code>segmentation_prompt</code>
-  - <code>segmentation_prompt</code>（可选）：自由文本分割提示。当 <code>segmentation_preset</code> 为空时使用
-- 控件与参数：
-  - <code>model_name</code> 模型选择，支持 Sa2VA InternVL3/Qwen/Qwen3-VL 系列
-  - <code>quantization</code> 可选 4bit/8bit；<code>use_flash_attn</code> 提升推理效率
-  - <code>keep_model_loaded</code> 控制模型常驻与释放
-  - <code>mask_threshold</code> 控制二值化阈值
-  - <code>image_scaling</code> 字符串参数，按长边缩放：范围 <code>512–2048</code>，步进 <code>1</code>；仅当目标值小于原图长边时执行等比缩小；<code>0</code> 或空字符串不缩放
-- 输出：
-  - 第1输出 <code>image</code>：尺寸为 <code>[1,H,W,3]</code> 的 <code>float32</code> 0–1 张量，分辨率与缩放后保持一致
-  - 第2输出 <code>mask</code>：尺寸为 <code>[1,H,W]</code> 的 <code>float32</code> 张量；当无分割结果时会输出同尺寸的空遮罩
-- 连接建议：
-  - 将 <code>Sa2VASegmentationPreset.segmentation_preset</code> → <code>Sa2VAAdvanced.segmentation_preset</code>
-  - 将输入图像 → <code>Sa2VAAdvanced.image</code>；从输出获取 <code>image</code> 与 <code>mask</code> 进行后续处理
