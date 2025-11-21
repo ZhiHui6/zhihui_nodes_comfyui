@@ -1,8 +1,5 @@
-import torch
-
 class LatentSwitchDualMode:
 
-    
     def __init__(self):
         pass
 
@@ -12,45 +9,60 @@ class LatentSwitchDualMode:
             "required": {
                 "mode": (["manual", "auto"], {"default": "manual"}),
                 "select_channel": (["1", "2", "3"], {"default": "1"}),
+                "inputcount": ("INT", {"default": 2, "min": 1, "max": 1000, "step": 1}),
+                "Latent_1_comment": ("STRING", {"multiline": False, "default": ""}),
+                "Latent_2_comment": ("STRING", {"multiline": False, "default": ""}),
+                "Latent_3_comment": ("STRING", {"multiline": False, "default": ""}),
             },
             "optional": {
                 "Latent_1": ("LATENT", {}),
                 "Latent_2": ("LATENT", {}),
                 "Latent_3": ("LATENT", {}),
-                "Latent_1_comment": ("STRING", {"multiline": False, "default": "", "placeholder": "Purpose or description of Latent 1"}),
-                "Latent_2_comment": ("STRING", {"multiline": False, "default": "", "placeholder": "Purpose or description of Latent 2"}),
-                "Latent_3_comment": ("STRING", {"multiline": False, "default": "", "placeholder": "Purpose or description of Latent 3"}),
             }
         }
 
     RETURN_TYPES = ("LATENT",)
     RETURN_NAMES = ("output_latent",)
     FUNCTION = "execute"
-    CATEGORY = "Zhi.AI/latent"
-    DESCRIPTION = "Latent Switcher: Multi-channel latent switcher supporting manual and automatic modes. Can switch between 3 latent inputs, supports annotation tags for easy management, intelligently selects non-empty inputs in automatic mode, suitable for conditional branching and dynamic switching in workflows."
+    CATEGORY = "Zhi.AI/Latent"
+    DESCRIPTION = "Dynamic Latent Switcher: Switches among a dynamic number of latent inputs. Supports manual mode (select by index) and auto mode (outputs the single non-empty input, errors if multiple). Input count is controlled via 'inputcount', and the UI can update ports accordingly. Newly added inputs are optional."
 
-    def execute(self, mode, select_channel, Latent_1=None, Latent_2=None, Latent_3=None, 
-                Latent_1_comment="", Latent_2_comment="", Latent_3_comment=""):
+    def execute(self, mode, select_channel, inputcount, Latent_1=None, Latent_2=None, Latent_3=None,
+                Latent_1_comment="", Latent_2_comment="", Latent_3_comment="", **kwargs):
         
-        latents = [Latent_1, Latent_2, Latent_3]
+        count = int(inputcount) if inputcount is not None else 2
+        count = max(1, count)
+        latents = []
+        for i in range(1, count + 1):
+            key = f"Latent_{i}"
+            latents.append(kwargs.get(key, locals().get(key, None)))
         
         if mode == "manual":
             idx = int(select_channel) - 1
-            if idx < 0 or idx > 2:
+            if idx < 0 or idx >= len(latents):
                 idx = 0
-            
-            selected_latent = latents[idx]
-            if selected_latent is None:
-                raise ValueError(f"Selected channel {select_channel} has no input")
-                
-        else:
-            selected_latent = None
-            for latent in latents:
-                if latent is not None:
-                    selected_latent = latent
-                    break
-            
-            if selected_latent is None:
-                raise ValueError("No valid Latent input found in automatic mode")
-        
-        return (selected_latent,)
+            selected = latents[idx]
+            if selected is None:
+                for lt in latents:
+                    if lt is not None:
+                        return (lt,)
+                return (None,)
+            return (selected,)
+
+        valid = [(i + 1, lt) for i, lt in enumerate(latents) if lt is not None]
+        if len(valid) == 0:
+            return (None,)
+        if len(valid) >= 2:
+            if len(valid) == 2:
+                ports = f"Latent_{valid[0][0]} and Latent_{valid[1][0]}"
+            elif len(valid) == 3:
+                ports = f"Latent_{valid[0][0]}, Latent_{valid[1][0]}, Latent_{valid[2][0]}"
+            else:
+                ports = ", ".join([f"Latent_{n}" for n, _ in valid])
+            raise ValueError(
+                f"Auto mode error: Detected {ports} with simultaneous inputs.\n"
+                f"Solutions:\n"
+                f"1. Disable other upstream node outputs, keep only one latent input\n"
+                f"2. Switch to manual mode and select the latent to output\n"
+            )
+        return (valid[0][1],)

@@ -1,13 +1,17 @@
 # 更新日志
 
+## v0.8.1 - 2025-11-21
+- 更新 Text/Image/Latent 双模式切换器：支持可变输入数量，自动模式冲突时给出明确端口提示与解决方案；同步更新中文本地化与 README 描述
+<br>
+
+- Update Text/Image/Latent Dual Mode Switchers: support dynamic number of inputs; in auto mode, provide clear port hints and solutions on conflicts; update Chinese localization and README descriptions accordingly
+
 ## v0.8.0 - 2025-11-18
 - 新增 Sa2VA 高级图像分割节点与分割预设（`Sa2VAAdvanced`、`Sa2VASegmentationPreset`）
-- 优化 FreeCheckpointLoader 支持子目录模型扫描
 - 更新中文本地化文件与 README
 - 修复 Qwen3VL API 中 `final_prompt` 缩进问题 <br>
 
 - Add Sa2VA Advanced image segmentation node and segmentation presets (`Sa2VAAdvanced`, `Sa2VASegmentationPreset`)
-- Optimize FreeCheckpointLoader to support scanning models in subdirectories
 - Update Chinese localization files and README
 - Fix indentation issue of `final_prompt` in Qwen3VL API
 
@@ -17,14 +21,10 @@
 - Update README and workflow configuration
 
 ## v0.7.0 - 2025-11-12
-- 新增 FreeCheckpointLoader 节点，支持自定义路径管理与模型扫描
-- 删除 FreeLoraLoader 节点及相关文件
 - 更新中文本地化文件与 README，添加工作流封面图片
 - 优化 Qwen3VL API 配置管理逻辑 
 <br>
 
-- Add FreeCheckpointLoader node supporting custom path management and model scanning
-- Remove FreeLoraLoader node and related files
 - Update Chinese localization files and README; add workflow cover images
 - Optimize configuration management logic of Qwen3VL API
 
@@ -63,9 +63,7 @@
 - Fix connection error in ModelScope platform LLM mode
 
 ## v0.5.0 - 2025-11-03
-- 新增 FreeLoraLoader 自由 LORA 加载器节点，支持跨路径模型文件加载与可视化浏览<br>
 
-- Add FreeLoraLoader node; support loading LORA model files across paths with visual browsing
 
 ## v0.4.5 - 2025-11-02
 - Qwen3-VL API：删减配置文件的更新记录信息

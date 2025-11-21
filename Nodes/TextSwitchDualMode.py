@@ -9,16 +9,16 @@ class TextSwitchDualMode:
             "required": {
                 "mode": (["manual", "auto"], {"default": "manual"}),
                 "select_text": (["1", "2", "3", "4"], {"default": "1"}),
+                "inputcount": ("INT", {"default": 2, "min": 2, "max": 1000, "step": 1}),
                 "text1_comment": ("STRING", {"multiline": False, "default": ""}),
                 "text2_comment": ("STRING", {"multiline": False, "default": ""}),
                 "text3_comment": ("STRING", {"multiline": False, "default": ""}),
                 "text4_comment": ("STRING", {"multiline": False, "default": ""}),
+
             },
             "optional": {
                 "text1": ("STRING", {"multiline": True, "default": "", "forceInput": True}),
                 "text2": ("STRING", {"multiline": True, "default": "", "forceInput": True}),
-                "text3": ("STRING", {"multiline": True, "default": "", "forceInput": True}),
-                "text4": ("STRING", {"multiline": True, "default": "", "forceInput": True}),
             }
         }
 
@@ -26,21 +26,34 @@ class TextSwitchDualMode:
     RETURN_NAMES = ("output_text",)
     FUNCTION = "execute"
     CATEGORY = "Zhi.AI/Text"
-    DESCRIPTION = "Text Switch: Selects between text inputs based on boolean switch. Outputs text A when switch is True, text B when False. Suitable for conditional text selection and workflow branch control."
+    DESCRIPTION = "Dynamic Text Switcher: Switches among a dynamic number of text inputs. Supports manual mode (select by index) and auto mode (outputs the single non-empty input, errors if multiple). Input count is controlled via the 'inputcount' slider, and the 'Update inputs' button updates ports accordingly. The select_text options and textN_comment fields synchronize with inputcount. Newly added inputs are optional."
 
-    def execute(self, mode, select_text, text1_comment, text2_comment, text3_comment, text4_comment,
-                text1="", text2="", text3="", text4=""):
+    def execute(self, inputcount, mode, select_text, text1_comment="", text2_comment="", text3_comment="", text4_comment="",
+                text1=None, text2=None, text3=None, text4=None, **kwargs):
         
-        texts = [text1, text2, text3, text4]
+        provided = {
+            "text1": text1,
+            "text2": text2,
+            "text3": text3,
+            "text4": text4,
+        }
+
+        texts = []
+        max_supported = int(inputcount) if inputcount is not None else 2
+        max_supported = max(1, max_supported)
+        for i in range(1, max_supported + 1):
+            key = f"text{i}"
+            val = kwargs.get(key, provided.get(key, ""))
+            texts.append(val if val is not None else "")
         
-        self.text_cache["text1"] = text1
-        self.text_cache["text2"] = text2
-        self.text_cache["text3"] = text3
-        self.text_cache["text4"] = text4
+        self.text_cache["text1"] = texts[0] if len(texts) > 0 else ""
+        self.text_cache["text2"] = texts[1] if len(texts) > 1 else ""
+        self.text_cache["text3"] = texts[2] if len(texts) > 2 else ""
+        self.text_cache["text4"] = texts[3] if len(texts) > 3 else ""
         
         if mode == "manual":
             idx = int(select_text) - 1
-            if idx < 0 or idx > 3:
+            if idx < 0 or idx >= len(texts):
                 idx = 0
             
             selected_text = texts[idx]
@@ -68,7 +81,7 @@ class TextSwitchDualMode:
                 elif connected_count == 3:
                     ports = f"text{valid_inputs[0][0]}, text{valid_inputs[1][0]}, text{valid_inputs[2][0]}"
                 else:
-                    ports = f"text{valid_inputs[0][0]}, text{valid_inputs[1][0]}, text{valid_inputs[2][0]}, text{valid_inputs[3][0]}"
+                    ports = ", ".join([f"text{n}" for n, _ in valid_inputs])
                 
                 raise ValueError(
                     f"Auto mode error: Detected {ports} with simultaneous inputs.\n"

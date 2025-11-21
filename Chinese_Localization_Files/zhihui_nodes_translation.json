@@ -81,14 +81,9 @@
     },
     "TextSwitchDualMode": {
         "title": "文本切换器",
-        "description": "文本切换器：根据模式在多个文本输入之间进行选择。手动模式下按索引选择特定文本，自动模式下自动输出唯一连接的文本。适用于条件文本选择和工作流分支控制。",
-        "inputs": {
-            "text1": "文本1",
-            "text2": "文本2",
-            "text3": "文本3",
-            "text4": "文本4"
-        },
+        "description": "动态文本切换器：支持可变数量的文本输入。提供手动模式（按索引选择）与自动模式（仅当唯一非空输入时输出；检测到多个非空将报错）。通过滑块 inputcount 控制端口数量，并通过按钮 Update inputs 根据设定值同步增删端口。select_text 选项与 textN_comment 注释与 inputcount 同步变化，新增的文本输入端口均为非必连。",
         "widgets": {
+            "inputcount": "输入数量",
             "mode": "模式",
             "select_text": "选择文本",
             "text1_comment": "文本1注释",
@@ -148,7 +143,7 @@
     },
     "ImageSwitchDualMode": {
         "title": "图像切换器",
-        "description": "图像切换器：根据模式在多个图像输入之间进行选择。手动模式下按索引选择特定图像，自动模式下自动输出唯一连接的图像。适用于条件图像选择和工作流分支控制。",
+        "description": "动态图像切换器：支持可变数量的图像输入。提供手动模式（按索引选择）与自动模式（仅当唯一非空输入时输出；检测到多个非空将报错）。通过滑块 inputcount 控制端口数量，并通过按钮 Update inputs 根据设定值同步增删端口。select_image 选项与 imageN_note 注释与 inputcount 同步变化，新增的图像输入端口均为非必连。",
         "inputs": {
             "select_image": "选择图像",
             "image1": "图像1",
@@ -159,6 +154,7 @@
         "widgets": {
             "mode": "模式",
             "select_image": "选择图像",
+            "inputcount": "输入数量",
             "image1_note": "图像1备注",
             "image2_note": "图像2备注",
             "image3_note": "图像3备注",
@@ -186,7 +182,7 @@
     },
     "LatentSwitchDualMode": {
         "title": "潜在空间切换器",
-        "description": "潜在空间切换器：支持手动和自动模式的多通道潜在空间切换器。可在3个潜在空间输入之间切换，支持注释标签便于管理，自动模式下智能选择非空输入，适用于工作流中的条件分支和动态切换。",
+        "description": "动态潜在空间切换器：支持可变数量的潜变量输入。提供手动模式（按索引选择）与自动模式（仅当唯一非空输入时输出；检测到多个非空将报错）。通过滑块 inputcount 控制端口数量，并通过按钮 Update inputs 根据设定值同步增删端口。select_channel 选项与 Latent_N_comment 注释与 inputcount 同步变化，新增的潜变量输入端口均为非必连。",
         "inputs": {
             "mode": "模式",
             "select_channel": "选择通道",
@@ -200,6 +196,7 @@
         "widgets": {
             "mode": "模式",
             "select_channel": "选择通道",
+            "inputcount": "输入数量",
             "Latent_1_comment": "潜在空间1注释",
             "Latent_2_comment": "潜在空间2注释",
             "Latent_3_comment": "潜在空间3注释"
@@ -836,21 +833,6 @@
         "outputs": {
             "result":"结果",
             "status":"状态"   
-        }
-    },
-    "FreeCheckpointLoader": {
-        "title": "自由检查点加载器",
-        "description": "通过Web界面加载支持自定义路径的扩散模型检查点",
-        "inputs": {
-            "ckpt_name": "CKPT名称"
-        },
-        "outputs": {
-            "MODEL": "模型",
-            "CLIP": "CLIP", 
-            "VAE": "VAE"
-        },
-        "tooltips": {
-            "ckpt_name": "要加载的检查点（模型）名称，支持从自定义路径扫描的模型文件"
         }
     },
     "Sa2VAAdvanced": {

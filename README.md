@@ -2,8 +2,8 @@
 [![GitHub](https://img.shields.io/badge/GitHub-zhihui--nodes--comfyui-blue?style=for-the-badge&logo=github)](https://github.com/ZhiHui6/zhihui_nodes_comfyui) [![License](https://img.shields.io/badge/License-MIT-green?style=for-the-badge)](LICENSE) [![ComfyUI](https://img.shields.io/badge/ComfyUI-Compatible-orange?style=for-the-badge)](https://github.com/comfyanonymous/ComfyUI)
 ---
 
-最新版本：`v0.8.0`（2025-11-18），完整更新日志：查看<a href="CHANGELOG.md">`CHANGELOG.md`</a><br>
-Latest version: `v0.8.0` (2025-11-18), full update log: view <a href="CHANGELOG.md">`CHANGELOG.md`</a>
+最新版本：`v0.8.1`（2025-11-21），完整更新日志：查看<a href="CHANGELOG.md">`CHANGELOG.md`</a><br>
+Latest version: `v0.8.1` (2025-11-21), full update log: view <a href="CHANGELOG.md">`CHANGELOG.md`</a>
 
 ## 📖 项目介绍 | Project Introduction
 
@@ -589,38 +589,6 @@ Detailed Reports: Provides detailed information and statistics of the conversion
 <img src="images/Song Style Prompt Generator.jpg" alt="Suno歌曲风格提示词生成器" width="45%"/>
 </a>
 </div>
-
-</td>
-</tr>
-</table>
-
-### 📁 模型加载器类节点 | Model Loader Nodes
-
-<table>
-<tr>
-<th width="30%">节点名称 | Node Name</th>
-<th>功能描述 | Function Description</th>
-</tr>
-<tr>
-<td><b>自由检查点加载器</b><br><b>Free Checkpoint Loader</b><br><code>FreeCheckpointLoader</code></td>
-<td>
-突破传统限制的高级模型加载器，支持自定义路径管理和动态模型发现，通过Web界面实现路径的添加和管理。<br>An advanced model loader that breaks through traditional limitations, supporting custom path management and dynamic model discovery. Paths can be added and managed through a web interface.
-<b>核心功能 | Core Features</b>：
-- <b>自定义路径支持</b>：通过Web界面添加和管理任意路径下的模型文件<br>
- <b>Custom Path Support:</b> Add and manage model files in arbitrary paths through web interface
-- <b>智能路径扫描</b>：自动扫描指定路径发现可用模型并更新列表<br>
- <b>Intelligent Path Scanning:</b> Automatically scans specified paths to discover available models and update the list
-
-<br>
-<div align="left">
-<a href="images/Free Checkpoint Loader1.jpg" target="_blank">
-<img src="images/Free Checkpoint Loader1.jpg" alt="自由检查点加载器1" width="45%"/>
-</a>
-<a href="images/Free Checkpoint Loader2.jpg" target="_blank">
-<img src="images/Free Checkpoint Loader2.jpg" alt="自由检查点加载器2" width="45%"/>
-</a>
-</div>
-
 </td>
 </tr>
 </table>
@@ -836,36 +804,36 @@ Tool node that provides interactive segmentation preset selection. Choose common
 </tr>
 <tr>
 <td><b>Latent切换器(双模式)</b><br><b>Latent Switch Dual Mode</b><br><code>LatentSwitchDualMode</code></td>
-<td>支持3个Latent输入的双模式切换器，可通过下拉菜单手动选择输出，或启用自动模式智能检测单个有效输入。<br>Supports 3 Latent inputs with dual-mode switching, can manually select output through dropdown menu, or enable auto mode to intelligently detect single valid input.
+<td>支持可变数量的潜变量输入的双模式切换器。通过滑块 <code>inputcount</code> 控制端口数量，并点击按钮 <code>Update inputs</code> 同步增删端口；手动模式下按索引选择输出（<code>select_channel</code> 选项随 <code>inputcount</code> 自动更新）；自动模式仅在存在唯一非空输入时输出，检测到多个非空输入将提示错误。新增的潜变量输入端口均为非必连，适合在不同生成路径之间灵活切换与对比实验。<br>Dual‑mode switcher with a dynamic number of latent inputs. Use the <code>inputcount</code> slider to control the number of ports and press <code>Update inputs</code> to sync additions/removals; in manual mode you select by index (<code>select_channel</code> options auto‑update with <code>inputcount</code>); in auto mode it outputs the single non‑empty input and errors when multiple non‑empty inputs are detected. Newly added latent inputs are optional, ideal for flexible switching and A/B testing across generation paths.
 
 <br>
 <div align="left">
-<a href="images/Latent切换器.jpg" target="_blank">
-<img src="images/Latent切换器.jpg" alt="Latent切换器" width="45%"/>
+<a href="images/Latent Switch Dual Mode.jpg" target="_blank">
+<img src="images/Latent Switch Dual Mode.jpg" alt="Latent切换器(双模式)" width="45%"/>
 </a>
 </div>
 </td>
 </tr>
 <tr>
 <td><b>文本切换器(双模式)</b><br><b>Text Switch Dual Mode</b><br><code>TextSwitchDualMode</code></td>
-<td>支持4个文本输入的双模式切换器，可通过下拉菜单手动选择输出，或启用自动模式智能检测单个有效输入。便于在不同版本的提示词之间快速切换，进行对比实验。<br>Supports 4 text inputs with dual-mode switching, can manually select output through dropdown menu, or enable auto mode to intelligently detect single valid input. Convenient for quickly switching between different versions of prompts for comparison experiments.
+<td>支持可变数量的文本输入的双模式切换器。通过滑块 <code>inputcount</code> 控制端口数量，并点击按钮 <code>Update inputs</code> 同步增删端口；手动模式下按索引选择输出（<code>select_text</code> 选项随 <code>inputcount</code> 自动更新）；自动模式仅在存在唯一非空输入时输出，检测到多个非空输入将提示错误。新增的文本输入端口均为非必连，适合在不同版本提示词之间灵活切换与对比实验。<br>Dual‑mode switcher with a dynamic number of text inputs. Use the <code>inputcount</code> slider to control the number of ports and press <code>Update inputs</code> to sync additions/removals; in manual mode you select by index (<code>select_text</code> options auto‑update with <code>inputcount</code>); in auto mode it outputs the single non‑empty input and errors when multiple non‑empty inputs are detected. Newly added text inputs are optional, ideal for flexible switching and A/B testing across prompt versions.
 
 <br>
 <div align="left">
-<a href="images/文本切换器.jpg" target="_blank">
-<img src="images/文本切换器.jpg" alt="文本切换器" width="45%"/>
+<a href="images/Text Switch Dual Mode.jpg" target="_blank">
+<img src="images/Text Switch Dual Mode.jpg" alt="文本切换器(双模式)" width="45%"/>
 </a>
 </div>
 </td>
 </tr>
 <tr>
 <td><b>图像切换器(双模式)</b><br><b>Image Switch Dual Mode</b><br><code>ImageSwitchDualMode</code></td>
-<td>支持在2个或4个图像输入之间进行切换的双模式切换器，可通过下拉菜单手动选择输出，或启用自动模式智能检测单个有效输入。便于比较不同生成结果或应用不同的图像处理路径。<br>Supports switching between 2 or 4 image inputs with dual-mode switching, can manually select output through dropdown menu, or enable auto mode to intelligently detect single valid input. Convenient for comparing different generation results or applying different image processing paths.
+<td>支持可变数量的图像输入的双模式切换器。通过滑块 <code>inputcount</code> 控制端口数量，并点击按钮 <code>Update inputs</code> 同步增删端口；手动模式下按索引选择输出（<code>select_image</code> 选项随 <code>inputcount</code> 自动更新）；自动模式仅在存在唯一非空输入时输出，检测到多个非空输入将提示错误。新增的图像输入端口均为非必连，便于在不同生成结果或不同处理路径之间进行灵活对比。<br>Dual‑mode switcher with a dynamic number of image inputs. Use the <code>inputcount</code> slider to control the number of ports and press <code>Update inputs</code> to sync additions/removals; in manual mode you select by index (<code>select_image</code> options auto‑update with <code>inputcount</code>); in auto mode it outputs the single non‑empty input and errors when multiple non‑empty inputs are detected. Newly added image inputs are optional, convenient for flexible comparison across different outputs or processing paths.
 
 <br>
 <div align="left">
-<a href="images/图像切换器.jpg" target="_blank">
-<img src="images/图像切换器.jpg" alt="图像切换器2路" width="45%"/>
+<a href="images/Image Switch Dual Mode.jpg" target="_blank">
+<img src="images/Image Switch Dual Mode.jpg" alt="图像切换器(双模式)" width="45%"/> 
 </a>
 </div>
 </td>

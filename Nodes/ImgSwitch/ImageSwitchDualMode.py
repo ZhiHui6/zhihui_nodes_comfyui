@@ -1,5 +1,3 @@
-import torch
-
 class ImageSwitchDualMode:
     
     def __init__(self):
@@ -11,16 +9,17 @@ class ImageSwitchDualMode:
             "required": {
                 "mode": (["manual", "auto"], {"default": "manual"}),
                 "select_image": (["1", "2", "3", "4"], {"default": "1"}),
+                "inputcount": ("INT", {"default": 2, "min": 1, "max": 1000, "step": 1}),
+                "image1_note": ("STRING", {"multiline": False, "default": ""}),
+                "image2_note": ("STRING", {"multiline": False, "default": ""}),
+                "image3_note": ("STRING", {"multiline": False, "default": ""}),
+                "image4_note": ("STRING", {"multiline": False, "default": ""}),
             },
             "optional": {
                 "image1": ("IMAGE", {}),
                 "image2": ("IMAGE", {}),
                 "image3": ("IMAGE", {}),
                 "image4": ("IMAGE", {}),
-                "image1_note": ("STRING", {"multiline": False, "default": "", "placeholder": "Image 1 description"}),
-                "image2_note": ("STRING", {"multiline": False, "default": "", "placeholder": "Image 2 description"}),
-                "image3_note": ("STRING", {"multiline": False, "default": "", "placeholder": "Image 3 description"}),
-                "image4_note": ("STRING", {"multiline": False, "default": "", "placeholder": "Image 4 description"}),
             }
         }
 
@@ -28,47 +27,45 @@ class ImageSwitchDualMode:
     RETURN_NAMES = ("output_image",)
     FUNCTION = "execute"
     CATEGORY = "Zhi.AI/Image"
-    DESCRIPTION = "Image Switch: Select between multiple image inputs based on mode. In manual mode, select specific image by index. In auto mode, automatically output the only connected image. Suitable for conditional image selection and workflow branching control."
+    DESCRIPTION = "Dynamic Image Switcher: Switches among a dynamic number of image inputs. Supports manual mode (select by index) and auto mode (outputs the single non-empty input, errors if multiple). Input count is controlled via 'inputcount', and the UI can update ports accordingly. Newly added inputs are optional."
 
-    def execute(self, mode, select_image, image1=None, image2=None, image3=None, image4=None,
-                image1_note="", image2_note="", image3_note="", image4_note=""):
-        
-        images = [image1, image2, image3, image4]
-        
+    def execute(self, mode, select_image, inputcount, image1=None, image2=None,
+                image3=None, image4=None,
+                image1_note="", image2_note="", image3_note="", image4_note="", **kwargs):
+
+        count = int(inputcount) if inputcount is not None else 2
+        count = max(1, count)
+        images = []
+        for i in range(1, count + 1):
+            key = f"image{i}"
+            images.append(kwargs.get(key, locals().get(key, None)))
+
         if mode == "manual":
             idx = int(select_image) - 1
-            if idx < 0 or idx > 3:
+            if idx < 0 or idx >= len(images):
                 idx = 0
-            
-            if images[idx] is not None:
-                return (images[idx],)
-            else:
-                for i, img in enumerate(images):
-                    if img is not None:
-                        return (img,)
-                return (None,)
-        
-        else:
-            connected_indices = [i+1 for i, img in enumerate(images) if img is not None]
-            connected_count = len(connected_indices)
-            
-            if connected_count == 0:
-                return (None,)
-            elif connected_count >= 2:
-                if connected_count == 2:
-                    ports = f"image{connected_indices[0]} and image{connected_indices[1]}"
-                elif connected_count == 3:
-                    ports = f"image{connected_indices[0]}, image{connected_indices[1]}, image{connected_indices[2]}"
-                else:
-                    ports = f"image{connected_indices[0]}, image{connected_indices[1]}, image{connected_indices[2]}, image{connected_indices[3]}"
-                
-                raise ValueError(
-                    f"Auto mode error: Detected {ports} with simultaneous inputs.\n"
-                    f"Solutions:\n"
-                    f"1. Disable other upstream node outputs, keep only one image input\n"
-                    f"2. Switch to manual mode and select the image to output\n"
-                )
-            
-            for i, img in enumerate(images):
+            selected = images[idx]
+            if selected is not None:
+                return (selected,)
+            for img in images:
                 if img is not None:
                     return (img,)
+            return (None,)
+
+        valid = [(i + 1, img) for i, img in enumerate(images) if img is not None]
+        if len(valid) == 0:
+            return (None,)
+        if len(valid) >= 2:
+            if len(valid) == 2:
+                ports = f"image{valid[0][0]} and image{valid[1][0]}"
+            elif len(valid) == 3:
+                ports = f"image{valid[0][0]}, image{valid[1][0]}, image{valid[2][0]}"
+            else:
+                ports = ", ".join([f"image{n}" for n, _ in valid])
+            raise ValueError(
+                f"Auto mode error: Detected {ports} with simultaneous inputs.\n"
+                f"Solutions:\n"
+                f"1. Disable other upstream node outputs, keep only one image input\n"
+                f"2. Switch to manual mode and select the image to output\n"
+            )
+        return (valid[0][1],)
