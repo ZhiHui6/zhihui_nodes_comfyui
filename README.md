@@ -326,8 +326,8 @@ Customizable output templates to adapt to different photography style requiremen
 <td><b>系统引导词加载器</b><br><b>System Prompt Loader</b><br><code>SystemPromptLoader</code></td>
 <td>从预设文件夹动态加载系统级引导词（System Prompt），并可选择性地与用户输入合并。适合管理和应用复杂的系统提示模板，提高生成结果的一致性和质量。<br>Dynamically loads system-level prompts from preset folders and can optionally merge with user input. Suitable for managing and applying complex system prompt templates to improve consistency and quality of generated results.<br><br>
 <div align="left">
-<a href="images/系统引导词加载器.jpg" target="_blank">
-<img src="images/系统引导词加载器.jpg" alt="系统引导词加载器" width="45%"/>
+<a href="images/System Prompt Loader.jpg" target="_blank">
+<img src="images/System Prompt Loader.jpg" alt="系统提示词加载器" width="45%"/>
 </a>
 </div>
 </td>
