@@ -1081,18 +1081,28 @@ class APIConfigManager {
         }
     }
 
-    restoreDefaultConfig(dialog) {
+    async restoreDefaultConfig(dialog) {
         if (!confirm("确定要恢复默认配置吗？这将清空所有当前设置。")) {
             return;
         }
 
         const defaultConfig = this.getDefaultConfig();
+        const ok = await this.saveConfig(defaultConfig);
         
         this.config = { ...defaultConfig };
         this.renderPlatformConfigs(this.config);
-        this.renderCustomConfigs(this.config);
+        
+        const customContainerExists = !!document.querySelector('#custom-configs');
+        if (customContainerExists) {
+            this.renderCustomConfigs(this.config);
+        }
+        this.attachActiveTargetHandlers(dialog);
 
-        alert("已恢复默认配置！如需提交更改，请在各平台卡片底部点击保存。");
+        if (ok) {
+            alert("已恢复默认配置并已自动保存！");
+        } else {
+            alert("已恢复默认配置，但保存失败，请稍后重试或手动保存。");
+        }
     }
 }
 

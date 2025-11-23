@@ -87,9 +87,7 @@
             "mode": "模式",
             "select_text": "选择文本",
             "text1_comment": "文本1注释",
-            "text2_comment": "文本2注释",
-            "text3_comment": "文本3注释",
-            "text4_comment": "文本4注释"
+            "text2_comment": "文本2注释"
         },
         "outputs": {
             "output_text": "输出文本"
@@ -863,6 +861,22 @@
         },
         "outputs": {
             "segmentation_preset": "分割预设"
+        }
+    },
+    "BatchLoadingOfImages": {
+        "title": "批量图像加载",
+        "description": "批量图像加载：从指定目录按排序批量读取图像，支持起始索引与数量上限，并可按字母、数字或时间排序；输出图像、掩码与文件路径列表，适用于批处理与数据预处理。",
+        "widgets": {
+            "directory": "目录路径",
+            "image_load_cap": "加载上限",
+            "start_index": "起始索引",
+            "load_always": "每次强制重新加载",
+            "sort_method": "排序方式"
+        },
+        "outputs": {
+            "IMAGE": "图像",
+            "MASK": "遮罩",
+            "FILE PATH": "文件路径"
         }
     }
 }

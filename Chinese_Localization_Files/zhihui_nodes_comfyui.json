@@ -205,5 +205,11 @@
     "Aliyun":"阿里云百炼",
     "Fully Custom":"完全自定义",
     "Platform Presets":"平台预设",
-    "not used":"未使用"
+    "not used":"未使用",
+    "Alphabetical (ASC)":"按字母升序",
+    "Alphabetical (DESC)":"按字母降序",
+    "Numerical (ASC)":"按数字升序",
+    "Numerical (DESC)":"按数字降序",
+    "Datetime (ASC)":"按日期时间升序",
+    "Datetime (DESC)":"按日期时间降序"
 }

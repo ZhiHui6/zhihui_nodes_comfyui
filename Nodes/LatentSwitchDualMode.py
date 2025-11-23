@@ -7,7 +7,7 @@ class LatentSwitchDualMode:
     def INPUT_TYPES(cls):
         return {
             "required": {
-                "mode": (["manual", "auto"], {"default": "manual"}),
+                "mode": (["manual", "auto"], {"default": "auto"}),
                 "select_channel": (["1", "2", "3"], {"default": "1"}),
                 "inputcount": ("INT", {"default": 2, "min": 1, "max": 1000, "step": 1}),
                 "Latent_1_comment": ("STRING", {"multiline": False, "default": ""}),

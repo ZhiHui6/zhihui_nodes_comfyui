@@ -2,17 +2,21 @@
     "api_keys": {
         "SiliconFlow": {
             "api_key": "",
-            "selected_model": "Qwen3-VL-8B-Instruct",
+            "website": "https://siliconflow.cn",
+            "docs": "https://docs.siliconflow.cn/cn/userguide/quickstart#4-1-%E5%88%9B%E5%BB%BAapi-key",
             "active": false
         },
         "ModelScope": {
             "api_key": "",
-            "selected_model": "Qwen3-VL-8B-Instruct",
+            "website": "https://modelscope.cn",
+            "docs": "https://modelscope.cn/docs/model-service/API-Inference/intro",
             "active": false
         },
         "Aliyun": {
             "api_key": "",
-            "selected_model": "qwen3-vl-plus",
+            "website": "https://www.aliyun.com/",
+            "docs": "https://bailian.console.aliyun.com/?spm=5176.29619931.J_SEsSjsNv72yRuRFS2VknO.2.74cd405fVDTiYg&tab=api#/api",
+            "api_base": "https://dashscope.aliyuncs.com/compatible-mode/v1",
             "active": false
         }
     },
@@ -40,5 +44,5 @@
         }
     },
     "active_target": "SiliconFlow",
-    "notes": "此文件用于存储Qwen3VL API节点的通讯配置。包括平台预设的API密钥和完全自定义的配置信息。请妥善保管您的API密钥，不要将其分享给他人。"
+    "config_version": "3.0"
 }

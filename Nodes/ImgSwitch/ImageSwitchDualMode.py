@@ -7,7 +7,7 @@ class ImageSwitchDualMode:
     def INPUT_TYPES(cls):
         return {
             "required": {
-                "mode": (["manual", "auto"], {"default": "manual"}),
+                "mode": (["manual", "auto"], {"default": "auto"}),
                 "select_image": (["1", "2", "3", "4"], {"default": "1"}),
                 "inputcount": ("INT", {"default": 2, "min": 1, "max": 1000, "step": 1}),
                 "image1_note": ("STRING", {"multiline": False, "default": ""}),

@@ -47,6 +47,7 @@ from .Nodes.ImageFormatConverter import ImageFormatConverter
 from .Nodes.Qwen3VL.Qwen3VLAPI import Qwen3VLAPI
 from .Nodes.Sa2VA.Sa2VAAdvanced import Sa2VAAdvanced
 from .Nodes.Sa2VA.Sa2VASegmentationPreset import Sa2VASegmentationPreset
+from .Nodes.Batch_loading_of_images import BatchLoadingOfImages
 
 import os
 
@@ -100,6 +101,7 @@ NODE_CLASS_MAPPINGS = {
     "Qwen3VLAPI": Qwen3VLAPI,
     "Sa2VAAdvanced": Sa2VAAdvanced,
     "Sa2VASegmentationPreset": Sa2VASegmentationPreset,
+    "BatchLoadingOfImages": BatchLoadingOfImages,
 }
 
 NODE_DISPLAY_NAME_MAPPINGS = {
@@ -152,6 +154,7 @@ NODE_DISPLAY_NAME_MAPPINGS = {
     "Qwen3VLAPI": "Qwen3-VL API",
     "Sa2VAAdvanced": "Sa2VA Advanced",
     "Sa2VASegmentationPreset": "Sa2VA Segmentation Preset",
+    "BatchLoadingOfImages": "Batch Loading Of Images",
 }
 
 WEB_DIRECTORY = os.path.join(os.path.dirname(os.path.abspath(__file__)), "web")

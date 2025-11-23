@@ -82,6 +82,37 @@ app.registerExtension({
                 app.graph.setDirtyCanvas(true, true);
             };
 
+            this.repositionSelectText = function(currentMode) {
+                const widgets = this.widgets || [];
+                const selIdx = widgets.findIndex(w => w && w.name === "select_text");
+                const modeIdx = widgets.findIndex(w => w && w.name === "mode");
+                if (selIdx < 0 || modeIdx < 0) return;
+                const sel = widgets[selIdx];
+                const hide = currentMode === "auto";
+                sel.hidden = hide;
+                if (hide) {
+                    widgets.splice(selIdx, 1);
+                    widgets.push(sel);
+                } else {
+                    widgets.splice(selIdx, 1);
+                    const insertPos = widgets.findIndex(w => w && w.name === "mode");
+                    widgets.splice(insertPos + 1, 0, sel);
+                }
+                this.size = this.computeSize(this.size);
+                app.graph.setDirtyCanvas(true, true);
+            };
+
+            const modeWidget = this.widgets?.find(w => w.name === "mode");
+            const selectTextWidget = this.widgets?.find(w => w.name === "select_text");
+            if (modeWidget && selectTextWidget) {
+                const originalModeCallback = modeWidget.callback;
+                modeWidget.callback = (value) => {
+                    if (originalModeCallback) originalModeCallback.call(this, value);
+                    this.repositionSelectText(modeWidget.value);
+                };
+                this.repositionSelectText(modeWidget.value);
+            }
+
             this.syncCommentWidgets = function (n) {
                 const target = Math.max(1, parseInt(n) || 1);
                 const isComment = (name) => /^text\d+_comment$/.test(name);

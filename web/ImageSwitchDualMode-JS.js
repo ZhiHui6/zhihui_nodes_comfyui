@@ -66,6 +66,26 @@ app.registerExtension({
                 app.graph.setDirtyCanvas(true, true);
             };
 
+            this.repositionSelectImage = function(currentMode) {
+                const widgets = this.widgets || [];
+                const selIdx = widgets.findIndex(w => w && w.name === "select_image");
+                const modeIdx = widgets.findIndex(w => w && w.name === "mode");
+                if (selIdx < 0 || modeIdx < 0) return;
+                const sel = widgets[selIdx];
+                const hide = currentMode === "auto";
+                sel.hidden = hide;
+                if (hide) {
+                    widgets.splice(selIdx, 1);
+                    widgets.push(sel);
+                } else {
+                    widgets.splice(selIdx, 1);
+                    const insertPos = widgets.findIndex(w => w && w.name === "mode");
+                    widgets.splice(insertPos + 1, 0, sel);
+                }
+                this.size = this.computeSize(this.size);
+                app.graph.setDirtyCanvas(true, true);
+            };
+
             this.syncCommentWidgets = function (n) {
                 const target = Math.max(1, parseInt(n) || 1);
                 const isNote = (name) => /^image\d+_note$/.test(name);
@@ -108,6 +128,17 @@ app.registerExtension({
                 this.updateInputs(v);
                 this.updateSelectOptions(v);
                 this.syncCommentWidgets(v);
+            }
+
+            const modeWidget = this.widgets?.find(w => w.name === "mode");
+            const selectWidget = this.widgets?.find(w => w.name === "select_image");
+            if (modeWidget && selectWidget) {
+                const originalModeCallback = modeWidget.callback;
+                modeWidget.callback = (value) => {
+                    if (originalModeCallback) originalModeCallback.call(this, value);
+                    this.repositionSelectImage(modeWidget.value);
+                };
+                this.repositionSelectImage(modeWidget.value);
             }
 
             return r;

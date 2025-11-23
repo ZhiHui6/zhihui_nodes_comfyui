@@ -1,5 +1,17 @@
 # 更新日志
 
+## v0.8.2 - 2025-11-23
+- 新增 BatchLoadingOfImages 节点：批量加载图像
+- 优化 ImageSwitchDualMode、TextSwitchDualMode 和 LatentSwitchDualMode 的自动模式切换逻辑
+- 修复 Qwen3VL API 配置管理器的恢复默认配置功能
+- 新增 Kontext watermark removal 工作流模版
+<br>
+
+- Add BatchLoadingOfImages node for batch image loading
+- Optimize auto-mode switching logic for ImageSwitchDualMode, TextSwitchDualMode, and LatentSwitchDualMode
+- Fix the "restore defaults" feature in Qwen3VL API configuration manager
+- Add Kontext watermark removal workflow template
+
 ## v0.8.1 - 2025-11-21
 - 更新 Text/Image/Latent 双模式切换器：支持可变输入数量，自动模式冲突时给出明确端口提示与解决方案；同步更新中文本地化与 README 描述
 <br>
