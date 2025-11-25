@@ -49,7 +49,7 @@ const Utils = {
 const StyleManager = {
     getStyles() {
         return {
-            base: "max-width:900px;width:95%;background:#111827;border:1px solid rgba(255,255,255,0.12);border-radius:10px;box-shadow:0 12px 40px rgba(0,0,0,.4);padding:16px 18px;color:#e8e8e8;z-index:10002;display:block;opacity:1;visibility:visible;pointer-events:auto;",
+            base: "max-width:980px;width:96%;background:#111827;border:1px solid rgba(255,255,255,0.12);border-radius:10px;box-shadow:0 12px 40px rgba(0,0,0,.4);padding:16px 18px;color:#e8e8e8;z-index:10002;display:block;opacity:1;visibility:visible;pointer-events:auto;",
             overlay: "position:fixed;left:0;top:0;width:100vw;height:100vh;background:rgba(0,0,0,0.35);backdrop-filter:blur(3px);-webkit-backdrop-filter:blur(3px);z-index:10001;display:flex;align-items:center;justify-content:center;",
             input: "background:linear-gradient(145deg,#2a2a3e,#1e1e32); color:#e8e8e8; border:1px solid #4a5568; border-radius:6px; padding:10px 14px; font-size:14px; transition:all .3s ease; height:38px;",
             button: "border:none; border-radius:6px; padding:10px 14px; font-size:14px; cursor:pointer; transition:all .3s ease;",
@@ -72,12 +72,14 @@ const StyleManager = {
                 #${uniqueId} .ui-controls { display:flex; flex-direction:column; gap:10px; }
                 #${uniqueId} .input-group { display:flex; flex-direction:column; gap:6px; max-width:650px; width:100%; }
                 #${uniqueId} .inline-controls { display:flex; align-items:center; gap:12px; flex-wrap:wrap; }
+                #${uniqueId} .model-row { gap:2px; }
                 #${uniqueId} .inline-controls label { flex: 0 0 auto; }
                 #${uniqueId} .inline-controls label span { white-space: nowrap; flex-shrink: 0; font-weight: 600; }
                 #${uniqueId} .input-group > span { font-weight: 600; }
-                #${uniqueId} .inline-controls .select-wrapper { flex: 0 1 auto; min-width: 220px; }
-                #${uniqueId} .inline-controls .model-name { margin-left: 16px; flex: 1 1 420px; min-width: 360px; }
-                #${uniqueId} .inline-controls .download-button { margin-left: 8px; flex: 0 0 auto; }
+                #${uniqueId} .inline-controls .select-wrapper { flex: 0 1 auto; min-width: 240px; }
+                #${uniqueId} .model-row .provider-item .select-wrapper { min-width: 160px; max-width: 220px; }
+                #${uniqueId} .inline-controls .model-name { margin-left: 0; flex: 0 1 420px; min-width: 360px; }
+                #${uniqueId} .inline-controls .download-button { flex: 0 0 auto; }
                 #${uniqueId} .text-input, #${uniqueId} .select-input { ${styles.input} }
                 #${uniqueId} .select-input { width:100%; appearance:none; -webkit-appearance:none; -moz-appearance:none; padding-right:36px; display:block; }
                 #${uniqueId} .select-wrapper { position:relative; display:flex; align-items:center; align-self:flex-start; }
@@ -94,7 +96,7 @@ const StyleManager = {
                 #${uniqueId} .progress-bar { ${styles.progressBar} }
                 #${uniqueId} .progress-fill { ${styles.progressFill} }
                 #${uniqueId} .progress-text { margin-top:6px; font-size:14px; color:#e8e8e8; }
-                #${uniqueId} .manage { margin-top: 12px; border: 1px solid transparent; border-radius: 8px; padding: 10px; max-width: 860px; width: 100%; background: linear-gradient(145deg, #1a202c, #2d3748) padding-box, linear-gradient(145deg, #4a5568, #718096) border-box; box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06), 0 0 0 1px rgba(255, 255, 255, 0.05) inset; position: relative; }
+                #${uniqueId} .manage { margin-top: 12px; border: 1px solid transparent; border-radius: 8px; padding: 10px; max-width: 920px; width: 100%; background: linear-gradient(145deg, #1a202c, #2d3748) padding-box, linear-gradient(145deg, #4a5568, #718096) border-box; box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06), 0 0 0 1px rgba(255, 255, 255, 0.05) inset; position: relative; }
                 #${uniqueId} .manage-header { display:flex; align-items:center; justify-content:space-between; }
                 #${uniqueId} .manage-title { font-size:15px; font-weight:600; }
                 #${uniqueId} .manage-list { margin-top:8px; display:flex; flex-direction:column; gap:6px; max-height:160px; overflow:auto; }
@@ -104,11 +106,13 @@ const StyleManager = {
                 #${uniqueId} .manage-item .meta { font-size:12px; color: #9aa0a6; margin-left:8px; flex: 1 1 auto; min-width: 0; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
                 #${uniqueId} .manage-item .subline { display:flex; align-items:center; gap:6px; }
                 #${uniqueId} .manage-item .actions { display:flex; align-items:center; gap:8px; flex: 0 0 auto; }
-                #${uniqueId} .btn-refresh { ${styles.button} background: #4299e1; color: #fff; padding:8px 12px; font-size:13px; }
+                #${uniqueId} .btn-refresh { ${styles.button} background: #ff7f00; color: #fff; padding:4px 8px; font-size:12px; }
+                #${uniqueId} .btn-activate { ${styles.button} background: #4299e1; color: #fff; padding:4px 8px; font-size:12px; }
                 #${uniqueId} .btn-delete { ${styles.buttonDanger} }
                 @media (min-width: 760px) {
                     #${uniqueId} .inline-controls { flex-wrap: nowrap; }
                     #${uniqueId} .inline-controls .select-wrapper { min-width: 240px; }
+                    #${uniqueId} .model-row .provider-item .select-wrapper { min-width: 160px; max-width: 220px; }
                     #${uniqueId} .inline-controls .model-name { min-width: 420px; }
                 }
             </style>
@@ -152,6 +156,7 @@ async function openSettings(node) {
         "Qwen3-VL-32B-Instruct-FP8",
         "Qwen3-VL-32B-Thinking-FP8",
         "Huihui-Qwen3-VL-8B-Instruct-abliterated",
+        "Huihui-Qwen3-VL-8B-Thinking-abliterated",
     ];
     if (modelWidget) {
         const modelOptions = Array.isArray(modelWidget.options) ? modelWidget.options : (modelWidget.options?.values || []);
@@ -161,6 +166,7 @@ async function openSettings(node) {
     const overlay = createOverlay();
     const dialog = createDialog();
     const uniqueId = `qwen3vl-settings-${Math.random().toString(36).substring(2, 9)}`;
+    
 
     dialog.innerHTML = `
         ${StyleManager.getUniqueStyles(uniqueId)}
@@ -170,8 +176,8 @@ async function openSettings(node) {
                 <button id="qwen3vl-close-circle" class="circle-close" type="button"></button>
             </div>
             <div class="ui-controls">
-                <div class="inline-controls">
-                    <label style="display:flex; align-items:center; gap:6px;">
+                <div class="inline-controls model-row">
+                    <label class="provider-item" style="display:flex; align-items:center; gap:6px;">
                         <span style="font-size:14px;">下载源:</span>
                         <div class="select-wrapper">
                             <select id="qwen3vl-provider" class="select-input">
@@ -222,17 +228,9 @@ async function openSettings(node) {
     };
 
     const providerEl = dialog.querySelector("#qwen3vl-provider");
+    const modelEl = dialog.querySelector("#qwen3vl-model");
     providerEl.onchange = async () => {
-        const status = dialog.querySelector("#qwen3vl-status");
-        status.classList.remove("success", "error", "warning", "highlight");
-        const success = await updateConfig({ provider: providerEl.value });
-        if (success) {
-            status.classList.add("success");
-            status.textContent = "下载源已设定";
-        } else {
-            status.classList.add("error");
-            status.textContent = "设定失败";
-        }
+        await updateConfig({ provider: providerEl.value });
     };
 
     const updateProgressUI = (p) => {
@@ -248,7 +246,7 @@ async function openSettings(node) {
         }
     };
 
-    const renderModelList = (list) => {
+    const renderModelList = (list, activeName) => {
         const cont = dialog.querySelector(`#${uniqueId} #qwen3vl-model-list`);
         cont.innerHTML = "";
         if (!Array.isArray(list) || list.length === 0) {
@@ -282,14 +280,42 @@ async function openSettings(node) {
                 badge.style.color = "#ef4444";
                 badge.style.border = "1px solid rgba(239,68,68,0.3)";
             }
+            const activeBadge = document.createElement("span");
+            if (m.active || (activeName && m.name === activeName)) {
+                activeBadge.textContent = "已激活";
+                activeBadge.style.cssText = "margin-left:6px; padding:2px 6px; border-radius:10px; font-size:12px; background:rgba(0, 255, 85, 0.12); color:#3b82f6; border:1px solid rgba(59,130,246,0.3);";
+            }
             const subline = document.createElement("div");
             subline.className = "subline";
             subline.appendChild(meta);
             subline.appendChild(badge);
+            if (activeBadge.textContent) subline.appendChild(activeBadge);
             left.appendChild(name);
             left.appendChild(subline);
             const actions = document.createElement("div");
             actions.className = "actions";
+            const activate = document.createElement("button");
+            activate.className = "btn-activate";
+            activate.textContent = "激活";
+            activate.onclick = async () => {
+                const status = dialog.querySelector("#qwen3vl-status");
+                status.classList.remove("success", "error", "warning", "highlight");
+                status.textContent = "正在激活...";
+                const result = await Utils.apiCall("/zhihui_nodes/qwen3vl/activate_model", {
+                    method: "POST",
+                    headers: { "Content-Type": "application/json" },
+                    body: JSON.stringify({ name: m.name })
+                });
+                if (result.ok) {
+                    status.classList.add("success");
+                    status.textContent = `已激活：${m.name}`;
+                    await fetchModelList();
+                } else {
+                    status.classList.add("error");
+                    status.textContent = `激活失败：${result.error || '未知错误'}`;
+                }
+            };
+            actions.appendChild(activate);
             const del = document.createElement("button");
             del.className = "btn-delete";
             del.textContent = "删除";
@@ -322,7 +348,7 @@ async function openSettings(node) {
     const fetchModelList = async () => {
         const result = await Utils.apiCall("/zhihui_nodes/qwen3vl/list_models", { method: "GET" });
         if (result.ok && result.data) {
-            renderModelList(result.data.models || []);
+            renderModelList(result.data.models || [], result.data.active_model_name || "");
         }
     };
 
@@ -351,10 +377,11 @@ async function openSettings(node) {
                 }
             }
         }, 500);
+        const payload = { provider, model_name };
         const downloadResult = await Utils.apiCall("/zhihui_nodes/qwen3vl/download", {
             method: "POST",
             headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({ provider, model_name })
+            body: JSON.stringify(payload)
         });
         if (downloadResult.ok) {
             const data = downloadResult.data;

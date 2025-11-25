@@ -631,16 +631,15 @@
             "repetition_penalty": "重复惩罚",
             "frame_count": "帧数",
             "max_new_tokens": "最大新令牌数",
-            "min_resolution": "最小分辨率",
-            "max_resolution": "最大分辨率",
             "seed": "随机种子",
             "attention": "注意力机制",
             "device": "设备",
-            "keep_model_loaded": "保持模型加载",
             "batch_mode": "批处理模式",
             "batch_directory": "批处理目录",
             "unlock_restrictions": "解锁限制",
-            "remove_think_tags": "移除思考标签"
+            "remove_think_tags": "移除思考标签",
+            "unload_mode": "卸载模式",
+            "image_size_limitation": "图像大小限制"
         },
         "outputs": {
             "STRING": "字符串"
@@ -660,15 +659,14 @@
             "quantization": "量化设置",
             "temperature": "生成温度",
             "max_new_tokens": "最大生成令牌数",
-            "min_resolution": "最小图像分辨率",
-            "max_resolution": "最大图像分辨率",
             "seed": "随机种子",
             "attention": "注意力机制",
             "device": "计算设备",
-            "keep_model_loaded": "保持模型在内存中",
             "remove_think_tags": "移除思考标签",
             "batch_mode": "批处理模式",
-            "batch_directory": "批处理目录路径"
+            "batch_directory": "批处理目录路径",
+            "unload_mode": "卸载模式",
+            "image_size_limitation": "图像大小限制"
         },
         "outputs": {
             "STRING": "字符串"

@@ -2,8 +2,8 @@
 [![GitHub](https://img.shields.io/badge/GitHub-zhihui--nodes--comfyui-blue?style=for-the-badge&logo=github)](https://github.com/ZhiHui6/zhihui_nodes_comfyui) [![License](https://img.shields.io/badge/License-MIT-green?style=for-the-badge)](LICENSE) [![ComfyUI](https://img.shields.io/badge/ComfyUI-Compatible-orange?style=for-the-badge)](https://github.com/comfyanonymous/ComfyUI)
 ---
 
-最新版本：`v0.8.2`（2025-11-23），完整更新日志：查看<a href="CHANGELOG.md">`CHANGELOG.md`</a><br>
-Latest version: `v0.8.2` (2025-11-23), full update log: view <a href="CHANGELOG.md">`CHANGELOG.md`</a>
+最新版本：`v0.8.3`（2025-11-25），完整更新日志：查看<a href="CHANGELOG.md">`CHANGELOG.md`</a><br>
+Latest version: `v0.8.3` (2025-11-25), full update log: view <a href="CHANGELOG.md">`CHANGELOG.md`</a>
 
 ## 📖 项目介绍 | Project Introduction
 

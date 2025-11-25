@@ -2,5 +2,7 @@
   "cache_dir": "",
   "provider": "modelscope",
   "hf_mirror_url": "https://hf-mirror.com",
-  "use_default_cache": true
+  "use_default_cache": true,
+  "active_model_name": "Qwen3-VL-8B-Instruct",
+  "active_model_path": "E:\\ComfyUI-Kaifa\\models\\prompt_generator\\Qwen3-VL-8B-Instruct"
 }

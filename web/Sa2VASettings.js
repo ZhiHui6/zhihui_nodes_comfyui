@@ -214,9 +214,7 @@ async function openSettings(node) {
 
     const providerEl = dialog.querySelector("#sa2va-provider");
     providerEl.onchange = async () => {
-        const status = dialog.querySelector("#sa2va-status");
-        const success = await updateConfig({ provider: providerEl.value });
-        status.textContent = success ? "下载源已设定" : "设定失败";
+        await updateConfig({ provider: providerEl.value });
     };
 
     const updateProgressUI = (p) => {

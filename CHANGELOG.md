@@ -1,4 +1,13 @@
 # 更新日志
+## v0.8.3 - 2025-11-25
+- 更新 中文本地化文件 以及 README
+- 新增 Qwen3VL 高级节点（`Qwen3VLAdvanced`）与基本节点（`Qwen3VLBasic`）的模型管理功能；全新的模型卸载卸载方法
+- 更新 工作流模版
+<br>
+
+- Update chinese localization files and README
+- New Qwen3VL advanced node and basic node model management features;new model unloading methods
+- Update workflow template
 
 ## v0.8.2 - 2025-11-23
 - 新增 BatchLoadingOfImages 节点：批量加载图像

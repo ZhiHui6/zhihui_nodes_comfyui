@@ -11,8 +11,13 @@ from transformers import (
 )
 import model_management
 from qwen_vl_utils import process_vision_info
-from pathlib import Path
-import re
+ 
+from PIL import Image
+try:
+    import modelscope as _ms
+    _MS_OK = True
+except Exception:
+    _MS_OK = False
 try:
     from server import PromptServer
     from aiohttp import web
@@ -23,27 +28,14 @@ except Exception:
     _PS_OK = False
 _THIS_DIR = os.path.dirname(os.path.abspath(__file__))
 _QWEN_CONFIG_PATH = os.path.join(_THIS_DIR, "qwen3vl_config.json")
-_QWEN_MODEL_MAP = {
-    "Qwen3-VL-4B-Instruct": "Qwen/Qwen3-VL-4B-Instruct",
-    "Qwen3-VL-4B-Thinking": "Qwen/Qwen3-VL-4B-Thinking",
-    "Qwen3-VL-8B-Instruct": "Qwen/Qwen3-VL-8B-Instruct",
-    "Qwen3-VL-8B-Thinking": "Qwen/Qwen3-VL-8B-Thinking",
-    "Huihui-Qwen3-VL-8B-Instruct-abliterated": "ayumix5/Huihui-Qwen3-VL-8B-Instruct-abliterated",
-    "Qwen3-VL-4B-Instruct-FP8": "Qwen/Qwen3-VL-4B-Instruct-FP8",
-    "Qwen3-VL-4B-Thinking-FP8": "Qwen/Qwen3-VL-4B-Thinking-FP8",
-    "Qwen3-VL-8B-Instruct-FP8": "Qwen/Qwen3-VL-8B-Instruct-FP8",
-    "Qwen3-VL-8B-Thinking-FP8": "Qwen/Qwen3-VL-8B-Thinking-FP8",
-    "Qwen3-VL-32B-Instruct": "Qwen/Qwen3-VL-32B-Instruct",
-    "Qwen3-VL-32B-Thinking": "Qwen/Qwen3-VL-32B-Thinking",
-    "Qwen3-VL-32B-Instruct-FP8": "Qwen/Qwen3-VL-32B-Instruct-FP8",
-    "Qwen3-VL-32B-Thinking-FP8": "Qwen/Qwen3-VL-32B-Thinking-FP8",
-}
 def _qwen_default_config():
     return {
         "cache_dir": "",
         "provider": "huggingface",
         "hf_mirror_url": "https://hf-mirror.com",
         "use_default_cache": True,
+        "active_model_name": "",
+        "active_model_path": "",
     }
 def _qwen_load_config():
     try:
@@ -181,76 +173,58 @@ class Qwen3VLAdvanced:
                     ],
                     {"default": "Disable", "tooltip": "解锁模型限制，提供不同级别的内容生成自由度"}
                 ),
-                "model": (
-                    [
-                        "Qwen3-VL-4B-Instruct",
-                        "Qwen3-VL-4B-Thinking",
-                        "Qwen3-VL-4B-Instruct-FP8",
-                        "Qwen3-VL-4B-Thinking-FP8",
-                        "Qwen3-VL-8B-Instruct",
-                        "Qwen3-VL-8B-Thinking",
-                        "Qwen3-VL-8B-Instruct-FP8",
-                        "Qwen3-VL-8B-Thinking-FP8",
-                        "Qwen3-VL-32B-Instruct",
-                        "Qwen3-VL-32B-Thinking",
-                        "Qwen3-VL-32B-Instruct-FP8",
-                        "Qwen3-VL-32B-Thinking-FP8",
-                        "Huihui-Qwen3-VL-8B-Instruct-abliterated",
-                    ],
-                    {"default": "Qwen3-VL-8B-Instruct", "tooltip": "选择Qwen3-VL模型版本，包含4B/8B/32B参数量和Instruct/Thinking两种类型"},
-                ),
+                
                 "quantization": (
                     ["none", "4bit", "8bit"],
-                    {"default": "8bit", "tooltip": "模型量化设置，降低显存占用。8bit平衡性能与资源，4bit更节省显存但可能影响质量"},
+                    {"default": "none", "tooltip": "Model quantization setting to reduce VRAM usage. 8bit balances performance and resource consumption, 4bit saves more VRAM but may affect quality"},
                 ),
                 "temperature": (
                     "FLOAT",
-                    {"default": 0.7, "min": 0, "max": 1, "step": 0.1, "tooltip": "控制生成文本的随机性，值越高越有创意，值越低越保守稳定"},
+                    {"default": 0.7, "min": 0, "max": 1, "step": 0.1, "tooltip": "Controls the randomness of the generated text. Higher values make the output more creative, while lower values make it more conservative and stable"},
                 ),
                 "top_p": (
                     "FLOAT",
-                    {"default": 0.9, "min": 0, "max": 1, "step": 0.1, "tooltip": "核采样参数，控制词汇选择范围，较小值使输出更集中，较大值增加多样性"},
+                    {"default": 0.9, "min": 0, "max": 1, "step": 0.1, "tooltip": "Core sampling parameter, controls the range of vocabulary selection. Smaller values make the output more focused, while larger values increase diversity"},
                 ),
                 "num_beams": (
                     "INT",
-                    {"default": 1, "min": 1, "max": 10, "step": 1, "tooltip": "束搜索数量，值大于1时启用束搜索，可提高输出质量但增加计算时间"},
+                    {"default": 1, "min": 1, "max": 10, "step": 1, "tooltip": "Number of beams for beam search. Values greater than 1 enable beam search, which can improve output quality but increase computation time"},
                 ),
                 "repetition_penalty": (
                     "FLOAT",
-                    {"default": 1.2, "min": 0.1, "max": 2.0, "step": 0.1, "tooltip": "重复惩罚系数，防止生成重复内容，值越大越避免重复"},
+                    {"default": 1.2, "min": 0.1, "max": 2.0, "step": 0.1, "tooltip": "Repetition penalty coefficient to prevent generating repeated content. Larger values make the output more conservative and avoid repetition"},
                 ),
                 "frame_count": (
                     "INT",
-                    {"default": 23, "min": 1, "max": 64, "step": 1, "tooltip": "视频处理时的帧数量，影响视频理解的精度和处理速度"},
+                    {"default": 23, "min": 1, "max": 64, "step": 1, "tooltip": "Number of frames to process in video. Higher values improve accuracy but increase processing time"},
                 ),
                 "max_new_tokens": (
                     "INT",
-                    {"default": 1024, "min": 128, "max": 8192, "step": 1, "tooltip": "生成文本的最大长度，值越大可生成越长的内容但消耗更多资源"},
+                    {"default": 1024, "min": 128, "max": 8192, "step": 1, "tooltip": "Maximum length of the generated text. Larger values allow for longer outputs but consume more resources"},
                 ),
-                "min_resolution": (
-                    "INT",
-                    {"default": 256, "min": 112, "max": 2048, "step": 1, "tooltip": "图像处理的最小分辨率，影响图像理解的细节程度和处理速度"},
-                ),
-                "max_resolution": (
-                    "INT", 
-                    {"default": 768, "min": 256, "max": 4096, "step": 1, "tooltip": "图像处理的最大分辨率，更高分辨率提供更多细节但消耗更多资源"},
-                ),
-                "seed": ("INT", {"default": -1, "tooltip": "随机种子，设置为-1使用随机值，固定值可确保结果可重现"}),
+                "image_size_limitation": ("INT", {
+                    "default": 1080,
+                    "min": 0,
+                    "max": 2500,
+                    "step": 1,
+                    "tooltip": "Maximum size (in pixels) for the longer side of the image. 0 means no scaling, upper limit is 2500 pixels. Affects image input ports, batch mode, and multi-path input ports."
+                }),
+                "seed": ("INT", {"default": -1, "tooltip": "Random seed for reproducibility. Set to -1 for random values, or use a fixed value to ensure reproducible results"}),
                 "attention": (
                     [
                         "eager",
                         "sdpa",
                         "flash_attention_2",
                     ],
-                    {"default": "sdpa", "tooltip": "注意力机制类型，sdpa平衡性能，flash_attention_2更快但需要特定硬件支持"},
+                    {"default": "sdpa", "tooltip": "Attention mechanism type. sdpa balances performance, while flash_attention_2 is faster but requires specific hardware support"},
                 ),
                 "device": (
                     ["auto", "gpu", "cpu"],
-                    {"default": "auto", "tooltip": "计算设备选择，auto自动选择最佳设备，gpu使用显卡加速，cpu使用处理器"},
+                    {"default": "auto", "tooltip": "Device to use for computation. auto selects the best available device, gpu uses GPU acceleration, and cpu uses the processor"},
                 ),
-                "keep_model_loaded": ("BOOLEAN", {"default": False, "tooltip": "保持模型在内存中，启用后可加快后续推理速度但占用更多显存"}),
-                "batch_mode": ("BOOLEAN", {"default": False, "tooltip": "批处理模式，启用后可批量处理指定目录下的所有图像文件"}),
-                "batch_directory": ("STRING", {"default": "", "tooltip": "批处理目录路径，指定要批量处理的图像文件所在目录"}),            
+                "unload_mode": (["Full Unload", "Unload to CPU", "Keep Loaded"], {"default": "Full Unload", "tooltip": "Unloading strategy after inference. Full Unload frees VRAM and memory; Unload to CPU moves the model to CPU and frees VRAM; Keep Loaded keeps the model in GPU for faster acceleration next time"}),
+                "batch_mode": ("BOOLEAN", {"default": False, "tooltip": "Enable batch mode to process multiple images from a specified directory"}),
+                "batch_directory": ("STRING", {"default": "", "tooltip": "Path to the directory containing images to be processed in batch mode"}),            
             },
             "optional": {
                 "extra_options": ("QWEN3VL_EXTRA_OPTIONS",),
@@ -267,19 +241,17 @@ class Qwen3VLAdvanced:
         self,
         output_language,
         preset_prompt,
-        model,
         system_prompt,
         user_prompt,
         unlock_restrictions,
-        keep_model_loaded,
+        unload_mode,
         temperature,
         top_p,
         num_beams,
         repetition_penalty,
         frame_count,
         max_new_tokens,
-        min_resolution,
-        max_resolution,
+        image_size_limitation,
         seed,
         quantization,
         device,
@@ -381,14 +353,10 @@ class Qwen3VLAdvanced:
                     f"注意：批量模式设计用于处理目录中的多张图片，与单张图片输入端口互斥。"
                 )
                 raise ValueError(error_message)
-            
-            min_pixels = self._resolution_to_pixels(min_resolution)
-            max_pixels = self._resolution_to_pixels(max_resolution)
-            
             return self.batch_inference(
-                final_prompt, batch_directory, model, quantization, keep_model_loaded,
+                final_prompt, batch_directory, quantization, unload_mode,
                 temperature, top_p, num_beams, repetition_penalty, frame_count, 
-                max_new_tokens, min_pixels, max_pixels,
+                max_new_tokens, image_size_limitation,
                 seed, attention, output_language, device, system_prompt, unlock_restrictions, 
                 remove_think_tags, extra_options
             )
@@ -396,42 +364,32 @@ class Qwen3VLAdvanced:
         if seed != -1:
             torch.manual_seed(seed)
         
-        model_exists, model_path, error_message = self.check_model_exists(model)
-        if not model_exists:
-            raise ValueError(error_message)
-        
-        self.model_checkpoint = model_path
-
-        if min_resolution > max_resolution:
-            raise ValueError(f"最小分辨率 ({min_resolution}) 不能大于最大分辨率 ({max_resolution})")
-        
-        min_pixels = self._resolution_to_pixels(min_resolution)
-        max_pixels = self._resolution_to_pixels(max_resolution)
-
+        cfg = _qwen_load_config()
+        active_name = str(cfg.get("active_model_name") or "").strip()
+        active_path = str(cfg.get("active_model_path") or "").strip()
+        if not active_path:
+            base_dir = _qwen_default_cache_dir()
+            if active_name:
+                active_path = os.path.join(base_dir, active_name)
+        if not (active_path and os.path.isdir(active_path)):
+            raise ValueError("未激活模型：请在管理界面选择已下载模型并点击‘激活’")
+        self.model_checkpoint = active_path
         if self.processor is None:
-            self.processor = AutoProcessor.from_pretrained(
-                self.model_checkpoint, min_pixels=min_pixels, max_pixels=max_pixels
-            )
+            self.processor = AutoProcessor.from_pretrained(self.model_checkpoint)
 
         if self.model is None:
-            if quantization == "4bit":
-                quantization_config = BitsAndBytesConfig(
-                    load_in_4bit=True,
-                )
-            elif quantization == "8bit":
-                quantization_config = BitsAndBytesConfig(
-                    load_in_8bit=True,
-                )
-            else:
-                quantization_config = None
-
             if device == "cpu":
                 device_map = {"": "cpu"}
             elif device == "gpu":
                 device_map = {"": 0}
             else:
                 device_map = "auto"
-
+            if quantization == "4bit":
+                quantization_config = BitsAndBytesConfig(load_in_4bit=True)
+            elif quantization == "8bit":
+                quantization_config = BitsAndBytesConfig(load_in_8bit=True)
+            else:
+                quantization_config = None
             self.model = Qwen3VLForConditionalGeneration.from_pretrained(
                 self.model_checkpoint,
                 dtype=torch.bfloat16 if self.bf16_support else torch.float16,
@@ -456,7 +414,7 @@ class Qwen3VLAdvanced:
                     },
                     {
                         "role": "user",
-                        "content": source_path
+                        "content": self._apply_size_limitation_to_content(source_path, image_size_limitation)
                         + [
                             {"type": "text", "text": final_prompt},
                         ],
@@ -465,6 +423,7 @@ class Qwen3VLAdvanced:
             elif image is not None:
                 to_pil = ToPILImage()
                 pil_image = to_pil(image[0].permute(2, 0, 1))
+                pil_image = self._resize_image_long_edge(pil_image, image_size_limitation)
                 
                 messages = [
                     {
@@ -540,16 +499,7 @@ class Qwen3VLAdvanced:
             if torch.cuda.is_available():
                 torch.cuda.empty_cache()
 
-            if not keep_model_loaded:
-                del self.processor
-                del self.model
-                self.processor = None
-                self.model = None
-                if torch.cuda.is_available():
-                    torch.cuda.empty_cache()
-                    torch.cuda.ipc_collect()
-                import gc
-                gc.collect()
+            self._apply_unload_mode(unload_mode)
 
             final_result = result[0]
             
@@ -592,17 +542,15 @@ class Qwen3VLAdvanced:
         self,
         final_prompt,
         batch_directory,
-        model,
         quantization,
-        keep_model_loaded,
+        unload_mode,
         temperature,
         top_p,
         num_beams,
         repetition_penalty,
         frame_count,
         max_new_tokens,
-        min_pixels,
-        max_pixels,
+        image_size_limitation,
         seed,
         attention,
         output_language,
@@ -622,32 +570,32 @@ class Qwen3VLAdvanced:
         if not image_files:
             return (f"在目录 '{batch_directory}' 中未找到图片文件。",)
         
-        model_exists, model_path, error_message = self.check_model_exists(model)
-        if not model_exists:
-            return (error_message,)
-        
-        self.model_checkpoint = model_path
-
+        cfg = _qwen_load_config()
+        active_name = str(cfg.get("active_model_name") or "").strip()
+        active_path = str(cfg.get("active_model_path") or "").strip()
+        if not active_path:
+            base_dir = _qwen_default_cache_dir()
+            if active_name:
+                active_path = os.path.join(base_dir, active_name)
+        if not (active_path and os.path.isdir(active_path)):
+            return ("未激活模型：请在管理界面选择已下载模型并点击‘激活’",)
+        self.model_checkpoint = active_path
         if self.processor is None:
-            self.processor = AutoProcessor.from_pretrained(
-                self.model_checkpoint, min_pixels=min_pixels, max_pixels=max_pixels
-            )
+            self.processor = AutoProcessor.from_pretrained(self.model_checkpoint)
 
         if self.model is None:
-            if quantization == "4bit":
-                quantization_config = BitsAndBytesConfig(load_in_4bit=True)
-            elif quantization == "8bit":
-                quantization_config = BitsAndBytesConfig(load_in_8bit=True)
-            else:
-                quantization_config = None
-
             if device == "cpu":
                 device_map = {"": "cpu"}
             elif device == "gpu":
                 device_map = {"": 0}
             else:
                 device_map = "auto"
-
+            if quantization == "4bit":
+                quantization_config = BitsAndBytesConfig(load_in_4bit=True)
+            elif quantization == "8bit":
+                quantization_config = BitsAndBytesConfig(load_in_8bit=True)
+            else:
+                quantization_config = None
             self.model = Qwen3VLForConditionalGeneration.from_pretrained(
                 self.model_checkpoint,
                 dtype=torch.bfloat16 if self.bf16_support else torch.float16,
@@ -662,6 +610,13 @@ class Qwen3VLAdvanced:
         for image_file in image_files:
             try:
                 with torch.no_grad():
+                    try:
+                        pil_image = Image.open(image_file)
+                        if pil_image.mode != "RGB":
+                            pil_image = pil_image.convert("RGB")
+                        pil_image = self._resize_image_long_edge(pil_image, image_size_limitation)
+                    except Exception:
+                        pil_image = f"file://{image_file}"
                     messages = [
                         {
                             "role": "system",
@@ -670,7 +625,7 @@ class Qwen3VLAdvanced:
                         {
                             "role": "user",
                             "content": [
-                                {"type": "image", "image": f"file://{image_file}"},
+                                {"type": "image", "image": pil_image},
                                 {"type": "text", "text": final_prompt},
                             ],
                         },
@@ -738,22 +693,98 @@ class Qwen3VLAdvanced:
                 print(f"处理失败 {image_file}: {str(e)}")
                 continue
 
-        if not keep_model_loaded:
-            del self.processor
-            del self.model
-            self.processor = None
-            self.model = None
-            if torch.cuda.is_available():
-                torch.cuda.empty_cache()
-                torch.cuda.ipc_collect()
-            import gc
-            gc.collect()
+        self._apply_unload_mode(unload_mode)
 
         log_message = f"批量处理完成。已处理: {processed_count} 张图片，失败: {failed_count} 张图片，目录: '{batch_directory}'。"
         
         return (log_message,)
-    def _resolution_to_pixels(self, resolution):
-        return resolution * resolution
+    def _resize_image_long_edge(self, pil_image, target):
+        try:
+            t = int(target)
+        except Exception:
+            t = 0
+        if t <= 0:
+            return pil_image
+        w, h = pil_image.size
+        m = max(w, h)
+        if m <= 0 or m <= t:
+            return pil_image
+        scale = float(t) / float(m)
+        new_w = max(1, int(round(w * scale)))
+        new_h = max(1, int(round(h * scale)))
+        return pil_image.resize((new_w, new_h), resample=Image.LANCZOS)
+
+    def _apply_size_limitation_to_content(self, content, target):
+        if not isinstance(content, list):
+            return content
+        out = []
+        for item in content:
+            if isinstance(item, dict) and item.get("type") == "image":
+                img = item.get("image")
+                if isinstance(img, str):
+                    p = img
+                    if p.startswith("file://"):
+                        p = p[7:]
+                    try:
+                        im = Image.open(p)
+                        if im.mode != "RGB":
+                            im = im.convert("RGB")
+                        im = self._resize_image_long_edge(im, target)
+                        out.append({"type": "image", "image": im})
+                    except Exception:
+                        out.append(item)
+                elif hasattr(img, "size"):
+                    try:
+                        out.append({"type": "image", "image": self._resize_image_long_edge(img, target)})
+                    except Exception:
+                        out.append(item)
+                else:
+                    out.append(item)
+            else:
+                out.append(item)
+        return out
+
+    def _apply_unload_mode(self, unload_mode):
+        try:
+            mode = str(unload_mode)
+        except Exception:
+            mode = "Full Unload"
+        if mode == "Keep Loaded":
+            return
+        if mode == "Unload to CPU":
+            try:
+                if self.model is not None:
+                    try:
+                        self.model.to("cpu")
+                    except Exception:
+                        pass
+                if torch.cuda.is_available():
+                    torch.cuda.empty_cache()
+                    try:
+                        torch.cuda.ipc_collect()
+                    except Exception:
+                        pass
+                return
+            except Exception:
+                pass
+        try:
+            del self.processor
+        except Exception:
+            pass
+        try:
+            del self.model
+        except Exception:
+            pass
+        self.processor = None
+        self.model = None
+        if torch.cuda.is_available():
+            torch.cuda.empty_cache()
+            try:
+                torch.cuda.ipc_collect()
+            except Exception:
+                pass
+        import gc
+        gc.collect()
     
     def _remove_think_content(self, text): 
         if not isinstance(text, str):
@@ -784,13 +815,34 @@ if _PS_OK:
             data = await request.json()
             cfg = _qwen_load_config()
             if isinstance(data, dict):
-                for k in ["provider", "hf_mirror_url", "cache_dir", "use_default_cache"]:
+                for k in ["provider", "hf_mirror_url", "cache_dir", "use_default_cache", "active_model_name", "active_model_path"]:
                     if k in data:
                         cfg[k] = data[k]
             ok = _qwen_save_config(cfg)
             if ok:
                 return web.json_response({"success": True})
             return web.json_response({"success": False}, status=500)
+        except Exception as e:
+            return web.json_response({"error": str(e)}, status=500)
+
+    @PromptServer.instance.routes.post("/zhihui_nodes/qwen3vl/activate_model")
+    async def qwen_activate_model(request):
+        try:
+            data = await request.json()
+            name = str(data.get("name") or "").strip()
+            if not name:
+                return web.json_response({"error": "缺少模型名称"}, status=400)
+            base_dir = _qwen_default_cache_dir()
+            target = os.path.join(base_dir, name)
+            if not os.path.isdir(target):
+                return web.json_response({"error": "模型目录不存在"}, status=404)
+            cfg = _qwen_load_config()
+            cfg["active_model_name"] = name
+            cfg["active_model_path"] = target
+            ok = _qwen_save_config(cfg)
+            if ok:
+                return web.json_response({"success": True, "active_model_name": name, "active_model_path": target})
+            return web.json_response({"error": "激活失败"}, status=500)
         except Exception as e:
             return web.json_response({"error": str(e)}, status=500)
 
@@ -828,7 +880,13 @@ if _PS_OK:
             name = str(q.get("model", "") or "").split("/")[-1]
             base_dir = _qwen_default_cache_dir()
             candidate = os.path.join(base_dir, name)
-            exists = _qwen_is_valid_model_dir(candidate)
+            exists = False
+            try:
+                if os.path.isdir(candidate):
+                    has_cfg = os.path.isfile(os.path.join(candidate, "config.json"))
+                    exists = has_cfg
+            except Exception:
+                exists = False
             return web.json_response({"exists": exists, "path": candidate})
         except Exception as e:
             return web.json_response({"error": str(e)}, status=500)
@@ -844,12 +902,21 @@ if _PS_OK:
                 cfg["provider"] = provider
             _qwen_save_config(cfg)
             import shutil, time
-            repo_id = _QWEN_MODEL_MAP.get(model_name) or f"qwen/{model_name}"
+            if '/' in model_name:
+                repo_id = model_name
+            else:
+                repo_id = f"Qwen/{model_name}"
             if model_name == "Huihui-Qwen3-VL-8B-Instruct-abliterated":
                 if cfg.get("provider") == "modelscope":
-                    repo_id = "ayumix5/Huihui-Qwen3-VL-8B-Instruct-abliterated"
+                    repo_id = "fireicewolf/Huihui-Qwen3-VL-8B-Instruct-abliterated"
                 else:
                     repo_id = "huihui-ai/Huihui-Qwen3-VL-8B-Instruct-abliterated"
+            if model_name == "Huihui-Qwen3-VL-8B-Thinking-abliterated":
+                if cfg.get("provider") == "modelscope":
+                    repo_id = "fireicewolf/Huihui-Qwen3-VL-8B-Thinking-abliterated"
+                else:
+                    repo_id = "huihui-ai/Huihui-Qwen3-VL-8B-Thinking-abliterated"
+            # Ensure directory name is the repo display name (not the file)
             display_name = repo_id.split("/")[-1] if isinstance(repo_id, str) else "QwenModel"
             base_dir = _qwen_default_cache_dir()
             target_dir = os.path.join(base_dir, display_name)
@@ -927,7 +994,8 @@ if _PS_OK:
                     try:
                         if cfg.get("provider") == "modelscope":
                             from modelscope.hub.snapshot_download import snapshot_download as ms_snapshot_download
-                            dl_dir = ms_snapshot_download(repo_id, cache_dir=download_dir)
+                            ms_kwargs = {"cache_dir": download_dir}
+                            dl_dir = ms_snapshot_download(repo_id, **ms_kwargs)
                             try:
                                 if _QWEN_PROGRESS.get("total_bytes", 0) <= 0:
                                     total = 0
@@ -978,7 +1046,10 @@ if _PS_OK:
                                 pass
                     except Exception:
                         pass
-                    valid = os.path.isdir(target_dir) and os.path.isfile(os.path.join(target_dir, "config.json"))
+                    valid = False
+                    if os.path.isdir(target_dir):
+                        cfg_ok = os.path.isfile(os.path.join(target_dir, "config.json"))
+                        valid = cfg_ok
                     if valid:
                         try:
                             _QWEN_PROGRESS.update({"status": "done", "percent": 100.0})
@@ -1054,6 +1125,8 @@ if _PS_OK:
     async def qwen_list_models(request):
         try:
             base_dir = _qwen_default_cache_dir()
+            cfg = _qwen_load_config()
+            active_name = str(cfg.get("active_model_name") or "").strip()
             models = []
             if os.path.isdir(base_dir):
                 try:
@@ -1072,10 +1145,19 @@ if _PS_OK:
                             except Exception:
                                 pass
                             valid = os.path.isfile(os.path.join(p, "config.json"))
-                            models.append({"name": name, "path": p, "size_bytes": int(size), "valid": bool(valid)})
+                            if not valid:
+                                try:
+                                    for _r, _d, files in os.walk(p):
+                                        for f in files:
+                                            pass
+                                        if valid:
+                                            break
+                                except Exception:
+                                    pass
+                            models.append({"name": name, "path": p, "size_bytes": int(size), "valid": bool(valid), "active": bool(name == active_name)})
                 except Exception:
                     pass
-            return web.json_response({"success": True, "base_dir": base_dir, "models": models})
+            return web.json_response({"success": True, "base_dir": base_dir, "models": models, "active_model_name": active_name})
         except Exception as e:
             return web.json_response({"error": str(e)}, status=500)
 

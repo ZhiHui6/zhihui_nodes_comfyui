@@ -200,9 +200,6 @@
     "Crop Blank":"裁剪空白",
     "user_prompt":"用户提示词",
     "system_prompt":"系统提示词",
-    "SiliconFlow":"硅基流动",
-    "ModelScope":"魔搭社区",
-    "Aliyun":"阿里云百炼",
     "Fully Custom":"完全自定义",
     "Platform Presets":"平台预设",
     "not used":"未使用",
@@ -211,5 +208,8 @@
     "Numerical (ASC)":"按数字升序",
     "Numerical (DESC)":"按数字降序",
     "Datetime (ASC)":"按日期时间升序",
-    "Datetime (DESC)":"按日期时间降序"
+    "Datetime (DESC)":"按日期时间降序",
+    "Full Unload":"完全卸载",
+    "Unload to CPU":"卸载到内存",
+    "Keep Loaded":"不卸载"
 }
