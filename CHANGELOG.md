@@ -1,4 +1,10 @@
 # 更新日志
+## v0.8.4 - 2025-11-26
+- 修复Text Switch Dual Mode 节点输入端口数量超过2个时，会导致节点运行错误的问题
+<br>
+
+- fix the Text Switch Dual Mode node issue that the number of input ports exceeds 2
+
 ## v0.8.3 - 2025-11-25
 - 更新 中文本地化文件 以及 README
 - 新增 Qwen3VL 高级节点（`Qwen3VLAdvanced`）与基本节点（`Qwen3VLBasic`）的模型管理功能；全新的模型卸载卸载方法
