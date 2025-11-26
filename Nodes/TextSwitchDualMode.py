@@ -1,20 +1,17 @@
 class TextSwitchDualMode:
     
     def __init__(self):
-        self.text_cache = {"text1": "", "text2": "", "text3": "", "text4": ""}
+        self.text_cache = {"text1": "", "text2": ""}
 
     @classmethod
     def INPUT_TYPES(cls):
         return {
             "required": {
                 "mode": (["manual", "auto"], {"default": "manual"}),
-                "select_text": (["1", "2", "3", "4"], {"default": "1"}),
+                "select_text": (["1", "2"], {"default": "1"}),
                 "inputcount": ("INT", {"default": 2, "min": 2, "max": 1000, "step": 1}),
                 "text1_comment": ("STRING", {"multiline": False, "default": ""}),
                 "text2_comment": ("STRING", {"multiline": False, "default": ""}),
-                "text3_comment": ("STRING", {"multiline": False, "default": ""}),
-                "text4_comment": ("STRING", {"multiline": False, "default": ""}),
-
             },
             "optional": {
                 "text1": ("STRING", {"multiline": True, "default": "", "forceInput": True}),
@@ -28,14 +25,12 @@ class TextSwitchDualMode:
     CATEGORY = "Zhi.AI/Text"
     DESCRIPTION = "Dynamic Text Switcher: Switches among a dynamic number of text inputs. Supports manual mode (select by index) and auto mode (outputs the single non-empty input, errors if multiple). Input count is controlled via the 'inputcount' slider, and the 'Update inputs' button updates ports accordingly. The select_text options and textN_comment fields synchronize with inputcount. Newly added inputs are optional."
 
-    def execute(self, inputcount, mode, select_text, text1_comment="", text2_comment="", text3_comment="", text4_comment="",
-                text1=None, text2=None, text3=None, text4=None, **kwargs):
+    def execute(self, inputcount, mode, select_text, text1_comment="", text2_comment="",
+                text1=None, text2=None, **kwargs):
         
         provided = {
             "text1": text1,
             "text2": text2,
-            "text3": text3,
-            "text4": text4,
         }
 
         texts = []
@@ -48,8 +43,6 @@ class TextSwitchDualMode:
         
         self.text_cache["text1"] = texts[0] if len(texts) > 0 else ""
         self.text_cache["text2"] = texts[1] if len(texts) > 1 else ""
-        self.text_cache["text3"] = texts[2] if len(texts) > 2 else ""
-        self.text_cache["text4"] = texts[3] if len(texts) > 3 else ""
         
         if mode == "manual":
             idx = int(select_text) - 1

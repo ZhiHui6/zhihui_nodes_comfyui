@@ -50,10 +50,11 @@ app.registerExtension({
                     for (let i = currentTextInputs + 1; i <= target_number_of_inputs; i++) {
                         const name = `text${i}`;
                         const exists = this.inputs.some(inp => inp.name === name);
-                        if (!exists) this.addInput(name, this._type || "STRING", { optional: true });
+                        if (!exists) {
+                            this.addInput(name, this._type || "STRING", { optional: true });
+                        }
                     }
                 }
-                // Ensure all dynamic text inputs are optional
                 for (const inp of this.inputs || []) {
                     if (/^text\d+$/.test(inp.name)) inp.optional = true;
                 }
