@@ -42,6 +42,9 @@
             "text_input": "文本输入"
         },
         "widgets": {
+            "remove_empty_lines": "删除空行",
+            "remove_spaces": "删除空格",
+            "remove_newlines": "删除换行符",
             "delete_text": "删除文本",
             "start_text": "起始文本",
             "end_text": "结束文本"

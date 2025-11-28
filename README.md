@@ -2,8 +2,8 @@
 [![GitHub](https://img.shields.io/badge/GitHub-zhihui--nodes--comfyui-blue?style=for-the-badge&logo=github)](https://github.com/ZhiHui6/zhihui_nodes_comfyui) [![License](https://img.shields.io/badge/License-MIT-green?style=for-the-badge)](LICENSE) [![ComfyUI](https://img.shields.io/badge/ComfyUI-Compatible-orange?style=for-the-badge)](https://github.com/comfyanonymous/ComfyUI)
 ---
 
-最新版本：`v0.8.5`（2025-11-28），完整更新日志：查看<a href="CHANGELOG.md">`CHANGELOG.md`</a><br>
-Latest version: `v0.8.5` (2025-11-28), full update log: view <a href="CHANGELOG.md">`CHANGELOG.md`</a>
+最新版本：`v0.8.6`（2025-11-28），完整更新日志：查看<a href="CHANGELOG.md">`CHANGELOG.md`</a><br>
+Latest version: `v0.8.6` (2025-11-28), full update log: view <a href="CHANGELOG.md">`CHANGELOG.md`</a>
 
 ## 📖 项目介绍 | Project Introduction
 
@@ -119,8 +119,8 @@ This node collection contains numerous nodes with different functions, divided i
 
 <br>
 <div align="left">
-<a href="images/文本修改器.jpg" target="_blank">
-<img src="images/文本修改器.jpg" alt="文本修改器" width="45%"/>
+<a href="images/Text Modifier.jpg" target="_blank">
+<img src="images/Text Modifier.jpg" alt="文本修改器" width="45%"/>
 </a>
 </div></td>
 </tr>
