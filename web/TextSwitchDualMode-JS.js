@@ -10,6 +10,13 @@ app.registerExtension({
             const r = onNodeCreated ? onNodeCreated.apply(this, arguments) : undefined;
 
             this._type = "STRING";
+            this.properties = this.properties || {};
+            const nodeName = nodeData?.name || "TextSwitchDualMode";
+            const today = new Date().toISOString().slice(0, 10);
+            this._noticeStorageKey = `zhihui_nodes_unconnected_notice_disabled_${nodeName}_${today}`;
+            this._unconnectedNoticeDisabled = !!window.localStorage.getItem(this._noticeStorageKey);
+            this._noticeOpen = false;
+            this._noticeDismissMs = 12000;
             const inputcountWidget = this.widgets?.find(w => w.name === "inputcount");
             if (inputcountWidget) {
                 const originalCallback = inputcountWidget.callback;
@@ -33,6 +40,7 @@ app.registerExtension({
 
                 const isTextPort = (name) => /^text\d+$/.test(name);
                 const currentTextInputs = this.inputs.filter(input => isTextPort(input.name)).length;
+                const newlyAdded = [];
 
                 if (target_number_of_inputs === currentTextInputs) return;
 
@@ -52,6 +60,7 @@ app.registerExtension({
                         const exists = this.inputs.some(inp => inp.name === name);
                         if (!exists) {
                             this.addInput(name, this._type || "STRING", { optional: true });
+                            newlyAdded.push(name);
                         }
                     }
                 }
@@ -60,6 +69,12 @@ app.registerExtension({
                 }
                 this.size = this.computeSize(this.size);
                 app.graph.setDirtyCanvas(true, true);
+
+                // 检查所有未连接端口（而非仅新增端口）
+                const allUnconnected = (this.inputs || [])
+                    .filter(i => isTextPort(i.name) && (i.link == null || i.link === undefined))
+                    .map(i => i.name);
+                if (allUnconnected.length) this.showUnconnectedNotice(allUnconnected, "文本端口");
             };
 
             this.updateSelectTextOptions = function (n) {
@@ -157,6 +172,63 @@ app.registerExtension({
                 this.updateSelectTextOptions(v);
                 this.syncCommentWidgets(v);
             }
+
+            this.showUnconnectedNotice = function(names, label) {
+                try {
+                    if (this._unconnectedNoticeDisabled || this._noticeOpen) return;
+                    this._noticeOpen = true;
+                    const overlay = document.createElement("div");
+                    overlay.style.cssText = `position: fixed;left:0;top:0;width:100%;height:100%;background: rgba(0,0,0,0.45);z-index: 9999;`;
+                    const dialog = document.createElement("div");
+                    dialog.style.cssText = `position: fixed;left:50%;top:50%;transform: translate(-50%,-50%);width: 520px;background: var(--comfy-menu-bg);border: 2px solid #4488ff;border-radius:8px;padding:16px;color: var(--input-text);z-index:10000;box-shadow:0 4px 20px rgba(0,0,0,0.3);`;
+                    dialog.innerHTML = `
+                        <h3 style="margin:0 0 10px 0;text-align:center;color:var(--input-text);">未连接端口</h3>
+                        <div style="font-size:13px;color:var(--descrip-text);margin-bottom:12px;">以下${label}当前未连接：</div>
+                        <div style="display:flex;flex-wrap:wrap;gap:6px;margin-bottom:12px;">
+                            ${names.map(n => `<span style=\"padding:4px 8px;border:1px solid var(--border-color);border-radius:4px;background:var(--comfy-input-bg);color:var(--input-text);\">${n}</span>`).join("")}
+                        </div>
+                        <div style="display:flex;justify-content:center;gap:8px;align-items:center;">
+                            <button id="notice-ok" style="background: #4488ff;border: 1px solid #4488ff;color: #ffffff;padding: 4px 10px;border-radius: 4px;cursor: pointer;font-size: 12px;">知道了</button>
+                            <label style="display:flex;align-items:center;gap:6px;font-size:12px;color:var(--input-text);">
+                                <input id="notice-disable" type="checkbox" style="accent-color:#22c55e;">本日内不再提示
+                            </label>
+                        </div>
+                        <div style="text-align:center;margin-top:8px;font-size:12px;">此窗口将自动在 <span id="countdown-val" style="font-weight:600;color:#22c55e;">${(this._noticeDismissMs/1000)|0}</span> 秒后关闭</div>`;
+                    document.body.appendChild(overlay);
+                    document.body.appendChild(dialog);
+                    const close = () => { 
+                        try { document.body.removeChild(dialog); document.body.removeChild(overlay);} catch(e){}
+                        this._noticeOpen = false;
+                        if (intervalId) { clearInterval(intervalId); intervalId = null; }
+                    };
+                    dialog.querySelector('#notice-ok')?.addEventListener('click', close);
+                    overlay.addEventListener('click', close);
+                    const disableEl = dialog.querySelector('#notice-disable');
+                    disableEl?.addEventListener('change', (e) => {
+                        if (e.target.checked) {
+                            try { window.localStorage.setItem(this._noticeStorageKey, '1'); } catch(err){}
+                            this._unconnectedNoticeDisabled = true;
+                        }
+                    });
+                    const countdownEl = dialog.querySelector('#countdown-val');
+                    let remaining = this._noticeDismissMs;
+                    const colorFor = (ms) => {
+                        const s = Math.ceil(ms/1000);
+                        if (s > 4) return '#22c55e';
+                        if (s > 2) return '#f59e0b';
+                        return '#ef4444';
+                    };
+                    let intervalId = setInterval(() => {
+                        remaining -= 1000;
+                        if (countdownEl) {
+                            countdownEl.textContent = String(Math.max(0, Math.ceil(remaining/1000)));
+                            countdownEl.style.color = colorFor(remaining);
+                        }
+                        if (remaining <= 0) close();
+                    }, 1000);
+                    setTimeout(close, this._noticeDismissMs);
+                } catch(e) { console.warn('showUnconnectedNotice failed', e); }
+            };
 
             return r;
         };

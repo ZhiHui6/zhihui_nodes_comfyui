@@ -8,18 +8,14 @@ class ImageSwitchDualMode:
         return {
             "required": {
                 "mode": (["manual", "auto"], {"default": "auto"}),
-                "select_image": (["1", "2", "3", "4"], {"default": "1"}),
-                "inputcount": ("INT", {"default": 2, "min": 1, "max": 1000, "step": 1}),
+                "select_image": ([str(i) for i in range(2, 1024)], {"default": "2"}),
+                "inputcount": ("INT", {"default": 2, "min": 2, "max": 1000, "step": 1}),
                 "image1_note": ("STRING", {"multiline": False, "default": ""}),
                 "image2_note": ("STRING", {"multiline": False, "default": ""}),
-                "image3_note": ("STRING", {"multiline": False, "default": ""}),
-                "image4_note": ("STRING", {"multiline": False, "default": ""}),
             },
             "optional": {
                 "image1": ("IMAGE", {}),
                 "image2": ("IMAGE", {}),
-                "image3": ("IMAGE", {}),
-                "image4": ("IMAGE", {}),
             }
         }
 
@@ -29,9 +25,7 @@ class ImageSwitchDualMode:
     CATEGORY = "Zhi.AI/Image"
     DESCRIPTION = "Dynamic Image Switcher: Switches among a dynamic number of image inputs. Supports manual mode (select by index) and auto mode (outputs the single non-empty input, errors if multiple). Input count is controlled via 'inputcount', and the UI can update ports accordingly. Newly added inputs are optional."
 
-    def execute(self, mode, select_image, inputcount, image1=None, image2=None,
-                image3=None, image4=None,
-                image1_note="", image2_note="", image3_note="", image4_note="", **kwargs):
+    def execute(self, mode, select_image, inputcount, image1=None, image2=None, image1_note="", image2_note="", **kwargs):
 
         count = int(inputcount) if inputcount is not None else 2
         count = max(1, count)

@@ -8,7 +8,7 @@ class TextSwitchDualMode:
         return {
             "required": {
                 "mode": (["manual", "auto"], {"default": "manual"}),
-                "select_text": (["1", "2"], {"default": "1"}),
+                "select_text": ([str(i) for i in range(2, 1024)], {"default": "2"}),
                 "inputcount": ("INT", {"default": 2, "min": 2, "max": 1000, "step": 1}),
                 "text1_comment": ("STRING", {"multiline": False, "default": ""}),
                 "text2_comment": ("STRING", {"multiline": False, "default": ""}),

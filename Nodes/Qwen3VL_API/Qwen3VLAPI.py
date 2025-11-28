@@ -48,7 +48,7 @@ class Qwen3VLAPI:
             if os.path.exists(self.api_config_path):
                 with open(self.api_config_path, 'r', encoding='utf-8') as f:
                     config = json.load(f)
-                # 迁移到统一的 active_target 字段（兼容旧配置）
+
                 if "active_target" not in config:
                     ap = config.get("active_platform")
                     ac = config.get("active_custom")

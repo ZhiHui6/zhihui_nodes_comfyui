@@ -1,4 +1,16 @@
 # 更新日志
+
+## v0.8.5 - 2025-11-28
+- 修复Qwen3VL高级版、基础版模型下载存放路径问题
+- 修复图像、文本、潜空间切换器端口输入BUG，增加端口连接提醒窗体。
+- 更新Readme文档
+- 更新本地化中文汉化文件
+<br>
+- Fixed the issue of the download and storage paths for the advanced and basic models of Qwen3VL
+- Fixed the input bugs of image, text, and latent space switcher ports, and added a port connection reminder form.
+- Update the Readme document
+- Update the localized Chinese translation file
+
 ## v0.8.4 - 2025-11-26
 - 修复Text Switch Dual Mode 节点输入端口数量超过2个时，会导致节点运行错误的问题
 <br>

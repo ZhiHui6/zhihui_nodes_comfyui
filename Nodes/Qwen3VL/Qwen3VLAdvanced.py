@@ -79,7 +79,8 @@ def _qwen_cleanup_model_dir(path):
         for name in os.listdir(path):
             p = os.path.join(path, name)
             if os.path.isdir(p):
-                if name.startswith("models--") or name.startswith("datasets--") or name in ("snapshots", "refs", ".cache", ".huggingface", "__pycache__"):
+                # 只清理特定的缓存目录，保留其他目录
+                if name in ("snapshots", "refs", ".cache", ".huggingface", "__pycache__"):
                     try:
                         shutil.rmtree(p, ignore_errors=True)
                     except Exception:
@@ -99,12 +100,12 @@ _QWEN_PAUSED = False
 
 QWEN_PROMPT_TYPES = {
     "Ignore": "",
-    "[Prompt Style]Tags": "Your task is to generate a clean list of comma-separated tags for a text-to-image AI, based *only* on the visual information in the image. Limit the output to a maximum of 50 unique tags. Strictly describe visual elements like subject, clothing, environment, colors, lighting, and composition. Do not include abstract concepts, interpretations, marketing terms, or technical jargon (e.g., no 'SEO', 'brand-aligned', 'viral potential'). The goal is a concise list of visual descriptors. Avoid repeating tags.",
-    "[Prompt Style]Simple": "Analyze the image and generate a simple, single-sentence text-to-image prompt. Describe the main subject and the setting concisely.",
-    "[Prompt Style]Detailed": "Generate a detailed, artistic text-to-image prompt based on the image. Combine the subject, their actions, the environment, lighting, and overall mood into a single, cohesive paragraph of about 2-3 sentences. Focus on key visual details.",
-    "[Prompt Style]Extreme Detailed": "Generate an extremely detailed and descriptive text-to-image prompt from the image. Create a rich paragraph that elaborates on the subject's appearance, textures of clothing, specific background elements, the quality and color of light, shadows, and the overall atmosphere. Aim for a highly descriptive and immersive prompt.",
-    "[Prompt Style]Cinematic": "Act as a master prompt engineer. Create a highly detailed and evocative prompt for an image generation AI. Describe the subject, their pose, the environment, the lighting, the mood, and the artistic style (e.g., photorealistic, cinematic, painterly). Weave all elements into a single, natural language paragraph, focusing on visual impact.",
-    "[Creative]Story": "Describe this image as if writing the beginning of a short story.",
+    "[Backtrack]Tags": "Your task is to generate a clean list of comma-separated tags for a text-to-image AI, based *only* on the visual information in the image. Limit the output to a maximum of 50 unique tags. Strictly describe visual elements like subject, clothing, environment, colors, lighting, and composition. Do not include abstract concepts, interpretations, marketing terms, or technical jargon (e.g., no 'SEO', 'brand-aligned', 'viral potential'). The goal is a concise list of visual descriptors. Avoid repeating tags.",
+    "[Backtrack]Simple": "Analyze the image and generate a simple, single-sentence text-to-image prompt. Describe the main subject and the setting concisely.",
+    "[Backtrack]Detailed": "Generate a detailed, artistic text-to-image prompt based on the image. Combine the subject, their actions, the environment, lighting, and overall mood into a single, cohesive paragraph of about 2-3 sentences. Focus on key visual details.",
+    "[Backtrack]Extreme Detailed": "Generate an extremely detailed and descriptive text-to-image prompt from the image. Create a rich paragraph that elaborates on the subject's appearance, textures of clothing, specific background elements, the quality and color of light, shadows, and the overall atmosphere. Aim for a highly descriptive and immersive prompt.",
+    "[Backtrack]Cinematic": "Act as a master prompt engineer. Create a highly detailed and evocative prompt for an image generation AI. Describe the subject, their pose, the environment, the lighting, the mood, and the artistic style (e.g., photorealistic, cinematic, painterly). Weave all elements into a single, natural language paragraph, focusing on visual impact.",
+    "[Creative]Illustrated Writing": "Describe this image as if writing the beginning of a short story.",
     "[Creative]Detailed Analysis": "Describe this image in detail, breaking down the subject, attire, accessories, background, and composition into separate sections.",
     "[Creative]Summarize Video": "Summarize the key events and narrative points in this video.",
     "[Creative]Short Story": "Write a short, imaginative story inspired by this image or video.",
@@ -1007,15 +1008,21 @@ if _PS_OK:
                                             except Exception:
                                                 pass
                                     _QWEN_PROGRESS["total_bytes"] = total
+                                # 修正：将 ModelScope 下载的模型内容复制到 target_dir
                                 if os.path.isdir(dl_dir):
+                                    # 如果 dl_dir 不是 target_dir，则复制内容
                                     if os.path.abspath(dl_dir) != os.path.abspath(target_dir):
+                                        import shutil
                                         shutil.copytree(dl_dir, target_dir, dirs_exist_ok=True)
                                     local_dir = target_dir
-                                try:
-                                    if dl_dir and os.path.isdir(dl_dir) and os.path.abspath(dl_dir) != os.path.abspath(target_dir):
-                                        shutil.rmtree(dl_dir, ignore_errors=True)
-                                except Exception:
-                                    pass
+                                    # 删除原始下载目录（dl_dir），避免冗余
+                                    try:
+                                        if dl_dir and os.path.isdir(dl_dir) and os.path.abspath(dl_dir) != os.path.abspath(target_dir):
+                                            shutil.rmtree(dl_dir, ignore_errors=True)
+                                    except Exception:
+                                        pass
+                                else:
+                                    local_dir = target_dir
                             except Exception:
                                 pass
                         else:
@@ -1034,15 +1041,51 @@ if _PS_OK:
                                             except Exception:
                                                 pass
                                     _QWEN_PROGRESS["total_bytes"] = total
-                                if os.path.isdir(dl_dir):
-                                    if os.path.abspath(dl_dir) != os.path.abspath(target_dir):
-                                        shutil.copytree(dl_dir, target_dir, dirs_exist_ok=True)
-                                    local_dir = target_dir
+                                
+                                # 修正：检查并整理 HuggingFace 下载目录结构
+                                config_exists = os.path.isfile(os.path.join(target_dir, "config.json"))
+                                
+                                if not config_exists:
+                                    # config.json 不在根目录，检查子目录
+                                    found_model_subdir = None
+                                    for item in os.listdir(target_dir):
+                                        item_path = os.path.join(target_dir, item)
+                                        if os.path.isdir(item_path) and os.path.isfile(os.path.join(item_path, "config.json")):
+                                            found_model_subdir = item_path
+                                            break
+                                    
+                                    if found_model_subdir:
+                                        # 将子目录中的所有文件移动到 target_dir
+                                        for sub_item in os.listdir(found_model_subdir):
+                                            src = os.path.join(found_model_subdir, sub_item)
+                                            dst = os.path.join(target_dir, sub_item)
+                                            try:
+                                                if os.path.exists(dst):
+                                                    if os.path.isdir(dst):
+                                                        shutil.rmtree(dst)
+                                                    else:
+                                                        os.remove(dst)
+                                                if os.path.isdir(src):
+                                                    shutil.copytree(src, dst, dirs_exist_ok=True)
+                                                else:
+                                                    shutil.copy2(src, dst)
+                                            except Exception as e:
+                                                pass
+                                        
+                                        # 删除源子目录
+                                        try:
+                                            shutil.rmtree(found_model_subdir)
+                                        except Exception:
+                                            pass
+                                
+                                # 最后清理缓存目录
                                 try:
                                     _qwen_cleanup_model_dir(target_dir)
                                 except Exception:
                                     pass
-                            except Exception:
+                                
+                                local_dir = target_dir
+                            except Exception as e:
                                 pass
                     except Exception:
                         pass

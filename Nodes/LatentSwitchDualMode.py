@@ -8,16 +8,14 @@ class LatentSwitchDualMode:
         return {
             "required": {
                 "mode": (["manual", "auto"], {"default": "auto"}),
-                "select_channel": (["1", "2", "3"], {"default": "1"}),
-                "inputcount": ("INT", {"default": 2, "min": 1, "max": 1000, "step": 1}),
+                "select_channel": ([str(i) for i in range(2, 1024)], {"default": "2"}),
+                "inputcount": ("INT", {"default": 2, "min": 2, "max": 1000, "step": 1}),
                 "Latent_1_comment": ("STRING", {"multiline": False, "default": ""}),
                 "Latent_2_comment": ("STRING", {"multiline": False, "default": ""}),
-                "Latent_3_comment": ("STRING", {"multiline": False, "default": ""}),
             },
             "optional": {
                 "Latent_1": ("LATENT", {}),
                 "Latent_2": ("LATENT", {}),
-                "Latent_3": ("LATENT", {}),
             }
         }
 
@@ -27,8 +25,7 @@ class LatentSwitchDualMode:
     CATEGORY = "Zhi.AI/Latent"
     DESCRIPTION = "Dynamic Latent Switcher: Switches among a dynamic number of latent inputs. Supports manual mode (select by index) and auto mode (outputs the single non-empty input, errors if multiple). Input count is controlled via 'inputcount', and the UI can update ports accordingly. Newly added inputs are optional."
 
-    def execute(self, mode, select_channel, inputcount, Latent_1=None, Latent_2=None, Latent_3=None,
-                Latent_1_comment="", Latent_2_comment="", Latent_3_comment="", **kwargs):
+    def execute(self, mode, select_channel, inputcount, Latent_1=None, Latent_2=None, Latent_1_comment="", Latent_2_comment="", **kwargs):
         
         count = int(inputcount) if inputcount is not None else 2
         count = max(1, count)
