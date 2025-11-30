@@ -1,4 +1,13 @@
 # 更新日志
+## v0.8.8 - 2025-12-1
+- 新增PromptCardSelector提示词卡选择器节点（内置卡池）
+- Qwen3-VL API节点增加“移除思考标签”按钮
+<br>
+
+- Added PromptCardSelector prompt card selector node (with built-in card pool)
+The number of Qwen3-VL API nodes has increased
+- Added "Remove Thought Label" button to Qwen3-VL API node
+
 
 ## v0.8.6 - 2025-11-28
 - 修复Qwen3VL高级版、基础版模型下载存放路径问题

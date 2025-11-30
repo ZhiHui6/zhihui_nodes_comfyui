@@ -988,6 +988,10 @@ class Qwen3VLAPI:
                     "default": False,
                     "tooltip": "Enable aggressive creative mode. This will apply high randomness and diverse sampling in LLM mode."
                 }),
+                "remove_think_tags": ("BOOLEAN", {
+                    "default": False,
+                    "tooltip": "启用后将删除输出文本中</think>标签及其之前的所有内容，保留纯净的描述文本"
+                }),
                 "size_limitation": ("INT", {
                     "default": 1080,
                     "min": 0,
@@ -1091,7 +1095,7 @@ class Qwen3VLAPI:
         else:
             return user_prompt.strip()
 
-    def analyze_image(self, user_prompt, system_prompt, llm_mode, aggressive_creative, size_limitation, max_tokens, temperature, seed, batch_mode, batch_folder_path, source_path=None, images=None):
+    def analyze_image(self, user_prompt, system_prompt, llm_mode, aggressive_creative, size_limitation, max_tokens, temperature, seed, remove_think_tags, batch_mode, batch_folder_path, source_path=None, images=None):
         import random
         import time
         
@@ -1188,6 +1192,8 @@ class Qwen3VLAPI:
                         platform_name, api_key, None, final_prompt, 
                         api_model_name, max_tokens, effective_temperature, timeout, api_base, sampling_params, size_limitation
                     )
+                    if remove_think_tags:
+                        result = self._remove_think_content(result)
                     status_messages.append("✅ 文本对话完成")
                     return (result, "\n".join(status_messages))
                 except Exception as e:
@@ -1219,6 +1225,8 @@ class Qwen3VLAPI:
                             result = self.call_aliyun_bailian_api_with_content(api_key, content_items, api_model_name, max_tokens, temperature, timeout, None)
                         else:
                             raise ValueError(f"不支持的平台: {platform_name}")
+                        if remove_think_tags:
+                            result = self._remove_think_content(result)
                         status_messages.append("✅ 多图内容分析完成")
                         return (result, "\n".join(status_messages))
                     except Exception as e:
@@ -1237,6 +1245,8 @@ class Qwen3VLAPI:
                             platform_name, api_key, None, final_prompt, 
                             api_model_name, max_tokens, effective_temperature, timeout, api_base, sampling_params, size_limitation
                         )
+                        if remove_think_tags:
+                            result = self._remove_think_content(result)
                         status_messages.append("✅ 文本对话完成")
                         return (result, "\n".join(status_messages))
                     except Exception as e:
@@ -1254,6 +1264,8 @@ class Qwen3VLAPI:
                         platform_name, api_key, image_tensor, final_prompt, 
                         api_model_name, max_tokens, temperature, timeout, api_base, {}, size_limitation
                     )
+                    if remove_think_tags:
+                        result = self._remove_think_content(result)
                     status_messages.append("✅ 图片分析完成")
                     return (result, "\n".join(status_messages))
                 except Exception as e:
@@ -1289,7 +1301,8 @@ class Qwen3VLAPI:
                                     platform_name, api_key, image_tensor, final_prompt,
                                     api_model_name, max_tokens, temperature, timeout, api_base, {}, size_limitation
                                 )
-                                
+                                if remove_think_tags:
+                                    result = self._remove_think_content(result)
                                 self.save_description(image_path, result)
                                 processed_count += 1
                                 
@@ -1330,7 +1343,8 @@ class Qwen3VLAPI:
                                 platform_name, api_key, image_tensor, final_prompt,
                                 api_model_name, max_tokens, temperature, timeout, api_base, {}, size_limitation
                             )
-                            
+                            if remove_think_tags:
+                                result = self._remove_think_content(result)
                             results.append(f"图片 {i+1}/{total_images}:\n{result}")
                             processed_count += 1
                             
@@ -1392,6 +1406,16 @@ class Qwen3VLAPI:
             params["presence_penalty"] = rnd.uniform(0.6, 1.2)
             params["frequency_penalty"] = rnd.uniform(0.5, 1.1)
         return effective_temperature, params
+    
+    def _remove_think_content(self, text):
+        if not isinstance(text, str):
+            return text
+        think_end_tag = "</think>"
+        pos = text.find(think_end_tag)
+        if pos != -1:
+            filtered = text[pos + len(think_end_tag):]
+            return filtered.lstrip()
+        return text
     
     @classmethod
     def IS_CHANGED(cls, **kwargs):

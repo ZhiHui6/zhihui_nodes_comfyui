@@ -815,7 +815,8 @@
             "batch_mode": "批处理模式",
             "batch_folder_path": "批处理文件夹路径",
             "access_method": "接入方式",
-            "size_limitation": "尺寸限制"
+            "size_limitation": "尺寸限制",
+            "remove_think_tags": "移除思考标签"
         },
         "tooltips": {
             "config_mode": "选择配置模式：平台预设使用内置平台设置，完全自定义允许手动设置所有参数",
@@ -878,6 +879,17 @@
             "IMAGE": "图像",
             "MASK": "遮罩",
             "FILE PATH": "文件路径"
+        }
+    },
+    "PromptCardSelector": {
+        "title": "提示词卡选择器",
+        "description": "提示词卡池选择器：从提示词卡池中选择、抽取并输出到节点。支持随机/顺序两种抽取模式、单卡/多卡加载方式、空行/换行符分割方式，以及随机轮换/顺序轮换卡池洗牌策略。内置卡池管理器，提供浏览、搜索、选择与编辑功能，支持导入/导出卡文件，适用于提示词的灵活组合和批量管理。",
+        "inputs": {},
+        "outputs": {
+            "text": "文本"
+        },
+        "widgets": {
+            "open_card_pool": "卡池管理器"
         }
     }
 }

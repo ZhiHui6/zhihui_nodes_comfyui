@@ -33,6 +33,7 @@ from .Nodes.Preview_or_Compare_Images import PreviewOrCompareImages
 from .Nodes.PauseWorkflow import PauseWorkflow
 from .Nodes.TextEditorWithContinue import TextEditorWithContinue
 from .Nodes.TagSelector.TagSelector import TagSelector
+from .Nodes.PromptCardSelector.PromptCardSelector import PromptCardSelector
 from .Nodes.SunoTools.SunoSongStylePromptGenerator import SunoSongStylePromptGenerator
 from .Nodes.SunoTools.SunoLyricsGenerator import SunoLyricsGenerator
 from .Nodes.Qwen3VL.Qwen3VLAdvanced import Qwen3VLAdvanced
@@ -48,6 +49,7 @@ from .Nodes.Qwen3VL_API.Qwen3VLAPI import Qwen3VLAPI
 from .Nodes.Sa2VA.Sa2VAAdvanced import Sa2VAAdvanced
 from .Nodes.Sa2VA.Sa2VASegmentationPreset import Sa2VASegmentationPreset
 from .Nodes.Batch_loading_of_images import BatchLoadingOfImages
+
 
 import os
 
@@ -88,6 +90,7 @@ NODE_CLASS_MAPPINGS = {
     "PauseWorkflow": PauseWorkflow,
     "TextEditorWithContinue": TextEditorWithContinue,
     "TagSelector": TagSelector,
+    "PromptCardSelector": PromptCardSelector,
     "SunoSongStylePromptGenerator": SunoSongStylePromptGenerator,
     "SunoLyricsGenerator": SunoLyricsGenerator,
     "Qwen3VLAdvanced": Qwen3VLAdvanced,
@@ -140,6 +143,7 @@ NODE_DISPLAY_NAME_MAPPINGS = {
     "PauseWorkflow": "Pause Workflow",
     "TextEditorWithContinue": "Text Editor with Continue",
     "TagSelector": "Tag Selector",
+    "PromptCardSelector": "Prompt Card Selector",
     "SunoSongStylePromptGenerator": "Suno Song Style Prompt Generator",
     "SunoLyricsGenerator": "Suno AI Lyrics Generator",
     "Qwen3VLAdvanced": "Qwen3-VL Advanced",

@@ -2,8 +2,8 @@
 [![GitHub](https://img.shields.io/badge/GitHub-zhihui--nodes--comfyui-blue?style=for-the-badge&logo=github)](https://github.com/ZhiHui6/zhihui_nodes_comfyui) [![License](https://img.shields.io/badge/License-MIT-green?style=for-the-badge)](LICENSE) [![ComfyUI](https://img.shields.io/badge/ComfyUI-Compatible-orange?style=for-the-badge)](https://github.com/comfyanonymous/ComfyUI)
 ---
 
-最新版本：`v0.8.6`（2025-11-28），完整更新日志：查看<a href="CHANGELOG.md">`CHANGELOG.md`</a><br>
-Latest version: `v0.8.6` (2025-11-28), full update log: view <a href="CHANGELOG.md">`CHANGELOG.md`</a>
+最新版本：`v0.8.8`（2025-12-1），完整更新日志：查看<a href="CHANGELOG.md">`CHANGELOG.md`</a><br>
+Latest version: `v0.8.8` (2025-12-1), full update log: view <a href="CHANGELOG.md">`CHANGELOG.md`</a>
 
 ## 📖 项目介绍 | Project Introduction
 
@@ -341,6 +341,38 @@ Customizable output templates to adapt to different photography style requiremen
 <img src="images/额外引导选项（通用）.jpg" alt="额外选项列表" width="45%"/>
 </a>
 </div></td>
+</tr>
+<tr>
+<td><b>提示词卡选择器</b><br><b>Prompt Card Selector</b><br><code>PromptCardSelector</code></td>
+<td>支持随机/顺序抽取模式、单卡/多卡加载、多种分割方式及卡池洗牌策略，内置卡池管理器提供浏览/搜索/编辑功能，支持导入/导出卡文件，适用于提示词组合与批量管理。<br>Supports random/sequential extraction modes, single-card/multi-card loading, multiple segmentation methods, and card pool shuffling strategies. Built-in card pool manager provides browsing/searching/editing functions, supports importing/exporting card files, suitable for prompt combination and batch management.
+
+<b>特点 | Features</b>：
+- <b>双抽取模式</b>：支持随机抽取和顺序抽取两种模式<br>
+<b>Dual Extraction Modes:</b> Supports both random and sequential extraction modes
+- <b>多卡加载</b>：支持单卡和多卡加载模式<br>
+<b>Multi-card Loading:</b> Supports both single-card and multi-card loading modes
+- <b>灵活分割</b>：支持多种文本分割方式（空白行、换行符等）<br>
+<b>Flexible Segmentation:</b> Supports multiple text segmentation methods (blank lines, line breaks, etc.)
+- <b>卡池管理</b>：内置卡池管理器，提供浏览、搜索、编辑功能<br>
+<b>Card Pool Management:</b> Built-in card pool manager providing browsing, searching, and editing functions
+- <b>导入导出</b>：支持提示卡文件的导入和导出<br>
+<b>Import/Export:</b> Supports importing and exporting prompt card files
+- <b>洗牌策略</b>：支持卡池洗牌策略，增加随机性<br>
+<b>Shuffle Strategy:</b> Supports card pool shuffling strategies to increase randomness
+
+<br>
+<div align="left">
+<a href="images/Prompt Card Selector1.jpg" target="_blank">
+<img src="images/Prompt Card Selector1.jpg" alt="提示词卡选择器1" width="30%"/>
+</a>
+<a href="images/Prompt Card Selector2.jpg" target="_blank">
+<img src="images/Prompt Card Selector2.jpg" alt="提示词卡选择器2" width="30%"/>
+</a>
+<a href="images/Prompt Card Selector3.jpg" target="_blank">
+<img src="images/Prompt Card Selector3.jpg" alt="提示词卡选择器3" width="30%"/>
+</a>
+</div>
+</td>
 </tr>
 </table>
 
@@ -774,6 +806,10 @@ Tool node that provides interactive segmentation preset selection. Choose common
 <th>功能描述 | Function Description</th>
 </tr>
 <tr>
+<th width="30%">节点名称 | Node Name</th>
+<th>功能描述 | Function Description</th>
+</tr>
+<tr>
 <td><b>🏷️TAG标签选择器</b><br><b>Tag Selector</b><br><code>TagSelector</code></td>
 <td>
 
@@ -1017,3 +1053,5 @@ pip install -r requirements.txt
 </div>
 
 如果您有任何想法或建议，请随时提出 Issue 或 Pull Request。<br>If you have any ideas or suggestions, please feel free to submit an Issue or Pull Request.
+
+

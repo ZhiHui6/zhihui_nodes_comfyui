@@ -1,0 +1,7 @@
+{
+  "mode": "random",
+  "split_rule": "auto",
+  "load_mode": "multi",
+  "pool_shuffle": "sequential",
+  "selected": []
+}

@@ -1,0 +1,481 @@
+import { app } from "/scripts/app.js";
+import { api } from "/scripts/api.js";
+
+const commonStyles = {
+    button: {
+        base: { display:'inline-flex', alignItems:'center', justifyContent:'center', padding:'6px 12px', borderRadius:'6px', border:'1px solid', fontSize:'14px', fontWeight:'500', cursor:'pointer', transition:'all 0.2s ease', outline:'none' },
+        primary: { background:'linear-gradient(135deg, #2563eb 0%, #1d4ed8 50%, #1e40af 100%)', borderColor:'rgba(59, 130, 246, 0.7)', color:'#ffffff' },
+        primaryHover: { background:'linear-gradient(135deg, #3b82f6 0%, #2563eb 50%, #1d4ed8 100%)', boxShadow:'0 2px 4px rgba(59, 130, 246, 0.2), 0 1px 2px rgba(0, 0, 0, 0.1)', borderColor:'rgba(59, 130, 246, 0.5)' },
+        danger: { background:'linear-gradient(135deg, #dc2626 0%, #b91c1c 100%)', borderColor:'rgba(220, 38, 38, 0.8)', color:'#ffffff' },
+        dangerHover: { background:'linear-gradient(135deg, #f87171 0%, #ef4444 100%)', boxShadow:'0 2px 8px rgba(239, 68, 68, 0.4)', borderColor:'rgba(248, 113, 113, 0.8)' }
+    },
+};
+
+function applyStyles(el, styles){ Object.assign(el.style, styles); }
+function setupButtonHover(el, normal, hover){ applyStyles(el, normal); el.addEventListener('mouseenter', ()=>applyStyles(el, hover)); el.addEventListener('mouseleave', ()=>applyStyles(el, normal)); }
+
+app.registerExtension({
+    name: "zhihui.PromptCardSelector",
+    async beforeRegisterNodeDef(nodeType, nodeData, app_) {
+        if (nodeData.name !== "PromptCardSelector") return;
+        const prevOnNodeCreated = nodeType.prototype.onNodeCreated;
+        nodeType.prototype.onNodeCreated = function(){
+            const r = prevOnNodeCreated ? prevOnNodeCreated.apply(this, arguments) : undefined;
+            return r;
+        };
+        const prevOnExecuted = nodeType.prototype.onExecuted;
+        nodeType.prototype.onExecuted = function(data){
+            if (prevOnExecuted) prevOnExecuted.apply(this, arguments);
+        };
+    },
+    nodeCreated(node){
+        if (node.comfyClass === "PromptCardSelector"){
+            const btn = node.addWidget("button", "🗃️卡池管理器·Card Pool Manager", "open_card_pool", () => openPromptCardPool(node));
+            btn.serialize = false;
+        }
+    }
+});
+
+let dialog = null; let currentNode = null;
+
+async function openPromptCardPool(node){
+    currentNode = node;
+    if (!dialog) createDialog();
+    dialog.style.display = 'block';
+}
+
+function createDialog(){
+    const overlay = document.createElement('div');
+    overlay.style.cssText = `position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(0,0,0,.5);z-index:10000;display:none;backdrop-filter:blur(10px)`;
+    const box = document.createElement('div');
+    const sh = window.innerHeight, sw = window.innerWidth; const h = Math.min(sh*0.92, 980); const w = Math.min(sw*0.92, h*(16/10)); const left=(sw-w)/2, top=(sh-h)/2;
+    box.style.cssText = `position:fixed;top:${top}px;left:${left}px;width:${w}px;height:${h}px;min-width:900px;min-height:600px;background:linear-gradient(135deg,#1e293b 0%,#0f172a 100%);border:2px solid rgb(19,101,201);border-radius:16px;box-shadow:0 0 24px rgba(96,165,250,.7),0 0 60px rgba(96,165,250,.4);z-index:10001;display:flex;flex-direction:column;overflow:hidden`;
+    const header = document.createElement('div'); header.style.cssText = `background:rgb(34,77,141);padding:6px 4px;display:flex;align-items:center;justify-content:space-between;border-radius:16px 16px 0 0;gap:16px`;
+    const title = document.createElement('span'); title.textContent = '🗃️卡池管理器'; title.style.cssText = `color:#f1f5f9;font-size:18px;font-weight:600;margin-left:15px`;
+    const closeBtn = document.createElement('button'); closeBtn.textContent = '×';
+    applyStyles(closeBtn, { ...commonStyles.button.base, ...commonStyles.button.danger, padding:'0', width:'22px', height:'22px', fontSize:'18px', fontWeight:'700', lineHeight:'22px', margin:'4px 8px 4px 0' });
+    setupButtonHover(closeBtn, commonStyles.button.danger, commonStyles.button.dangerHover);
+    closeBtn.onclick = () => { overlay.style.display = 'none'; };
+    const tabs = document.createElement('div'); tabs.style.cssText = `display:flex;gap:6px;margin:8px 12px`;
+    const tabFiles = document.createElement('button'); tabFiles.textContent = '提示词卡池设置';
+    const tabManage = document.createElement('button'); tabManage.textContent = '提示词卡池编辑';
+    const inactiveStyle = { ...commonStyles.button.base, background:'linear-gradient(135deg,#6b7280 0%,#4b5563 100%)', borderColor:'rgba(107,114,128,0.7)', color:'#fff' };
+    const activeStyle = { ...commonStyles.button.base, ...commonStyles.button.primary };
+    const hoverStyle = { ...commonStyles.button.base, ...commonStyles.button.primaryHover };
+    function setupTab(el){
+        applyStyles(el, inactiveStyle);
+        el.dataset.active = 'false';
+        el.onmouseenter = () => applyStyles(el, activeStyle);
+        el.onmouseleave = () => { if (el.dataset.active === 'true') { applyStyles(el, activeStyle); } else { applyStyles(el, inactiveStyle); } };
+    }
+    setupTab(tabFiles);
+    setupTab(tabManage);
+    const content = document.createElement('div'); content.style.cssText = `flex:1;overflow:auto;padding:6px 8px;position:relative`;
+    header.appendChild(title); header.appendChild(closeBtn);
+    const statusBar = document.createElement('div'); statusBar.style.cssText = `display:flex;gap:8px;margin:4px 12px 0 12px;align-items:center`;
+    box.appendChild(header); box.appendChild(tabs); box.appendChild(statusBar); box.appendChild(content);
+    overlay.appendChild(box); document.body.appendChild(overlay);
+    dialog = overlay; dialog.content = content; dialog.tabFiles = tabFiles; dialog.tabManage = tabManage; dialog.statusBar = statusBar; dialog.tabs = tabs; tabs.appendChild(tabFiles); tabs.appendChild(tabManage);
+    function setActiveTab(which){
+        if (which === 'files'){
+            tabFiles.dataset.active = 'true'; tabManage.dataset.active = 'false';
+            applyStyles(tabFiles, activeStyle); applyStyles(tabManage, inactiveStyle);
+            tabFiles.disabled = true; tabManage.disabled = false;
+            showPromptCardPoolFiles();
+        } else {
+            tabFiles.dataset.active = 'false'; tabManage.dataset.active = 'true';
+            applyStyles(tabFiles, inactiveStyle); applyStyles(tabManage, activeStyle);
+            tabFiles.disabled = false; tabManage.disabled = true;
+            showPromptCardPoolManage();
+        }
+    }
+    tabFiles.onclick = () => setActiveTab('files');
+    tabManage.onclick = () => setActiveTab('manage');
+    tabFiles.click();
+}
+
+async function fetchPromptCards(){ try { const res = await fetch('/zhihui/prompt_cards'); const data = await res.json(); return Array.isArray(data.files) ? data.files : []; } catch(e){ return []; } }
+async function fetchPromptCardContent(name, source){ try { const src = source || 'system'; const res = await fetch(`/zhihui/prompt_card?name=${encodeURIComponent(name)}&source=${encodeURIComponent(src)}`); const data = await res.json(); return data.content || ''; } catch(e){ return ''; } }
+async function savePromptCard(name, content, source, confirm){ const res = await fetch('/zhihui/prompt_cards', { method:'POST', headers:{'Content-Type':'application/json'}, body:JSON.stringify({ name, content, source: source||'user', confirm }) }); return res.ok; }
+async function deletePromptCard(name, source, confirm){ const res = await fetch('/zhihui/prompt_cards', { method:'DELETE', headers:{'Content-Type':'application/json'}, body:JSON.stringify({ name, source: source||'user', confirm }) }); return res.ok; }
+async function selectPromptCards(params){ const res = await fetch('/zhihui/prompt_cards/select', { method:'POST', headers:{'Content-Type':'application/json'}, body:JSON.stringify(params) }); return await res.json(); }
+async function getPromptCardSettings(){ try { const res = await fetch('/zhihui/prompt_cards/settings'); const data = await res.json(); return data && typeof data === 'object' ? data : {}; } catch(e){ return {}; } }
+async function savePromptCardSettings(st){ try { const res = await fetch('/zhihui/prompt_cards/settings', { method:'POST', headers:{'Content-Type':'application/json'}, body: JSON.stringify(st||{}) }); return res.ok; } catch(e){ return false; } }
+
+async function showPromptCardPoolFiles(){
+    const container = dialog.content; container.innerHTML = '';
+    const controlsPanel = document.createElement('div'); controlsPanel.style.cssText = `display:flex;flex-direction:column;gap:8px;margin:6px 4px 16px 4px;padding:8px;border:1px solid rgba(34,197,94,0.35);border-radius:8px;background:rgba(34,197,94,0.08)`;
+    const modeSel = document.createElement('select'); modeSel.innerHTML = `<option value="random" selected>随机抽取</option><option value="sequential">顺序抽取</option>`; modeSel.style.cssText = `background:#1f2937;color:#e5e7eb;border:1px solid #3b82f6;border-radius:6px;padding:4px 8px`;
+    const splitSel = document.createElement('select'); splitSel.innerHTML = `<option value="auto" selected>自动</option><option value="blankline">空白行</option><option value="newline">换行符</option>`; splitSel.style.cssText = `background:#1f2937;color:#e5e7eb;border:1px solid #3b82f6;border-radius:6px;padding:4px 8px`;
+    const loadModeSel = document.createElement('select'); loadModeSel.innerHTML = `<option value="single" selected>单卡池</option><option value="multi">多卡池</option>`; loadModeSel.style.cssText = `background:#1f2937;color:#e5e7eb;border:1px solid #3b82f6;border-radius:6px;padding:4px 8px`;
+    const shuffleSel = document.createElement('select'); shuffleSel.innerHTML = `<option value="random">随机轮换</option><option value="sequential">顺序轮换</option>`; shuffleSel.style.cssText = `background:#1f2937;color:#e5e7eb;border:1px solid #3b82f6;border-radius:6px;padding:4px 8px`;
+    if (dialog.searchContainer){ try { dialog.searchContainer.remove(); } catch(_){} }
+    if (dialog.filesStatusBar){ try { dialog.filesStatusBar.remove(); } catch(_){} }
+    const filterInput = document.createElement('input'); filterInput.type='text'; filterInput.placeholder='搜索'; filterInput.style.cssText = `width:220px;min-width:180px;background:#1f2937;color:#e7e7eb;border:1px solid #3b82f6;border-radius:6px;padding:0 10px 0 26px;height:24px;font-size:13px`;
+    const searchContainer = document.createElement('div'); searchContainer.style.cssText = `display:flex;align-items:center;gap:8px;margin:0`;
+    const searchBox = document.createElement('div'); searchBox.style.cssText = `position:relative;display:flex;align-items:center`;
+    const searchIcon = document.createElement('span'); searchIcon.textContent = '🔍'; searchIcon.style.cssText = `position:absolute;left:8px;top:50%;transform:translateY(-50%);font-size:13px;color:#93c5fd;pointer-events:none`;
+    searchBox.appendChild(searchIcon); searchBox.appendChild(filterInput); searchContainer.appendChild(searchBox);
+    dialog.searchContainer = searchContainer; dialog.searchInput = filterInput; try { searchContainer.style.marginLeft = 'auto'; } catch(_){}
+    const labelStyle = `display:block;margin:0 0 2px 2px;color:#93c5fd;font-size:12px;font-weight:600`;
+    const wrap = (labelText, el, grow=false) => { const w = document.createElement('div'); w.style.cssText = `display:flex;flex-direction:column;gap:2px${grow?';flex:1;':''}`; const lb = document.createElement('span'); lb.textContent = labelText; lb.style.cssText = labelStyle; w.appendChild(lb); w.appendChild(el); return w; };
+    const confirmBtn = document.createElement('button'); confirmBtn.textContent = '确认设定';
+    applyStyles(confirmBtn, { ...commonStyles.button.base, background:'linear-gradient(135deg,#059669 0%,#047857 100%)', borderColor:'rgba(16,185,129,0.7)', color:'#fff' });
+    const confirmBtnNormalStyle = { background:'linear-gradient(135deg,#059669 0%,#047857 100%)', borderColor:'rgba(16,185,129,0.7)', color:'#fff' };
+    const confirmBtnHoverStyle = { background:'linear-gradient(135deg,#10b981 0%,#059669 100%)', borderColor:'rgba(16,185,129,0.6)', color:'#fff', boxShadow:'0 2px 4px rgba(16,185,129,0.25), 0 1px 2px rgba(0,0,0,0.1)' };
+    setupButtonHover(confirmBtn, confirmBtnNormalStyle, confirmBtnHoverStyle);
+
+    const countBadge = document.createElement('span'); countBadge.textContent = '已选: 0'; countBadge.style.cssText = `display:inline-flex;align-items:center;gap:6px;height:22px;padding:0 8px;background:rgba(59,130,246,0.10);color:#93c5fd;border:1px solid rgba(59,130,246,0.35);border-radius:6px;font-size:12px`;
+    const searchReport = document.createElement('span'); searchReport.textContent = ''; searchReport.style.cssText = `display:inline-flex;visibility:hidden;align-items:center;justify-content:center;gap:6px;height:22px;min-width:120px;padding:0 10px;background:rgba(59,130,246,0.08);color:#e5e7eb;border:1px solid rgba(59,130,246,0.35);border-radius:8px;font-size:12px;white-space:nowrap`;
+    const selAllBtn = document.createElement('button'); selAllBtn.textContent = '全选'; applyStyles(selAllBtn, { ...commonStyles.button.base, background:'linear-gradient(135deg,#6b7280 0%,#4b5563 100%)', borderColor:'rgba(107,114,128,0.7)', color:'#fff', height:'24px', padding:'2px 8px', fontSize:'12px' });
+    const invertBtn = document.createElement('button'); invertBtn.textContent = '反选'; applyStyles(invertBtn, { ...commonStyles.button.base, background:'linear-gradient(135deg,#6b7280 0%,#4b5563 100%)', borderColor:'rgba(107,114,128,0.7)', color:'#fff', height:'24px', padding:'2px 8px', fontSize:'12px' });
+    const clearBtn = document.createElement('button'); clearBtn.textContent = '清除'; applyStyles(clearBtn, { ...commonStyles.button.base, ...commonStyles.button.danger, height:'24px', padding:'2px 8px', fontSize:'12px' });
+
+    const rowTop = document.createElement('div'); rowTop.style.cssText = `display:flex;align-items:center;justify-content:space-between;gap:8px;flex-wrap:wrap`;
+    const rowTopLeft = document.createElement('div'); rowTopLeft.style.cssText = `display:flex;align-items:center;gap:8px`;
+    const rowTopRight = document.createElement('div'); rowTopRight.style.cssText = `display:flex;align-items:center;gap:8px`;
+    try { searchContainer.insertBefore(searchReport, searchBox); } catch(_) { searchContainer.appendChild(searchReport); } rowTop.appendChild(rowTopLeft); rowTop.appendChild(rowTopRight);
+
+    const rowBottom = document.createElement('div'); rowBottom.style.cssText = `display:flex;align-items:center;justify-content:space-between;gap:8px;flex-wrap:wrap`;
+    const bottomLeft = document.createElement('div'); bottomLeft.style.cssText = `display:flex;gap:10px;align-items:flex-end;flex-wrap:wrap`;
+    const bottomRight = document.createElement('div'); bottomRight.style.cssText = `display:flex;gap:8px;align-items:flex-end;flex-wrap:wrap;justify-content:flex-end;flex:1`;
+    const shuffleWrap = wrap('卡池洗牌逻辑', shuffleSel);
+    bottomLeft.appendChild(wrap('卡池载入模式', loadModeSel)); bottomLeft.appendChild(shuffleWrap); bottomLeft.appendChild(wrap('提示词抽取方式', modeSel)); bottomLeft.appendChild(wrap('分段识别依据', splitSel));
+    
+    rowBottom.appendChild(bottomLeft); rowBottom.appendChild(bottomRight);
+
+    controlsPanel.appendChild(rowTop); controlsPanel.appendChild(rowBottom); container.appendChild(controlsPanel);
+    const tagsFrame = document.createElement('div'); tagsFrame.style.cssText = `margin:6px 4px;padding:0 12px 10px 12px;border:1px solid rgba(59,130,246,0.35);border-radius:8px;background:rgba(59,130,246,0.10)`; container.appendChild(tagsFrame);
+    const tagsHeader = document.createElement('div'); tagsHeader.style.cssText = `width:100%;margin:12px 0 8px 0;padding:0;color:#93c5fd;font-size:16px;font-weight:800;display:flex;align-items:center;justify-content:space-between;gap:12px`; tagsFrame.appendChild(tagsHeader);
+    const tagsHeaderLeft = document.createElement('div'); tagsHeaderLeft.style.cssText = `display:flex;align-items:center;gap:8px;flex:1`;
+    const tagsTitle = document.createElement('span'); tagsTitle.textContent='提示词卡';
+    tagsHeaderLeft.appendChild(tagsTitle); tagsHeaderLeft.appendChild(countBadge); tagsHeader.appendChild(tagsHeaderLeft);
+    const selectedTools = document.createElement('div'); selectedTools.style.cssText = `display:flex;align-items:center;gap:10px;flex-wrap:wrap;margin-left:14px`;
+    selectedTools.appendChild(selAllBtn); selectedTools.appendChild(invertBtn); selectedTools.appendChild(clearBtn);
+    tagsHeaderLeft.appendChild(selectedTools);
+    const tagsHeaderCenter = document.createElement('div'); tagsHeaderCenter.style.cssText = `display:flex;align-items:center;justify-content:center;flex:1`;
+    tagsHeaderCenter.appendChild(searchContainer);
+    const tagsHeaderRight = document.createElement('div'); tagsHeaderRight.style.cssText = `flex:1`;
+    tagsHeader.appendChild(tagsHeaderCenter);
+    tagsHeader.appendChild(tagsHeaderRight);
+    const listWrap = document.createElement('div'); listWrap.style.cssText = `display:flex;flex-wrap:wrap;gap:6px;margin-top:0`; tagsFrame.appendChild(listWrap);
+    const usageToggleBar = document.createElement('div');
+    usageToggleBar.style.cssText = `margin:10px 4px 4px 4px;display:flex;align-items:center;gap:10px`;
+    const usageToggleLabel = document.createElement('span');
+    usageToggleLabel.textContent = '📘 使用说明';
+    usageToggleLabel.style.cssText = `color:#93c5fd;font-weight:800`;
+    const usageToggleBtn = document.createElement('button');
+    usageToggleBtn.textContent = '展开说明';
+    applyStyles(usageToggleBtn, { ...commonStyles.button.base, ...commonStyles.button.primary, height:'24px', padding:'2px 10px', fontSize:'12px' }); setupButtonHover(usageToggleBtn, commonStyles.button.primary, commonStyles.button.primaryHover);
+    usageToggleBar.appendChild(usageToggleLabel); usageToggleBar.appendChild(usageToggleBtn); container.appendChild(usageToggleBar);
+    const usageTips = document.createElement('div');
+    usageTips.style.cssText = `margin:8px 4px 90px 4px;padding:14px 14px;color:#e5e7eb;background:linear-gradient(135deg, rgba(30,58,138,0.30) 0%, rgba(2,6,23,0.60) 100%);border:1px solid rgba(59,130,246,0.45);border-radius:12px;box-shadow:0 8px 24px rgba(0,0,0,0.35);font-size:12px;line-height:1.7`;
+    usageTips.innerHTML = `
+    <div style=\"display:flex;align-items:center;gap:8px;margin-bottom:10px\">
+        <span style=\"display:inline-flex;align-items:center;justify-content:center;width:22px;height:22px;border-radius:50%;background:#3b82f6;color:#0b1220;font-weight:800\">i</span>
+        <span style=\"color:#93c5fd;font-weight:800;font-size:14px\">提示词卡池设置使用说明</span>
+    </div>
+    <div style=\"display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:10px\">
+        <div style=\"border:1px solid rgba(59,130,246,0.35);border-radius:10px;padding:10px;background:rgba(30,64,175,0.15)\">
+            <div style=\"color:#60a5fa;font-weight:700;margin-bottom:6px\">载入模式</div>
+            <div><span style=\"display:inline-block;padding:2px 8px;border-radius:10px;background:#22c55e;color:#082911;font-weight:700;margin-right:6px\">单卡池</span>仅可选择一个卡池；当为单卡池时，<span style=\"color:#fca5a5;font-weight:700\">卡池洗牌隐藏且不生效</span>。</div>
+            <div style=\"margin-top:6px\"><span style=\"display:inline-block;padding:2px 8px;border-radius:10px;background:#a855f7;color:#160433;font-weight:700;margin-right:6px\">多卡池</span>可选择多个卡池，并可配置卡池洗牌策略。</div>
+        </div>
+        <div style=\"border:1px solid rgba(147,51,234,0.35);border-radius:10px;padding:10px;background:rgba(88,28,135,0.18)\">
+            <div style=\"color:#c084fc;font-weight:700;margin-bottom:6px\">卡池洗牌</div>
+            <div>仅在多卡池显示。</div>
+            <div style=\"margin-top:6px\"><span style=\"display:inline-block;padding:2px 8px;border-radius:10px;background:#3b82f6;color:#0b1220;font-weight:700;margin-right:6px\">随机轮换</span>按随机顺序合并卡池条目。</div>
+            <div style=\"margin-top:6px\"><span style=\"display:inline-block;padding:2px 8px;border-radius:10px;background:#f59e0b;color:#1f1203;font-weight:700;margin-right:6px\">顺序轮换</span>保持固定顺序合并卡池条目。</div>
+        </div>
+        <div style=\"border:1px solid rgba(34,197,94,0.35);border-radius:10px;padding:10px;background:rgba(20,83,45,0.18)\">
+            <div style=\"color:#86efac;font-weight:700;margin-bottom:6px\">抽取模式</div>
+            <div><span style=\"display:inline-block;padding:2px 8px;border-radius:10px;background:#22c55e;color:#082911;font-weight:700;margin-right:6px\">随机抽取</span>从合并后的段落集合随机抽取。</div>
+            <div style=\"margin-top:6px\"><span style=\"display:inline-block;padding:2px 8px;border-radius:10px;background:#f59e0b;color:#1f1203;font-weight:700;margin-right:6px\">顺序抽取</span>按轮转索引顺序抽取，跨次运行可延续。</div>
+        </div>
+        <div style=\"border:1px solid rgba(234,179,8,0.35);border-radius:10px;padding:10px;background:rgba(66,32,6,0.18)\">
+            <div style=\"color:#fbbf24;font-weight:700;margin-bottom:6px\">分隔依据</div>
+            <div><span style=\"display:inline-block;padding:2px 8px;border-radius:10px;background:#fbbf24;color:#1d1402;font-weight:700;margin-right:6px\">空白行</span>适合按段落组织的卡内容。</div>
+            <div style=\"margin-top:6px\"><span style=\"display:inline-block;padding:2px 8px;border-radius:10px;background:#fde047;color:#1d1402;font-weight:700;margin-right:6px\">换行符</span>适合按行组织的卡内容。</div>
+        </div>
+        
+    </div>
+    <div style=\"margin-top:12px;border-top:1px dashed rgba(59,130,246,0.35);padding-top:10px\">
+        <div style=\"color:#93c5fd;font-weight:700;margin-bottom:6px\">使用流程示例</div>
+        <div style=\"display:flex;flex-wrap:wrap;gap:8px\">
+            <span style=\"display:inline-flex;align-items:center;gap:6px;padding:6px 10px;border-radius:10px;background:rgba(34,197,94,0.12);border:1px solid rgba(34,197,94,0.35)\"><b style=\"background:#22c55e;color:#082911;border-radius:50%;width:18px;height:18px;display:inline-flex;align-items:center;justify-content:center\">1</b> 选择载入模式，必要时设置卡池洗牌</span>
+            <span style=\"display:inline-flex;align-items:center;gap:6px;padding:6px 10px;border-radius:10px;background:rgba(245,158,11,0.12);border:1px solid rgba(245,158,11,0.35)\"><b style=\"background:#f59e0b;color:#1f1203;border-radius:50%;width:18px;height:18px;display:inline-flex;align-items:center;justify-content:center\">2</b> 选择抽取模式与分隔依据</span>
+            <span style=\"display:inline-flex;align-items:center;gap:6px;padding:6px 10px;border-radius:10px;background:rgba(59,130,246,0.12);border:1px solid rgba(59,130,246,0.35)\"><b style=\"background:#3b82f6;color:#0b1220;border-radius:50%;width:18px;height:18px;display:inline-flex;align-items:center;justify-content:center\">3</b> 搜索并选择卡条目</span>
+            <span style=\"display:inline-flex;align-items:center;gap:6px;padding:6px 10px;border-radius:10px;background:rgba(99,102,241,0.12);border:1px solid rgba(99,102,241,0.35)\"><b style=\"background:#818cf8;color:#0b1220;border-radius:50%;width:18px;height:18px;display:inline-flex;align-items:center;justify-content:center\">4</b> 点击“抽取并输出到节点”</span>
+        </div>
+    </div>
+    
+    `;
+    usageTips.style.display = 'none';
+    usageToggleBtn.onclick = () => { const vis = usageTips.style.display !== 'none'; usageTips.style.display = vis ? 'none' : ''; usageToggleBtn.textContent = vis ? '展开说明' : '收起说明'; };
+    container.appendChild(usageTips);
+    const footer = document.createElement('div'); footer.style.cssText = `position:absolute;right:12px;bottom:12px;display:flex;gap:8px`; footer.appendChild(confirmBtn); container.appendChild(footer);
+    let all = []; let selected = new Map(); const chipIndex = new Map(); let currentKeyword = '';
+    const keyOf = (item) => `${item.source}|${item.name}`;
+    const markSelected = (chip, isSel) => {
+        if (!chip) return;
+        chip.style.background = isSel ? 'linear-gradient(135deg,#a855f7 0%,#9333ea 100%)' : '#444';
+        chip.style.color = isSel ? '#fff' : '#ccc';
+        chip.style.border = isSel ? '1px solid rgba(168,85,247,0.8)' : '1px solid #6aa1f3';
+    };
+    const updateSelectedCount = () => { countBadge.textContent = `已选: ${selected.size}`; };
+    const refresh = async () => {
+        all = await fetchPromptCards(); listWrap.innerHTML = ''; chipIndex.clear();
+        currentKeyword = (filterInput.value || '').trim().toLowerCase();
+        const files = all.filter(item => { const name = item.name || ''; const displayName = name.split('/').pop().replace(/\.txt$/i, ''); return !currentKeyword || name.toLowerCase().includes(currentKeyword) || displayName.toLowerCase().includes(currentKeyword); });
+        if (currentKeyword){ searchReport.style.visibility = 'visible'; searchReport.textContent = files.length > 0 ? `搜索结果：${files.length} 条` : '未找到结果'; } else { searchReport.style.visibility = 'hidden'; searchReport.textContent = ''; }
+        if (files.length === 0){ listWrap.innerHTML = ''; const empty = document.createElement('div'); empty.textContent = '无结果'; empty.style.cssText = `display:flex;align-items:center;justify-content:center;margin:10px;padding:12px;color:#e5e7eb;background:rgba(107,114,128,0.15);border:1px solid rgba(107,114,128,0.35);border-radius:8px;font-size:13px`; listWrap.appendChild(empty); updateSelectedCount(); return; }
+        const groups = {}; files.forEach(item => { const parts = (item.name||'').split('/'); const g = parts.length>1 ? parts[0] : '根目录'; (groups[g] = groups[g] || []).push(item); });
+        Object.keys(groups).sort().forEach(groupName => {
+            const title = document.createElement('div'); title.textContent = groupName; title.style.cssText = `width:100%;margin:8px 0 4px 0;color:#93c5fd;border-bottom:1px solid rgba(59,130,246,0.35);font-size:12px`; if (groupName==='NSFW'){ title.style.color='#f87171'; title.style.borderBottom='1px solid rgba(248,113,113,0.35)'; } else if (groupName==='SFW'){ title.style.color='#22c55e'; title.style.borderBottom='1px solid rgba(34,197,94,0.35)'; }
+            listWrap.appendChild(title);
+            groups[groupName].sort((a,b)=> (a.name||'').localeCompare(b.name||'' )).forEach(item => {
+                const chip = document.createElement('span'); chip.style.cssText = `display:inline-flex;align-items:center;gap:4px;padding:6px 12px;background:#444;color:#ccc;border-radius:16px;cursor:pointer;border:1px solid #6aa1f3;font-size:14px`;
+                const prefix = document.createElement('span'); prefix.textContent = item.source === 'user' ? '用户' : '预置'; prefix.style.cssText = `display:inline-block;padding:0 6px;border-radius:10px;font-size:12px;font-weight:700;color:#fff;${item.source==='user' ? 'background:#22c55e;border:1px solid rgba(34,197,94,0.6);' : 'background:#2563eb;border:1px solid rgba(59,130,246,0.6);'}`;
+                const displayName = (item.name||'').split('/').pop().replace(/\.txt$/i, ''); const nameSpan = document.createElement('span'); nameSpan.textContent = displayName;
+                chip.appendChild(prefix); chip.appendChild(nameSpan);
+                const key = keyOf(item);
+                chip.dataset.key = key; chipIndex.set(key, chip);
+                chip.onclick = async () => {
+                    const isSingle = (loadModeSel.value || 'multi') === 'single';
+                    if (isSingle){
+                        const already = selected.has(key);
+                        // clear all selections
+                        selected.clear(); chipIndex.forEach(ch => markSelected(ch, false));
+                        // if it wasn't selected, select it; otherwise keep none
+                        if (!already){ selected.set(key, {name:item.name, source:item.source}); markSelected(chip, true); }
+                        updateSelectedCount(); saveSettingsNow();
+                    } else {
+                        if (selected.has(key)) { selected.delete(key); markSelected(chip, false); } else { selected.set(key, {name:item.name, source:item.source}); markSelected(chip, true); }
+                        updateSelectedCount(); saveSettingsNow();
+                    }
+                };
+                chip.onmouseenter = async () => { chip.title = await fetchPromptCardContent(item.name, item.source); };
+                markSelected(chip, selected.has(key));
+                listWrap.appendChild(chip);
+            });
+        });
+        updateSelectedCount();
+    };
+    const initSettings = await getPromptCardSettings();
+    if (initSettings.mode) modeSel.value = initSettings.mode;
+    if (initSettings.split_rule) splitSel.value = initSettings.split_rule;
+    if (initSettings.load_mode) loadModeSel.value = initSettings.load_mode;
+    shuffleSel.value = initSettings.pool_shuffle ? initSettings.pool_shuffle : 'sequential';
+    const updateShuffleVisibility = () => { const isMulti = (loadModeSel.value || 'multi') === 'multi'; shuffleWrap.style.display = isMulti ? '' : 'none'; shuffleSel.disabled = !isMulti; };
+    updateShuffleVisibility();
+    const updateSelectionButtons = () => { const isMulti = (loadModeSel.value || 'multi') === 'multi'; [selAllBtn, invertBtn].forEach(btn => { btn.disabled = !isMulti; btn.style.opacity = isMulti ? '1' : '0.5'; btn.style.cursor = isMulti ? 'pointer' : 'not-allowed'; }); };
+    updateSelectionButtons();
+    if (Array.isArray(initSettings.selected)) { selected.clear(); initSettings.selected.forEach(it => { if (it && it.name){ selected.set(keyOf({name:it.name, source: it.source || 'system'}), {name: it.name, source: it.source || 'system'}); } }); }
+    refresh();
+    const onSearchInput = () => refresh();
+    filterInput.addEventListener('input', onSearchInput);
+    const saveSettingsNow = () => { const isMulti = (loadModeSel.value || 'multi') === 'multi'; savePromptCardSettings({ mode: modeSel.value, split_rule: splitSel.value, load_mode: loadModeSel.value, pool_shuffle: isMulti ? shuffleSel.value : 'sequential', selected: Array.from(selected.values()) }); };
+    modeSel.onchange = saveSettingsNow; splitSel.onchange = saveSettingsNow; shuffleSel.onchange = saveSettingsNow;
+    loadModeSel.onchange = () => { updateShuffleVisibility(); updateSelectionButtons(); saveSettingsNow(); const isSingle = (loadModeSel.value || 'multi') === 'single'; if (isSingle && selected.size > 1){ const firstKey = selected.keys().next().value; selected.clear(); chipIndex.forEach(ch => markSelected(ch, false)); if (firstKey){ const ch = chipIndex.get(firstKey); const parts = (firstKey||'').split('|'); const nm = parts[1]; const src = parts[0]; selected.set(firstKey, {name:nm, source:src}); markSelected(ch, true); } updateSelectedCount(); saveSettingsNow(); } };
+    selAllBtn.onclick = () => {
+        if (selAllBtn.disabled) return;
+        const files = all.filter(item => { const name = item.name || ''; const displayName = name.split('/').pop().replace(/\.txt$/i, ''); return !currentKeyword || name.toLowerCase().includes(currentKeyword) || displayName.toLowerCase().includes(currentKeyword); });
+        const isSingle = (loadModeSel.value || 'multi') === 'single';
+        if (isSingle){
+            selected.clear(); chipIndex.forEach(ch => markSelected(ch, false));
+            const first = files[0]; if (first){ const k = keyOf(first); selected.set(k, {name:first.name, source:first.source}); markSelected(chipIndex.get(k), true); }
+            updateSelectedCount(); saveSettingsNow(); return;
+        }
+        files.forEach(item => { const k = keyOf(item); selected.set(k, {name:item.name, source:item.source}); const ch = chipIndex.get(k); markSelected(ch, true); }); updateSelectedCount(); saveSettingsNow();
+    };
+    invertBtn.onclick = () => {
+        if (invertBtn.disabled) return;
+        const files = all.filter(item => { const name = item.name || ''; const displayName = name.split('/').pop().replace(/\.txt$/i, ''); return !currentKeyword || name.toLowerCase().includes(currentKeyword) || displayName.toLowerCase().includes(currentKeyword); });
+        const isSingle = (loadModeSel.value || 'multi') === 'single';
+        if (isSingle){
+            if (selected.size > 0){ selected.clear(); chipIndex.forEach(ch => markSelected(ch, false)); updateSelectedCount(); saveSettingsNow(); }
+            else { const first = files[0]; if (first){ const k = keyOf(first); selected.set(k, {name:first.name, source:first.source}); markSelected(chipIndex.get(k), true); } updateSelectedCount(); saveSettingsNow(); }
+            return;
+        }
+        files.forEach(item => { const k = keyOf(item); if (selected.has(k)) { selected.delete(k); markSelected(chipIndex.get(k), false); } else { selected.set(k, {name:item.name, source:item.source}); markSelected(chipIndex.get(k), true); } }); updateSelectedCount(); saveSettingsNow();
+    };
+    clearBtn.onclick = () => { selected.clear(); chipIndex.forEach(ch => markSelected(ch, false)); updateSelectedCount(); saveSettingsNow(); };
+    
+    const todayStr = new Date().toISOString().slice(0,10);
+    const noSelNoticeKey = `zhihui_nodes_no_selection_notice_disabled_PromptCardSelector_${todayStr}`;
+    let noSelNoticeOpen = false; let noSelNoticeDismissMs = 10000;
+    const showNoSelectionNotice = () => {
+        try {
+            if (noSelNoticeOpen) return;
+            if (window.localStorage.getItem(noSelNoticeKey)) return;
+            noSelNoticeOpen = true;
+            const overlay = document.createElement('div'); overlay.style.cssText = `position:fixed;left:0;top:0;width:100%;height:100%;background:rgba(0,0,0,.45);z-index:9999;`;
+            const dialog = document.createElement('div'); dialog.style.cssText = `position:fixed;left:50%;top:50%;transform:translate(-50%,-50%);width:520px;background:var(--comfy-menu-bg);border:2px solid #4488ff;border-radius:8px;padding:16px;color:var(--input-text);z-index:10000;box-shadow:0 4px 20px rgba(0,0,0,0.3);`;
+            dialog.innerHTML = `
+                <h3 style="margin:0 0 10px 0;text-align:center;color:var(--input-text);">未选择提示词卡</h3>
+                <div style="font-size:13px;color:var(--descrip-text);margin-bottom:12px;">当前未点选任何提示词卡条目，请先在卡池中选择。</div>
+                <div style="display:flex;justify-content:center;gap:8px;align-items:center;">
+                    <button id="notice-ok" style="background:#4488ff;border:1px solid #4488ff;color:#ffffff;padding:4px 10px;border-radius:4px;cursor:pointer;font-size:12px;">知道了</button>
+                    <label style="display:flex;align-items:center;gap:6px;font-size:12px;color:var(--input-text);">
+                        <input id="notice-disable" type="checkbox" style="accent-color:#22c55e;">本日内不再提示
+                    </label>
+                </div>
+                <div style="text-align:center;margin-top:8px;font-size:12px;">此窗口将自动在 <span id="countdown-val" style="font-weight:600;color:#22c55e;">${(noSelNoticeDismissMs/1000)|0}</span> 秒后关闭</div>`;
+            document.body.appendChild(overlay); document.body.appendChild(dialog);
+            const close = () => { try { document.body.removeChild(dialog); document.body.removeChild(overlay); } catch(_){} noSelNoticeOpen = false; if (intervalId) { clearInterval(intervalId); intervalId = null; } };
+            dialog.querySelector('#notice-ok')?.addEventListener('click', close);
+            overlay.addEventListener('click', close);
+            const disableEl = dialog.querySelector('#notice-disable');
+            disableEl?.addEventListener('change', (e) => { if (e.target.checked) { try { window.localStorage.setItem(noSelNoticeKey, '1'); } catch(_){} } });
+            const countdownEl = dialog.querySelector('#countdown-val');
+            let remaining = noSelNoticeDismissMs;
+            const colorFor = (ms) => { const s = Math.ceil(ms/1000); if (s > 4) return '#22c55e'; if (s > 2) return '#f59e0b'; return '#ef4444'; };
+            let intervalId = setInterval(() => { remaining -= 1000; if (countdownEl){ countdownEl.textContent = String(Math.max(0, Math.ceil(remaining/1000))); countdownEl.style.color = colorFor(remaining); } if (remaining <= 0) close(); }, 1000);
+            setTimeout(close, noSelNoticeDismissMs);
+        } catch(_){}
+    };
+    confirmBtn.onclick = () => { saveSettingsNow(); if (selected.size === 0) { showNoSelectionNotice(); return; } alert('设定已保存'); };
+}
+
+function showPromptCardPoolManage(){
+    const container = dialog.content; container.innerHTML = '';
+    if (dialog.searchContainer){ try { dialog.searchContainer.remove(); } catch(_){} dialog.searchContainer = null; }
+    if (dialog.filesStatusBar){ try { dialog.filesStatusBar.remove(); } catch(_){} dialog.filesStatusBar = null; }
+    const form = document.createElement('div'); form.style.cssText = `display:flex;flex-direction:column;gap:8px;margin:6px 4px`;
+    const nameInput = document.createElement('input'); nameInput.type='text'; nameInput.placeholder='文件名'; nameInput.style.cssText = `background:#1f2937;color:#e5e7eb;border:1px solid #3b82f6;border-radius:6px;padding:6px 8px;width:260px;min-width:260px`;
+    const textarea = document.createElement('textarea'); textarea.placeholder='提示词卡内容'; textarea.style.cssText = `height:200px;background:#1f2937;color:#e5e7eb;border:1px solid #3b82f6;border-radius:6px;padding:8px;resize:none`;
+    const btnRow = document.createElement('div'); btnRow.style.cssText = `display:flex;gap:8px;align-items:center;flex-wrap:wrap`;
+    const saveBtn = document.createElement('button'); saveBtn.textContent = '保存'; applyStyles(saveBtn, { ...commonStyles.button.base, background:'linear-gradient(135deg,#059669 0%,#047857 100%)', borderColor:'rgba(16,185,129,0.7)', color:'#fff', height:'32px', padding:'4px 10px', fontSize:'13px' });
+    const delBtn = document.createElement('button'); delBtn.textContent = '删除'; applyStyles(delBtn, { ...commonStyles.button.base, ...commonStyles.button.danger, height:'32px', padding:'4px 10px', fontSize:'13px' });
+    const cancelBtn = document.createElement('button'); cancelBtn.textContent = '取消'; applyStyles(cancelBtn, { ...commonStyles.button.base, background:'linear-gradient(135deg,#334155 0%,#1f2937 100%)', borderColor:'rgba(100,116,139,0.8)', color:'#fff', height:'32px', padding:'4px 10px', fontSize:'13px' });
+    const categorySel = document.createElement('select'); categorySel.innerHTML = `<option value="SFW">SFW</option><option value="NSFW">NSFW</option>`; categorySel.style.cssText = `background:#1f2937;color:#e5e7eb;border:1px solid #3b82f6;border-radius:6px;padding:6px 8px;height:32px`;
+    const editTools = document.createElement('div'); editTools.style.cssText = `display:flex;gap:6px;align-items:center;flex-wrap:wrap;padding:4px 8px;height:32px;border:1px solid rgba(59,130,246,0.35);border-radius:8px;background:rgba(59,130,246,0.10)`;
+    const clearBtn = document.createElement('button'); clearBtn.textContent='清空'; applyStyles(clearBtn, { ...commonStyles.button.base, background:'linear-gradient(135deg,#64748b 0%,#475569 100%)', borderColor:'rgba(148,163,184,0.6)', color:'#fff', height:'22px', padding:'2px 6px', fontSize:'12px' });
+    const removeEmptyBtn = document.createElement('button'); removeEmptyBtn.textContent='去除空行'; applyStyles(removeEmptyBtn, { ...commonStyles.button.base, background:'linear-gradient(135deg,#64748b 0%,#475569 100%)', borderColor:'rgba(148,163,184,0.6)', color:'#fff', height:'22px', padding:'2px 6px', fontSize:'12px' });
+    const removeSpacesBtn = document.createElement('button'); removeSpacesBtn.textContent='去除空格'; applyStyles(removeSpacesBtn, { ...commonStyles.button.base, background:'linear-gradient(135deg,#64748b 0%,#475569 100%)', borderColor:'rgba(148,163,184,0.6)', color:'#fff', height:'22px', padding:'2px 6px', fontSize:'12px' });
+    const removeNewlinesBtn = document.createElement('button'); removeNewlinesBtn.textContent='去除换行'; applyStyles(removeNewlinesBtn, { ...commonStyles.button.base, background:'linear-gradient(135deg,#64748b 0%,#475569 100%)', borderColor:'rgba(148,163,184,0.6)', color:'#fff', height:'22px', padding:'2px 6px', fontSize:'12px' });
+    const trimEdgeSpacesBtn = document.createElement('button'); trimEdgeSpacesBtn.textContent='修剪首尾空格'; applyStyles(trimEdgeSpacesBtn, { ...commonStyles.button.base, background:'linear-gradient(135deg,#64748b 0%,#475569 100%)', borderColor:'rgba(148,163,184,0.6)', color:'#fff', height:'22px', padding:'2px 6px', fontSize:'12px' });
+    const addBlankLinesBtn = document.createElement('button'); addBlankLinesBtn.textContent='增加空行间隔'; applyStyles(addBlankLinesBtn, { ...commonStyles.button.base, background:'linear-gradient(135deg,#64748b 0%,#475569 100%)', borderColor:'rgba(148,163,184,0.6)', color:'#fff', height:'22px', padding:'2px 6px', fontSize:'12px' });
+    const removeLineNumbersBtn = document.createElement('button'); removeLineNumbersBtn.textContent='去除序号'; applyStyles(removeLineNumbersBtn, { ...commonStyles.button.base, background:'linear-gradient(135deg,#64748b 0%,#475569 100%)', borderColor:'rgba(148,163,184,0.6)', color:'#fff', height:'22px', padding:'2px 6px', fontSize:'12px' });
+    const removeLeadingPunctBtn = document.createElement('button'); removeLeadingPunctBtn.textContent='去除段首标点'; applyStyles(removeLeadingPunctBtn, { ...commonStyles.button.base, background:'linear-gradient(135deg,#64748b 0%,#475569 100%)', borderColor:'rgba(148,163,184,0.6)', color:'#fff', height:'22px', padding:'2px 6px', fontSize:'12px' });
+    const listFrame = document.createElement('div'); listFrame.style.cssText = `margin:25px 4px 0 4px;padding:0 12px 10px 12px;border:1px solid rgba(59,130,246,0.35);border-radius:8px;background:rgba(59,130,246,0.10)`;
+    const list = document.createElement('div'); list.style.cssText = `display:flex;flex-wrap:wrap;gap:4px;margin-top:0`;
+    const inputRow = document.createElement('div'); inputRow.style.cssText = `display:flex;gap:8px;align-items:center`;
+    inputRow.appendChild(categorySel); inputRow.appendChild(nameInput); form.appendChild(inputRow); form.appendChild(textarea);
+    btnRow.appendChild(saveBtn); btnRow.appendChild(cancelBtn); btnRow.appendChild(delBtn);
+    editTools.appendChild(clearBtn); editTools.appendChild(removeEmptyBtn); editTools.appendChild(removeSpacesBtn); editTools.appendChild(removeNewlinesBtn); editTools.appendChild(trimEdgeSpacesBtn); editTools.appendChild(addBlankLinesBtn); editTools.appendChild(removeLineNumbersBtn); editTools.appendChild(removeLeadingPunctBtn);
+    btnRow.appendChild(editTools); form.appendChild(btnRow); container.appendChild(form);
+
+    const ioTools = document.createElement('div'); ioTools.style.cssText = `display:flex;gap:10px;align-items:center;flex-wrap:wrap;margin-left:8px`;
+    const importBtn = document.createElement('button'); importBtn.textContent = '导入'; applyStyles(importBtn, { ...commonStyles.button.base, background:'linear-gradient(135deg,#6b7280 0%,#4b5563 100%)', borderColor:'rgba(107,114,128,0.7)', color:'#fff', height:'32px', padding:'4px 10px', fontSize:'13px' });
+    const exportBtn = document.createElement('button'); exportBtn.textContent = '导出'; applyStyles(exportBtn, { ...commonStyles.button.base, background:'linear-gradient(135deg,#6b7280 0%,#4b5563 100%)', borderColor:'rgba(107,114,128,0.7)', color:'#fff', height:'32px', padding:'4px 10px', fontSize:'13px' });
+    const importInput = document.createElement('input'); importInput.type = 'file'; importInput.accept = '.txt'; importInput.multiple = true; importInput.style.cssText = `display:none`;
+    importBtn.onclick = () => { importInput.click(); };
+    importInput.onchange = async () => {
+        const files = Array.from(importInput.files || []); if (!files.length) return;
+        const tasks = files.map(f => new Promise(resolve => { const reader = new FileReader(); reader.onload = () => resolve({ name: (f.name||'').replace(/\.txt$/i, ''), content: String(reader.result||'') }); reader.onerror = () => resolve({ name: (f.name||'').replace(/\.txt$/i, ''), content: '' }); reader.readAsText(f, 'utf-8'); }));
+        const ov = document.createElement('div');
+        ov.style.cssText = `position:fixed;left:0;top:0;width:100%;height:100%;background:rgba(0,0,0,.4);z-index:10020;display:flex;align-items:center;justify-content:center`;
+        const bx = document.createElement('div');
+        bx.style.cssText = `min-width:320px;max-width:420px;background:#0f172a;border:1px solid rgba(59,130,246,.6);border-radius:12px;box-shadow:0 10px 30px rgba(0,0,0,.4);padding:16px;color:#e5e7eb;display:flex;flex-direction:column;gap:10px`;
+        const title = document.createElement('div');
+        title.textContent = '选择分类';
+        title.style.cssText = `font-size:16px;font-weight:700;color:#93c5fd`;
+        const sel = document.createElement('select');
+        sel.innerHTML = `<option value="SFW">SFW</option><option value="NSFW">NSFW</option>`;
+        sel.value = (categorySel.value || 'SFW');
+        sel.style.cssText = `background:#1f2937;color:#e5e7eb;border:1px solid #3b82f6;border-radius:6px;padding:6px 8px;height:34px`;
+        const btns = document.createElement('div');
+        btns.style.cssText = `display:flex;gap:8px;justify-content:flex-end`;
+        const okBtn = document.createElement('button'); okBtn.textContent = '确定'; applyStyles(okBtn, { ...commonStyles.button.base, ...commonStyles.button.primary }); setupButtonHover(okBtn, commonStyles.button.primary, commonStyles.button.primaryHover);
+        const cancelBtn = document.createElement('button'); cancelBtn.textContent = '取消'; applyStyles(cancelBtn, { ...commonStyles.button.base, background:'linear-gradient(135deg,#334155 0%,#1f2937 100%)', borderColor:'rgba(100,116,139,0.8)', color:'#fff' });
+        btns.appendChild(cancelBtn); btns.appendChild(okBtn);
+        bx.appendChild(title); bx.appendChild(sel); bx.appendChild(btns); ov.appendChild(bx); document.body.appendChild(ov);
+        const proceed = async () => {
+            const group = (String(sel.value).toUpperCase() === 'NSFW') ? 'NSFW' : 'SFW';
+            const items = await Promise.all(tasks);
+            let successCount = 0;
+            for (const it of items) {
+                const finalName = `${group}/${it.name}`;
+                const ok = await savePromptCard(finalName, it.content, 'user', undefined);
+                if (ok) successCount++;
+            }
+            importInput.value = '';
+            try { document.body.removeChild(ov); } catch(_){}
+            refresh();
+            alert(`已导入 ${successCount}/${items.length} 个文件至 ${group}`);
+        };
+        okBtn.onclick = proceed;
+        cancelBtn.onclick = () => { importInput.value = ''; try { document.body.removeChild(ov); } catch(_){} };
+    };
+    exportBtn.onclick = () => {
+        const txt = String(textarea.value || '');
+        const nm = (nameInput.value || '').trim(); const filename = (nm ? nm : '导出条目') + '.txt';
+        const blob = new Blob([txt], { type: 'text/plain;charset=utf-8' }); const url = URL.createObjectURL(blob);
+        const a = document.createElement('a'); a.href = url; a.download = filename; document.body.appendChild(a); a.click(); setTimeout(() => { document.body.removeChild(a); URL.revokeObjectURL(url); }, 0);
+    };
+    ioTools.appendChild(importBtn); ioTools.appendChild(exportBtn); ioTools.appendChild(importInput);
+    btnRow.insertBefore(ioTools, editTools);
+    listFrame.appendChild(list); const listHeaderBar = document.createElement('div'); listHeaderBar.textContent='提示词卡池文件'; listHeaderBar.style.cssText = `width:100%;margin:10px 0 4px 0;padding:2px 0 0 0;color:#93c5fd;font-size:14px;font-weight:700;display:flex;align-items:center;gap:6px`;
+    const refreshBtn = document.createElement('button'); refreshBtn.textContent='刷新'; applyStyles(refreshBtn, { ...commonStyles.button.base, ...commonStyles.button.primary, height:'20px', padding:'0 6px', fontSize:'11px', display:'inline-flex', alignItems:'center', justifyContent:'center' }); setupButtonHover(refreshBtn, commonStyles.button.primary, commonStyles.button.primaryHover); refreshBtn.onclick = () => { refresh(); };
+    listHeaderBar.appendChild(refreshBtn);
+    listFrame.insertBefore(listHeaderBar, list); container.appendChild(listFrame);
+    let currentCardPath=null, currentCardSource=null, originalName='', originalContent='', originalPath=null, cancelStage=0;
+    const manageChipIndex = new Map(); let activeManageKey = null;
+    const refresh = async () => {
+        list.innerHTML = ''; const files = await fetchPromptCards(); const order = ['SFW','NSFW','根目录'];
+        const groups = {}; files.forEach(item => { const parts=(item.name||'').split('/'); const g = parts.length>1 ? parts[0] : '根目录'; (groups[g] = groups[g] || []).push(item); });
+        Object.keys(groups).sort((a,b)=>{ const ai=order.indexOf(a), bi=order.indexOf(b); if (ai!==-1 || bi!==-1) return (ai===-1?999:ai)-(bi===-1?999:bi); return a.localeCompare(b); }).forEach(groupName => {
+            const title = document.createElement('div'); title.textContent = groupName; title.style.cssText = `width:100%;margin:0 0 4px 0;color:#93c5fd;border-bottom:1px solid rgba(59,130,246,0.35);font-size:12px`; if (groupName==='NSFW'){ title.style.color='#f87171'; title.style.borderBottom='1px solid rgba(248,113,113,0.35)'; } else if (groupName==='SFW'){ title.style.color='#22c55e'; title.style.borderBottom='1px solid rgba(34,197,94,0.35)'; }
+            list.appendChild(title);
+            groups[groupName].sort((a,b)=> (a.name||'').localeCompare(b.name||'' )).forEach(item => {
+                const chip = document.createElement('span'); chip.style.cssText = `display:inline-flex;align-items:center;gap:4px;padding:3px 6px;background:#3a3a3a;color:#eee;border-radius:12px;cursor:pointer;border:1px solid #6aa1f3;font-size:12px`;
+                const prefix = document.createElement('span'); prefix.textContent = item.source === 'user' ? '用户' : '预置'; prefix.style.cssText = `display:inline-block;padding:0 6px;border-radius:10px;font-size:12px;font-weight:700;color:#fff;${item.source==='user' ? 'background:#22c55e;border:1px solid rgba(34,197,94,0.6);' : 'background:#2563eb;border:1px solid rgba(59,130,246,0.6);'}`;
+                const displayName = (item.name||'').split('/').pop().replace(/\.txt$/i, ''); const nameSpan = document.createElement('span'); nameSpan.textContent = displayName;
+                chip.appendChild(prefix); chip.appendChild(nameSpan);
+                const k = `${item.source}|${item.name}`; manageChipIndex.set(k, chip);
+                const markActive = (ch, act) => {
+                    if (!ch) return;
+                    if (act){
+                        ch.style.background = 'linear-gradient(135deg,#a855f7 0%,#9333ea 100%)';
+                        ch.style.color = '#fff';
+                        ch.style.border = '1px solid rgba(168,85,247,0.8)';
+                    } else {
+                        ch.style.background = '#3a3a3a';
+                        ch.style.color = '#eee';
+                        ch.style.border = '1px solid #6aa1f3';
+                    }
+                };
+                chip.onclick = async () => { nameInput.value = displayName; currentCardPath = item.name; currentCardSource = item.source; const content = await fetchPromptCardContent(item.name, item.source); textarea.value = content; originalName = displayName; originalContent = content; originalPath = item.name; const group = (item.name.split('/')[0] || '').toUpperCase(); if (group==='SFW' || group==='NSFW') categorySel.value = group; const prev = manageChipIndex.get(activeManageKey); markActive(prev, false); activeManageKey = k; markActive(chip, true); };
+                markActive(chip, k === activeManageKey);
+                list.appendChild(chip);
+            });
+        });
+    };
+    refresh();
+    const save = async () => {
+        const nm = (nameInput.value||'').trim(); const group = (categorySel.value||'SFW').toUpperCase(); let finalName = `${group}/${nm}`; if (!nm) return; let sourceToUse = currentCardSource || 'user'; let confirmText = undefined;
+        if (sourceToUse === 'system'){ const input = prompt('警告：你正在修改系统预置条目。请输入授权指令“我已知晓后果”以继续：',''); if (input !== '我已知晓后果') return; confirmText = input; }
+        const ok = await savePromptCard(finalName, textarea.value||'', sourceToUse, confirmText); if (ok) { refresh(); }
+        originalName = nm; originalContent = textarea.value||''; originalPath = finalName.endsWith('.txt') ? finalName : `${finalName}.txt`; currentCardPath = originalPath; currentCardSource = sourceToUse; cancelStage = 0;
+    };
+    const cancel = () => {
+        const nmNow = (nameInput.value||'').trim(); const isDirty = nmNow !== (originalName||'') || (textarea.value||'') !== (originalContent||'');
+        if (isDirty){ nameInput.value = originalName || ''; textarea.value = originalContent || ''; currentCardPath = originalPath; const group = (currentCardPath ? currentCardPath.split('/')[0] : categorySel.value) || 'SFW'; if (group==='SFW' || group==='NSFW') categorySel.value = group; cancelStage = 1; return; }
+        if (cancelStage === 1){ nameInput.value=''; textarea.value=''; currentCardPath=null; currentCardSource=null; originalName=''; originalContent=''; originalPath=null; cancelStage=0; return; }
+        nameInput.value=''; textarea.value=''; currentCardPath=null; currentCardSource=null; originalName=''; originalContent=''; originalPath=null; cancelStage=0;
+    };
+    const del = async () => {
+        const nm = (nameInput.value||'').trim(); const toDelete = currentCardPath || (nm ? nm + '.txt' : ''); if (!toDelete) return; let sourceToUse = currentCardSource || 'user'; const second = confirm('再次确认：删除后不可恢复，是否继续？'); if (!second) return; let confirmText = undefined; if (sourceToUse==='system'){ const input = prompt('警告：你正在删除系统自带条目。请输入授权指令“我已知晓后果”以继续：',''); if (input !== '我已知晓后果') return; confirmText = input; }
+        const ok = await deletePromptCard(toDelete, sourceToUse, confirmText); if (ok){ textarea.value=''; nameInput.value=''; refresh(); }
+    };
+    saveBtn.onclick = save; cancelBtn.onclick = cancel; delBtn.onclick = del;
+    clearBtn.onclick = () => { textarea.value = ''; };
+    removeEmptyBtn.onclick = () => { const lines = (textarea.value||'').split(/\r?\n/).filter(ln => ln.trim() !== ''); textarea.value = lines.join('\n'); };
+    removeSpacesBtn.onclick = () => { textarea.value = (textarea.value||'').replace(/[ \u3000]+/g, ''); };
+    removeNewlinesBtn.onclick = () => { textarea.value = (textarea.value||'').replace(/\r?\n/g, ''); };
+    trimEdgeSpacesBtn.onclick = () => { const lines = (textarea.value||'').split(/\r?\n/).map(ln => ln.replace(/^\s+|\s+$/g, '')); textarea.value = lines.join('\n').trim(); };
+    addBlankLinesBtn.onclick = () => { const t = (textarea.value||'').replace(/\r/g, ''); textarea.value = t.replace(/\n(?!\n)/g, '\n\n'); };
+    removeLineNumbersBtn.onclick = () => { const lines = (textarea.value||'').split(/\r?\n/); textarea.value = lines.map(s => s.replace(/^\s*\d+[\.\u3002、:：\)\]\-—]*\s*/, '').replace(/^\s*[（(]?\d+[）)]\s*/, '').replace(/^\s*[①②③④⑤⑥⑦⑧⑨⑩][\.\u3002、:：\)\]\-—]*\s*/, '').replace(/^\s*(?:[一二三四五六七八九十百千〇零]+)[\.\u3002、:：\)\]\-—]*\s*/, '').replace(/^\s*(?:[IVXLCM]+)[\.\u3002、:：\)\]\-—]*\s*/i, '')).join('\n'); };
+    removeLeadingPunctBtn.onclick = () => { const lines = (textarea.value||'').split(/\r?\n/); textarea.value = lines.map(ln => ln.replace(/^[\s\.,;:：，、。!！\?？\-—~·…]+/, '')).join('\n'); };
+}
