@@ -148,7 +148,7 @@ async function showPromptCardPoolFiles(){
     const tagsFrame = document.createElement('div'); tagsFrame.style.cssText = `margin:6px 4px;padding:0 12px 10px 12px;border:1px solid rgba(59,130,246,0.35);border-radius:8px;background:rgba(59,130,246,0.10)`; container.appendChild(tagsFrame);
     const tagsHeader = document.createElement('div'); tagsHeader.style.cssText = `width:100%;margin:12px 0 8px 0;padding:0;color:#93c5fd;font-size:16px;font-weight:800;display:flex;align-items:center;justify-content:space-between;gap:12px`; tagsFrame.appendChild(tagsHeader);
     const tagsHeaderLeft = document.createElement('div'); tagsHeaderLeft.style.cssText = `display:flex;align-items:center;gap:8px;flex:1`;
-    const tagsTitle = document.createElement('span'); tagsTitle.textContent='提示词卡';
+    const tagsTitle = document.createElement('span'); tagsTitle.textContent='提示词卡池';
     tagsHeaderLeft.appendChild(tagsTitle); tagsHeaderLeft.appendChild(countBadge); tagsHeader.appendChild(tagsHeaderLeft);
     const selectedTools = document.createElement('div'); selectedTools.style.cssText = `display:flex;align-items:center;gap:10px;flex-wrap:wrap;margin-left:14px`;
     selectedTools.appendChild(selAllBtn); selectedTools.appendChild(invertBtn); selectedTools.appendChild(clearBtn);
@@ -173,39 +173,41 @@ async function showPromptCardPoolFiles(){
     usageTips.innerHTML = `
     <div style=\"display:flex;align-items:center;gap:8px;margin-bottom:10px\">
         <span style=\"display:inline-flex;align-items:center;justify-content:center;width:22px;height:22px;border-radius:50%;background:#3b82f6;color:#0b1220;font-weight:800\">i</span>
-        <span style=\"color:#93c5fd;font-weight:800;font-size:14px\">提示词卡池设置使用说明</span>
+        <span style=\"color:#93c5fd;font-weight:800;font-size:14px\">提示词卡池设置指南</span>
     </div>
     <div style=\"display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:10px\">
         <div style=\"border:1px solid rgba(59,130,246,0.35);border-radius:10px;padding:10px;background:rgba(30,64,175,0.15)\">
-            <div style=\"color:#60a5fa;font-weight:700;margin-bottom:6px\">载入模式</div>
-            <div><span style=\"display:inline-block;padding:2px 8px;border-radius:10px;background:#22c55e;color:#082911;font-weight:700;margin-right:6px\">单卡池</span>仅可选择一个卡池；当为单卡池时，<span style=\"color:#fca5a5;font-weight:700\">卡池洗牌隐藏且不生效</span>。</div>
-            <div style=\"margin-top:6px\"><span style=\"display:inline-block;padding:2px 8px;border-radius:10px;background:#a855f7;color:#160433;font-weight:700;margin-right:6px\">多卡池</span>可选择多个卡池，并可配置卡池洗牌策略。</div>
+            <div style=\"color:#60a5fa;font-weight:700;margin-bottom:6px;font-size:13px\">卡池载入模式</div>
+            <div><span style=\"display:inline-block;padding:2px 8px;border-radius:10px;background:#22c55e;color:#082911;font-weight:700;margin-right:6px\">单卡池</span>仅可选择一个卡池；当为单卡池时，<span style=\"color:#fca5a5;font-weight:700\">卡池洗牌逻辑隐藏且不生效</span>。</div>
+            <div style=\"margin-top:6px\"><span style=\"display:inline-block;padding:2px 8px;border-radius:10px;background:#f59e0b;color:#1f1203;font-weight:700;margin-right:6px\">多卡池</span>可选择多个卡池，并可配置卡池洗牌逻辑。</div>
+            <div style=\"margin-top:6px;color:#e5e7eb;font-size:12px\">⚠️单卡池模式下每次仅能选中一个卡条目，<b>全选/反选</b>不可用；点击新卡条目会清空其他选择。</div>
         </div>
         <div style=\"border:1px solid rgba(147,51,234,0.35);border-radius:10px;padding:10px;background:rgba(88,28,135,0.18)\">
-            <div style=\"color:#c084fc;font-weight:700;margin-bottom:6px\">卡池洗牌</div>
-            <div>仅在多卡池显示。</div>
-            <div style=\"margin-top:6px\"><span style=\"display:inline-block;padding:2px 8px;border-radius:10px;background:#3b82f6;color:#0b1220;font-weight:700;margin-right:6px\">随机轮换</span>按随机顺序合并卡池条目。</div>
-            <div style=\"margin-top:6px\"><span style=\"display:inline-block;padding:2px 8px;border-radius:10px;background:#f59e0b;color:#1f1203;font-weight:700;margin-right:6px\">顺序轮换</span>保持固定顺序合并卡池条目。</div>
+            <div style=\"color:#c084fc;font-weight:700;margin-bottom:6px;font-size:13px\">卡池洗牌逻辑</div>
+            <div style=\"margin-top:6px\"><span style=\"display:inline-block;padding:2px 8px;border-radius:10px;background:#22c55e;color:#082911;font-weight:700;margin-right:6px\">随机轮换</span>从已经点选的多个卡池文件中按随机顺序切换文件读取。</div>
+            <div style=\"margin-top:6px\"><span style=\"display:inline-block;padding:2px 8px;border-radius:10px;background:#f59e0b;color:#1f1203;font-weight:700;margin-right:6px\">顺序轮换</span>从已经点选的多个卡池文件中保持固定顺序切换文件读取。</div>
+            <div style=\"margin-top:6px;color:#e5e7eb;font-size:12px\">⚠️仅在多卡池模式下显示。</div>
         </div>
         <div style=\"border:1px solid rgba(34,197,94,0.35);border-radius:10px;padding:10px;background:rgba(20,83,45,0.18)\">
-            <div style=\"color:#86efac;font-weight:700;margin-bottom:6px\">抽取模式</div>
-            <div><span style=\"display:inline-block;padding:2px 8px;border-radius:10px;background:#22c55e;color:#082911;font-weight:700;margin-right:6px\">随机抽取</span>从合并后的段落集合随机抽取。</div>
-            <div style=\"margin-top:6px\"><span style=\"display:inline-block;padding:2px 8px;border-radius:10px;background:#f59e0b;color:#1f1203;font-weight:700;margin-right:6px\">顺序抽取</span>按轮转索引顺序抽取，跨次运行可延续。</div>
+            <div style=\"color:#86efac;font-weight:700;margin-bottom:6px;font-size:13px\">提示词抽取方式</div>
+            <div><span style=\"display:inline-block;padding:2px 8px;border-radius:10px;background:#22c55e;color:#082911;font-weight:700;margin-right:6px\">随机抽取</span>从卡池文件的内容中随机抽取预定段落的提示词。</div>
+            <div style=\"margin-top:6px\"><span style=\"display:inline-block;padding:2px 8px;border-radius:10px;background:#f59e0b;color:#1f1203;font-weight:700;margin-right:6px\">顺序抽取</span>从卡池文件的内容中按文本段落顺序抽取。</div>
         </div>
         <div style=\"border:1px solid rgba(234,179,8,0.35);border-radius:10px;padding:10px;background:rgba(66,32,6,0.18)\">
-            <div style=\"color:#fbbf24;font-weight:700;margin-bottom:6px\">分隔依据</div>
-            <div><span style=\"display:inline-block;padding:2px 8px;border-radius:10px;background:#fbbf24;color:#1d1402;font-weight:700;margin-right:6px\">空白行</span>适合按段落组织的卡内容。</div>
-            <div style=\"margin-top:6px\"><span style=\"display:inline-block;padding:2px 8px;border-radius:10px;background:#fde047;color:#1d1402;font-weight:700;margin-right:6px\">换行符</span>适合按行组织的卡内容。</div>
+            <div style=\"color:#fbbf24;font-weight:700;margin-bottom:6px;font-size:13px\">分段识别依据</div>
+            <div><span style=\"display:inline-block;padding:2px 8px;border-radius:10px;background:#22c55e;color:#082911;font-weight:700;margin-right:6px\">空白行</span>适合按段落组织的卡池内容。</div>
+            <div style=\"margin-top:6px\"><span style=\"display:inline-block;padding:2px 8px;border-radius:10px;background:#f59e0b;color:#1f1203;font-weight:700;margin-right:6px\">换行符</span>适合按行组织的卡池内容。</div>
+            <div style=\"margin-top:6px\"><span style=\"display:inline-block;padding:2px 8px;border-radius:10px;background:#a855f7;color:#160433;font-weight:700;margin-right:6px\">自动</span>自动识别，检测到空白行则按段落，否则按行，适合混合格式的卡池内容。</div>
         </div>
         
     </div>
     <div style=\"margin-top:12px;border-top:1px dashed rgba(59,130,246,0.35);padding-top:10px\">
         <div style=\"color:#93c5fd;font-weight:700;margin-bottom:6px\">使用流程示例</div>
         <div style=\"display:flex;flex-wrap:wrap;gap:8px\">
-            <span style=\"display:inline-flex;align-items:center;gap:6px;padding:6px 10px;border-radius:10px;background:rgba(34,197,94,0.12);border:1px solid rgba(34,197,94,0.35)\"><b style=\"background:#22c55e;color:#082911;border-radius:50%;width:18px;height:18px;display:inline-flex;align-items:center;justify-content:center\">1</b> 选择载入模式，必要时设置卡池洗牌</span>
-            <span style=\"display:inline-flex;align-items:center;gap:6px;padding:6px 10px;border-radius:10px;background:rgba(245,158,11,0.12);border:1px solid rgba(245,158,11,0.35)\"><b style=\"background:#f59e0b;color:#1f1203;border-radius:50%;width:18px;height:18px;display:inline-flex;align-items:center;justify-content:center\">2</b> 选择抽取模式与分隔依据</span>
-            <span style=\"display:inline-flex;align-items:center;gap:6px;padding:6px 10px;border-radius:10px;background:rgba(59,130,246,0.12);border:1px solid rgba(59,130,246,0.35)\"><b style=\"background:#3b82f6;color:#0b1220;border-radius:50%;width:18px;height:18px;display:inline-flex;align-items:center;justify-content:center\">3</b> 搜索并选择卡条目</span>
-            <span style=\"display:inline-flex;align-items:center;gap:6px;padding:6px 10px;border-radius:10px;background:rgba(99,102,241,0.12);border:1px solid rgba(99,102,241,0.35)\"><b style=\"background:#818cf8;color:#0b1220;border-radius:50%;width:18px;height:18px;display:inline-flex;align-items:center;justify-content:center\">4</b> 点击“抽取并输出到节点”</span>
+            <span style=\"display:inline-flex;align-items:center;gap:6px;padding:6px 10px;border-radius:10px;background:rgba(34,197,94,0.12);border:1px solid rgba(34,197,94,0.35)\"><b style=\"background:#22c55e;color:#082911;border-radius:50%;width:18px;height:18px;display:inline-flex;align-items:center;justify-content:center\">1</b> 选择卡池载入模式，必要时设置卡池洗牌逻辑</span>
+            <span style=\"display:inline-flex;align-items:center;gap:6px;padding:6px 10px;border-radius:10px;background:rgba(245,158,11,0.12);border:1px solid rgba(245,158,11,0.35)\"><b style=\"background:#f59e0b;color:#1f1203;border-radius:50%;width:18px;height:18px;display:inline-flex;align-items:center;justify-content:center\">2</b> 选择提示词抽取方式与分段识别依据</span>
+            <span style=\"display:inline-flex;align-items:center;gap:6px;padding:6px 10px;border-radius:10px;background:rgba(59,130,246,0.12);border:1px solid rgba(59,130,246,0.35)\"><b style=\"background:#3b82f6;color:#0b1220;border-radius:50%;width:18px;height:18px;display:inline-flex;align-items:center;justify-content:center\">3</b> 搜索并选择卡条目（悬停可预览内容）</span>
+            <span style=\"display:inline-flex;align-items:center;gap:6px;padding:6px 10px;border-radius:10px;background:rgba(99,102,241,0.12);border:1px solid rgba(99,102,241,0.35)\"><b style=\"background:#818cf8;color:#0b1220;border-radius:50%;width:18px;height:18px;display:inline-flex;align-items:center;justify-content:center\">4</b> 点击“确认设定”，在运行节点时按设定抽取并输出</span>
         </div>
     </div>
     
