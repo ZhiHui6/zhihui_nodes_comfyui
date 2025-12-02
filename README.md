@@ -747,10 +747,6 @@
 <th>功能描述</th>
 </tr>
 <tr>
-<th width="30%">节点名称</th>
-<th>功能描述</th>
-</tr>
-<tr>
 <td><b>🏷️TAG标签选择器</b><br><code>TagSelector</code></td>
 <td>
 

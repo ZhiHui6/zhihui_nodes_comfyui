@@ -748,10 +748,6 @@ A tool node that provides interactive segmentation preset selection, allowing se
 <th>Function Description</th>
 </tr>
 <tr>
-<th width="30%">Node Name</th>
-<th>Function Description</th>
-</tr>
-<tr>
 <td><b>🏷️TAG Tag Selector</b><br><code>TagSelector</code></td>
 <td>
 
