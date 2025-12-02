@@ -10,7 +10,8 @@ from .Nodes.TextCombinerNode import TextCombinerNode
 from .Nodes.TextModifier import TextModifier
 from .Nodes.TextExtractor import TextExtractor
 from .Nodes.TriggerWordMerger import TriggerWordMerger
-from .Nodes.TextSwitchDualMode import TextSwitchDualMode
+from .Nodes.TextSwitch.TextSwitchDualMode import TextSwitchDualMode
+from .Nodes.TextSwitch.PriorityTextSwitch import PriorityTextSwitch
 from .Nodes.ShowText import ShowText
 from .Nodes.TranslateNodes.BaiduTranslate import BaiduTranslate
 from .Nodes.TranslateNodes.FreeTranslate import FreeTranslate
@@ -50,7 +51,6 @@ from .Nodes.Sa2VA.Sa2VAAdvanced import Sa2VAAdvanced
 from .Nodes.Sa2VA.Sa2VASegmentationPreset import Sa2VASegmentationPreset
 from .Nodes.Batch_loading_of_images import BatchLoadingOfImages
 
-
 import os
 
 NODE_CLASS_MAPPINGS = {
@@ -67,6 +67,7 @@ NODE_CLASS_MAPPINGS = {
     "TextExtractor": TextExtractor,
     "TriggerWordMerger": TriggerWordMerger,
     "TextSwitchDualMode": TextSwitchDualMode,
+    "PriorityTextSwitch": PriorityTextSwitch,
     "ShowText": ShowText,
     "BaiduTranslate": BaiduTranslate,
     "FreeTranslate": FreeTranslate,
@@ -121,6 +122,7 @@ NODE_DISPLAY_NAME_MAPPINGS = {
     "TextExtractor": "Text Extractor",
     "TriggerWordMerger": "Trigger Word Merger",
     "TextSwitchDualMode": "Text Switch Dual Mode",
+    "PriorityTextSwitch": "Priority Text Switch",
     "ShowText": "Show Text",
     "BaiduTranslate": "Baidu Translate",
     "FreeTranslate": "Free Translate",

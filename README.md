@@ -2,8 +2,8 @@
 [![GitHub](https://img.shields.io/badge/GitHub-zhihui--nodes--comfyui-blue?style=for-the-badge&logo=github)](https://github.com/ZhiHui6/zhihui_nodes_comfyui) [![License](https://img.shields.io/badge/License-MIT-green?style=for-the-badge)](LICENSE) [![ComfyUI](https://img.shields.io/badge/ComfyUI-Compatible-orange?style=for-the-badge)](https://github.com/comfyanonymous/ComfyUI)
 ---
 
-最新版本：`v0.8.8`（2025-12-1），完整更新日志：查看<a href="CHANGELOG.md">`CHANGELOG.md`</a><br>
-Latest version: `v0.8.8` (2025-12-1), full update log: view <a href="CHANGELOG.md">`CHANGELOG.md`</a>
+最新版本：`v0.8.9`（2025-12-2），完整更新日志：查看<a href="CHANGELOG.md">`CHANGELOG.md`</a><br>
+Latest version: `v0.8.9` (2025-12-2), full update log: view <a href="CHANGELOG.md">`CHANGELOG.md`</a>
 
 ## 📖 项目介绍 | Project Introduction
 
@@ -103,6 +103,17 @@ This node collection contains numerous nodes with different functions, divided i
 </div></td>
 </tr>
 <tr>
+<td><b>优先级文本切换</b><br><b>Priority Text Switch</b><br><code>PriorityTextSwitch</code></td>
+<td>优先级文本切换节点：当同时接入文本A和文本B端口时，优先输出B端口；如果B端口为空或未连接，则输出文本A端口；如果两个端口都为空，则返回空字符串。<br>Priority text switching node. When both text A and text B ports are connected, it prioritizes output from port B; if port B has no input, it outputs from text A port; if both ports have no input, it returns an empty string.
+
+<b>特点 | Features</b>：
+- <b>优先级控制</b>：文本B端口优先级高于文本A端口<br>
+<b>Priority Control:</b> Text B port has higher priority than text A port
+- <b>智能切换</b>：自动检测输入状态，空值时回退到A或输出空文本<br>
+<b>Smart Switching:</b> Automatically detects input state; falls back to A or returns empty text
+
+</td>
+</tr>
 <td><b>提示词合并器(可注释)</b><br><b>Prompt Combiner (with annotations)</b><br><code>TextCombinerNode</code></td>
 <td>合并两个文本输入，并可通过独立的开关控制每个文本的输出，并带注释功能。可用于动态组合不同的提示词部分，灵活构建完整提示。<br>Combines two text inputs and can control the output of each text through independent switches, with annotation functionality. Can be used to dynamically combine different prompt parts and flexibly build complete prompts.
 

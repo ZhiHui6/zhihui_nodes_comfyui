@@ -181,6 +181,21 @@
             "output_image": "输出图像"
         }
     },
+    "PriorityTextSwitch": {
+        "title": "优先级文本切换器",
+        "description": "优先级文本切换器：当文本A和文本B端口都连接时，优先输出B端口；如果B端口无输入，则输出文本A端口；如果两个端口都无输入，则输出空文本。",
+        "inputs": {
+            "textA": "文本A",
+            "textB": "文本B"
+        },
+        "widgets": {
+            "textA_note": "文本A备注",
+            "textB_note": "文本B备注"
+        },
+        "outputs": {
+            "output_text": "输出文本"
+        }
+    },
     "LatentSwitchDualMode": {
         "title": "潜在空间切换器",
         "description": "动态潜在空间切换器：支持可变数量的潜变量输入。提供手动模式（按索引选择）与自动模式（仅当唯一非空输入时输出；检测到多个非空将报错）。通过滑块 inputcount 控制端口数量，并通过按钮 Update inputs 根据设定值同步增删端口。select_channel 选项与 Latent_N_comment 注释与 inputcount 同步变化，新增的潜变量输入端口均为非必连。",

@@ -17,14 +17,51 @@ app.registerExtension({
             this._unconnectedNoticeDisabled = !!window.localStorage.getItem(this._noticeStorageKey);
             this._noticeOpen = false;
             this._noticeDismissMs = 12000;
+
+            this._noteStorageKey = () => {
+                try { return `zh_imageswitch_notes_${this.id || 'unknown'}`; } catch(_) { return 'zh_imageswitch_notes_unknown'; }
+            };
+
+            this.saveNoteValues = function () {
+                try {
+                    const inputcountW = this.widgets?.find(w => w.name === "inputcount");
+                    const target = Math.max(1, parseInt(inputcountW?.value) || 1);
+                    const notes = [];
+                    for (let i = 1; i <= target; i++) {
+                        const w = this.widgets?.find(w => w.name === `image${i}_note`);
+                        notes.push(w ? (w.value ?? "") : "");
+                    }
+                    this.properties.zh_imageswitch = { count: target, notes };
+                    try { window.localStorage.setItem(this._noteStorageKey(), JSON.stringify({ count: target, notes })); } catch(_){}
+                } catch(_){}
+            };
+
+            this.restoreNoteValues = function () {
+                try {
+                    let saved = null;
+                    try { const raw = window.localStorage.getItem(this._noteStorageKey()); if (raw) saved = JSON.parse(raw); } catch(_){}
+                    if (!saved) saved = this.properties?.zh_imageswitch;
+                    if (!saved || !Array.isArray(saved.notes)) return;
+                    const target = Math.max(1, parseInt(saved.count) || saved.notes.length || 1);
+                    for (let i = 1; i <= target; i++) {
+                        const w = this.widgets?.find(w => w.name === `image${i}_note`);
+                        if (w && saved.notes[i - 1] !== undefined) w.value = saved.notes[i - 1];
+                    }
+                } catch(_){}
+            };
             const inputcountWidget = this.widgets?.find(w => w.name === "inputcount");
             if (inputcountWidget) {
+                const saved = this.properties?.zh_imageswitch;
+                if (saved && typeof saved.count !== "undefined") {
+                    inputcountWidget.value = String(saved.count);
+                }
                 const originalCallback = inputcountWidget.callback;
                 inputcountWidget.callback = (value) => {
                     if (originalCallback) originalCallback.call(this, value);
                     this.updateInputs(value);
                     this.updateSelectOptions(value);
                     this.syncCommentWidgets(value);
+                    this.saveNoteValues();
                 };
             }
 
@@ -33,6 +70,7 @@ app.registerExtension({
                 this.updateInputs(n);
                 this.updateSelectOptions(n);
                 this.syncCommentWidgets(n);
+                this.saveNoteValues();
             });
 
             this.updateInputs = function (n) {
@@ -119,6 +157,10 @@ app.registerExtension({
                     if (!w) {
                         w = this.addWidget("text", name, "");
                         if (w) w.serialize = true;
+                        if (w) {
+                            const orig = w.callback;
+                            w.callback = (val) => { if (orig) orig.call(this, val); this.saveNoteValues(); };
+                        }
                     }
                 }
                 const posAfterInput = (this.widgets?.findIndex(w => w.name === "inputcount") ?? -1) + 1;
@@ -133,6 +175,7 @@ app.registerExtension({
                     const tail = others.slice(posAfterInput);
                     this.widgets.push(...head, ...notes, ...tail);
                 }
+                this.restoreNoteValues();
                 this.size = this.computeSize(this.size);
                 app.graph.setDirtyCanvas(true, true);
             };
@@ -142,6 +185,7 @@ app.registerExtension({
                 this.updateInputs(v);
                 this.updateSelectOptions(v);
                 this.syncCommentWidgets(v);
+                this.restoreNoteValues();
             }
 
             this.showUnconnectedNotice = function(names, label) {
@@ -211,6 +255,39 @@ app.registerExtension({
                 };
                 this.repositionSelectImage(modeWidget.value);
             }
+
+            const configure = nodeType.prototype.configure;
+            nodeType.prototype.configure = function () {
+                const r2 = configure ? configure.apply(this, arguments) : undefined;
+                this.properties = this.properties || {};
+                return r2;
+            };
+
+            const onConfigure = nodeType.prototype.onConfigure;
+            nodeType.prototype.onConfigure = function () {
+                const r3 = onConfigure ? onConfigure.apply(this, arguments) : undefined;
+                try {
+                    let saved = null;
+                    try { const raw = window.localStorage.getItem(this._noteStorageKey()); if (raw) saved = JSON.parse(raw); } catch(_){}
+                    if (!saved) saved = this.properties?.zh_imageswitch;
+                    if (saved && typeof saved.count !== "undefined") {
+                        const inputcountWidget = this.widgets?.find(w => w.name === "inputcount");
+                        if (inputcountWidget) inputcountWidget.value = String(saved.count);
+                        const n = parseInt(saved.count) || 1;
+                        this.updateInputs(n);
+                        this.updateSelectOptions(n);
+                        this.syncCommentWidgets(n);
+                        this.restoreNoteValues();
+                    }
+                } catch(_){}
+                return r3;
+            };
+
+            const onSerialize = nodeType.prototype.onSerialize;
+            nodeType.prototype.onSerialize = function (o) {
+                try { this.saveNoteValues(); } catch(_){}
+                return onSerialize ? onSerialize.apply(this, arguments) : undefined;
+            };
 
             return r;
         };

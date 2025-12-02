@@ -2,6 +2,19 @@
   "mode": "random",
   "split_rule": "auto",
   "load_mode": "multi",
-  "pool_shuffle": "sequential",
-  "selected": []
+  "pool_shuffle": "random",
+  "selected": [
+    {
+      "name": "SFW/冬服美女.txt",
+      "source": "system"
+    },
+    {
+      "name": "SFW/高领毛衣.txt",
+      "source": "system"
+    },
+    {
+      "name": "SFW/清宫多人.txt",
+      "source": "system"
+    }
+  ]
 }
