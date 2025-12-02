@@ -102,6 +102,12 @@ This node collection includes many nodes with different functions, divided into 
 - <b>Priority Control</b>：Text B port has higher priority than text A port
 - <b>Intelligent Switching</b>：Automatically detects input status, fallback to A or output empty text when empty value
 
+<br>
+<div align="left">
+<a href="images/Priority Text Switch.jpg" target="_blank">
+<img src="images/Priority Text Switch.jpg" alt="Priority Text Switch" width="45%"/>
+</a>
+</div>
 </td>
 </tr>
 <td><b>Text Combiner (With Comments)</b><br><code>TextCombinerNode</code></td>

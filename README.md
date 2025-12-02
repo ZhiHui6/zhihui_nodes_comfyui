@@ -101,6 +101,12 @@
 - <b>优先级控制</b>：文本B端口优先级高于文本A端口
 - <b>智能切换</b>：自动检测输入状态，空值时回退到A或输出空文本
 
+<br>
+<div align="left">
+<a href="images/Priority Text Switch.jpg" target="_blank">
+<img src="images/Priority Text Switch.jpg" alt="优先级文本切换" width="45%"/>
+</a>
+</div>
 </td>
 </tr>
 <td><b>提示词合并器(可注释)</b><br><code>TextCombinerNode</code></td>
