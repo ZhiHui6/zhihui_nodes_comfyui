@@ -36,12 +36,191 @@ app.registerExtension({
     }
 });
 
-let dialog = null; let currentNode = null;
+let dialog = null; let currentNode = null; let keyboardBlockHandler = null;
+
+function disableMainUIInteraction() {
+    let modalOverlay = document.getElementById('card-pool-modal-overlay');
+    if (!modalOverlay) {
+        modalOverlay = document.createElement('div');
+        modalOverlay.id = 'card-pool-modal-overlay';
+        modalOverlay.style.cssText = `
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100vw;
+            height: 100vh;
+            background: rgba(0, 0, 0, 0.3);
+            z-index: 9998;
+            pointer-events: all;
+            backdrop-filter: blur(2px);
+            -webkit-backdrop-filter: blur(2px);
+            transition: opacity 0.2s ease-in-out;
+        `;
+        
+        modalOverlay.addEventListener('click', function(e) {
+            if (e.target === modalOverlay) {
+                closeDialog();
+            }
+        });
+        
+        document.body.appendChild(modalOverlay);
+    }
+    
+    modalOverlay.style.opacity = '0';
+    modalOverlay.style.display = 'block';
+    setTimeout(() => {
+        modalOverlay.style.opacity = '1';
+    }, 10);
+    
+    const interactiveElements = document.querySelectorAll(
+        'button:not([id*="card-pool"]):not([data-card-pool-ignore]), input:not([id*="card-pool"]):not([data-card-pool-ignore]), select:not([id*="card-pool"]):not([data-card-pool-ignore]), textarea:not([id*="card-pool"]):not([data-card-pool-ignore]), a[href]:not([id*="card-pool"]):not([data-card-pool-ignore]), [onclick]:not([id*="card-pool"]):not([data-card-pool-ignore]), [contenteditable="true"]:not([id*="card-pool"]):not([data-card-pool-ignore])'
+    );
+    
+    interactiveElements.forEach(element => {
+        if (!dialog || !dialog.contains(element)) {
+            element.dataset.originalTabIndex = element.tabIndex;
+            element.dataset.originalPointerEvents = element.style.pointerEvents;
+            element.dataset.originalUserSelect = element.style.userSelect;
+            
+            element.tabIndex = -1;
+            element.style.pointerEvents = 'none';
+            element.style.userSelect = 'none';
+            
+            if (element.tagName === 'BUTTON' || element.tagName === 'INPUT' || element.tagName === 'SELECT' || element.tagName === 'TEXTAREA') {
+                element.dataset.originalDisabled = element.disabled;
+                element.disabled = true;
+            }
+            
+            element.dataset.cardPoolDisabled = 'true';
+        }
+    });
+    
+    if (!keyboardBlockHandler) {
+        keyboardBlockHandler = function(e) {
+            const target = e.target;
+            const isTextInput = target && (
+                target.tagName === 'INPUT' ||
+                target.tagName === 'TEXTAREA' ||
+                target.contentEditable === 'true'
+            );
+            
+            if (isTextInput && (e.ctrlKey || e.metaKey)) {
+                const allowedKeys = ['c', 'v', 'x', 'a', 'z']; // Copy, Paste, Cut, Select All, Undo
+                if (allowedKeys.includes(e.key.toLowerCase())) {
+                    return true;
+                }
+            }
+            
+            if (e.ctrlKey || e.metaKey) {
+                const blockedKeys = ['s', 'o', 'n', 'r', 'y'];
+                if (blockedKeys.includes(e.key.toLowerCase())) {
+                    e.preventDefault();
+                    e.stopPropagation();
+                    return false;
+                }
+            }
+            
+            if (e.key === 'Escape') {
+                e.preventDefault();
+                e.stopPropagation();
+                return false;
+            }
+            
+            if (e.key === 'F5') {
+                e.preventDefault();
+                e.stopPropagation();
+                return false;
+            }
+        };
+        
+        document.addEventListener('keydown', keyboardBlockHandler, true);
+    }
+}
+
+function enableMainUIInteraction() {
+    const modalOverlay = document.getElementById('card-pool-modal-overlay');
+    if (modalOverlay) {
+        modalOverlay.style.opacity = '0';
+        setTimeout(() => {
+            modalOverlay.style.display = 'none';
+        }, 200);
+    }
+    
+    const interactiveElements = document.querySelectorAll('[data-card-pool-disabled="true"]');
+    
+    interactiveElements.forEach(element => {
+        if (element.dataset.originalTabIndex !== undefined) {
+            element.tabIndex = element.dataset.originalTabIndex;
+            delete element.dataset.originalTabIndex;
+        }
+        
+        if (element.dataset.originalPointerEvents !== undefined) {
+            element.style.pointerEvents = element.dataset.originalPointerEvents;
+            delete element.dataset.originalPointerEvents;
+        }
+        
+        if (element.dataset.originalUserSelect !== undefined) {
+            element.style.userSelect = element.dataset.originalUserSelect;
+            delete element.dataset.originalUserSelect;
+        }
+        
+        if (element.dataset.originalDisabled !== undefined) {
+            element.disabled = element.dataset.originalDisabled === 'true';
+            delete element.dataset.originalDisabled;
+        }
+        
+        delete element.dataset.cardPoolDisabled;
+    });
+    
+    if (keyboardBlockHandler) {
+        document.removeEventListener('keydown', keyboardBlockHandler, true);
+        keyboardBlockHandler = null;
+    }
+}
+
+function cleanupCardPoolModal() {
+    const modalOverlay = document.getElementById('card-pool-modal-overlay');
+    if (modalOverlay) {
+        modalOverlay.remove();
+    }
+    
+    const disabledElements = document.querySelectorAll('[data-card-pool-disabled="true"]');
+    disabledElements.forEach(element => {
+
+        if (element.dataset.originalTabIndex !== undefined) {
+            element.tabIndex = element.dataset.originalTabIndex;
+        }
+        if (element.dataset.originalPointerEvents !== undefined) {
+            element.style.pointerEvents = element.dataset.originalPointerEvents;
+        }
+        if (element.dataset.originalUserSelect !== undefined) {
+            element.style.userSelect = element.dataset.originalUserSelect;
+        }
+        if (element.dataset.originalDisabled !== undefined) {
+            element.disabled = element.dataset.originalDisabled === 'true';
+        }
+        
+        delete element.dataset.originalTabIndex;
+        delete element.dataset.originalPointerEvents;
+        delete element.dataset.originalUserSelect;
+        delete element.dataset.originalDisabled;
+        delete element.dataset.cardPoolDisabled;
+    });
+    
+    if (keyboardBlockHandler) {
+        document.removeEventListener('keydown', keyboardBlockHandler, true);
+        keyboardBlockHandler = null;
+    }
+}
+
+window.addEventListener('beforeunload', cleanupCardPoolModal);
+window.addEventListener('pagehide', cleanupCardPoolModal);
 
 async function openPromptCardPool(node){
     currentNode = node;
     if (!dialog) createDialog();
     dialog.style.display = 'block';
+    disableMainUIInteraction();
 }
 
 function createDialog(){
@@ -55,7 +234,11 @@ function createDialog(){
     const closeBtn = document.createElement('button'); closeBtn.textContent = '×';
     applyStyles(closeBtn, { ...commonStyles.button.base, ...commonStyles.button.danger, padding:'0', width:'22px', height:'22px', fontSize:'18px', fontWeight:'700', lineHeight:'22px', margin:'4px 8px 4px 0' });
     setupButtonHover(closeBtn, commonStyles.button.danger, commonStyles.button.dangerHover);
-    closeBtn.onclick = () => { overlay.style.display = 'none'; };
+    closeBtn.onclick = () => { overlay.style.display = 'none'; enableMainUIInteraction(); cleanupCardPoolModal(); };
+    
+    overlay.onclick = (e) => {
+        e.stopPropagation();
+    };
     const tabs = document.createElement('div'); tabs.style.cssText = `display:flex;gap:6px;margin:8px 12px`;
     const tabFiles = document.createElement('button'); tabFiles.textContent = '提示词卡池设置';
     const tabManage = document.createElement('button'); tabManage.textContent = '提示词卡池编辑';
@@ -95,13 +278,24 @@ function createDialog(){
 }
 
 async function fetchPromptCards(){ try { const res = await fetch('/zhihui/prompt_cards'); const data = await res.json(); return Array.isArray(data.files) ? data.files : []; } catch(e){ return []; } }
-async function fetchPromptCardContent(name, source){ try { const src = source || 'system'; const res = await fetch(`/zhihui/prompt_card?name=${encodeURIComponent(name)}&source=${encodeURIComponent(src)}`); const data = await res.json(); return data.content || ''; } catch(e){ return ''; } }
+async function fetchPromptCardContent(name, source){ try { const src = source || 'system'; const res = await fetch(`/zhihui/prompt_card?name=${encodeURIComponent(name)}&source=${encodeURIComponent(src)}`); const data = await res.json(); let content = data.content || '';
+
+content = content.replace(/^\s*\/\/.*$/gm, '');
+    
+    content = content.replace(/^\s*\{\{提供者:\s*[^}]+\}\}\s*$/gm, '');
+    content = content.replace(/^\s*\{\{版本:\s*[^}]+\}\}\s*$/gm, '');
+    content = content.replace(/^\s*\/\/\s*提供者:\s*[^}]+$/gm, '');
+    content = content.replace(/^\s*\/\/\s*版本号:\s*[^}]+$/gm, '');
+    content = content.replace(/^\s*\/\/\s*版本:\s*[^}]+$/gm, '');
+    content = content.replace(/^\s*提供者:\s*[^}]+$/gm, '');
+    content = content.replace(/^\s*版本:\s*[^}]+$/gm, '');
+    
+    return content.trim(); } catch(e){ return ''; } }
 async function savePromptCard(name, content, source, confirm){ const res = await fetch('/zhihui/prompt_cards', { method:'POST', headers:{'Content-Type':'application/json'}, body:JSON.stringify({ name, content, source: source||'user', confirm }) }); return res.ok; }
 async function deletePromptCard(name, source, confirm){ const res = await fetch('/zhihui/prompt_cards', { method:'DELETE', headers:{'Content-Type':'application/json'}, body:JSON.stringify({ name, source: source||'user', confirm }) }); return res.ok; }
 async function selectPromptCards(params){ const res = await fetch('/zhihui/prompt_cards/select', { method:'POST', headers:{'Content-Type':'application/json'}, body:JSON.stringify(params) }); return await res.json(); }
 async function getPromptCardSettings(){ try { const res = await fetch('/zhihui/prompt_cards/settings'); const data = await res.json(); return data && typeof data === 'object' ? data : {}; } catch(e){ return {}; } }
 async function savePromptCardSettings(st){ try { const res = await fetch('/zhihui/prompt_cards/settings', { method:'POST', headers:{'Content-Type':'application/json'}, body: JSON.stringify(st||{}) }); return res.ok; } catch(e){ return false; } }
-
 async function showPromptCardPoolFiles(){
     const container = dialog.content; container.innerHTML = '';
     const controlsPanel = document.createElement('div'); controlsPanel.style.cssText = `display:flex;flex-direction:column;gap:8px;margin:6px 4px 16px 4px;padding:8px;border:1px solid rgba(34,197,94,0.35);border-radius:8px;background:rgba(34,197,94,0.08)`;
@@ -149,7 +343,13 @@ async function showPromptCardPoolFiles(){
     const tagsHeader = document.createElement('div'); tagsHeader.style.cssText = `width:100%;margin:12px 0 8px 0;padding:0;color:#93c5fd;font-size:16px;font-weight:800;display:flex;align-items:center;justify-content:space-between;gap:12px`; tagsFrame.appendChild(tagsHeader);
     const tagsHeaderLeft = document.createElement('div'); tagsHeaderLeft.style.cssText = `display:flex;align-items:center;gap:8px;flex:1`;
     const tagsTitle = document.createElement('span'); tagsTitle.textContent='提示词卡池';
-    tagsHeaderLeft.appendChild(tagsTitle); tagsHeaderLeft.appendChild(countBadge); tagsHeader.appendChild(tagsHeaderLeft);
+    
+    const totalFilesSpan = document.createElement('span');
+    totalFilesSpan.id = 'poolTotalFilesCount';
+    totalFilesSpan.textContent = '文件总数: 0';
+    totalFilesSpan.style.cssText = 'background:linear-gradient(135deg, #fbbf24 0%, #f59e0b 100%);color:#1f1203;padding:2px 8px;border-radius:12px;font-size:11px;font-weight:700;margin-left:8px;box-shadow:0 2px 4px rgba(0,0,0,0.2);';
+    
+    tagsHeaderLeft.appendChild(tagsTitle); tagsHeaderLeft.appendChild(totalFilesSpan); tagsHeaderLeft.appendChild(countBadge); tagsHeader.appendChild(tagsHeaderLeft);
     const selectedTools = document.createElement('div'); selectedTools.style.cssText = `display:flex;align-items:center;gap:10px;flex-wrap:wrap;margin-left:14px`;
     selectedTools.appendChild(selAllBtn); selectedTools.appendChild(invertBtn); selectedTools.appendChild(clearBtn);
     tagsHeaderLeft.appendChild(selectedTools);
@@ -227,6 +427,12 @@ async function showPromptCardPoolFiles(){
     const updateSelectedCount = () => { countBadge.textContent = `已选: ${selected.size}`; };
     const refresh = async () => {
         all = await fetchPromptCards(); listWrap.innerHTML = ''; chipIndex.clear();
+        
+        const poolTotalFilesSpan = document.getElementById('poolTotalFilesCount');
+        if (poolTotalFilesSpan) {
+            poolTotalFilesSpan.textContent = `文件总数: ${all.length}`;
+        }
+        
         currentKeyword = (filterInput.value || '').trim().toLowerCase();
         const files = all.filter(item => { const name = item.name || ''; const displayName = name.split('/').pop().replace(/\.txt$/i, ''); return !currentKeyword || name.toLowerCase().includes(currentKeyword) || displayName.toLowerCase().includes(currentKeyword); });
         if (currentKeyword){ searchReport.style.visibility = 'visible'; searchReport.textContent = files.length > 0 ? `搜索结果：${files.length} 条` : '未找到结果'; } else { searchReport.style.visibility = 'hidden'; searchReport.textContent = ''; }
@@ -246,9 +452,9 @@ async function showPromptCardPoolFiles(){
                     const isSingle = (loadModeSel.value || 'multi') === 'single';
                     if (isSingle){
                         const already = selected.has(key);
-                        // clear all selections
+
                         selected.clear(); chipIndex.forEach(ch => markSelected(ch, false));
-                        // if it wasn't selected, select it; otherwise keep none
+
                         if (!already){ selected.set(key, {name:item.name, source:item.source}); markSelected(chip, true); }
                         updateSelectedCount(); saveSettingsNow();
                     } else {
@@ -343,27 +549,113 @@ function showPromptCardPoolManage(){
     const container = dialog.content; container.innerHTML = '';
     if (dialog.searchContainer){ try { dialog.searchContainer.remove(); } catch(_){} dialog.searchContainer = null; }
     if (dialog.filesStatusBar){ try { dialog.filesStatusBar.remove(); } catch(_){} dialog.filesStatusBar = null; }
-    const form = document.createElement('div'); form.style.cssText = `display:flex;flex-direction:column;gap:8px;margin:6px 4px`;
-    const nameInput = document.createElement('input'); nameInput.type='text'; nameInput.placeholder='文件名'; nameInput.style.cssText = `background:#1f2937;color:#e5e7eb;border:1px solid #3b82f6;border-radius:6px;padding:6px 8px;width:260px;min-width:260px`;
+    const form = document.createElement('div'); form.style.cssText = `display:flex;flex-direction:column;gap:6px;margin:6px 4px`;
+    const nameInput = document.createElement('input'); nameInput.type='text'; nameInput.placeholder='文件名'; nameInput.style.cssText = `background:#1f2937;color:#e5e7eb;border:1px solid #3b82f6;border-radius:6px;padding:6px 6px;width:135px;min-width:135px;height:32px;line-height:20px`;
     const textarea = document.createElement('textarea'); textarea.placeholder='提示词卡内容'; textarea.style.cssText = `height:200px;background:#1f2937;color:#e5e7eb;border:1px solid #3b82f6;border-radius:6px;padding:8px;resize:none`;
-    const btnRow = document.createElement('div'); btnRow.style.cssText = `display:flex;gap:8px;align-items:center;flex-wrap:wrap`;
+    const btnRow = document.createElement('div'); btnRow.style.cssText = `display:flex;gap:6px;align-items:center;flex-wrap:wrap`;
     const saveBtn = document.createElement('button'); saveBtn.textContent = '保存'; applyStyles(saveBtn, { ...commonStyles.button.base, background:'linear-gradient(135deg,#059669 0%,#047857 100%)', borderColor:'rgba(16,185,129,0.7)', color:'#fff', height:'32px', padding:'4px 10px', fontSize:'13px' });
     const delBtn = document.createElement('button'); delBtn.textContent = '删除'; applyStyles(delBtn, { ...commonStyles.button.base, ...commonStyles.button.danger, height:'32px', padding:'4px 10px', fontSize:'13px' });
     const cancelBtn = document.createElement('button'); cancelBtn.textContent = '取消'; applyStyles(cancelBtn, { ...commonStyles.button.base, background:'linear-gradient(135deg,#334155 0%,#1f2937 100%)', borderColor:'rgba(100,116,139,0.8)', color:'#fff', height:'32px', padding:'4px 10px', fontSize:'13px' });
-    const categorySel = document.createElement('select'); categorySel.innerHTML = `<option value="SFW">SFW</option><option value="NSFW">NSFW</option>`; categorySel.style.cssText = `background:#1f2937;color:#e5e7eb;border:1px solid #3b82f6;border-radius:6px;padding:6px 8px;height:32px`;
-    const editTools = document.createElement('div'); editTools.style.cssText = `display:flex;gap:6px;align-items:center;flex-wrap:wrap;padding:4px 8px;height:32px;border:1px solid rgba(59,130,246,0.35);border-radius:8px;background:rgba(59,130,246,0.10)`;
+    const categorySel = document.createElement('select'); categorySel.innerHTML = `<option value="SFW">SFW</option><option value="NSFW">NSFW</option>`; categorySel.style.cssText = `background:#1f2937;color:#e5e7eb;border:1px solid #3b82f6;border-radius:6px;padding:6px 6px;height:32px;min-width:80px`;
+    const editTools = document.createElement('div'); editTools.style.cssText = `display:flex;gap:4px;align-items:center;flex-wrap:wrap;padding:4px 6px;height:32px;border:1px solid rgba(59,130,246,0.35);border-radius:8px;background:rgba(59,130,246,0.10)`;
     const clearBtn = document.createElement('button'); clearBtn.textContent='清空'; applyStyles(clearBtn, { ...commonStyles.button.base, background:'linear-gradient(135deg,#64748b 0%,#475569 100%)', borderColor:'rgba(148,163,184,0.6)', color:'#fff', height:'22px', padding:'2px 6px', fontSize:'12px' });
     const removeEmptyBtn = document.createElement('button'); removeEmptyBtn.textContent='去除空行'; applyStyles(removeEmptyBtn, { ...commonStyles.button.base, background:'linear-gradient(135deg,#64748b 0%,#475569 100%)', borderColor:'rgba(148,163,184,0.6)', color:'#fff', height:'22px', padding:'2px 6px', fontSize:'12px' });
     const removeSpacesBtn = document.createElement('button'); removeSpacesBtn.textContent='去除空格'; applyStyles(removeSpacesBtn, { ...commonStyles.button.base, background:'linear-gradient(135deg,#64748b 0%,#475569 100%)', borderColor:'rgba(148,163,184,0.6)', color:'#fff', height:'22px', padding:'2px 6px', fontSize:'12px' });
     const removeNewlinesBtn = document.createElement('button'); removeNewlinesBtn.textContent='去除换行'; applyStyles(removeNewlinesBtn, { ...commonStyles.button.base, background:'linear-gradient(135deg,#64748b 0%,#475569 100%)', borderColor:'rgba(148,163,184,0.6)', color:'#fff', height:'22px', padding:'2px 6px', fontSize:'12px' });
     const trimEdgeSpacesBtn = document.createElement('button'); trimEdgeSpacesBtn.textContent='修剪首尾空格'; applyStyles(trimEdgeSpacesBtn, { ...commonStyles.button.base, background:'linear-gradient(135deg,#64748b 0%,#475569 100%)', borderColor:'rgba(148,163,184,0.6)', color:'#fff', height:'22px', padding:'2px 6px', fontSize:'12px' });
-    const addBlankLinesBtn = document.createElement('button'); addBlankLinesBtn.textContent='增加空行间隔'; applyStyles(addBlankLinesBtn, { ...commonStyles.button.base, background:'linear-gradient(135deg,#64748b 0%,#475569 100%)', borderColor:'rgba(148,163,184,0.6)', color:'#fff', height:'22px', padding:'2px 6px', fontSize:'12px' });
+    const addBlankLinesBtn = document.createElement('button'); addBlankLinesBtn.textContent='产生空行'; applyStyles(addBlankLinesBtn, { ...commonStyles.button.base, background:'linear-gradient(135deg,#64748b 0%,#475569 100%)', borderColor:'rgba(148,163,184,0.6)', color:'#fff', height:'22px', padding:'2px 6px', fontSize:'12px' });
     const removeLineNumbersBtn = document.createElement('button'); removeLineNumbersBtn.textContent='去除序号'; applyStyles(removeLineNumbersBtn, { ...commonStyles.button.base, background:'linear-gradient(135deg,#64748b 0%,#475569 100%)', borderColor:'rgba(148,163,184,0.6)', color:'#fff', height:'22px', padding:'2px 6px', fontSize:'12px' });
     const removeLeadingPunctBtn = document.createElement('button'); removeLeadingPunctBtn.textContent='去除段首标点'; applyStyles(removeLeadingPunctBtn, { ...commonStyles.button.base, background:'linear-gradient(135deg,#64748b 0%,#475569 100%)', borderColor:'rgba(148,163,184,0.6)', color:'#fff', height:'22px', padding:'2px 6px', fontSize:'12px' });
     const listFrame = document.createElement('div'); listFrame.style.cssText = `margin:25px 4px 0 4px;padding:0 12px 10px 12px;border:1px solid rgba(59,130,246,0.35);border-radius:8px;background:rgba(59,130,246,0.10)`;
     const list = document.createElement('div'); list.style.cssText = `display:flex;flex-wrap:wrap;gap:4px;margin-top:0`;
-    const inputRow = document.createElement('div'); inputRow.style.cssText = `display:flex;gap:8px;align-items:center`;
-    inputRow.appendChild(categorySel); inputRow.appendChild(nameInput); form.appendChild(inputRow); form.appendChild(textarea);
+    const inputRow = document.createElement('div'); inputRow.style.cssText = `display:flex;gap:6px;align-items:center`;
+
+    const fileNameTitle = document.createElement('span');
+    fileNameTitle.textContent = '🔞分级类型';
+    fileNameTitle.style.cssText = `color:#93c5fd;font-size:13px;font-weight:600;white-space:nowrap;display:flex;align-items:center;height:32px;padding:0 2px;background:rgba(59,130,246,0.15);border:1px solid rgba(59,130,246,0.35);border-radius:6px;min-width:100px;justify-content:center`;
+
+    const authorInput = document.createElement('input');
+    authorInput.type = 'text';
+    authorInput.placeholder = '提供者';
+    authorInput.style.cssText = `background:#1f2937;color:#e5e7eb;border:1px solid #3b82f6;border-radius:6px;padding:6px 6px;width:120px;min-width:120px;height:32px;line-height:20px`;
+
+    const versionInput = document.createElement('input');
+    versionInput.type = 'text';
+    versionInput.placeholder = '版本号';
+    versionInput.style.cssText = `background:#1f2937;color:#e5e7eb;border:1px solid #3b82f6;border-radius:6px;padding:6px 6px;width:60px;min-width:60px;height:32px;line-height:20px`;
+
+    const authorTitle = document.createElement('span');
+    authorTitle.textContent = '👩‍🎨提供者';
+    authorTitle.style.cssText = `color:#93c5fd;font-size:13px;font-weight:600;white-space:nowrap;display:flex;align-items:center;height:32px;padding:0 2px;background:rgba(59,130,246,0.15);border:1px solid rgba(59,130,246,0.35);border-radius:6px;min-width:80px;justify-content:center`;
+
+    const versionTitle = document.createElement('span');
+    versionTitle.textContent = '🏷️版本';
+    versionTitle.style.cssText = `color:#93c5fd;font-size:13px;font-weight:600;white-space:nowrap;display:flex;align-items:center;height:32px;padding:0 2px;background:rgba(59,130,246,0.15);border:1px solid rgba(59,130,246,0.35);border-radius:6px;min-width:60px;justify-content:center`;
+
+    const fileInfoDisplay = document.createElement('div');
+    fileInfoDisplay.id = 'fileInfoDisplay';
+    fileInfoDisplay.style.cssText = `display:flex;align-items:center;gap:12px;margin-left:8px;padding:6px 10px;background:linear-gradient(135deg, rgba(30,58,138,0.25) 0%, rgba(2,6,23,0.4) 100%);border:1px solid rgba(59,130,246,0.5);border-radius:8px;color:#93c5fd;font-size:13px;min-width:220px;box-shadow:0 2px 4px rgba(0,0,0,0.15);`;
+    
+    const charCountContainer = document.createElement('div');
+    charCountContainer.style.cssText = 'display:flex;align-items:center;gap:4px;';
+    
+    const charIcon = document.createElement('span');
+    charIcon.textContent = '🔤';
+    charIcon.style.cssText = 'font-size:14px;';
+    
+    const charCountSpan = document.createElement('span');
+    charCountSpan.id = 'charCount';
+    charCountSpan.textContent = '字符数: 0';
+    charCountSpan.style.cssText = 'font-weight:600;';
+    
+    charCountContainer.appendChild(charIcon);
+    charCountContainer.appendChild(charCountSpan);
+    
+    const wordCountContainer = document.createElement('div');
+    wordCountContainer.style.cssText = 'display:flex;align-items:center;gap:4px;';
+    
+    const wordIcon = document.createElement('span');
+    wordIcon.textContent = '📖';
+    wordIcon.style.cssText = 'font-size:14px;';
+    
+    const wordCountSpan = document.createElement('span');
+    wordCountSpan.id = 'wordCount';
+    wordCountSpan.textContent = '词条数: 0';
+    wordCountSpan.style.cssText = 'font-weight:600;';
+    
+    wordCountContainer.appendChild(wordIcon);
+    wordCountContainer.appendChild(wordCountSpan);
+    
+    fileInfoDisplay.appendChild(charCountContainer);
+    fileInfoDisplay.appendChild(wordCountContainer);
+    
+    inputRow.appendChild(fileNameTitle);
+    inputRow.appendChild(categorySel);
+    
+    const spacer1 = document.createElement('div');
+    spacer1.style.cssText = 'width:8px';
+    inputRow.appendChild(spacer1);
+    
+    const nameTitle = document.createElement('span');
+    nameTitle.textContent = '📄文件名';
+    nameTitle.style.cssText = `color:#93c5fd;font-size:13px;font-weight:600;white-space:nowrap;display:flex;align-items:center;height:32px;padding:0 2px;background:rgba(59,130,246,0.15);border:1px solid rgba(59,130,246,0.35);border-radius:6px;min-width:80px;justify-content:center`;
+    inputRow.appendChild(nameTitle);
+    inputRow.appendChild(nameInput);
+    
+    const spacer2 = document.createElement('div');
+    spacer2.style.cssText = 'width:8px';
+    inputRow.appendChild(spacer2);
+    inputRow.appendChild(authorTitle);
+    inputRow.appendChild(authorInput);
+    
+    const spacer3 = document.createElement('div');
+    spacer3.style.cssText = 'width:8px';
+    inputRow.appendChild(spacer3);
+    inputRow.appendChild(versionTitle);
+    inputRow.appendChild(versionInput);
+    inputRow.appendChild(fileInfoDisplay);
+    form.appendChild(inputRow);
+    form.appendChild(textarea);
     btnRow.appendChild(saveBtn); btnRow.appendChild(cancelBtn); btnRow.appendChild(delBtn);
     editTools.appendChild(clearBtn); editTools.appendChild(removeEmptyBtn); editTools.appendChild(removeSpacesBtn); editTools.appendChild(removeNewlinesBtn); editTools.appendChild(trimEdgeSpacesBtn); editTools.appendChild(addBlankLinesBtn); editTools.appendChild(removeLineNumbersBtn); editTools.appendChild(removeLeadingPunctBtn);
     btnRow.appendChild(editTools); form.appendChild(btnRow); container.appendChild(form);
@@ -419,14 +711,26 @@ function showPromptCardPoolManage(){
     ioTools.appendChild(importBtn); ioTools.appendChild(exportBtn); ioTools.appendChild(importInput);
     btnRow.insertBefore(ioTools, editTools);
     listFrame.appendChild(list); const listHeaderBar = document.createElement('div'); listHeaderBar.textContent='提示词卡池文件'; listHeaderBar.style.cssText = `width:100%;margin:10px 0 4px 0;padding:2px 0 0 0;color:#93c5fd;font-size:14px;font-weight:700;display:flex;align-items:center;gap:6px`;
+    
+    const totalFilesSpan = document.createElement('span');
+    totalFilesSpan.id = 'totalFilesCount';
+    totalFilesSpan.textContent = '文件总数: 0';
+    totalFilesSpan.style.cssText = 'background:linear-gradient(135deg, #fbbf24 0%, #f59e0b 100%);color:#1f1203;padding:2px 8px;border-radius:12px;font-size:11px;font-weight:700;margin-left:8px;box-shadow:0 2px 4px rgba(0,0,0,0.2);';
+    
     const refreshBtn = document.createElement('button'); refreshBtn.textContent='刷新'; applyStyles(refreshBtn, { ...commonStyles.button.base, ...commonStyles.button.primary, height:'20px', padding:'0 6px', fontSize:'11px', display:'inline-flex', alignItems:'center', justifyContent:'center' }); setupButtonHover(refreshBtn, commonStyles.button.primary, commonStyles.button.primaryHover); refreshBtn.onclick = () => { refresh(); };
+    listHeaderBar.appendChild(totalFilesSpan);
     listHeaderBar.appendChild(refreshBtn);
     listFrame.insertBefore(listHeaderBar, list); container.appendChild(listFrame);
     let currentCardPath=null, currentCardSource=null, originalName='', originalContent='', originalPath=null, cancelStage=0;
     const manageChipIndex = new Map(); let activeManageKey = null;
     const refresh = async () => {
         list.innerHTML = ''; const files = await fetchPromptCards(); const order = ['SFW','NSFW','根目录'];
-        const groups = {}; files.forEach(item => { const parts=(item.name||'').split('/'); const g = parts.length>1 ? parts[0] : '根目录'; (groups[g] = groups[g] || []).push(item); });
+        const groups = {}; files.forEach(item => { const parts=(item.name||'').split('/'); const g = parts.length>1 ? parts[0] : '根目录'; (groups[g] = groups[g] || []).push(item); });   
+        const totalFiles = files.length;
+        const totalFilesSpan = document.getElementById('totalFilesCount');
+        if (totalFilesSpan) {
+            totalFilesSpan.textContent = `文件总数: ${totalFiles}`;
+        }
         Object.keys(groups).sort((a,b)=>{ const ai=order.indexOf(a), bi=order.indexOf(b); if (ai!==-1 || bi!==-1) return (ai===-1?999:ai)-(bi===-1?999:bi); return a.localeCompare(b); }).forEach(groupName => {
             const title = document.createElement('div'); title.textContent = groupName; title.style.cssText = `width:100%;margin:0 0 4px 0;color:#93c5fd;border-bottom:1px solid rgba(59,130,246,0.35);font-size:12px`; if (groupName==='NSFW'){ title.style.color='#f87171'; title.style.borderBottom='1px solid rgba(248,113,113,0.35)'; } else if (groupName==='SFW'){ title.style.color='#22c55e'; title.style.borderBottom='1px solid rgba(34,197,94,0.35)'; }
             list.appendChild(title);
@@ -438,34 +742,148 @@ function showPromptCardPoolManage(){
                 const k = `${item.source}|${item.name}`; manageChipIndex.set(k, chip);
                 const markActive = (ch, act) => {
                     if (!ch) return;
-                    if (act){
-                        ch.style.background = 'linear-gradient(135deg,#a855f7 0%,#9333ea 100%)';
-                        ch.style.color = '#fff';
-                        ch.style.border = '1px solid rgba(168,85,247,0.8)';
-                    } else {
-                        ch.style.background = '#3a3a3a';
-                        ch.style.color = '#eee';
-                        ch.style.border = '1px solid #6aa1f3';
-                    }
+                    ch.style.background = '#3a3a3a';
+                    ch.style.color = '#eee';
+                    ch.style.border = '1px solid #6aa1f3';
                 };
-                chip.onclick = async () => { nameInput.value = displayName; currentCardPath = item.name; currentCardSource = item.source; const content = await fetchPromptCardContent(item.name, item.source); textarea.value = content; originalName = displayName; originalContent = content; originalPath = item.name; const group = (item.name.split('/')[0] || '').toUpperCase(); if (group==='SFW' || group==='NSFW') categorySel.value = group; const prev = manageChipIndex.get(activeManageKey); markActive(prev, false); activeManageKey = k; markActive(chip, true); };
+                chip.onclick = async () => { nameInput.value = displayName; currentCardPath = item.name; currentCardSource = item.source; const rawContent = await fetchPromptCardContent(item.name, item.source); 
+                
+                let author = '';
+                let version = '';
+                let displayContent = rawContent;
+                
+                const authorMatch1 = displayContent.match(/^\s*\{\{提供者:\s*([^}]+)\}\}\s*$/m);
+                if (authorMatch1) {
+                    author = authorMatch1[1].trim();
+                    displayContent = displayContent.replace(authorMatch1[0], '').trim();
+                }
+                
+                const authorMatch2 = displayContent.match(/^\s*\/\/\s*提供者:\s*(.+)$/m);
+                if (authorMatch2) {
+                    author = authorMatch2[1].trim();
+                    displayContent = displayContent.replace(authorMatch2[0], '').trim();
+                }
+                
+                const authorMatch3 = displayContent.match(/^\s*提供者:\s*(.+)$/m);
+                if (authorMatch3) {
+                    author = authorMatch3[1].trim();
+                    displayContent = displayContent.replace(authorMatch3[0], '').trim();
+                }
+                
+                const versionMatch1 = displayContent.match(/^\s*\{\{版本:\s*([^}]+)\}\}\s*$/m);
+                if (versionMatch1) {
+                    version = versionMatch1[1].trim();
+                    displayContent = displayContent.replace(versionMatch1[0], '').trim();
+                }
+                
+                const versionMatch2 = displayContent.match(/^\s*\/\/\s*版本号:\s*(.+)$/m);
+                if (versionMatch2) {
+                    version = versionMatch2[1].trim();
+                    displayContent = displayContent.replace(versionMatch2[0], '').trim();
+                }
+                
+                const versionMatch3 = displayContent.match(/^\s*\/\/\s*版本:\s*(.+)$/m);
+                if (versionMatch3) {
+                    version = versionMatch3[1].trim();
+                    displayContent = displayContent.replace(versionMatch3[0], '').trim();
+                }
+                
+                const versionMatch4 = displayContent.match(/^\s*版本:\s*(.+)$/m);
+                if (versionMatch4) {
+                    version = versionMatch4[1].trim();
+                    displayContent = displayContent.replace(versionMatch4[0], '').trim();
+                }
+                
+                if (authorInput) authorInput.value = author;
+                if (versionInput) versionInput.value = version;
+                
+                textarea.value = displayContent;
+                originalName = displayName; 
+                originalContent = displayContent; 
+                originalPath = item.name; 
+                const group = (item.name.split('/')[0] || '').toUpperCase(); 
+                if (group==='SFW' || group==='NSFW') categorySel.value = group; 
+                const prev = manageChipIndex.get(activeManageKey); 
+                markActive(prev, false); 
+                activeManageKey = k; 
+                markActive(chip, true); 
+                updateFileInfo(); 
+                };
                 markActive(chip, k === activeManageKey);
                 list.appendChild(chip);
             });
         });
     };
     refresh();
+
+    const updateFileInfo = () => {
+        const content = textarea.value || '';
+        const charCount = content.length;
+        
+        let wordCount = 0;
+        if (content.trim() !== '') {
+            const paragraphs = content.split(/\n\s*\n/).filter(paragraph => paragraph.trim().length > 0);
+            
+            paragraphs.forEach(paragraph => {
+                const lines = paragraph.split(/\n/).filter(line => line.trim().length > 0);
+                
+                if (lines.length === 1) {
+                    const words = lines[0].trim().split(/[\s\u3000]+/).filter(word => word.length > 0);
+                    wordCount += words.length;
+                } else {
+                    wordCount += lines.length;
+                }
+            });
+        }
+        
+        const charCountElement = document.getElementById('charCount');
+        const wordCountElement = document.getElementById('wordCount');
+        
+        if (charCountElement) {
+            charCountElement.textContent = `字符: ${charCount}`;
+        }
+        
+        if (wordCountElement) {
+            wordCountElement.textContent = `词条: ${wordCount}`;
+        }
+    };
+    
+    textarea.addEventListener('input', updateFileInfo);
+    
     const save = async () => {
         const nm = (nameInput.value||'').trim(); const group = (categorySel.value||'SFW').toUpperCase(); let finalName = `${group}/${nm}`; if (!nm) return; let sourceToUse = currentCardSource || 'user'; let confirmText = undefined;
         if (sourceToUse === 'system'){ const input = prompt('警告：你正在修改系统预置条目。请输入授权指令“我已知晓后果”以继续：',''); if (input !== '我已知晓后果') return; confirmText = input; }
-        const ok = await savePromptCard(finalName, textarea.value||'', sourceToUse, confirmText); if (ok) { refresh(); }
+
+        const author = authorInput ? authorInput.value.trim() : '';
+        const version = versionInput ? versionInput.value.trim() : '';
+        const currentContent = textarea.value || '';
+        let saveContent = currentContent;
+        
+        saveContent = saveContent.replace(/^\s*\{\{提供者:.*?\}\}\s*$/gm, '');
+        saveContent = saveContent.replace(/^\s*\{\{版本:.*?\}\}\s*$/gm, '');
+        saveContent = saveContent.replace(/^\s*\/\/\s*提供者:.*?$/gm, '');
+        saveContent = saveContent.replace(/^\s*\/\/\s*版本号:.*?$/gm, '');
+        saveContent = saveContent.replace(/^\s*\/\/\s*版本:.*?$/gm, '');
+        saveContent = saveContent.replace(/^\s*提供者:.*?$/gm, '');
+        saveContent = saveContent.replace(/^\s*版本:.*?$/gm, '');
+        
+        if (author || version) {
+            let header = '';
+            if (author) header += `{{提供者: ${author}}}\n`;
+            if (version) header += `{{版本: ${version}}}\n`;
+            if (header) {
+                saveContent = header + '\n' + saveContent;
+            }
+        }
+        
+        const ok = await savePromptCard(finalName, saveContent, sourceToUse, confirmText); if (ok) { refresh(); }
         originalName = nm; originalContent = textarea.value||''; originalPath = finalName.endsWith('.txt') ? finalName : `${finalName}.txt`; currentCardPath = originalPath; currentCardSource = sourceToUse; cancelStage = 0;
     };
     const cancel = () => {
         const nmNow = (nameInput.value||'').trim(); const isDirty = nmNow !== (originalName||'') || (textarea.value||'') !== (originalContent||'');
-        if (isDirty){ nameInput.value = originalName || ''; textarea.value = originalContent || ''; currentCardPath = originalPath; const group = (currentCardPath ? currentCardPath.split('/')[0] : categorySel.value) || 'SFW'; if (group==='SFW' || group==='NSFW') categorySel.value = group; cancelStage = 1; return; }
-        if (cancelStage === 1){ nameInput.value=''; textarea.value=''; currentCardPath=null; currentCardSource=null; originalName=''; originalContent=''; originalPath=null; cancelStage=0; return; }
-        nameInput.value=''; textarea.value=''; currentCardPath=null; currentCardSource=null; originalName=''; originalContent=''; originalPath=null; cancelStage=0;
+        if (isDirty){ nameInput.value = originalName || ''; textarea.value = originalContent || ''; currentCardPath = originalPath; const group = (currentCardPath ? currentCardPath.split('/')[0] : categorySel.value) || 'SFW'; if (group==='SFW' || group==='NSFW') categorySel.value = group; cancelStage = 1; setTimeout(updateFileInfo, 0); return; }
+        if (cancelStage === 1){ nameInput.value=''; textarea.value=''; currentCardPath=null; currentCardSource=null; originalName=''; originalContent=''; originalPath=null; cancelStage=0; if (authorInput) authorInput.value=''; if (versionInput) versionInput.value=''; setTimeout(updateFileInfo, 0); return; }
+        nameInput.value=''; textarea.value=''; currentCardPath=null; currentCardSource=null; originalName=''; originalContent=''; originalPath=null; cancelStage=0; if (authorInput) authorInput.value=''; if (versionInput) versionInput.value=''; setTimeout(updateFileInfo, 0);
     };
     const del = async () => {
         const nm = (nameInput.value||'').trim(); const toDelete = currentCardPath || (nm ? nm + '.txt' : ''); if (!toDelete) return; let sourceToUse = currentCardSource || 'user'; const second = confirm('再次确认：删除后不可恢复，是否继续？'); if (!second) return; let confirmText = undefined; if (sourceToUse==='system'){ const input = prompt('警告：你正在删除系统自带条目。请输入授权指令“我已知晓后果”以继续：',''); if (input !== '我已知晓后果') return; confirmText = input; }
@@ -477,7 +895,13 @@ function showPromptCardPoolManage(){
     removeSpacesBtn.onclick = () => { textarea.value = (textarea.value||'').replace(/[ \u3000]+/g, ''); };
     removeNewlinesBtn.onclick = () => { textarea.value = (textarea.value||'').replace(/\r?\n/g, ''); };
     trimEdgeSpacesBtn.onclick = () => { const lines = (textarea.value||'').split(/\r?\n/).map(ln => ln.replace(/^\s+|\s+$/g, '')); textarea.value = lines.join('\n').trim(); };
-    addBlankLinesBtn.onclick = () => { const t = (textarea.value||'').replace(/\r/g, ''); textarea.value = t.replace(/\n(?!\n)/g, '\n\n'); };
+    addBlankLinesBtn.onclick = () => { 
+        const t = (textarea.value||'').replace(/\r/g, ''); 
+        if (t.includes('\n\n')) {
+            return;
+        }
+        textarea.value = t.replace(/\n(?!\n)/g, '\n\n'); 
+    };
     removeLineNumbersBtn.onclick = () => { const lines = (textarea.value||'').split(/\r?\n/); textarea.value = lines.map(s => s.replace(/^\s*\d+[\.\u3002、:：\)\]\-—]*\s*/, '').replace(/^\s*[（(]?\d+[）)]\s*/, '').replace(/^\s*[①②③④⑤⑥⑦⑧⑨⑩][\.\u3002、:：\)\]\-—]*\s*/, '').replace(/^\s*(?:[一二三四五六七八九十百千〇零]+)[\.\u3002、:：\)\]\-—]*\s*/, '').replace(/^\s*(?:[IVXLCM]+)[\.\u3002、:：\)\]\-—]*\s*/i, '')).join('\n'); };
     removeLeadingPunctBtn.onclick = () => { const lines = (textarea.value||'').split(/\r?\n/); textarea.value = lines.map(ln => ln.replace(/^[\s\.,;:：，、。!！\?？\-—~·…]+/, '')).join('\n'); };
 }

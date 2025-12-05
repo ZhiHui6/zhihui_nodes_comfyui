@@ -1,4 +1,15 @@
 # 更新日志
+
+## v0.9.0 - 2025-12-5
+- 优化、修复PromptCardSelector节点：添加卡池文件数统计，提供者、版本号信息等。
+- SystemPrompt节点新增文本：Prompt优化师、Veo3分镜分析与提示词、视频分析与复刻
+- 更新README
+<br>
+
+- Optimized and fixed PromptCardSelector node: added card pool file count statistics, provider and version information.
+- Added new text to SystemPrompt node: Prompt Optimizer, Veo3 Storyboard Analysis and Prompts, Video Analysis and Replication
+- Updated README
+
 ## v0.8.9 - 2025-12-2
 - 修复 Image/Latent/Text Switch Dual Mode节点注释栏的无故隐藏问题
 - 新增 TextSwitchDualMode 节点：文本切换器（双模式）
