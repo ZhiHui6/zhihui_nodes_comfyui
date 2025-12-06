@@ -255,9 +255,20 @@ class PromptCardSelector:
                     return [blk.strip() for blk in re.split(r'(?:\r?\n\s*){2,}', t) if blk.strip()]
                 if rule == 'auto':
                     import re
-                    if re.search(r'\r?\n\s*\r?\n', t):
-                        return [blk.strip() for blk in re.split(r'(?:\r?\n\s*){2,}', t) if blk.strip()]
-                    return [ln.strip() for ln in t.splitlines() if ln.strip()]
+
+                    paragraphs = [blk.strip() for blk in re.split(r'\n\s*\n', t) if blk.strip()]
+                    result = []
+                    
+                    for paragraph in paragraphs:
+                        lines = [ln.strip() for ln in paragraph.splitlines() if ln.strip()]                
+                        if len(lines) == 1:
+                            words = [word.strip() for word in re.split(r'[\s\u3000]+', lines[0]) if word.strip()]
+                            if words:
+                                result.extend(words)
+                        else:
+                            result.extend(lines)
+                    
+                    return result if result else [t.strip()]
                 return [t]
             except Exception:
                 return []
@@ -273,7 +284,7 @@ class PromptCardSelector:
             parts = _split(txt, split_rule)
             if parts:
                 segments.extend(parts)
-        # de-duplicate segments by text content (trimmed)
+
         try:
             _seen = set()
             _uniq = []
