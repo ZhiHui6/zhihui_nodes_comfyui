@@ -1,5 +1,11 @@
 # 更新日志
 
+## v0.9.1 - 2025-12-6
+- PromptCardSelector 节点添加全局通知系统用于显示操作反馈和实现用户词卡打包备份与恢复功能。
+<br>
+
+- PromptCardSelector node adds a global notification system for displaying operation feedback and implements user prompt-card pack backup & restore functionality.
+
 ## v0.9.0 - 2025-12-5
 - 优化、修复PromptCardSelector节点：添加卡池文件数统计，提供者、版本号信息等。
 - SystemPrompt节点新增文本：Prompt优化师、Veo3分镜分析与提示词、视频分析与复刻

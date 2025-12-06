@@ -3,18 +3,5 @@
   "split_rule": "auto",
   "load_mode": "multi",
   "pool_shuffle": "random",
-  "selected": [
-    {
-      "name": "SFW/衬衣POLO衫.txt",
-      "source": "system"
-    },
-    {
-      "name": "SFW/吊带背心紧身裤.txt",
-      "source": "system"
-    },
-    {
-      "name": "SFW/夹克连帽衫.txt",
-      "source": "system"
-    }
-  ]
+  "selected": []
 }

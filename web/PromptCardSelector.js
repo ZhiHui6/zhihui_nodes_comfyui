@@ -13,6 +13,162 @@ const commonStyles = {
 
 function applyStyles(el, styles){ Object.assign(el.style, styles); }
 function setupButtonHover(el, normal, hover){ applyStyles(el, normal); el.addEventListener('mouseenter', ()=>applyStyles(el, hover)); el.addEventListener('mouseleave', ()=>applyStyles(el, normal)); }
+function showNotification(message, type = 'success', duration = 3000) {
+
+    const existingNotification = document.getElementById('card-pool-notification');
+    if (existingNotification) {
+        existingNotification.remove();
+    }
+    
+    const dialogContent = dialog && dialog.content;
+    if (!dialogContent) {
+
+        const notification = document.createElement('div');
+        notification.id = 'card-pool-notification';
+        
+        const isSuccess = type === 'success';
+        const bgColor = isSuccess ? 'linear-gradient(135deg, #059669 0%, #047857 100%)' : 'linear-gradient(135deg, #dc2626 0%, #b91c1c 100%)';
+        const borderColor = isSuccess ? 'rgba(16, 185, 129, 0.7)' : 'rgba(220, 38, 38, 0.8)';
+        const icon = isSuccess ? '✓' : '✗';
+        
+        notification.style.cssText = `
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            z-index: 10002;
+            background: ${bgColor};
+            border: 1px solid ${borderColor};
+            color: #ffffff;
+            padding: 12px 16px;
+            border-radius: 8px;
+            font-size: 14px;
+            font-weight: 500;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15), 0 2px 4px rgba(0, 0, 0, 0.1);
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            transform: translateX(100%);
+            transition: transform 0.3s ease;
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
+            max-width: 300px;
+            word-wrap: break-word;
+        `;
+        
+        const iconSpan = document.createElement('span');
+        iconSpan.textContent = icon;
+        iconSpan.style.cssText = `
+            font-size: 16px;
+            font-weight: 700;
+            min-width: 16px;
+            text-align: center;
+        `;
+        
+        const messageSpan = document.createElement('span');
+        messageSpan.textContent = message;
+        
+        notification.appendChild(iconSpan);
+        notification.appendChild(messageSpan);
+        
+        document.body.appendChild(notification);
+        
+        setTimeout(() => {
+            notification.style.transform = 'translateX(0)';
+        }, 10);
+        
+        setTimeout(() => {
+            notification.style.transform = 'translateX(100%)';
+            setTimeout(() => {
+                if (notification.parentNode) {
+                    notification.remove();
+                }
+            }, 300);
+        }, duration);
+        
+        notification.addEventListener('click', () => {
+            notification.style.transform = 'translateX(100%)';
+            setTimeout(() => {
+                if (notification.parentNode) {
+                    notification.remove();
+                }
+            }, 300);
+        });
+        return;
+    }
+    
+    const notification = document.createElement('div');
+    notification.id = 'card-pool-notification';
+    
+    const isSuccess = type === 'success';
+    const bgColor = isSuccess ? 'linear-gradient(135deg, #059669 0%, #047857 100%)' : 'linear-gradient(135deg, #dc2626 0%, #b91c1c 100%)';
+    const borderColor = isSuccess ? 'rgba(16, 185, 129, 0.7)' : 'rgba(220, 38, 38, 0.8)';
+    const icon = isSuccess ? '✓' : '✗';
+    
+    notification.style.cssText = `
+        position: absolute;
+        bottom: 20px;
+        left: 50%;
+        transform: translateX(-50%) translateY(100px);
+        z-index: 10002;
+        background: ${bgColor};
+        border: 1px solid ${borderColor};
+        color: #ffffff;
+        padding: 12px 16px;
+        border-radius: 8px;
+        font-size: 14px;
+        font-weight: 500;
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15), 0 2px 4px rgba(0, 0, 0, 0.1);
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        transition: transform 0.3s ease;
+        backdrop-filter: blur(10px);
+        -webkit-backdrop-filter: blur(10px);
+        max-width: 300px;
+        word-wrap: break-word;
+        pointer-events: auto;
+    `;
+    
+    const iconSpan = document.createElement('span');
+    iconSpan.textContent = icon;
+    iconSpan.style.cssText = `
+        font-size: 16px;
+        font-weight: 700;
+        min-width: 16px;
+        text-align: center;
+    `;
+    
+    const messageSpan = document.createElement('span');
+    messageSpan.textContent = message;
+    
+    notification.appendChild(iconSpan);
+    notification.appendChild(messageSpan);
+    
+    dialogContent.style.position = 'relative';
+    dialogContent.appendChild(notification);
+    
+    setTimeout(() => {
+        notification.style.transform = 'translateX(-50%) translateY(0)';
+    }, 10);
+    
+    setTimeout(() => {
+        notification.style.transform = 'translateX(-50%) translateY(100px)';
+        setTimeout(() => {
+            if (notification.parentNode) {
+                notification.remove();
+            }
+        }, 300);
+    }, duration);
+    
+    notification.addEventListener('click', () => {
+        notification.style.transform = 'translateX(-50%) translateY(100px)';
+        setTimeout(() => {
+            if (notification.parentNode) {
+                notification.remove();
+            }
+        }, 300);
+    });
+}
 
 app.registerExtension({
     name: "zhihui.PromptCardSelector",
@@ -279,23 +435,106 @@ function createDialog(){
 
 async function fetchPromptCards(){ try { const res = await fetch('/zhihui/prompt_cards'); const data = await res.json(); return Array.isArray(data.files) ? data.files : []; } catch(e){ return []; } }
 async function fetchPromptCardContent(name, source){ try { const src = source || 'system'; const res = await fetch(`/zhihui/prompt_card?name=${encodeURIComponent(name)}&source=${encodeURIComponent(src)}`); const data = await res.json(); let content = data.content || '';
-
-content = content.replace(/^\s*\/\/.*$/gm, '');
-    
-    content = content.replace(/^\s*\{\{提供者:\s*[^}]+\}\}\s*$/gm, '');
-    content = content.replace(/^\s*\{\{版本:\s*[^}]+\}\}\s*$/gm, '');
-    content = content.replace(/^\s*\/\/\s*提供者:\s*[^}]+$/gm, '');
-    content = content.replace(/^\s*\/\/\s*版本号:\s*[^}]+$/gm, '');
-    content = content.replace(/^\s*\/\/\s*版本:\s*[^}]+$/gm, '');
-    content = content.replace(/^\s*提供者:\s*[^}]+$/gm, '');
-    content = content.replace(/^\s*版本:\s*[^}]+$/gm, '');
-    
-    return content.trim(); } catch(e){ return ''; } }
+    return content; } catch(e){ return ''; } }
 async function savePromptCard(name, content, source, confirm){ const res = await fetch('/zhihui/prompt_cards', { method:'POST', headers:{'Content-Type':'application/json'}, body:JSON.stringify({ name, content, source: source||'user', confirm }) }); return res.ok; }
 async function deletePromptCard(name, source, confirm){ const res = await fetch('/zhihui/prompt_cards', { method:'DELETE', headers:{'Content-Type':'application/json'}, body:JSON.stringify({ name, source: source||'user', confirm }) }); return res.ok; }
 async function selectPromptCards(params){ const res = await fetch('/zhihui/prompt_cards/select', { method:'POST', headers:{'Content-Type':'application/json'}, body:JSON.stringify(params) }); return await res.json(); }
 async function getPromptCardSettings(){ try { const res = await fetch('/zhihui/prompt_cards/settings'); const data = await res.json(); return data && typeof data === 'object' ? data : {}; } catch(e){ return {}; } }
 async function savePromptCardSettings(st){ try { const res = await fetch('/zhihui/prompt_cards/settings', { method:'POST', headers:{'Content-Type':'application/json'}, body: JSON.stringify(st||{}) }); return res.ok; } catch(e){ return false; } }
+
+async function backupUserPromptCards() {
+    try {
+        const allCards = await fetchPromptCards();
+        const userCards = allCards.filter(card => card.source === 'user');
+        
+        if (userCards.length === 0) {
+            showNotification('没有用户卡池文件可备份', 'error', 3000);
+            return;
+        }
+        
+        if (!window.JSZip) {
+            const script = document.createElement('script');
+            script.src = 'https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js';
+            script.onload = () => performBackup(userCards);
+            script.onerror = () => {
+                showNotification('无法加载压缩库，使用直接下载', 'error');
+                performDirectDownload(userCards);
+            };
+            document.head.appendChild(script);
+        } else {
+            performBackup(userCards);
+        }
+    } catch(e) {
+        showNotification('备份失败：' + e.message, 'error');
+    }
+}
+
+async function performBackup(userCards) {
+    try {
+        const JSZip = window.JSZip;
+        const zip = new JSZip();
+        let successCount = 0;
+        
+        for (const card of userCards) {
+            try {
+                const content = await fetchPromptCardContent(card.name, card.source);
+                const filePath = card.name.endsWith('.txt') ? card.name : card.name + '.txt';
+                zip.file(filePath, content);
+                successCount++;
+            } catch(e) {
+                console.warn(`备份文件 ${card.name} 失败:`, e);
+            }
+        }
+        
+        if (successCount === 0) {
+            showNotification('没有文件被成功备份', 'error');
+            return;
+        }
+        
+        const timestamp = new Date().toISOString().slice(0, 19).replace(/[:-]/g, '');
+        const filename = `PromptCards_Backup_${timestamp}.zip`;
+        
+        const blob = await zip.generateAsync({ type: 'blob' });
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = filename;
+        document.body.appendChild(a);
+        a.click();
+        setTimeout(() => {
+            document.body.removeChild(a);
+            URL.revokeObjectURL(url);
+        }, 100);
+        
+        showNotification(`成功备份 ${successCount} 个文件`, 'success', 3000);
+    } catch(e) {
+        showNotification('备份失败：' + e.message, 'error');
+    }
+}
+
+async function performDirectDownload(userCards) {
+    try {
+        for (const card of userCards) {
+            const content = await fetchPromptCardContent(card.name, card.source);
+            const filename = (card.name.split('/').pop() || 'card') + '.txt';
+            const blob = new Blob([content], { type: 'text/plain;charset=utf-8' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = filename;
+            document.body.appendChild(a);
+            a.click();
+            setTimeout(() => {
+                document.body.removeChild(a);
+                URL.revokeObjectURL(url);
+            }, 200);
+        }
+        showNotification(`已下载 ${userCards.length} 个文件`, 'success');
+    } catch(e) {
+        showNotification('下载失败：' + e.message, 'error');
+    }
+}
+
 async function showPromptCardPoolFiles(){
     const container = dialog.content; container.innerHTML = '';
     const controlsPanel = document.createElement('div'); controlsPanel.style.cssText = `display:flex;flex-direction:column;gap:8px;margin:6px 4px 16px 4px;padding:8px;border:1px solid rgba(34,197,94,0.35);border-radius:8px;background:rgba(34,197,94,0.08)`;
@@ -492,7 +731,7 @@ async function showPromptCardPoolFiles(){
         if (isSingle){
             selected.clear(); chipIndex.forEach(ch => markSelected(ch, false));
             const first = files[0]; if (first){ const k = keyOf(first); selected.set(k, {name:first.name, source:first.source}); markSelected(chipIndex.get(k), true); }
-            updateSelectedCount(); saveSettingsNow(); return;
+            updateSelectedCount(); saveSettingsNow; return;
         }
         files.forEach(item => { const k = keyOf(item); selected.set(k, {name:item.name, source:item.source}); const ch = chipIndex.get(k); markSelected(ch, true); }); updateSelectedCount(); saveSettingsNow();
     };
@@ -620,7 +859,7 @@ function showPromptCardPoolManage(){
     
     const wordCountSpan = document.createElement('span');
     wordCountSpan.id = 'wordCount';
-    wordCountSpan.textContent = '词条数: 0';
+       wordCountSpan.textContent = '词条数: 0';
     wordCountSpan.style.cssText = 'font-weight:600;';
     
     wordCountContainer.appendChild(wordIcon);
@@ -663,8 +902,16 @@ function showPromptCardPoolManage(){
     const ioTools = document.createElement('div'); ioTools.style.cssText = `display:flex;gap:10px;align-items:center;flex-wrap:wrap;margin-left:8px`;
     const importBtn = document.createElement('button'); importBtn.textContent = '导入'; applyStyles(importBtn, { ...commonStyles.button.base, background:'linear-gradient(135deg,#6b7280 0%,#4b5563 100%)', borderColor:'rgba(107,114,128,0.7)', color:'#fff', height:'32px', padding:'4px 10px', fontSize:'13px' });
     const exportBtn = document.createElement('button'); exportBtn.textContent = '导出'; applyStyles(exportBtn, { ...commonStyles.button.base, background:'linear-gradient(135deg,#6b7280 0%,#4b5563 100%)', borderColor:'rgba(107,114,128,0.7)', color:'#fff', height:'32px', padding:'4px 10px', fontSize:'13px' });
+    
+    const backupBtn = document.createElement('button'); backupBtn.textContent = '备份用户词卡'; applyStyles(backupBtn, { ...commonStyles.button.base, background:'linear-gradient(135deg,#8b5cf6 0%,#7c3aed 100%)', borderColor:'rgba(139,92,246,0.7)', color:'#fff', height:'32px', padding:'4px 12px', fontSize:'13px' }); setupButtonHover(backupBtn, { background:'linear-gradient(135deg,#8b5cf6 0%,#7c3aed 100%)', borderColor:'rgba(139,92,246,0.7)', color:'#fff' }, { background:'linear-gradient(135deg,#a78bfa 0%,#8b5cf6 100%)', borderColor:'rgba(139,92,246,0.6)', color:'#fff', boxShadow:'0 2px 4px rgba(139,92,246,0.25), 0 1px 2px rgba(0,0,0,0.1)' });
+    
+    const importBackupBtn = document.createElement('button'); importBackupBtn.textContent = '导入词卡备份'; applyStyles(importBackupBtn, { ...commonStyles.button.base, background:'linear-gradient(135deg,#f59e0b 0%,#d97706 100%)', borderColor:'rgba(245,158,11,0.7)', color:'#fff', height:'32px', padding:'4px 12px', fontSize:'13px' }); setupButtonHover(importBackupBtn, { background:'linear-gradient(135deg,#f59e0b 0%,#d97706 100%)', borderColor:'rgba(245,158,11,0.7)', color:'#fff' }, { background:'linear-gradient(135deg,#fbbf24 0%,#f59e0b 100%)', borderColor:'rgba(245,158,11,0.6)', color:'#fff', boxShadow:'0 2px 4px rgba(245,158,11,0.25), 0 1px 2px rgba(0,0,0,0.1)' });
+    
     const importInput = document.createElement('input'); importInput.type = 'file'; importInput.accept = '.txt'; importInput.multiple = true; importInput.style.cssText = `display:none`;
+    const importBackupInput = document.createElement('input'); importBackupInput.type = 'file'; importBackupInput.accept = '.zip'; importBackupInput.multiple = false; importBackupInput.style.cssText = `display:none`;
     importBtn.onclick = () => { importInput.click(); };
+    importBackupBtn.onclick = () => { importBackupInput.click(); };
+    
     importInput.onchange = async () => {
         const files = Array.from(importInput.files || []); if (!files.length) return;
         const tasks = files.map(f => new Promise(resolve => { const reader = new FileReader(); reader.onload = () => resolve({ name: (f.name||'').replace(/\.txt$/i, ''), content: String(reader.result||'') }); reader.onerror = () => resolve({ name: (f.name||'').replace(/\.txt$/i, ''), content: '' }); reader.readAsText(f, 'utf-8'); }));
@@ -708,7 +955,105 @@ function showPromptCardPoolManage(){
         const blob = new Blob([txt], { type: 'text/plain;charset=utf-8' }); const url = URL.createObjectURL(blob);
         const a = document.createElement('a'); a.href = url; a.download = filename; document.body.appendChild(a); a.click(); setTimeout(() => { document.body.removeChild(a); URL.revokeObjectURL(url); }, 0);
     };
-    ioTools.appendChild(importBtn); ioTools.appendChild(exportBtn); ioTools.appendChild(importInput);
+    backupBtn.onclick = () => { backupUserPromptCards(); };
+    
+    // 处理导入备份压缩包
+    importBackupInput.onchange = async () => {
+        const files = Array.from(importBackupInput.files || []);
+        if (!files.length) return;
+        
+        const file = files[0];
+        if (!file.name.toLowerCase().endsWith('.zip')) {
+            showNotification('请选择.zip格式的压缩包文件', 'error');
+            return;
+        }
+        
+        try {
+            if (!window.JSZip) {
+                const script = document.createElement('script');
+                script.src = 'https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js';
+                script.onload = () => processZipFile(file);
+                script.onerror = () => {
+                    showNotification('无法加载压缩库，请检查网络连接', 'error');
+                    importBackupInput.value = '';
+                };
+                document.head.appendChild(script);
+            } else {
+                processZipFile(file);
+            }
+        } catch(e) {
+            showNotification('处理压缩包失败：' + e.message, 'error');
+            importBackupInput.value = '';
+        }
+    };
+    
+    async function processZipFile(file) {
+        try {
+            const JSZip = window.JSZip;
+            const zip = new JSZip();
+            const zipContent = await zip.loadAsync(file);
+            
+            const txtFiles = Object.keys(zipContent.files).filter(name => 
+                name.toLowerCase().endsWith('.txt') && !name.endsWith('/')
+            );
+            
+            if (txtFiles.length === 0) {
+                showNotification('压缩包中没有找到.txt文件', 'error');
+                importBackupInput.value = '';
+                return;
+            }
+            
+            const group = (String(categorySel.value || 'SFW').toUpperCase() === 'NSFW') ? 'NSFW' : 'SFW';
+            let successCount = 0;
+            let skipCount = 0;
+            
+            const progressDiv = document.createElement('div');
+            progressDiv.style.cssText = `position:fixed;left:50%;top:50%;transform:translate(-50%,-50%);background:#0f172a;border:1px solid rgba(59,130,246,.6);border-radius:12px;box-shadow:0 10px 30px rgba(0,0,0,.4);padding:20px;color:#e5e7eb;display:flex;flex-direction:column;gap:15px;z-index:10021;min-width:300px`;
+            const titleDiv = document.createElement('div');
+            titleDiv.textContent = `正在导入备份到 ${group} 分类 (共${txtFiles.length}个文件)`;
+            titleDiv.style.cssText = `font-size:16px;font-weight:700;color:#93c5fd;text-align:center`;
+            const progressInfo = document.createElement('div');
+            progressInfo.style.cssText = `margin:10px 0;padding:10px;background:rgba(34,197,94,0.1);border:1px solid rgba(34,197,94,0.35);border-radius:8px;color:#86efac;font-size:12px;text-align:center`;
+            progressInfo.textContent = '准备开始...';
+            progressDiv.appendChild(titleDiv);
+            progressDiv.appendChild(progressInfo);
+            document.body.appendChild(progressDiv);
+            
+            try {
+                for (let i = 0; i < txtFiles.length; i++) {
+                    const fileName = txtFiles[i];
+                    const displayName = fileName.split('/').pop().replace(/\.txt$/i, '');
+                    const finalName = `${group}/${displayName}`;
+                    
+                    try {
+                        const content = await zipContent.files[fileName].async('string');
+                        const ok = await savePromptCard(finalName, content, 'user', undefined);
+                        if (ok) {
+                            successCount++;
+                        } else {
+                            skipCount++;
+                        }
+                    } catch(e) {
+                        console.warn(`导入文件 ${fileName} 失败:`, e);
+                        skipCount++;
+                    }
+                    
+                    progressInfo.textContent = `正在处理... ${i + 1}/${txtFiles.length} - 成功: ${successCount}, 跳过: ${skipCount}`;
+                    
+                    await new Promise(resolve => setTimeout(resolve, 100));
+                }
+            } finally {
+                importBackupInput.value = '';
+                try { document.body.removeChild(progressDiv); } catch(_){}
+                refresh();
+                showNotification(`导入完成！成功: ${successCount}, 跳过: ${skipCount} (已导入到${group})`, successCount > 0 ? 'success' : 'warning', 3000);
+            }
+        } catch(e) {
+            showNotification('解析压缩包失败：' + e.message, 'error');
+            importBackupInput.value = '';
+        }
+    }
+    ioTools.appendChild(importBtn); ioTools.appendChild(exportBtn); ioTools.appendChild(backupBtn); ioTools.appendChild(importBackupBtn); ioTools.appendChild(importInput); ioTools.appendChild(importBackupInput);
     btnRow.insertBefore(ioTools, editTools);
     listFrame.appendChild(list); const listHeaderBar = document.createElement('div'); listHeaderBar.textContent='提示词卡池文件'; listHeaderBar.style.cssText = `width:100%;margin:10px 0 4px 0;padding:2px 0 0 0;color:#93c5fd;font-size:14px;font-weight:700;display:flex;align-items:center;gap:6px`;
     
@@ -755,44 +1100,47 @@ function showPromptCardPoolManage(){
                 const authorMatch1 = displayContent.match(/^\s*\{\{提供者:\s*([^}]+)\}\}\s*$/m);
                 if (authorMatch1) {
                     author = authorMatch1[1].trim();
-                    displayContent = displayContent.replace(authorMatch1[0], '').trim();
                 }
                 
                 const authorMatch2 = displayContent.match(/^\s*\/\/\s*提供者:\s*(.+)$/m);
-                if (authorMatch2) {
+                if (authorMatch2 && !author) {
                     author = authorMatch2[1].trim();
-                    displayContent = displayContent.replace(authorMatch2[0], '').trim();
                 }
                 
                 const authorMatch3 = displayContent.match(/^\s*提供者:\s*(.+)$/m);
-                if (authorMatch3) {
+                if (authorMatch3 && !author) {
                     author = authorMatch3[1].trim();
-                    displayContent = displayContent.replace(authorMatch3[0], '').trim();
                 }
                 
                 const versionMatch1 = displayContent.match(/^\s*\{\{版本:\s*([^}]+)\}\}\s*$/m);
                 if (versionMatch1) {
                     version = versionMatch1[1].trim();
-                    displayContent = displayContent.replace(versionMatch1[0], '').trim();
                 }
                 
                 const versionMatch2 = displayContent.match(/^\s*\/\/\s*版本号:\s*(.+)$/m);
-                if (versionMatch2) {
+                if (versionMatch2 && !version) {
                     version = versionMatch2[1].trim();
-                    displayContent = displayContent.replace(versionMatch2[0], '').trim();
                 }
                 
                 const versionMatch3 = displayContent.match(/^\s*\/\/\s*版本:\s*(.+)$/m);
-                if (versionMatch3) {
+                if (versionMatch3 && !version) {
                     version = versionMatch3[1].trim();
-                    displayContent = displayContent.replace(versionMatch3[0], '').trim();
                 }
                 
                 const versionMatch4 = displayContent.match(/^\s*版本:\s*(.+)$/m);
-                if (versionMatch4) {
+                if (versionMatch4 && !version) {
                     version = versionMatch4[1].trim();
-                    displayContent = displayContent.replace(versionMatch4[0], '').trim();
                 }
+                
+                displayContent = displayContent.replace(/^\s*\{\{提供者:\s*[^}]+\}\}\s*$/gm, '');
+                displayContent = displayContent.replace(/^\s*\{\{版本:\s*[^}]+\}\}\s*$/gm, '');
+                displayContent = displayContent.replace(/^\s*\/\/\s*提供者:.*?$/gm, '');
+                displayContent = displayContent.replace(/^\s*\/\/\s*版本号:.*?$/gm, '');
+                displayContent = displayContent.replace(/^\s*\/\/\s*版本:.*?$/gm, '');
+                displayContent = displayContent.replace(/^\s*提供者:.*?$/gm, '');
+                displayContent = displayContent.replace(/^\s*版本:.*?$/gm, '');
+                displayContent = displayContent.replace(/^\s*\/\/.*$/gm, '');
+                displayContent = displayContent.trim();
                 
                 if (authorInput) authorInput.value = author;
                 if (versionInput) versionInput.value = version;
@@ -852,7 +1200,7 @@ function showPromptCardPoolManage(){
     
     const save = async () => {
         const nm = (nameInput.value||'').trim(); const group = (categorySel.value||'SFW').toUpperCase(); let finalName = `${group}/${nm}`; if (!nm) return; let sourceToUse = currentCardSource || 'user'; let confirmText = undefined;
-        if (sourceToUse === 'system'){ const input = prompt('警告：你正在修改系统预置条目。请输入授权指令“我已知晓后果”以继续：',''); if (input !== '我已知晓后果') return; confirmText = input; }
+        if (sourceToUse === 'system'){ const input = prompt('警告：你正在修改系统预置条目，此操作将会造成不可逆的后果。请输入确认指令“我已知晓”以继续：',''); if (input !== '我已知晓') return; confirmText = input; }
 
         const author = authorInput ? authorInput.value.trim() : '';
         const version = versionInput ? versionInput.value.trim() : '';
@@ -876,7 +1224,13 @@ function showPromptCardPoolManage(){
             }
         }
         
-        const ok = await savePromptCard(finalName, saveContent, sourceToUse, confirmText); if (ok) { refresh(); }
+        const ok = await savePromptCard(finalName, saveContent, sourceToUse, confirmText); 
+        if (ok) { 
+            refresh(); 
+            showNotification('保存成功！', 'success');
+        } else {
+            showNotification('保存失败，请重试', 'error');
+        }
         originalName = nm; originalContent = textarea.value||''; originalPath = finalName.endsWith('.txt') ? finalName : `${finalName}.txt`; currentCardPath = originalPath; currentCardSource = sourceToUse; cancelStage = 0;
     };
     const cancel = () => {
@@ -887,7 +1241,15 @@ function showPromptCardPoolManage(){
     };
     const del = async () => {
         const nm = (nameInput.value||'').trim(); const toDelete = currentCardPath || (nm ? nm + '.txt' : ''); if (!toDelete) return; let sourceToUse = currentCardSource || 'user'; const second = confirm('再次确认：删除后不可恢复，是否继续？'); if (!second) return; let confirmText = undefined; if (sourceToUse==='system'){ const input = prompt('警告：你正在删除系统自带条目。请输入授权指令“我已知晓后果”以继续：',''); if (input !== '我已知晓后果') return; confirmText = input; }
-        const ok = await deletePromptCard(toDelete, sourceToUse, confirmText); if (ok){ textarea.value=''; nameInput.value=''; refresh(); }
+        const ok = await deletePromptCard(toDelete, sourceToUse, confirmText); 
+        if (ok){ 
+            textarea.value=''; 
+            nameInput.value=''; 
+            refresh(); 
+            showNotification('删除成功！', 'success');
+        } else {
+            showNotification('删除失败，请重试', 'error');
+        }
     };
     saveBtn.onclick = save; cancelBtn.onclick = cancel; delBtn.onclick = del;
     clearBtn.onclick = () => { textarea.value = ''; };
