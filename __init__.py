@@ -13,7 +13,9 @@ from .Nodes.TriggerWordMerger import TriggerWordMerger
 from .Nodes.TextSwitch.TextSwitchDualMode import TextSwitchDualMode
 from .Nodes.TextSwitch.PriorityTextSwitch import PriorityTextSwitch
 from .Nodes.ShowText import ShowText
-from .Nodes.TencentTranslater import TencentTranslater
+from .Nodes.MultiPlatformTranslate.MultiPlatformTranslate import MultiPlatformTranslate
+from .Nodes.MultiPlatformTranslate.MultiPlatformTranslateAPI import MultiPlatformTranslateAPI
+
 from .Nodes.PhotographPromptGen.PhotographPromptGenerator import PhotographPromptGenerator
 from .Nodes.WanPromptGenerator import WanPromptGenerator
 from .Nodes.ImageScaler import ImageScaler
@@ -67,7 +69,7 @@ NODE_CLASS_MAPPINGS = {
     "TextSwitchDualMode": TextSwitchDualMode,
     "PriorityTextSwitch": PriorityTextSwitch,
     "ShowText": ShowText,
-    "TencentTranslater": TencentTranslater,
+    "MultiPlatformTranslate": MultiPlatformTranslate,
     "PhotographPromptGenerator": PhotographPromptGenerator,
     "WanPromptGenerator": WanPromptGenerator,
     "ImageScaler": ImageScaler,
@@ -120,7 +122,7 @@ NODE_DISPLAY_NAME_MAPPINGS = {
     "TextSwitchDualMode": "Text Switch Dual Mode",
     "PriorityTextSwitch": "Priority Text Switch",
     "ShowText": "Show Text",
-    "TencentTranslater": "Tencent Translater",
+    "MultiPlatformTranslate": "Multi Platform Translate",
     "PhotographPromptGenerator": "Photograph Prompt Generator",
     "WanPromptGenerator": "Wan Prompt Generator",
     "ImageScaler": "Image Scaler",

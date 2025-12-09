@@ -1,0 +1,47 @@
+{
+    "platforms": {
+        "baidu": {
+            "name": "百度翻译",
+            "enabled": true,
+            "config": {
+                "app_id": "",
+                "api_key": ""
+            },
+            "api_url": "https://fanyi-api.baidu.com/api/trans/vip/translate"
+        },
+        "aliyun": {
+            "name": "阿里云翻译",
+            "enabled": true,
+            "config": {
+                "access_key_id": "",
+                "access_key_secret": ""
+            },
+            "api_url": "https://mt.cn-hangzhou.aliyuncs.com"
+        },
+        "youdao": {
+            "name": "有道翻译",
+            "enabled": true,
+            "config": {
+                "app_key": "",
+                "app_secret": ""
+            },
+            "api_url": "https://openapi.youdao.com/api"
+        },
+        "zhipu": {
+            "name": "智谱AI翻译",
+            "enabled": true,
+            "config": {
+                "api_key": "",
+                "model": ""
+            },
+            "api_url": "https://open.bigmodel.cn/api/paas/v4/chat/completions"
+        },
+        "free": {
+            "name": "免费翻译",
+            "enabled": true,
+            "config": {},
+            "api_url": "https://transmart.qq.com/api/imt"
+        }
+    },
+    "default_platform": "baidu"
+}

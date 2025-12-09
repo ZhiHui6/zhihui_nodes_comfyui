@@ -210,5 +210,9 @@
     "Datetime (DESC)":"按日期时间降序",
     "Full Unload":"完全卸载",
     "Unload to CPU":"卸载到内存",
-    "Keep Loaded":"不卸载"
+    "Keep Loaded":"不卸载",
+    "aliyun":"阿里云",
+    "youdao":"有道",
+    "free":"免费",
+    "zhipu":"智谱"
 }

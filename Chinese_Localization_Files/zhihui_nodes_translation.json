@@ -228,53 +228,7 @@
             "image_output": "图像输出"
         }
     },
-    "FreeTranslate": {
-        "title": "免费翻译",
-        "description": "免费翻译：使用各种AI模型的免费文本翻译解决方案。支持中英文互译、自动语言检测，提供Claude、GPT、Gemini等多种AI模型选择。无需API密钥，适用于快速翻译和多语言内容处理。",
-        "outputs": {
-            "translation_result": "翻译结果"
-        },
-        "widgets": {
-            "source_language": "源语言",
-            "target_language": "目标语言",
-            "model": "模型"
-        }
-    },
-    "BaiduTranslate": {
-        "title": "百度翻译",
-        "description": "百度翻译：使用百度翻译API进行文本翻译。支持中英文互译、自动源语言检测，提供明文和后台两种密钥加载方式。适用于多语言提示词处理和国际化内容创作。",       
-        "inputs": {
-            "key_loading": "密钥加载",
-            "source_language": "源语言",
-            "target_language": "目标语言"
-        },
-        "outputs": {
-            "translation_result": "翻译结果"
-        },
-        "widgets": {
-            "enable_translate": "启用翻译",
-            "app_id": "应用ID",
-            "api_key": "API密钥",
-            "key_loading": "密钥加载",
-            "source_language": "源语言",
-            "target_language": "目标语言"
-        }
-    },
-    "TencentTranslater": {
-        "title": "腾讯翻译",
-        "description": "腾讯翻译：使用腾讯云翻译API进行文本翻译。支持自动语言检测中和英文互译，提供高质量的机器翻译服务。适用于多语言内容处理和国际化应用开发。",
-        "inputs": {
-            "Text": "文本输入"
-        },
-        "outputs": {
-            "Translation_Result": "翻译结果"
-        },
-        "widgets": {
-            "Translate_Enable": "启用翻译",
-            "From": "源语言",
-            "To": "目标语言"
-            }
-    },
+
     "PromptPresetOneChoice": {
         "title": "单选提示词预设",
         "description": "单选提示词预设：提供6个预设提示词选项，用户可选择其中一个输出。每个提示词可添加注释标注，便于管理和识别不同提示词内容。",
@@ -905,6 +859,23 @@
         },
         "widgets": {
             "open_card_pool": "卡池管理器"
+        }
+    },
+    "MultiPlatformTranslate": {
+        "title": "多平台翻译器",
+        "description": "多平台翻译节点，支持阿里云、有道和免费翻译服务。点击下方的'配置管理'按钮来管理各平台的API设置。",
+        "inputs": {
+            "your_text": "输入文本"
+        },
+        "widgets": {
+            "enable_translate": "启用翻译",
+            "platform": "翻译平台",
+            "source_language": "源语言",
+            "target_language": "目标语言",
+            "your_text": "输入文本"
+        },
+        "outputs": {
+            "translation_result": "翻译结果"
         }
     }
 }

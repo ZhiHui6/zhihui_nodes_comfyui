@@ -3,10 +3,5 @@
   "split_rule": "auto",
   "load_mode": "single",
   "pool_shuffle": "sequential",
-  "selected": [
-    {
-      "name": "SFW/冬服美女2.txt",
-      "source": "system"
-    }
-  ]
+  "selected": []
 }

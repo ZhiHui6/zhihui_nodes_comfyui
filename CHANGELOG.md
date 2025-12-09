@@ -1,5 +1,18 @@
 # 更新日志
 
+## v0.9.2 - 2025-12-9
+
+- 新增多平台翻译器：支持百度、阿里云、有道、智谱AI和免费。
+- 移除旧的腾讯翻译、百度翻译和免费翻译节点。
+- 更新本地化文件和README文档
+- PromptCardSelector节点添加“游戏提示词卡”资源文件
+<br>
+
+- Added multi-platform translator: supports Baidu, Alibaba Cloud, Youdao, Zhipu AI and free options.
+- Removed legacy Tencent, Baidu and free translation nodes.
+- Updated localization files and README documentation.
+- PromptCardSelector node added “Game Prompt Cards” resource file.
+
 ## v0.9.1 - 2025-12-6
 - PromptCardSelector 节点添加全局通知系统用于显示操作反馈和实现用户词卡打包备份与恢复功能。
 <br>

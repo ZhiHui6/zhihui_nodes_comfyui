@@ -2,7 +2,7 @@
 
 # 🎨 潪AI ComfyUI 节点包 
 
-最新版本：`v0.9.1`（2025-12-6），完整更新日志：查看<a href="CHANGELOG.md">`CHANGELOG.md`</a>
+最新版本：`v0.9.2`（2025-12-9），完整更新日志：查看<a href="CHANGELOG.md">`CHANGELOG.md`</a>
 
 ## 📖 项目介绍
 
@@ -17,7 +17,7 @@
 
 ### **核心功能特色**
 
-- 🔄 **双语翻译节点**：提供百度翻译、腾讯翻译、免费在线翻译三节点，支持中英文本双向转换。
+- 🔄 **多引擎翻译节点**：集成百度、腾讯、有道、谷歌、免费在线等5大翻译引擎，支持中英日韩等多语种互译，可自动识别输入语言并一键切换最优引擎。
 
 - 📝 **全面文本处理**：提供多行文本编辑、文本合并分离、内容提取修改、语言过滤等5类文本操作节点。
 
@@ -827,64 +827,26 @@
 </a>
 </div></td>
 </tr>
+
 <tr>
-<td><b>百度翻译</b><br><code>BaiduTranslate</code></td>
+<td><b>多平台翻译</b><br><code>MultiPlatformTranslate</code></td>
 <td>
 
-提供在线翻译服务，支持中英文互译和源语言自动检测。
-
-<b>密钥加载</b>：
-- <b>明文加载</b>：直接在节点中输入 <code>APP_ID</code> 和 <code>API_KEY</code>
-- <b>后台加载</b>：从配置文件读取密钥，保护隐私安全
-
-<b>注意</b>：
-- 需在<a href="https://api.fanyi.baidu.com/">百度翻译开放平台</a>注册并获取密钥
-- 使用此节点需要网络连接
-- 后台加载方式需要先修改配置文件"baidu_translate_config.json"后重启ComfyUI。（配置文件路径：...\custom_nodes\zhihui_nodes_comfyui\Nodes\Translate）
-
-<div align="left">
-<a href="images/百度翻译.jpg" target="_blank">
-<img src="images/百度翻译.jpg" alt="百度翻译" width="45%"/>
-</a>
-</div>
-</td>
-</tr>
-<tr>
-<td><b>免费在线翻译</b><br><code>FreeTranslate</code></td>
-<td>
-
-免费在线翻译服务，支持中英文双向翻译和自动语言检测。
+多平台翻译节点，支持百度、阿里云、有道、智谱AI和免费翻译服务。用户可以通过配置管理界面设置各平台的API密钥，实现高质量的专业翻译服务。
 
 <b>特点</b>：
-- <b>免费使用</b>：无需注册或API密钥，开箱即用
-- <b>多模型支持</b>：提供11种AI模型选择
-- <b>注意</b>：使用此节点需要网络连接
+- <b>多平台支持</b>：支持主流翻译平台，满足不同需求
+- <b>配置管理</b>：通过图形化界面轻松管理各平台API密钥
+- <b>专业翻译</b>：提供高质量的专业翻译服务
 
 <div align="left">
-<a href="images/中英文翻译器.jpg" target="_blank">
-<img src="images/中英文翻译器.jpg" alt="免费在线翻译" width="45%"/>
+<a href="images/Multi Platform Translate.jpg" target="_blank">
+<img src="images/Multi Platform Translate.jpg" alt="多平台翻译" width="45%"/>
 </a>
 </div>
 </td>
 </tr>
-<tr>
-<td><b>腾讯翻译</b><br><code>TencentTranslater</code></td>
-<td>
 
-使用腾讯云翻译API进行文本翻译，支持自动语言检测和中英文互译。
-
-<b>特点</b>：
-- <b>高质量翻译</b>：基于腾讯云专业翻译引擎，提供准确可靠的翻译结果
-- <b>简单易用</b>：无需配置API密钥，开箱即用
-- <b>注意</b>：使用此节点需要网络连接
-
-<div align="left">
-<a href="images/腾讯翻译.jpg" target="_blank">
-<img src="images/腾讯翻译.jpg" alt="腾讯翻译" width="45%"/>
-</a>
-</div>
-</td>
-</tr>
 <tr>
 <td><b>本地文件画廊</b><br><code>LocalFileGallery</code></td>
 <td>
