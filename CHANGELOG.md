@@ -1,11 +1,18 @@
 # 更新日志
 
-## v0.9.2 - 2025-12-9
+## v0.9.3 - 2025-12-11
+- 多平台翻译器节点(MultiPlatformTranslate)：设置界面新增备份和导入按钮
+- 图片宽高比节点(ImageAspectRatio)：在自定义尺寸选项中新增“互换宽高”功能按钮
+<br>
 
+- Multi-platform translator node: added backup and import buttons in the settings UI.
+- Image aspect ratio node: added a "swap width & height" button in the custom size options.
+
+## v0.9.2 - 2025-12-9
 - 新增多平台翻译器：支持百度、阿里云、有道、智谱AI和免费。
 - 移除旧的腾讯翻译、百度翻译和免费翻译节点。
 - 更新本地化文件和README文档
-- PromptCardSelector节点添加“游戏提示词卡”资源文件
+- PromptCardSelector节点添加“游戏提示词卡”资源文件。
 <br>
 
 - Added multi-platform translator: supports Baidu, Alibaba Cloud, Youdao, Zhipu AI and free options.
@@ -21,8 +28,8 @@
 
 ## v0.9.0 - 2025-12-5
 - 优化、修复PromptCardSelector节点：添加卡池文件数统计，提供者、版本号信息等。
-- SystemPrompt节点新增文本：Prompt优化师、Veo3分镜分析与提示词、视频分析与复刻
-- 更新README
+- SystemPrompt节点新增文本：Prompt优化师、Veo3分镜分析与提示词、视频分析与复刻。
+- 更新README。
 <br>
 
 - Optimized and fixed PromptCardSelector node: added card pool file count statistics, provider and version information.

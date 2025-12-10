@@ -9,6 +9,9 @@ app.registerExtension({
                 const r = onNodeCreated ? onNodeCreated.apply(this, arguments) : undefined;
                 
                 this.initialized = true;
+                
+                this.lastCustomSize = { width: 1328, height: 1328 };
+                this.lastPresetSize = null;
 
                 const QWEN_PRESETS = [
                     "1:1(1328x1328)",
@@ -96,6 +99,103 @@ app.registerExtension({
                     }
                 };
 
+                this.swapWidthHeight = function() {
+                    const widthWidget = this.widgets.find(w => w.name === "custom_width");
+                    const heightWidget = this.widgets.find(w => w.name === "custom_height");
+                    
+                    if (widthWidget && heightWidget) {
+                        const currentWidth = parseInt(widthWidget.value) || 1328;
+                        const currentHeight = parseInt(heightWidget.value) || 1328;
+                        
+                        widthWidget.value = currentHeight;
+                        heightWidget.value = currentWidth;
+                        
+                        this.lastCustomSize = {
+                            width: currentHeight,
+                            height: currentWidth
+                        };
+                        
+                        if (this.aspectRatio && this.aspectRatio > 0) {
+                            this.aspectRatio = currentHeight / currentWidth;
+                            this.lastWidth = currentHeight;
+                            this.lastHeight = currentWidth;
+                        }
+                        
+                        app.graph.setDirtyCanvas(true, true);
+                    }
+                };
+
+                this.repositionCustomControls = function(isCustom) {
+                    const currentSize = { ...this.size };
+                    
+                    const widgets = this.widgets || [];
+                    const modeIdx = widgets.findIndex(w => w && w.name === "preset_mode");
+                    const aspectIdx = widgets.findIndex(w => w && w.name === "aspect_ratio");
+                    const widthIdx = widgets.findIndex(w => w && w.name === "custom_width");
+                    const heightIdx = widgets.findIndex(w => w && w.name === "custom_height");
+                    const lockIdx = widgets.findIndex(w => w && w.name === "aspect_lock");
+                    const swapIdx = widgets.findIndex(w => w && w.name === "🔁互换宽高·Swap_W&H");
+                    
+                    if (modeIdx < 0 || aspectIdx < 0 || widthIdx < 0 || heightIdx < 0 || lockIdx < 0) return;
+                    
+                    const aspectWidget = widgets[aspectIdx];
+                    const widthWidget = widgets[widthIdx];
+                    const heightWidget = widgets[heightIdx];
+                    const lockWidget = widgets[lockIdx];
+                    let swapWidget = swapIdx >= 0 ? widgets[swapIdx] : null;
+                    
+                    if (!isCustom) {
+                        this.lastCustomSize = {
+                            width: parseInt(widthWidget.value) || 1328,
+                            height: parseInt(heightWidget.value) || 1328
+                        };
+                    }
+                    
+                    const indicesToRemove = [aspectIdx, widthIdx, heightIdx, lockIdx, swapIdx].filter(idx => idx >= 0).sort((a, b) => b - a);
+                    for (const idx of indicesToRemove) {
+                        widgets.splice(idx, 1);
+                    }
+                    
+                    if (isCustom) {
+                        widgets.splice(modeIdx + 1, 0, widthWidget, heightWidget);
+                        
+                        if (!swapWidget) {
+                            swapWidget = this.addWidget("button", "🔁互换宽高·Swap_W&H", null, () => {
+                                this.swapWidthHeight();
+                            });
+                            const curIdx = widgets.indexOf(swapWidget);
+                            if (curIdx >= 0) widgets.splice(curIdx, 1);
+                        }
+
+                        widgets.splice(modeIdx + 3, 0, swapWidget, lockWidget);
+                        
+                        aspectWidget.hidden = true;
+                        widthWidget.hidden = false;
+                        heightWidget.hidden = false;
+                        lockWidget.hidden = false;
+                        if (swapWidget) {
+                            swapWidget.hidden = false;
+                        }
+                        widthWidget.value = this.lastCustomSize.width;
+                        heightWidget.value = this.lastCustomSize.height;
+                        widgets.push(aspectWidget);
+                    } else {
+                        widgets.splice(modeIdx + 1, 0, aspectWidget);
+                        aspectWidget.hidden = false;
+                        widthWidget.hidden = true;
+                        heightWidget.hidden = true;
+                        lockWidget.hidden = true;
+                        widgets.push(widthWidget, heightWidget, lockWidget);
+                        if (swapWidget) {
+                            swapWidget.hidden = true;
+                            widgets.push(swapWidget);
+                        }
+                    }
+                    
+                    this.size = currentSize;
+                    app.graph.setDirtyCanvas(true, true);
+                };
+
                 const originalCallback = this.callback;
                 this.callback = function() {
                     if (originalCallback) {
@@ -116,10 +216,7 @@ app.registerExtension({
 
                     const isCustom = modeWidget.value === "Custom Size";
                     
-                    aspectRatioWidget.hidden = isCustom;
-                    widthWidget.hidden = !isCustom;
-                    heightWidget.hidden = !isCustom;
-                    lockWidget.hidden = !isCustom;
+                    this.repositionCustomControls(isCustom);
                     
                     if (!isCustom) {
                         lockWidget.value = false;
@@ -182,12 +279,20 @@ app.registerExtension({
                                     this.lastHeight = 1328;
                                 }
                             }
+                            this.lastCustomSize = {
+                                width: parseInt(widthWidget.value) || 1328,
+                                height: parseInt(heightWidget.value) || 1328
+                            };
                             this.callback();
                         };
 
                         modeWidget.callback = () => {
                             if (originalModeCallback) originalModeCallback.apply(modeWidget, arguments);
                             applyAspectOptionsByMode(modeWidget.value, aspectRatioWidget);
+                            
+                            const isCustom = modeWidget.value === "Custom Size";
+                            this.repositionCustomControls(isCustom);
+                            
                             this.callback();
                         };
                         
@@ -222,6 +327,11 @@ app.registerExtension({
                                             this.lastHeight = currentHeight;
                                         }
                                         
+                                        this.lastCustomSize = {
+                                            width: parseInt(widthWidget.value) || 1328,
+                                            height: parseInt(heightWidget.value) || 1328
+                                        };
+                                        
                                         this.isUpdating = false;
                                     }
                                 }
@@ -229,6 +339,10 @@ app.registerExtension({
                         }, 100);
                         
                         applyAspectOptionsByMode(modeWidget.value, aspectRatioWidget);
+                        
+                        const isCustom = modeWidget.value === "Custom Size";
+                        this.repositionCustomControls(isCustom);
+                        
                         this.callback();
                     }
                 }, 100);

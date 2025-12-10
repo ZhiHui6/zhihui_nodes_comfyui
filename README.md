@@ -2,7 +2,7 @@
 
 # 🎨 潪AI ComfyUI 节点包 
 
-最新版本：`v0.9.2`（2025-12-9），完整更新日志：查看<a href="CHANGELOG.md">`CHANGELOG.md`</a>
+最新版本：`v0.9.3`（2025-12-11），完整更新日志：查看<a href="CHANGELOG.md">`CHANGELOG.md`</a>
 
 ## 📖 项目介绍
 
@@ -374,14 +374,8 @@
 
 <br>
 <div align="left">
-<a href="images/图像宽高比设置1.jpg" target="_blank">
-<img src="images/图像宽高比设置1.jpg" alt="图像宽高比设置1" width="30%"/>
-</a>
-<a href="images/图像宽高比设置2.jpg" target="_blank">
-<img src="images/图像宽高比设置2.jpg" alt="图像宽高比设置2" width="30%"/>
-</a>
-<a href="images/图像宽高比设置3.jpg" target="_blank">
-<img src="images/图像宽高比设置3.jpg" alt="图像宽高比设置3" width="30%"/>
+<a href="images/Image Aspect Ratio.jpg" target="_blank">
+<img src="images/Image Aspect Ratio.jpg" alt="Image Aspect Ratio" width="80%"/>
 </a>
 </div>
 </td>

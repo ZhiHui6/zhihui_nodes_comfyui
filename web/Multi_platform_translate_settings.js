@@ -291,6 +291,10 @@ const StyleManager = {
                     min-height: 28px;
                 }
                 
+                #${uniqueId} .btn-clear {
+                    margin-right: auto;
+                }
+                
                 #${uniqueId} .btn-save { 
                     ${styles.button} ${styles.buttonSuccess}
                 }
@@ -627,7 +631,9 @@ async function openSettings(node) {
                 ${fieldsHtml}
 
                 <div class="form-actions">
-                    <button id="btn-clear" class="btn-clear" style="background: linear-gradient(135deg, #dc2626 0%, #b91c1c 100%); color: #fff; border: none; border-radius: 6px; padding: 6px 12px; font-size: 13px; font-weight: 600; cursor: pointer; box-shadow: 0 2px 8px rgba(220, 38, 38, 0.3); margin-right: 8px;">清除所有配置</button>
+                    <button id="btn-clear" class="btn-clear" style="background: linear-gradient(135deg, #dc2626 0%, #b91c1c 100%); color: #fff; border: none; border-radius: 6px; padding: 6px 12px; font-size: 13px; font-weight: 600; cursor: pointer; box-shadow: 0 2px 8px rgba(220, 38, 38, 0.3); margin-right: auto;">清除所有配置</button>
+                    <button id="btn-backup" class="btn-backup" style="background: linear-gradient(135deg, #6366f1 0%, #4f46e5 100%); color: #fff; border: none; border-radius: 6px; padding: 6px 12px; font-size: 13px; font-weight: 600; cursor: pointer; box-shadow: 0 2px 8px rgba(99, 102, 241, 0.3); margin-right: 8px;">备份平台信息</button>
+                    <button id="btn-import" class="btn-import" style="background: linear-gradient(135deg, #8b5cf6 0%, #7c3aed 100%); color: #fff; border: none; border-radius: 6px; padding: 6px 12px; font-size: 13px; font-weight: 600; cursor: pointer; box-shadow: 0 2px 8px rgba(139, 92, 246, 0.3); margin-right: 8px;">导入平台信息</button>
                     <button id="btn-save" class="btn-save">保存配置</button>
                 </div>
             </div>
@@ -744,6 +750,80 @@ async function openSettings(node) {
             } else {
                 showPopupNotification("❌ 配置清除失败，请重试。", "error");
             }
+        });
+
+        dialog.querySelector("#btn-backup").addEventListener("click", async () => {
+            try {
+                const config = await loadConfig();
+                if (config && config.platforms) {
+                    const backupData = JSON.stringify(config, null, 2);
+                    const blob = new Blob([backupData], { type: 'application/json' });
+                    const url = URL.createObjectURL(blob);
+                    const a = document.createElement('a');
+                    a.href = url;
+                    a.download = `translate-config-backup-${new Date().toISOString().slice(0, 10)}.json`;
+                    document.body.appendChild(a);
+                    a.click();
+                    document.body.removeChild(a);
+                    URL.revokeObjectURL(url);
+                    showPopupNotification("✅ 平台信息备份成功！", "success");
+                } else {
+                    showPopupNotification("❌ 没有可备份的配置信息。", "error");
+                }
+            } catch (error) {
+                console.error('备份失败:', error);
+                showPopupNotification("❌ 备份失败，请重试。", "error");
+            }
+        });
+
+        dialog.querySelector("#btn-import").addEventListener("click", async () => {
+            const input = document.createElement('input');
+            input.type = 'file';
+            input.accept = '.json';
+            input.onchange = async (event) => {
+                const file = event.target.files[0];
+                if (!file) return;
+                
+                try {
+                    const text = await file.text();
+                    const importedConfig = JSON.parse(text);
+                    
+                    if (importedConfig && importedConfig.platforms) {
+                        // 验证配置格式
+                        const validPlatforms = ['baidu', 'tencent', 'aliyun', 'youdao', 'zhipu', 'free'];
+                        let hasValidConfig = false;
+                        
+                        for (const platform of validPlatforms) {
+                            if (importedConfig.platforms[platform] && importedConfig.platforms[platform].config) {
+                                hasValidConfig = true;
+                                break;
+                            }
+                        }
+                        
+                        if (hasValidConfig) {
+                            if (confirm("确定要导入配置吗？这将覆盖当前所有平台配置！")) {
+                                const success = await saveConfig(importedConfig);
+                                if (success) {
+                                    currentConfig = importedConfig;
+                                    render();
+                                    attachEvents();
+                                    showPopupNotification("✅ 平台信息导入成功！", "success");
+                                } else {
+                                    showPopupNotification("❌ 配置导入失败，请重试。", "error");
+                                }
+                            }
+                        } else {
+                            showPopupNotification("❌ 导入的文件格式不正确。", "error");
+                        }
+                    } else {
+                        showPopupNotification("❌ 导入的文件格式不正确。", "error");
+                    }
+                } catch (error) {
+                    console.error('导入失败:', error);
+                    showPopupNotification("❌ 导入失败，文件格式错误或文件损坏。", "error");
+                }
+            };
+            input.click();
         });
     }
 

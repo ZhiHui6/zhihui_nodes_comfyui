@@ -2,7 +2,7 @@
 
 # 🎨 Zhi.AI ComfyUI Node Pack 
 
-Latest version: `v0.9.2` (2025-12-9), For complete changelog: See <a href="CHANGELOG.md">`CHANGELOG.md`</a>
+Latest version: `v0.9.3` (2025-12-11), For complete changelog: See <a href="CHANGELOG.md">`CHANGELOG.md`</a>
 
 ## 📖 Project Introduction
 
@@ -373,14 +373,8 @@ A comprehensive prompt generator written based on WanXiang 2.2 official document
 
 <br>
 <div align="left">
-<a href="images/图像宽高比设置1.jpg" target="_blank">
-<img src="images/图像宽高比设置1.jpg" alt="Image Aspect Ratio Settings1" width="30%"/>
-</a>
-<a href="images/图像宽高比设置2.jpg" target="_blank">
-<img src="images/图像宽高比设置2.jpg" alt="Image Aspect Ratio Settings2" width="30%"/>
-</a>
-<a href="images/图像宽高比设置3.jpg" target="_blank">
-<img src="images/图像宽高比设置3.jpg" alt="Image Aspect Ratio Settings3" width="30%"/>
+<a href="images/Image Aspect Ratio.jpg" target="_blank">
+<img src="images/Image Aspect Ratio.jpg" alt="Image Aspect Ratio" width="80%"/>
 </a>
 </div>
 </td>
