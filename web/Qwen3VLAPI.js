@@ -173,7 +173,7 @@ class APIConfigManager {
             width: 800px;
             height: auto;
             background: var(--comfy-menu-bg);
-            border: 2px solid #4488ff;
+            border: 1px solid var(--border-color);
             border-radius: 8px;
             padding: 20px;
             max-height: 95vh;
@@ -223,32 +223,62 @@ class APIConfigManager {
                     </div>
                 </div>
                 
-                <div style="margin-top: 15px; display: flex; gap: 8px; justify-content: space-between; align-items: center;">
-                    <div>
+                <div style="margin-top: 15px; display: flex; gap: 15px; justify-content: space-between; align-items: center;">
+                    <div style="display: flex; gap: 12px; align-items: center;">
                         <button id="restore-default" style="
-                            background: var(--comfy-input-bg);
-                            border: 1px solid var(--border-color);
-                            color: var(--input-text);
-                            padding: 6px 12px;
+                            background: #d97706;
+                            border: 1px solid #d97706;
+                            color: white;
+                            padding: 8px 16px;
+                            border-radius: 6px;
+                            cursor: pointer;
+                            font-size: 13px;
+                            font-weight: bold;
+                            transition: all 0.2s ease;
+                            box-shadow: 0 2px 4px rgba(217, 119, 6, 0.2);
+                        " onmouseover="this.style.background='#b45309'; this.style.borderColor='#b45309'; this.style.boxShadow='0 2px 12px rgba(217, 119, 6, 0.6)'; this.style.transform='translateY(-1px)';" 
+                          onmouseout="this.style.background='#d97706'; this.style.borderColor='#d97706'; this.style.boxShadow='0 2px 4px rgba(217, 119, 6, 0.2)'; this.style.transform='translateY(0)';">恢复默认</button>
+                    </div>
+                    
+                    <div style="display: flex; gap: 8px; padding: 4px 8px; background: var(--comfy-panel-bg, #2a2a2a); border-radius: 6px; border: 1px solid var(--border-color, #404040); margin-left: -350px;">
+                        <button id="export-config" style="
+                            background: #3b82f6;
+                            border: 1px solid #3b82f6;
+                            color: white;
+                            padding: 6px 14px;
                             border-radius: 4px;
                             cursor: pointer;
                             font-size: 13px;
                             transition: all 0.2s ease;
-                        " onmouseover="this.style.background='#ff6b35'; this.style.borderColor='#ff6b35'; this.style.color='white';" 
-                          onmouseout="this.style.background='var(--comfy-input-bg)'; this.style.borderColor='var(--border-color)'; this.style.color='var(--input-text)';">恢复默认</button>
+                            font-weight: 500;
+                        " onmouseover="this.style.background='#2563eb'; this.style.borderColor='#2563eb'; this.style.boxShadow='0 4px 16px rgba(59, 130, 246, 0.6)'; this.style.transform='translateY(-2px)';" 
+                          onmouseout="this.style.background='#3b82f6'; this.style.borderColor='#3b82f6'; this.style.boxShadow='none'; this.style.transform='translateY(0)';">导出配置</button>
+                        <button id="import-config" style="
+                            background: #3b82f6;
+                            border: 1px solid #3b82f6;
+                            color: white;
+                            padding: 6px 14px;
+                            border-radius: 4px;
+                            cursor: pointer;
+                            font-size: 13px;
+                            transition: all 0.2s ease;
+                            font-weight: 500;
+                        " onmouseover="this.style.background='#2563eb'; this.style.borderColor='#2563eb'; this.style.boxShadow='0 4px 16px rgba(59, 130, 246, 0.6)'; this.style.transform='translateY(-2px)';" 
+                          onmouseout="this.style.background='#3b82f6'; this.style.borderColor='#3b82f6'; this.style.boxShadow='none'; this.style.transform='translateY(0)';">导入配置</button>
                     </div>
+                    
                     <div>
                         <button id="exit-dialog" style="
-                            background: var(--comfy-input-bg);
-                            border: 1px solid var(--border-color);
-                            color: var(--input-text);
+                            background: #ff0000;
+                            border: 1px solid #ff0000;
+                            color: white;
                             padding: 6px 12px;
                             border-radius: 4px;
                             cursor: pointer;
                             font-size: 13px;
                             transition: all 0.2s ease;
-                        " onmouseover="this.style.background='#ff4444'; this.style.borderColor='#ff4444'; this.style.color='white';" 
-                          onmouseout="this.style.background='var(--comfy-input-bg)'; this.style.borderColor='var(--border-color)'; this.style.color='var(--input-text)';">退出</button>
+                        " onmouseover="this.style.background='#e60000'; this.style.borderColor='#e60000'; this.style.boxShadow='0 4px 16px rgba(255, 0, 0, 0.6)'; this.style.transform='translateY(-2px)';" 
+                          onmouseout="this.style.background='#ff0000'; this.style.borderColor='#ff0000'; this.style.boxShadow='none'; this.style.transform='translateY(0)';">退出</button>
                     </div>
                 </div>
             </div>
@@ -272,6 +302,14 @@ class APIConfigManager {
 
         dialog.querySelector("#restore-default").onclick = () => {
             this.restoreDefaultConfig(dialog);
+        };
+
+        dialog.querySelector("#export-config").onclick = () => {
+            this.exportConfig();
+        };
+
+        dialog.querySelector("#import-config").onclick = () => {
+            this.importConfig(dialog);
         };
 
         const exitBtn = dialog.querySelector("#exit-dialog");
@@ -1102,6 +1140,104 @@ class APIConfigManager {
             alert("已恢复默认配置并已自动保存！");
         } else {
             alert("已恢复默认配置，但保存失败，请稍后重试或手动保存。");
+        }
+    }
+
+    async exportConfig() {
+        try {
+            const config = await this.loadConfig();
+            const exportData = {
+                version: config.config_version || "3.0",
+                export_time: new Date().toISOString(),
+                config: config
+            };
+            
+            const dataStr = JSON.stringify(exportData, null, 2);
+            const dataBlob = new Blob([dataStr], { type: 'application/json' });
+            const url = URL.createObjectURL(dataBlob);
+            
+            const link = document.createElement('a');
+            link.href = url;
+            link.download = `qwen3vl_config_${new Date().toISOString().slice(0, 19).replace(/:/g, '-')}.json`;
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+            URL.revokeObjectURL(url);
+            
+            alert("配置导出成功！");
+        } catch (error) {
+            console.error("导出配置失败:", error);
+            alert("导出配置失败，请重试。");
+        }
+    }
+
+    async importConfig(dialog) {
+        try {
+            const input = document.createElement('input');
+            input.type = 'file';
+            input.accept = '.json';
+            input.onchange = async (event) => {
+                const file = event.target.files[0];
+                if (!file) return;
+                
+                try {
+                    const text = await file.text();
+                    const importData = JSON.parse(text);
+                    
+                    // 验证导入数据的格式
+                    if (!importData.config) {
+                        throw new Error('无效的配置文件格式');
+                    }
+                    
+                    const importedConfig = importData.config;
+                    
+                    // 验证必要的字段
+                    if (!importedConfig.api_keys || !importedConfig.custom_configs) {
+                        throw new Error('配置文件缺少必要字段');
+                    }
+                    
+                    // 显示导入确认对话框
+                    if (!confirm(`确定要导入配置文件吗？这将覆盖当前的所有设置。`)) {
+                        return;
+                    }
+                    
+                    // 合并配置，保留当前的活动目标设置
+                    const currentConfig = await this.loadConfig();
+                    const mergedConfig = {
+                        ...importedConfig,
+                        active_target: currentConfig.active_target || importedConfig.active_target || "SiliconFlow",
+                        config_version: importedConfig.config_version || "3.0"
+                    };
+                    
+                    // 保存导入的配置
+                    const ok = await this.saveConfig(mergedConfig);
+                    if (ok) {
+                        this.config = mergedConfig;
+                        
+                        // 重新渲染界面
+                        this.renderPlatformConfigs(this.config);
+                        
+                        const customContainerExists = !!document.querySelector('#custom-configs');
+                        if (customContainerExists) {
+                            this.renderCustomConfigs(this.config);
+                        }
+                        this.attachActiveTargetHandlers(dialog);
+                        
+                        alert("配置导入成功！");
+                    } else {
+                        alert("配置导入失败，请重试。");
+                    }
+                    
+                } catch (error) {
+                    console.error("解析配置文件失败:", error);
+                    alert(`导入失败：${error.message}`);
+                }
+            };
+            input.click();
+            
+        } catch (error) {
+            console.error("导入配置失败:", error);
+            alert("导入配置失败，请重试。");
         }
     }
 }

@@ -296,17 +296,17 @@
       "count": 1
     },
     "动物生物.动物": {
-      "enabled": false,
+      "enabled": true,
       "weight": 1,
       "count": 1
     },
     "动物生物.幻想生物": {
-      "enabled": false,
+      "enabled": true,
       "weight": 1,
       "count": 1
     },
     "动物生物.行为动态": {
-      "enabled": false,
+      "enabled": true,
       "weight": 1,
       "count": 1
     }

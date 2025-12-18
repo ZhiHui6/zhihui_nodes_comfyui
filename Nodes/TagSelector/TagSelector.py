@@ -493,7 +493,7 @@ Output: A beautiful young girl with expressive eyes and a gentle smile, sitting 
     @classmethod
     def get_preview_image_path(cls, tag_name):
         user_images_dir = os.path.join(os.path.dirname(__file__), "user_images")
-        filename = f"{tag_name}_Preview.png"
+        filename = f"{tag_name}_Preview.webp"
         return os.path.join(user_images_dir, filename)
 
     @classmethod
@@ -509,15 +509,47 @@ Output: A beautiful young girl with expressive eyes and a gentle smile, sitting 
             
             image_bytes = base64.b64decode(image_data)
             
+            # 将图片转换为WebP格式并优化
+            from PIL import Image
+            import io
+            
+            # 从字节数据创建图片对象
+            img = Image.open(io.BytesIO(image_bytes))
+            
+            # 确保图片模式兼容WebP
+            if img.mode in ["RGBA", "LA"]:
+                # WebP支持透明度
+                pass
+            elif img.mode in ["P", "L", "1"]:
+                # 转换为RGB模式
+                img = img.convert("RGB")
+            elif img.mode not in ["RGB", "RGBA"]:
+                img = img.convert("RGB")
+            
+            # 优化图片尺寸（保持宽高比，最大边长不超过800像素）
+            max_size = 800
+            if max(img.size) > max_size:
+                img.thumbnail((max_size, max_size), Image.Resampling.LANCZOS)
+            
+            # 保存为WebP格式，优化文件大小
             image_path = cls.get_preview_image_path(tag_name)
             
-            with open(image_path, 'wb') as f:
-                f.write(image_bytes)
+            # 使用WebP格式保存，设置合适的质量参数以平衡文件大小和图像质量
+            img.save(image_path, "WEBP", quality=85, optimize=True, method=6)
             
             return True
         except Exception as e:
             print(f"Error saving preview image: {e}")
-            return False
+            # 出现错误时回退到原来的保存方式
+            try:
+                image_path = cls.get_preview_image_path(tag_name)
+                image_bytes = base64.b64decode(image_data)
+                with open(image_path, 'wb') as f:
+                    f.write(image_bytes)
+                return True
+            except Exception as fallback_error:
+                print(f"Fallback error saving preview image: {fallback_error}")
+                return False
 
     @classmethod
     def save_user_tags(cls, user_tags):
@@ -591,21 +623,44 @@ async def save_user_tag(request):
         name = data.get('name', '').strip()
         content = data.get('content', '').strip()
         preview_image = data.get('preview_image', None)
+        original_name = data.get('original_name', '').strip()  # 编辑模式下的原始标签名称
         
         if not name or not content:
             return web.json_response({"error": "名称和内容不能为空"}, status=400)
         
         user_tags = TagSelector.get_user_tags()
+        
+        # 如果是编辑模式，先删除原始标签（如果名称发生了变化）
+        if original_name and original_name != name:
+            if original_name in user_tags:
+                del user_tags[original_name]
+                # 删除原始预览图片
+                TagSelector.delete_preview_image(original_name)
+        
+        # 检查是否需要删除图片（编辑模式下用户点击了删除图片）
+        delete_image = data.get('delete_image', False)
+        if original_name and delete_image:
+            TagSelector.delete_preview_image(name)
+        
+        # 保存新标签数据
         user_tags[name] = {
-            "content": content,
-            "preview": f"/zhihui/user_tags/preview/{name}"
+            "content": content
         }
+        
+        # 只有在没有删除图片的情况下才添加预览字段
+        if not delete_image:
+            user_tags[name]["preview"] = f"/zhihui/user_tags/preview/{name}"
         
         if TagSelector.save_user_tags(user_tags):
             if preview_image:
+                # 如果有新图片，保存它
                 TagSelector.save_preview_image(name, preview_image)
+            elif original_name and delete_image:
+                # 如果是编辑模式且明确删除图片，删除现有图片
+                TagSelector.delete_preview_image(name)
             
-            return web.json_response({"success": True, "message": "标签保存成功"})
+            message = "标签更新成功！" if original_name else "标签保存成功"
+            return web.json_response({"success": True, "message": message})
         else:
             return web.json_response({"error": "保存失败"}, status=500)
     except Exception as e:
@@ -643,5 +698,40 @@ async def get_user_tag_preview(request):
             return web.FileResponse(image_path)
         else:
             return web.json_response({"error": "预览图不存在"}, status=404)
+    except Exception as e:
+        return web.json_response({"error": str(e)}, status=500)
+
+@PromptServer.instance.routes.delete('/zhihui/user_tags/all')
+async def delete_all_user_tags_and_images(request):
+    try:
+        # 获取所有用户标签
+        user_tags = TagSelector.get_user_tags()
+        
+        # 删除所有用户标签
+        if TagSelector.save_user_tags({}):
+            # 删除所有用户图片
+            user_images_dir = os.path.join(os.path.dirname(__file__), "user_images")
+            if os.path.exists(user_images_dir):
+                deleted_count = 0
+                for filename in os.listdir(user_images_dir):
+                    if filename.endswith('_Preview.webp'):
+                        image_path = os.path.join(user_images_dir, filename)
+                        try:
+                            os.remove(image_path)
+                            deleted_count += 1
+                        except Exception as e:
+                            print(f"Error deleting image {filename}: {e}")
+                
+                return web.json_response({
+                    "success": True, 
+                    "message": f"所有自定义标签和图片已删除（共删除 {deleted_count} 张图片）"
+                })
+            else:
+                return web.json_response({
+                    "success": True, 
+                    "message": "所有自定义标签已删除（未找到用户图片文件夹）"
+                })
+        else:
+            return web.json_response({"error": "删除标签失败"}, status=500)
     except Exception as e:
         return web.json_response({"error": str(e)}, status=500)

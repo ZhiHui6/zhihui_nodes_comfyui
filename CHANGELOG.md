@@ -1,5 +1,27 @@
 # 更新日志
 
+## v0.9.4 - 2025-12-18
+- 系统提示词加载器节点(SystemPromptLoader)：
+  - 新增预设文本"通用中文反推提示词工程"
+- 标签选择器节点(TagSelector)：
+  - 新增删除所有标签功能
+  - 调整优化界面部分元素
+  - 重构并升级标签编辑界面功能
+  - 随机标签界面现已集成到主导航菜单
+- Qwen3VL在线版节点(Qwen3VLAPI) ：
+  - 新增配置信息导入、导出功能
+  <br>
+
+- SystemPromptLoader node:
+  - Added preset text "Universal Chinese Reverse-Prompt Engineering"
+- TagSelector node:
+  - Added delete all tags functionality
+  - Adjusted and optimized some UI elements
+  - Refactored and upgraded the tag-editing UI
+  - Random-tag UI is now integrated into the main navigation menu
+- Qwen3VLAPI node:
+  - Added import / export functionality for configuration data
+
 ## v0.9.3 - 2025-12-11
 - 多平台翻译器节点(MultiPlatformTranslate)：设置界面新增备份和导入按钮
 - 图片宽高比节点(ImageAspectRatio)：在自定义尺寸选项中新增“互换宽高”功能按钮
