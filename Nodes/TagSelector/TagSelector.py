@@ -509,38 +509,29 @@ Output: A beautiful young girl with expressive eyes and a gentle smile, sitting 
             
             image_bytes = base64.b64decode(image_data)
             
-            # 将图片转换为WebP格式并优化
             from PIL import Image
             import io
             
-            # 从字节数据创建图片对象
             img = Image.open(io.BytesIO(image_bytes))
             
-            # 确保图片模式兼容WebP
             if img.mode in ["RGBA", "LA"]:
-                # WebP支持透明度
                 pass
             elif img.mode in ["P", "L", "1"]:
-                # 转换为RGB模式
                 img = img.convert("RGB")
             elif img.mode not in ["RGB", "RGBA"]:
                 img = img.convert("RGB")
             
-            # 优化图片尺寸（保持宽高比，最大边长不超过800像素）
             max_size = 800
             if max(img.size) > max_size:
                 img.thumbnail((max_size, max_size), Image.Resampling.LANCZOS)
             
-            # 保存为WebP格式，优化文件大小
             image_path = cls.get_preview_image_path(tag_name)
             
-            # 使用WebP格式保存，设置合适的质量参数以平衡文件大小和图像质量
             img.save(image_path, "WEBP", quality=85, optimize=True, method=6)
             
             return True
         except Exception as e:
             print(f"Error saving preview image: {e}")
-            # 出现错误时回退到原来的保存方式
             try:
                 image_path = cls.get_preview_image_path(tag_name)
                 image_bytes = base64.b64decode(image_data)
@@ -623,40 +614,33 @@ async def save_user_tag(request):
         name = data.get('name', '').strip()
         content = data.get('content', '').strip()
         preview_image = data.get('preview_image', None)
-        original_name = data.get('original_name', '').strip()  # 编辑模式下的原始标签名称
+        original_name = data.get('original_name', '').strip()
         
         if not name or not content:
             return web.json_response({"error": "名称和内容不能为空"}, status=400)
         
         user_tags = TagSelector.get_user_tags()
         
-        # 如果是编辑模式，先删除原始标签（如果名称发生了变化）
         if original_name and original_name != name:
             if original_name in user_tags:
                 del user_tags[original_name]
-                # 删除原始预览图片
                 TagSelector.delete_preview_image(original_name)
         
-        # 检查是否需要删除图片（编辑模式下用户点击了删除图片）
         delete_image = data.get('delete_image', False)
         if original_name and delete_image:
             TagSelector.delete_preview_image(name)
         
-        # 保存新标签数据
         user_tags[name] = {
             "content": content
         }
         
-        # 只有在没有删除图片的情况下才添加预览字段
         if not delete_image:
             user_tags[name]["preview"] = f"/zhihui/user_tags/preview/{name}"
         
         if TagSelector.save_user_tags(user_tags):
             if preview_image:
-                # 如果有新图片，保存它
                 TagSelector.save_preview_image(name, preview_image)
             elif original_name and delete_image:
-                # 如果是编辑模式且明确删除图片，删除现有图片
                 TagSelector.delete_preview_image(name)
             
             message = "标签更新成功！" if original_name else "标签保存成功"
@@ -704,12 +688,9 @@ async def get_user_tag_preview(request):
 @PromptServer.instance.routes.delete('/zhihui/user_tags/all')
 async def delete_all_user_tags_and_images(request):
     try:
-        # 获取所有用户标签
         user_tags = TagSelector.get_user_tags()
         
-        # 删除所有用户标签
         if TagSelector.save_user_tags({}):
-            # 删除所有用户图片
             user_images_dir = os.path.join(os.path.dirname(__file__), "user_images")
             if os.path.exists(user_images_dir):
                 deleted_count = 0
@@ -733,5 +714,77 @@ async def delete_all_user_tags_and_images(request):
                 })
         else:
             return web.json_response({"error": "删除标签失败"}, status=500)
+    except Exception as e:
+        return web.json_response({"error": str(e)}, status=500)
+
+@PromptServer.instance.routes.get('/zhihui/user_tags/backup')
+async def backup_user_tags(request):
+    try:
+        import zipfile
+        import io
+        
+        user_tags_path = os.path.join(os.path.dirname(__file__), "user_tags.json")
+        user_images_dir = os.path.join(os.path.dirname(__file__), "user_images")
+        
+        zip_buffer = io.BytesIO()
+        
+        with zipfile.ZipFile(zip_buffer, 'w', zipfile.ZIP_DEFLATED, compresslevel=9) as zip_file:
+            if os.path.exists(user_tags_path):
+                zip_file.write(user_tags_path, arcname="user_tags.json")
+            
+            if os.path.exists(user_images_dir):
+                for root, dirs, files in os.walk(user_images_dir):
+                    for file in files:
+                        file_path = os.path.join(root, file)
+                        arcname = os.path.relpath(file_path, os.path.dirname(user_images_dir))
+                        zip_file.write(file_path, arcname=arcname)
+        
+        zip_buffer.seek(0)
+        
+        response = web.Response(
+            body=zip_buffer.getvalue(),
+            content_type='application/zip',
+            headers={
+                'Content-Disposition': 'attachment; filename="user_tags_backup.zip"'
+            }
+        )
+        
+        return response
+    except Exception as e:
+        return web.json_response({"error": str(e)}, status=500)
+
+@PromptServer.instance.routes.post('/zhihui/user_tags/restore')
+async def restore_user_tags(request):
+    try:
+        import zipfile
+        import io
+        
+        data = await request.post()
+        backup_file = data.get('backup_file')
+        
+        if not backup_file:
+            return web.json_response({"error": "未选择备份文件"}, status=400)
+        
+        zip_buffer = io.BytesIO(backup_file.file.read())
+        
+        with zipfile.ZipFile(zip_buffer, 'r') as zip_file:
+            user_tags_path = os.path.join(os.path.dirname(__file__), "user_tags.json")
+            user_images_dir = os.path.join(os.path.dirname(__file__), "user_images")
+            
+            if 'user_tags.json' in zip_file.namelist():
+                with zip_file.open('user_tags.json') as source_file:
+                    content = source_file.read()
+                    with open(user_tags_path, 'wb') as dest_file:
+                        dest_file.write(content)
+            
+            for file_info in zip_file.infolist():
+                if file_info.filename.startswith('user_images/') and not file_info.is_dir():
+                    dest_path = os.path.join(os.path.dirname(__file__), file_info.filename)
+                    os.makedirs(os.path.dirname(dest_path), exist_ok=True)
+                    with zip_file.open(file_info) as source_file:
+                        with open(dest_path, 'wb') as dest_file:
+                            dest_file.write(source_file.read())
+        
+        return web.json_response({"success": True, "message": "恢复成功"})
     except Exception as e:
         return web.json_response({"error": str(e)}, status=500)

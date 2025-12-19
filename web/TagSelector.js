@@ -94,19 +94,15 @@ const commonStyles = {
     }
 }
 
-// 气泡提示函数
 function showToast(message, type = 'info', duration = 3000) {
-    // 移除已存在的气泡提示
     const existingToast = document.getElementById('custom-toast');
     if (existingToast) {
         existingToast.remove();
     }
 
-    // 创建气泡提示元素
     const toast = document.createElement('div');
     toast.id = 'custom-toast';
     
-    // 根据类型设置样式
     const typeStyles = {
         success: {
             background: 'linear-gradient(135deg, #10b981 0%, #059669 100%)',
@@ -148,7 +144,6 @@ function showToast(message, type = 'info', duration = 3000) {
         pointer-events: none;
     `;
 
-    // 添加动画样式
     if (!document.getElementById('toast-animations')) {
         const styleSheet = document.createElement('style');
         styleSheet.id = 'toast-animations';
@@ -180,7 +175,6 @@ function showToast(message, type = 'info', duration = 3000) {
     toast.textContent = message;
     document.body.appendChild(toast);
 
-    // 自动消失
     setTimeout(() => {
         toast.style.animation = 'slideOutCenter 0.3s ease';
         setTimeout(() => {
@@ -913,7 +907,7 @@ function createTagSelectorDialog() {
     nameInput.className = 'tag-input';
     nameInput.type = 'text';
     nameInput.placeholder = '输入标签名称 (纯中文:9个, 纯英文:18个字符)';
-    nameInput.maxLength = 18; // 允许最多18个字符，用于英文输入
+    nameInput.maxLength = 18;
     nameInput.style.cssText = `
         background: rgba(15, 23, 42, 0.3);
         border: 1px solid rgba(59, 130, 246, 0.4);
@@ -927,13 +921,11 @@ function createTagSelectorDialog() {
         width: 120px;
         min-width: 120px;
         height: 24px;
-    // 添加字符计数函数
     function countChineseAndEnglish(text) {
         let chineseCount = 0;
         let englishCount = 0;
         
         for (let char of text) {
-            // 使用Unicode范围判断中文字符
             if (/[\u4e00-\u9fa5]/.test(char)) {
                 chineseCount++;
             } else if (/[a-zA-Z]/.test(char)) {
@@ -944,21 +936,17 @@ function createTagSelectorDialog() {
         return { chinese: chineseCount, english: englishCount };
     }
     
-    // 验证字符长度函数
     function validateCharacterLength(text) {
         const counts = countChineseAndEnglish(text);
         
-        // 纯中文：最多9个字符
         if (counts.chinese > 0 && counts.english === 0) {
             return counts.chinese <= 9;
         }
         
-        // 纯英文：最多18个字符
         if (counts.english > 0 && counts.chinese === 0) {
             return counts.english <= 18;
         }
         
-        // 混合字符：按照最严格的规则（中文按1个，英文按0.5个计算）
         const mixedCount = counts.chinese + (counts.english * 0.5);
         return mixedCount <= 9;
     }
@@ -966,9 +954,7 @@ function createTagSelectorDialog() {
     nameInput.addEventListener('input', () => {
         const value = nameInput.value;
         
-        // 如果超出长度限制，截断字符
         if (!validateCharacterLength(value)) {
-            // 逐步减少字符直到满足条件
             let truncatedValue = value;
             while (truncatedValue.length > 0 && !validateCharacterLength(truncatedValue)) {
                 truncatedValue = truncatedValue.substring(0, truncatedValue.length - 1);
@@ -1576,7 +1562,6 @@ function createTagSelectorDialog() {
         gap: 12px;
     `;
 
-    // 一键随机按钮（添加到清空选择按钮左边）
     const quickRandomBtn = document.createElement('button');
     quickRandomBtn.innerHTML = '<span style="font-size: 14px; font-weight: 600; display: block;">一键随机</span>';
     quickRandomBtn.style.cssText = `
@@ -1611,7 +1596,6 @@ function createTagSelectorDialog() {
         }
     };
 
-    // 恢复选择按钮（添加到清空选择按钮左边）
     const restoreBtn = document.createElement('button');
     restoreBtn.innerHTML = '<span style="font-size: 14px; font-weight: 600; display: block;">恢复选择</span>';
     restoreBtn.style.cssText = `
@@ -1696,8 +1680,6 @@ function createTagSelectorDialog() {
     overlay.appendChild(dialog);
 
     tagSelectorDialog = overlay;
-    
-    // 保存按钮引用以便后续控制显示
     tagSelectorDialog.clearButtonContainer = clearButtonContainer;
     tagSelectorDialog.clearBtn = clearBtn;
     tagSelectorDialog.quickRandomBtn = quickRandomBtn;
@@ -1781,11 +1763,7 @@ function createTagSelectorDialog() {
 function initializeCategoryList() {
     const categoryList = tagSelectorDialog.categoryList;
     categoryList.innerHTML = '';
-
-    // 获取所有分类，包括新增的随机标签
     const allCategories = [...Object.keys(tagsData), '随机标签'];
-    
-    // 自定义分类排序规则
     const customOrder = ['常规标签', '艺术题材', '人物类', '动物生物', '场景类', '涩影湿', '随机标签', '灵感套装', '自定义'];
     allCategories.sort((a, b) => {
         return customOrder.indexOf(a) - customOrder.indexOf(b);
@@ -1836,7 +1814,6 @@ function initializeCategoryList() {
             tagSelectorDialog.activeSubSubCategory = null;
             tagSelectorDialog.activeSubSubSubCategory = null;
 
-            // 处理随机标签分类
             if (category === '随机标签') {
                 showRandomTagManagement();
             } else {
@@ -1867,7 +1844,6 @@ function showSubCategories(category) {
         tagSelectorDialog.subSubSubCategoryTabs.innerHTML = '';
     }
     
-    // 控制清空选择按钮的显示 - 在指定的分类中显示
     const categoriesToShowClearButton = ['常规标签', '艺术题材', '人物类', '场景类', '动物生物', '灵感套装', '涩影湿'];
     if (tagSelectorDialog.clearButtonContainer) {
         if (categoriesToShowClearButton.includes(category)) {
@@ -1877,7 +1853,6 @@ function showSubCategories(category) {
         }
     }
     
-    // 显示恢复选择按钮（与清空选择按钮一同显示）
     if (tagSelectorDialog.restoreBtn) {
         if (categoriesToShowClearButton.includes(category)) {
             tagSelectorDialog.restoreBtn.style.display = 'block';
@@ -1892,13 +1867,11 @@ function showSubCategories(category) {
         tagSelectorDialog.formButtonsContainer.style.display = 'none';
     }
     
-    // 隐藏一键随机按钮（除非在随机标签界面）
     if (tagSelectorDialog.quickRandomBtn) {
         tagSelectorDialog.quickRandomBtn.style.display = 'none';
     }
     const subCategories = tagsData[category];
     
-    // 在自定义分类下添加"标签管理"子菜单
     let subCategoryKeys = Object.keys(subCategories);
     if (category === '自定义' && !subCategoryKeys.includes('标签管理')) {
         subCategoryKeys = [...subCategoryKeys, '标签管理'];
@@ -1954,7 +1927,6 @@ function showSubCategories(category) {
             tagSelectorDialog.activeSubSubCategory = null;
             tagSelectorDialog.activeSubSubSubCategory = null;
 
-            // 处理"标签管理"子菜单
             if (category === '自定义' && subCategory === '标签管理') {
                 showCustomTagManagement();
             } else {
@@ -1981,12 +1953,8 @@ function showSubCategories(category) {
 }
 
 function showSubSubCategories(category, subCategory) {
-    // 退出标签管理界面时，恢复顶部已选择标签区域的正常显示
     if (tagSelectorDialog.selectedTagsList && tagSelectorDialog.hintText && tagSelectorDialog.selectedCount) {
-        // 恢复告示信息
         tagSelectorDialog.hintText.textContent = '💡未选择任何标签，请从下方选择您需要的TAG标签，或通过搜索栏快速查找。';
-        
-        // 根据已选择标签数量决定显示内容
         if (selectedTags.size > 0) {
             tagSelectorDialog.hintText.style.display = 'none';
             tagSelectorDialog.selectedCount.style.display = 'inline-block';
@@ -2183,7 +2151,6 @@ function createTagElement(display, value, isSelected) {
         maxWidth: '120px'
     });
 
-    // 限制显示最多13个字符
      const displayText = display.length > 13 ? display.substring(0, 13) + '...' : display;
     tagElement.textContent = displayText;
     tagElement.dataset.value = value;
@@ -2235,7 +2202,6 @@ function createCustomTagTooltip(tagValue, tagName, tagObj) {
         gap: '10px'
     });
     
-    // 标签内容和图片预览区域
     const mainContainer = document.createElement('div');
     mainContainer.style.cssText = `
         width: 100%;
@@ -2245,7 +2211,6 @@ function createCustomTagTooltip(tagValue, tagName, tagObj) {
         align-items: flex-start;
     `;
     
-    // 标签内容区域
     const contentDiv = document.createElement('div');
     contentDiv.style.cssText = `
         flex: 1;
@@ -2267,8 +2232,6 @@ function createCustomTagTooltip(tagValue, tagName, tagObj) {
     `;
 
     contentDiv.textContent = tagValue;
-    
-    // 图片预览区域
     const previewContainer = document.createElement('div');
     previewContainer.style.cssText = `
         flex-shrink: 0;
@@ -2309,13 +2272,10 @@ function createCustomTagTooltip(tagValue, tagName, tagObj) {
         opacity: 0;
     `;
 
-    // 改进图片路径处理 - 如果有时间戳，添加到URL中以强制刷新图片缓存
     const timestamp = tagObj && tagObj.imageTimestamp ? `?t=${tagObj.imageTimestamp}` : '';
     const imageUrl = `/zhihui/user_tags/preview/${encodeURIComponent(tagName)}${timestamp}`;
     previewImg.src = imageUrl;
     previewImg.alt = `预览: ${tagName}`;
-    
-    // 添加加载状态指示器
     const loadingDiv = document.createElement('div');
     loadingDiv.style.cssText = `
         position: absolute;
@@ -2343,7 +2303,6 @@ function createCustomTagTooltip(tagValue, tagName, tagObj) {
         加载中...
     `;
     
-    // 添加CSS动画
     if (!document.getElementById('tooltip-spin-animation')) {
         const style = document.createElement('style');
         style.id = 'tooltip-spin-animation';
@@ -2356,7 +2315,6 @@ function createCustomTagTooltip(tagValue, tagName, tagObj) {
         document.head.appendChild(style);
     }
     
-    // 图片加载事件处理
     previewImg.onload = () => {
         loadingDiv.style.display = 'none';
         previewImg.style.opacity = '1';
@@ -2369,11 +2327,9 @@ function createCustomTagTooltip(tagValue, tagName, tagObj) {
             <div>无预览图片</div>
         `;
         
-        // 隐藏图片元素
         previewImg.style.display = 'none';
     };
     
-    // 添加悬停效果
     previewDiv.addEventListener('mouseenter', () => {
         previewDiv.style.transform = 'scale(1.02)';
         previewDiv.style.boxShadow = '0 8px 25px rgba(59, 130, 246, 0.4)';
@@ -2387,8 +2343,6 @@ function createCustomTagTooltip(tagValue, tagName, tagObj) {
     previewDiv.appendChild(loadingDiv);
     previewDiv.appendChild(previewImg);
     previewContainer.appendChild(previewDiv);
-    
-    // 将预览区域和内容区域添加到主容器（预览图在左，文本内容在右）
     mainContainer.appendChild(previewContainer);
     mainContainer.appendChild(contentDiv);
     tooltip.appendChild(mainContainer);
@@ -2398,12 +2352,9 @@ function createCustomTagTooltip(tagValue, tagName, tagObj) {
 
 function showTags(category, subCategory) {
 
-    // 退出标签管理界面时，恢复顶部已选择标签区域的正常显示
     if (tagSelectorDialog.selectedTagsList && tagSelectorDialog.hintText && tagSelectorDialog.selectedCount) {
-        // 恢复告示信息
         tagSelectorDialog.hintText.textContent = '💡未选择任何标签，请从下方选择您需要的TAG标签，或通过搜索栏快速查找。';
         
-        // 根据已选择标签数量决定显示内容
         if (selectedTags.size > 0) {
             tagSelectorDialog.hintText.style.display = 'none';
             tagSelectorDialog.selectedCount.style.display = 'inline-block';
@@ -2423,7 +2374,6 @@ function showTags(category, subCategory) {
         tagSelectorDialog.subSubSubCategoryTabs.innerHTML = '';
     }
 
-    // 显示一级分类导航菜单，但隐藏二级分类导航菜单
     if (tagSelectorDialog.subCategoryTabs) {
         tagSelectorDialog.subCategoryTabs.style.display = 'flex';
     }
@@ -2434,7 +2384,6 @@ function showTags(category, subCategory) {
         tagSelectorDialog.subSubSubCategoryTabs.style.display = 'none';
     }
     
-    // 控制清空选择按钮的显示 - 在指定的分类中显示
     const categoriesToShowClearButton = ['常规标签', '艺术题材', '人物类', '场景类', '动物生物', '灵感套装', '涩影湿'];
     if (tagSelectorDialog.clearButtonContainer) {
         if (categoriesToShowClearButton.includes(category) || (category === '自定义' && subCategory === '我的标签')) {
@@ -2444,7 +2393,6 @@ function showTags(category, subCategory) {
         }
     }
     
-    // 显示恢复选择按钮（与清空选择按钮一同显示）
     if (tagSelectorDialog.restoreBtn) {
         if (categoriesToShowClearButton.includes(category) || (category === '自定义' && subCategory === '我的标签')) {
             tagSelectorDialog.restoreBtn.style.display = 'block';
@@ -2549,7 +2497,6 @@ function showTags(category, subCategory) {
         tagContainer.appendChild(tagElement);
 
         if (isCustomCategory) {
-            // 删除按钮功能已移除
         }
 
         tagContent.appendChild(tagContainer);
@@ -2560,7 +2507,6 @@ function showRandomTagManagement() {
     const tagContent = tagSelectorDialog.tagContent;
     tagContent.innerHTML = '';
     
-    // 隐藏二级分类导航菜单
     if (tagSelectorDialog.subCategoryTabs) {
         tagSelectorDialog.subCategoryTabs.style.display = 'none';
     }
@@ -2571,7 +2517,6 @@ function showRandomTagManagement() {
         tagSelectorDialog.subSubSubCategoryTabs.style.display = 'none';
     }
     
-    // 主标题（无框架）
     const mainTitle = document.createElement('h2');
     mainTitle.textContent = '🎲 随机标签生成';
     mainTitle.style.cssText = `
@@ -2583,9 +2528,8 @@ function showRandomTagManagement() {
     `;
     tagContent.appendChild(mainTitle);
     
-    // 规则说明
     const rulesDescription = document.createElement('div');
-    rulesDescription.style.cssText = 'margin-bottom: 12px;'; // 添加底部间距，与组别间距保持一致
+    rulesDescription.style.cssText = 'margin-bottom: 12px;';
     rulesDescription.innerHTML = `
         <div style="color: #e2e8f0; font-size: 14px; line-height: 1.6; background: rgba(37, 99, 235, 0.1); border-radius: 8px; padding: 16px; border: 1px solid rgba(37, 99, 235, 0.3);">
             <div style="color: #60a5fa; font-size: 16px; font-weight: 600; margin: 0 0 12px 0; text-align: left;">📋 生成规则说明</div>
@@ -2607,22 +2551,14 @@ function showRandomTagManagement() {
             </div>
         </div>
     `;
-    tagContent.appendChild(rulesDescription);
-    
 
-    
-    // 规则说明已合并到标题区域
-    
-    // 全局设置部分
+    tagContent.appendChild(rulesDescription);
     const globalSection = createGlobalSection();
-    globalSection.style.cssText = 'margin-bottom: 12px;'; // 添加底部间距，与其他框架保持一致
+    globalSection.style.cssText = 'margin-bottom: 12px;';
     tagContent.appendChild(globalSection);
-    
-    // 分类权重设置部分
     const categoriesSection = createCategoriesSection();
     tagContent.appendChild(categoriesSection);
     
-    // 隐藏管理按钮和表单按钮，显示底部一键随机和清空选择按钮
     if (tagSelectorDialog.managementButtonsContainer) {
         tagSelectorDialog.managementButtonsContainer.style.display = 'none';
     }
@@ -2633,12 +2569,10 @@ function showRandomTagManagement() {
         tagSelectorDialog.clearButtonContainer.style.display = 'flex';
     }
     
-    // 显示一键随机按钮
     if (tagSelectorDialog.quickRandomBtn) {
         tagSelectorDialog.quickRandomBtn.style.display = 'block';
     }
     
-    // 显示恢复选择按钮
     if (tagSelectorDialog.restoreBtn) {
         tagSelectorDialog.restoreBtn.style.display = 'block';
     }
@@ -2648,7 +2582,6 @@ function showCustomTagManagement() {
     const tagContent = tagSelectorDialog.tagContent;
     tagContent.innerHTML = '';
     
-    // 显示一级和二级分类导航菜单，但隐藏三级分类导航菜单
     if (tagSelectorDialog.subCategoryTabs) {
         tagSelectorDialog.subCategoryTabs.style.display = 'flex';
     }
@@ -2659,7 +2592,6 @@ function showCustomTagManagement() {
         tagSelectorDialog.subSubSubCategoryTabs.style.display = 'none';
     }
     
-    // 隐藏清空选择按钮和表单按钮
     if (tagSelectorDialog.clearButtonContainer) {
         tagSelectorDialog.clearButtonContainer.style.display = 'none';
     }
@@ -2667,17 +2599,14 @@ function showCustomTagManagement() {
         tagSelectorDialog.formButtonsContainer.style.display = 'none';
     }
     
-    // 隐藏一键随机按钮
     if (tagSelectorDialog.quickRandomBtn) {
         tagSelectorDialog.quickRandomBtn.style.display = 'none';
     }
     
-    // 隐藏恢复选择按钮
     if (tagSelectorDialog.restoreBtn) {
         tagSelectorDialog.restoreBtn.style.display = 'none';
     }
     
-    // 在标签管理界面下，隐藏顶部已选择标签的内容并更新告示信息
     if (tagSelectorDialog.selectedTagsList) {
         tagSelectorDialog.selectedTagsList.style.display = 'none';
     }
@@ -2689,7 +2618,6 @@ function showCustomTagManagement() {
         tagSelectorDialog.selectedCount.style.display = 'none';
     }
     
-    // 显示添加标签、编辑标签、删除标签按钮
     if (!tagSelectorDialog.managementButtonsContainer) {
         const managementButtonsContainer = document.createElement('div');
         managementButtonsContainer.style.cssText = `
@@ -2703,7 +2631,6 @@ function showCustomTagManagement() {
             z-index: 10;
         `;
         
-        // 添加标签按钮
         const addBtn = document.createElement('button');
         addBtn.innerHTML = '<span style="font-size: 14px; font-weight: 600; display: block;">添加标签</span>';
         addBtn.style.cssText = `
@@ -2735,11 +2662,10 @@ function showCustomTagManagement() {
             addBtn.style.transform = 'none';
         });
         addBtn.onclick = () => {
-            createTagManagementForm(); // 不带参数表示添加新标签
+            createTagManagementForm();
         };
         managementButtonsContainer.appendChild(addBtn);
         
-        // 删除全部按钮
         const deleteAllBtn = document.createElement('button');
         deleteAllBtn.innerHTML = '<span style="font-size: 14px; font-weight: 600; display: block;">删除全部</span>';
         deleteAllBtn.style.cssText = `
@@ -2771,16 +2697,13 @@ function showCustomTagManagement() {
             deleteAllBtn.style.transform = 'none';
         });
         
-        // 删除全部按钮点击事件
         deleteAllBtn.onclick = () => {
-            // 检查是否有自定义标签
             const customTags = tagsData['自定义']?.['我的标签'] || [];
             if (customTags.length === 0) {
                 showToast('没有可删除的自定义标签', 'info');
                 return;
             }
             
-            // 创建警告对话框
             const warningDialog = document.createElement('div');
             warningDialog.style.cssText = `
                 position: fixed;
@@ -2881,7 +2804,6 @@ function showCustomTagManagement() {
                 cursor: not-allowed;
             `;
             
-            // 确认按钮状态管理
             const updateConfirmButtonState = () => {
                 if (confirmInput.value === '确认删除') {
                     confirmButton.style.opacity = '1';
@@ -2901,10 +2823,8 @@ function showCustomTagManagement() {
                 }
             });
             
-            // 确认删除函数
             const confirmDelete = async () => {
                 try {
-                    // 调用后端API删除所有标签和图片
                     const response = await fetch('/zhihui/user_tags/all', {
                         method: 'DELETE',
                         headers: {
@@ -2915,24 +2835,15 @@ function showCustomTagManagement() {
                     const result = await response.json();
                     
                     if (response.ok) {
-                        // 更新本地数据
                         if (tagsData['自定义']) {
                             tagsData['自定义']['我的标签'] = [];
                         }
                         
-                        // 保存到localStorage
                         localStorage.setItem('tagSelector_user_tags', JSON.stringify(tagsData));
-                        
-                        // 关闭警告对话框
                         document.body.removeChild(warningDialog);
-                        
-                        // 重新显示标签列表
                         showCustomTagManagement();
-                        
-                        // 显示成功消息
                         showToast(result.message || '所有自定义标签和图片已成功删除！', 'success');
                     } else {
-                        // 显示错误消息
                         showToast(result.error || '删除失败，请重试', 'error');
                     }
                 } catch (error) {
@@ -2942,8 +2853,6 @@ function showCustomTagManagement() {
             };
             
             confirmButton.onclick = confirmDelete;
-            
-            // 添加悬停效果
             cancelButton.addEventListener('mouseenter', () => {
                 cancelButton.style.background = 'linear-gradient(135deg, #9ca3af 0%, #6b7280 100%)';
             });
@@ -2962,36 +2871,148 @@ function showCustomTagManagement() {
                 }
             });
             
-            // 组装警告对话框
             buttonContainer.appendChild(cancelButton);
             buttonContainer.appendChild(confirmButton);
-            
             warningCard.appendChild(warningTitle);
             warningCard.appendChild(warningMessage);
             warningCard.appendChild(confirmInput);
             warningCard.appendChild(buttonContainer);
-            
             warningDialog.appendChild(warningCard);
             document.body.appendChild(warningDialog);
-            
-            // 聚焦到输入框
             confirmInput.focus();
         };
         
         managementButtonsContainer.appendChild(deleteAllBtn);
+        const backupBtn = document.createElement('button');
+        backupBtn.innerHTML = '<span style="font-size: 14px; font-weight: 600; display: block;">备份用户标签</span>';
+        backupBtn.style.cssText = `
+            background: linear-gradient(135deg, #3b82f6 0%, #2563eb 100%);
+            border: 1px solid rgba(59, 130, 246, 0.8);
+            color: #ffffff;
+            padding: 7px 14px;
+            border-radius: 4px;
+            cursor: pointer;
+            font-weight: 600;
+            transition: all 0.2s ease;
+            line-height: 1.2;
+            height: 35px;
+            width: auto;
+            min-width: 100px;
+            white-space: nowrap;
+            font-size: 14px;
+        `;
+        backupBtn.addEventListener('mouseenter', () => {
+            backupBtn.style.background = 'linear-gradient(135deg, #60a5fa 0%, #3b82f6 100%)';
+            backupBtn.style.color = '#ffffff';
+            backupBtn.style.borderColor = 'rgba(96, 165, 250, 0.8)';
+            backupBtn.style.transform = 'none';
+        });
+        backupBtn.addEventListener('mouseleave', () => {
+            backupBtn.style.background = 'linear-gradient(135deg, #3b82f6 0%, #2563eb 100%)';
+            backupBtn.style.color = '#ffffff';
+            backupBtn.style.borderColor = 'rgba(59, 130, 246, 0.8)';
+            backupBtn.style.transform = 'none';
+        });
+        backupBtn.onclick = async () => {
+            try {
+                const response = await fetch('/zhihui/user_tags/backup', {
+                    method: 'GET',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    }
+                });
+                if (response.ok) {
+                    const blob = await response.blob();
+                    const url = window.URL.createObjectURL(blob);
+                    const a = document.createElement('a');
+                    a.href = url;
+                    a.download = `user_tags_backup_${new Date().toISOString().slice(0, 10)}.zip`;
+                    document.body.appendChild(a);
+                    a.click();
+                    window.URL.revokeObjectURL(url);
+                    document.body.removeChild(a);
+                    showToast('备份成功！', 'success');
+                } else {
+                    const result = await response.json();
+                    showToast(result.error || '备份失败', 'error');
+                }
+            } catch (error) {
+                console.error('Error backing up user tags:', error);
+                showToast('备份失败，请重试', 'error');
+            }
+        };
+        managementButtonsContainer.appendChild(backupBtn);
+        const restoreTagsBtn = document.createElement('button');
+        restoreTagsBtn.innerHTML = '<span style="font-size: 14px; font-weight: 600; display: block;">恢复用户标签</span>';
+        restoreTagsBtn.style.cssText = `
+            background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%);
+            border: 1px solid rgba(245, 158, 11, 0.8);
+            color: #ffffff;
+            padding: 7px 14px;
+            border-radius: 4px;
+            cursor: pointer;
+            font-weight: 600;
+            transition: all 0.2s ease;
+            line-height: 1.2;
+            height: 35px;
+            width: auto;
+            min-width: 100px;
+            white-space: nowrap;
+            font-size: 14px;
+        `;
+        restoreTagsBtn.addEventListener('mouseenter', () => {
+            restoreTagsBtn.style.background = 'linear-gradient(135deg, #fbbf24 0%, #f59e0b 100%)';
+            restoreTagsBtn.style.color = '#ffffff';
+            restoreTagsBtn.style.borderColor = 'rgba(251, 191, 36, 0.8)';
+            restoreTagsBtn.style.transform = 'none';
+        });
+        restoreTagsBtn.addEventListener('mouseleave', () => {
+            restoreTagsBtn.style.background = 'linear-gradient(135deg, #f59e0b 0%, #d97706 100%)';
+            restoreTagsBtn.style.color = '#ffffff';
+            restoreTagsBtn.style.borderColor = 'rgba(245, 158, 11, 0.8)';
+            restoreTagsBtn.style.transform = 'none';
+        });
+        restoreTagsBtn.onclick = () => {
+            const input = document.createElement('input');
+            input.type = 'file';
+            input.accept = '.zip';
+            input.onchange = async (e) => {
+                const file = e.target.files[0];
+                if (!file) return;
+                const formData = new FormData();
+                formData.append('backup_file', file);
+                try {
+                    const response = await fetch('/zhihui/user_tags/restore', {
+                        method: 'POST',
+                        body: formData
+                    });
+                    if (response.ok) {
+                        const result = await response.json();
+                        showToast('恢复成功！', 'success');
+                        await loadTagsData();
+                        showCustomTagManagement();
+                    } else {
+                        const result = await response.json();
+                        showToast(result.error || '恢复失败', 'error');
+                    }
+                } catch (error) {
+                    console.error('Error restoring user tags:', error);
+                    showToast('恢复失败，请重试', 'error');
+                }
+            };
+            input.click();
+        };
+        managementButtonsContainer.appendChild(restoreTagsBtn);
         
-        // 将管理按钮容器添加到footer
-        const footer = tagSelectorDialog.lastElementChild; // footer是dialog的最后一个子元素
+        const footer = tagSelectorDialog.lastElementChild;
         if (footer) {
             footer.appendChild(managementButtonsContainer);
             tagSelectorDialog.managementButtonsContainer = managementButtonsContainer;
         }
     } else {
-        // 如果管理按钮容器已存在，直接显示
         tagSelectorDialog.managementButtonsContainer.style.display = 'flex';
     }
     
-    // 创建标题栏
     const titleBar = document.createElement('div');
     titleBar.style.cssText = `
         color: #38f2f8ff;
@@ -3007,7 +3028,6 @@ function showCustomTagManagement() {
     titleBar.textContent = '可编辑自定义标签列表';
     tagContent.appendChild(titleBar);
     
-    // 创建标签列表区域
     const tagList = document.createElement('div');
     tagList.style.cssText = `
         display: grid;
@@ -3017,10 +3037,8 @@ function showCustomTagManagement() {
     `;
     tagContent.appendChild(tagList);
     
-    // 获取自定义标签数据
     const customTags = tagsData['自定义']?.['我的标签'] || [];
     
-    // 存储当前选中的标签
     if (!tagSelectorDialog.selectedTagForManagement) {
         tagSelectorDialog.selectedTagForManagement = null;
     }
@@ -3037,7 +3055,6 @@ function showCustomTagManagement() {
         emptyMessage.textContent = '暂无自定义标签，请点击下方按钮添加';
         tagList.appendChild(emptyMessage);
     } else {
-        // 显示每个标签
         customTags.forEach(tag => {
             const tagItem = document.createElement('div');
             tagItem.style.cssText = `
@@ -3053,7 +3070,6 @@ function showCustomTagManagement() {
                 transition: all 0.3s ease;
             `;
             
-            // 图片显示区域
             const tagImage = document.createElement('div');
             tagImage.style.cssText = `
                 flex-shrink: 0;
@@ -3068,9 +3084,7 @@ function showCustomTagManagement() {
                 position: relative;
             `;
             
-            // 图片元素
             const img = document.createElement('img');
-            // 如果有时间戳，添加到URL中以强制刷新图片缓存
             const timestamp = tag.imageTimestamp ? `?t=${tag.imageTimestamp}` : '';
             const imageUrl = `/zhihui/user_tags/preview/${encodeURIComponent(tag.display)}${timestamp}`;
             img.src = imageUrl;
@@ -3082,7 +3096,6 @@ function showCustomTagManagement() {
                 display: block;
             `;
             
-            // 加载失败时显示默认提示
             img.onerror = () => {
                 tagImage.innerHTML = '';
                 const noImageText = document.createElement('div');
@@ -3099,7 +3112,6 @@ function showCustomTagManagement() {
             tagImage.appendChild(img);
             tagItem.appendChild(tagImage);
             
-            // 文本内容区域
             const textContent = document.createElement('div');
             textContent.style.cssText = `
                 flex: 1;
@@ -3108,7 +3120,6 @@ function showCustomTagManagement() {
                 gap: 6px;
             `;
             
-            // 标签名称
             const tagName = document.createElement('div');
             tagName.style.cssText = `
                 font-weight: 600;
@@ -3121,12 +3132,9 @@ function showCustomTagManagement() {
                 min-width: 0;
             `;
             
-            // 限制显示最多13个字符
             const displayText = tag.display.length > 13 ? tag.display.substring(0, 13) + '...' : tag.display;
             tagName.textContent = displayText;
             textContent.appendChild(tagName);
-            
-            // 标签内容预览
             const tagContentPreview = document.createElement('div');
             tagContentPreview.style.cssText = `
                 color: #e2e8f0;
@@ -3141,10 +3149,8 @@ function showCustomTagManagement() {
             `;
             tagContentPreview.textContent = tag.value;
             textContent.appendChild(tagContentPreview);
-            
             tagItem.appendChild(textContent);
             
-            // 创建编辑和删除按钮容器
             const actionButtons = document.createElement('div');
             actionButtons.style.cssText = `
                 position: absolute;
@@ -3154,7 +3160,6 @@ function showCustomTagManagement() {
                 gap: 4px;
             `;
             
-            // 编辑按钮
             const editBtn = document.createElement('button');
             editBtn.innerHTML = '✏️';
             editBtn.style.cssText = `
@@ -3173,7 +3178,6 @@ function showCustomTagManagement() {
                 justify-content: center;
             `;
             
-            // 编辑按钮tooltip
             const editTooltip = document.createElement('div');
             editTooltip.textContent = '编辑';
             editTooltip.style.cssText = `
@@ -3208,13 +3212,12 @@ function showCustomTagManagement() {
                 editTooltip.style.visibility = 'hidden';
             });
             editBtn.onclick = (e) => {
-                e.stopPropagation(); // 阻止冒泡到父元素
+                e.stopPropagation();
                 editTooltip.style.opacity = '0';
                 editTooltip.style.visibility = 'hidden';
                 createTagManagementForm(tag);
             };
             
-            // 删除按钮
             const deleteBtn = document.createElement('button');
             deleteBtn.innerHTML = '🗑️';
             deleteBtn.style.cssText = `
@@ -3233,7 +3236,6 @@ function showCustomTagManagement() {
                 justify-content: center;
             `;
             
-            // 删除按钮tooltip
             const deleteTooltip = document.createElement('div');
             deleteTooltip.textContent = '删除';
             deleteTooltip.style.cssText = `
@@ -3268,12 +3270,11 @@ function showCustomTagManagement() {
                 deleteTooltip.style.visibility = 'hidden';
             });
             deleteBtn.onclick = async (e) => {
-                e.stopPropagation(); // 阻止冒泡到父元素
+                e.stopPropagation();
                 deleteTooltip.style.opacity = '0';
                 deleteTooltip.style.visibility = 'hidden';
                 if (confirm(`确定要删除标签 "${tag.display}" 吗？`)) {
                     try {
-                        // 调用后端API删除标签和相关图片
                         const response = await fetch('/zhihui/user_tags', {
                             method: 'DELETE',
                             headers: {
@@ -3285,20 +3286,15 @@ function showCustomTagManagement() {
                         const result = await response.json();
                         
                         if (response.ok) {
-                            // 从本地数据中删除标签
                             const customTagsData = tagsData['自定义']['我的标签'];
                             const tagIndex = customTagsData.findIndex(t => t.id === tag.id);
                             if (tagIndex !== -1) {
                                 customTagsData.splice(tagIndex, 1);
-                                // 保存到localStorage
                                 localStorage.setItem('tagSelector_user_tags', JSON.stringify(tagsData));
-                                // 重新显示标签列表
                                 showCustomTagManagement();
-                                // 显示成功消息
                                 showToast('标签删除成功！', 'success');
                             }
                         } else {
-                            // 显示错误消息
                             showToast(result.error || '删除失败', 'error');
                         }
                     } catch (error) {
@@ -3313,12 +3309,8 @@ function showCustomTagManagement() {
             deleteBtn.appendChild(deleteTooltip);
             actionButtons.appendChild(deleteBtn);
             tagItem.appendChild(actionButtons);
-            
-            // 点击选中/取消选中功能
             tagItem.onclick = () => {
                 const isCurrentlySelected = tagItem.classList.contains('selected-tag-item');
-                
-                // 隐藏所有其他标签的操作按钮
                 tagList.querySelectorAll('.selected-tag-item').forEach(item => {
                     item.classList.remove('selected-tag-item');
                     item.style.borderColor = '#475569';
@@ -3329,22 +3321,17 @@ function showCustomTagManagement() {
                 });
                 
                 if (!isCurrentlySelected) {
-                    // 如果当前未选中，则选中
                     tagItem.classList.add('selected-tag-item');
                     tagItem.style.borderColor = '#38bdf8';
                     actionButtons.style.display = 'flex';
                     tagSelectorDialog.selectedTagForManagement = tag;
                 } else {
-                    // 如果当前已选中，则取消选中
                     tagSelectorDialog.selectedTagForManagement = null;
                     tagItem.style.borderColor = '#475569';
                     actionButtons.style.display = 'none';
                 }
-                
-                // 更新底部操作按钮 - 已删除编辑和删除功能
             };
             
-            // 悬停效果
             tagItem.addEventListener('mouseenter', () => {
                 if (!tagItem.classList.contains('selected-tag-item')) {
                     tagItem.style.borderColor = '#94a3b8';
@@ -3366,12 +3353,10 @@ function createTagManagementForm(tagToEdit = null) {
     const tagContent = tagSelectorDialog.tagContent;
     tagContent.innerHTML = '';
     
-    // 隐藏底部管理按钮（添加标签按钮）
     if (tagSelectorDialog.managementButtonsContainer) {
         tagSelectorDialog.managementButtonsContainer.style.display = 'none';
     }
     
-    // 创建表单标题
     const title = document.createElement('div');
     title.style.cssText = `
         color: #38f2f8ff;
@@ -3383,7 +3368,6 @@ function createTagManagementForm(tagToEdit = null) {
     title.textContent = tagToEdit ? '编辑自定义标签' : '添加自定义标签';
     tagContent.appendChild(title);
     
-    // 创建表单容器
     const formContainer = document.createElement('div');
     formContainer.style.cssText = `
         background: linear-gradient(135deg, #2d3748 0%, #1e293b 100%);
@@ -3396,7 +3380,6 @@ function createTagManagementForm(tagToEdit = null) {
     `;
     tagContent.appendChild(formContainer);
     
-    // 创建左侧预览图和右侧表单的布局
     const mainContentContainer = document.createElement('div');
     mainContentContainer.style.cssText = `
         display: flex;
@@ -3406,7 +3389,6 @@ function createTagManagementForm(tagToEdit = null) {
     `;
     formContainer.appendChild(mainContentContainer);
     
-    // 左侧预览图区域
     const leftPreviewContainer = document.createElement('div');
     leftPreviewContainer.style.cssText = `
         flex-shrink: 0;
@@ -3427,7 +3409,6 @@ function createTagManagementForm(tagToEdit = null) {
     previewLabel.textContent = '预览图';
     leftPreviewContainer.appendChild(previewLabel);
     
-    // 创建预览容器，始终显示框架（竖版）
     const previewContainer = document.createElement('div');
     previewContainer.style.cssText = `
         width: 380px;
@@ -3446,7 +3427,6 @@ function createTagManagementForm(tagToEdit = null) {
         overflow: hidden;
     `;
     
-    // 添加无图片提示（默认显示）
     const noImageHint = document.createElement('div');
     noImageHint.style.cssText = `
         display: flex;
@@ -3475,7 +3455,6 @@ function createTagManagementForm(tagToEdit = null) {
     noImageHint.appendChild(hintText);
     previewContainer.appendChild(noImageHint);
     
-    // 创建预览图片
     const previewImg = document.createElement('img');
     previewImg.style.cssText = `
         max-width: 100%;
@@ -3485,15 +3464,11 @@ function createTagManagementForm(tagToEdit = null) {
     `;
     
     if (tagToEdit) {
-        // 如果有时间戳，添加到URL中以强制刷新图片缓存
         const timestamp = tagToEdit.imageTimestamp ? `?t=${tagToEdit.imageTimestamp}` : '';
         previewImg.src = `/zhihui/user_tags/preview/${encodeURIComponent(tagToEdit.display)}${timestamp}`;
         previewImg.onload = function() {
-            // 图片加载成功时，显示图片，隐藏无图片提示
             this.style.display = 'block';
             noImageHint.style.display = 'none';
-            
-            // 更新按钮状态
             previewButton.textContent = '更换图片';
             deleteButton.style.display = 'block';
             currentPreviewImage = this.src;
@@ -3501,16 +3476,12 @@ function createTagManagementForm(tagToEdit = null) {
             console.log(`编辑模式图片尺寸调整: ${this.naturalWidth}x${this.naturalHeight}`);
         };
         previewImg.onerror = () => {
-            // 图片加载失败时，保持无图片提示显示
             previewImg.style.display = 'none';
             noImageHint.style.display = 'flex';
-            
-            // 保持上传按钮状态
             previewButton.textContent = '上传图片';
             deleteButton.style.display = 'none';
         };
     } else {
-        // 新建模式，显示无图片提示
         previewImg.style.display = 'none';
         noImageHint.style.display = 'flex';
     }
@@ -3526,7 +3497,6 @@ function createTagManagementForm(tagToEdit = null) {
     `;
     leftPreviewContainer.appendChild(previewInput);
     
-    // 创建按钮容器
     const buttonContainer = document.createElement('div');
     buttonContainer.style.cssText = `
         display: flex;
@@ -3564,7 +3534,6 @@ function createTagManagementForm(tagToEdit = null) {
     };
     buttonContainer.appendChild(previewButton);
     
-    // 创建删除按钮（初始隐藏）
     const deleteButton = document.createElement('button');
     deleteButton.textContent = '删除图片';
     deleteButton.style.cssText = `
@@ -3589,20 +3558,18 @@ function createTagManagementForm(tagToEdit = null) {
         deleteButton.style.boxShadow = 'none';
     });
     deleteButton.onclick = () => {
-        // 删除图片逻辑
         currentPreviewImage = null;
-        imageDeleted = true; // 标记图片已被删除
+        imageDeleted = true;
         previewImg.src = '';
         previewImg.style.display = 'none';
-        noImageHint.style.display = 'flex'; // 显示无图片提示
+        noImageHint.style.display = 'flex';
         previewButton.textContent = '上传图片';
         deleteButton.style.display = 'none';
-        previewInput.value = ''; // 清空文件输入
+        previewInput.value = '';
         console.log('图片已删除');
     };
     buttonContainer.appendChild(deleteButton);
     
-    // 右侧表单区域
     const rightFormContainer = document.createElement('div');
     rightFormContainer.style.cssText = `
         flex: 1;
@@ -3610,7 +3577,6 @@ function createTagManagementForm(tagToEdit = null) {
     `;
     mainContentContainer.appendChild(rightFormContainer);
     
-    // 标签名称输入
     const nameContainer = document.createElement('div');
     nameContainer.style.cssText = `
         margin-bottom: 12px;
@@ -3633,7 +3599,7 @@ function createTagManagementForm(tagToEdit = null) {
     nameInput.type = 'text';
     nameInput.placeholder = '输入标签名称 (纯中文:9个, 纯英文:18个字符)';
     nameInput.value = tagToEdit?.display || '';
-    nameInput.maxLength = 18; // 允许最多18个字符，用于英文输入
+    nameInput.maxLength = 18;
     nameInput.style.cssText = `
         width: 100%;
         padding: 10px;
@@ -3652,13 +3618,11 @@ function createTagManagementForm(tagToEdit = null) {
         nameInput.style.boxShadow = 'none';
     });
     
-    // 添加字符计数函数
     function countChineseAndEnglishEdit(text) {
         let chineseCount = 0;
         let englishCount = 0;
         
         for (let char of text) {
-            // 使用Unicode范围判断中文字符
             if (/[\u4e00-\u9fa5]/.test(char)) {
                 chineseCount++;
             } else if (/[a-zA-Z]/.test(char)) {
@@ -3669,32 +3633,25 @@ function createTagManagementForm(tagToEdit = null) {
         return { chinese: chineseCount, english: englishCount };
     }
     
-    // 验证字符长度函数
     function validateCharacterLengthEdit(text) {
         const counts = countChineseAndEnglishEdit(text);
         
-        // 纯中文：最多9个字符
         if (counts.chinese > 0 && counts.english === 0) {
             return counts.chinese <= 9;
         }
         
-        // 纯英文：最多18个字符
         if (counts.english > 0 && counts.chinese === 0) {
             return counts.english <= 18;
         }
         
-        // 混合字符：按照最严格的规则（中文按1个，英文按0.5个计算）
         const mixedCount = counts.chinese + (counts.english * 0.5);
         return mixedCount <= 9;
     }
     
-    // 监听输入事件，确保中文字符也能正确计算长度
     nameInput.addEventListener('input', () => {
         const value = nameInput.value;
         
-        // 如果超出长度限制，截断字符
         if (!validateCharacterLengthEdit(value)) {
-            // 逐步减少字符直到满足条件
             let truncatedValue = value;
             while (truncatedValue.length > 0 && !validateCharacterLengthEdit(truncatedValue)) {
                 truncatedValue = truncatedValue.substring(0, truncatedValue.length - 1);
@@ -3704,7 +3661,6 @@ function createTagManagementForm(tagToEdit = null) {
     });
     nameContainer.appendChild(nameInput);
     
-    // 标签内容输入
     const contentContainer = document.createElement('div');
     contentContainer.style.cssText = `
         margin-bottom: 8px;
@@ -3748,22 +3704,16 @@ function createTagManagementForm(tagToEdit = null) {
     });
     contentContainer.appendChild(contentTextarea);
     
-    // 实现撤销/重做功能的历史记录
-    let history = [contentTextarea.value]; // 初始状态
-    let historyIndex = 0; // 当前历史记录索引
-    let isUpdatingHistory = false; // 防止重复添加相同内容
+    let history = [contentTextarea.value];
+    let historyIndex = 0;
+    let isUpdatingHistory = false;
     
-    // 监听输入事件，添加到历史记录
     contentTextarea.addEventListener('input', () => {
         if (isUpdatingHistory) return;
         
-        // 移除当前索引之后的历史记录（如果有的话）
         history = history.slice(0, historyIndex + 1);
-        
-        // 添加新内容到历史记录
         history.push(contentTextarea.value);
         
-        // 限制历史记录长度（最多100条）
         if (history.length > 100) {
             history.shift();
         } else {
@@ -3771,7 +3721,6 @@ function createTagManagementForm(tagToEdit = null) {
         }
     });
     
-    // 创建字符统计信息显示区域
     const charStatsContainer = document.createElement('div');
     charStatsContainer.style.cssText = `
         padding: 8px 12px;
@@ -3790,7 +3739,6 @@ function createTagManagementForm(tagToEdit = null) {
         align-self: center;
     `;
     
-    // 左侧统计信息
     const statsLeft = document.createElement('div');
     statsLeft.style.cssText = `
         display: flex;
@@ -3798,7 +3746,6 @@ function createTagManagementForm(tagToEdit = null) {
         flex-wrap: wrap;
     `;
     
-    // 字符数统计
     const charCountSpan = document.createElement('span');
     charCountSpan.innerHTML = `字符数: <span style="color: white;">0</span>`;
     charCountSpan.style.cssText = `
@@ -3807,7 +3754,6 @@ function createTagManagementForm(tagToEdit = null) {
         text-shadow: 0 1px 2px rgba(59, 130, 246, 0.3);
     `;
     
-    // 行数统计
     const lineCountSpan = document.createElement('span');
     lineCountSpan.innerHTML = `行数: <span style="color: white;">1</span>`;
     lineCountSpan.style.cssText = `
@@ -3816,7 +3762,6 @@ function createTagManagementForm(tagToEdit = null) {
         text-shadow: 0 1px 2px rgba(16, 185, 129, 0.3);
     `;
     
-    // 标点符号数统计
     const punctuationCountSpan = document.createElement('span');
     punctuationCountSpan.innerHTML = `标点符号数: <span style="color: white;">0</span>`;
     punctuationCountSpan.style.cssText = `
@@ -3829,7 +3774,6 @@ function createTagManagementForm(tagToEdit = null) {
     statsLeft.appendChild(lineCountSpan);
     statsLeft.appendChild(punctuationCountSpan);
     
-    // 右侧提示信息
     const statsRight = document.createElement('div');
     statsRight.style.cssText = `
         font-style: italic;
@@ -3840,7 +3784,6 @@ function createTagManagementForm(tagToEdit = null) {
     charStatsContainer.appendChild(statsLeft);
     charStatsContainer.appendChild(statsRight);
     
-    // 创建编辑工具和统计信息的容器，使它们同行显示
     const toolsAndStatsContainer = document.createElement('div');
     toolsAndStatsContainer.style.cssText = `
         display: flex;
@@ -3851,7 +3794,6 @@ function createTagManagementForm(tagToEdit = null) {
         flex-wrap: wrap;
     `;
     
-    // 创建保存按钮容器（左侧）
     const saveButtonsContainer = document.createElement('div');
     saveButtonsContainer.style.cssText = `
         display: flex;
@@ -3863,13 +3805,10 @@ function createTagManagementForm(tagToEdit = null) {
         align-self: center;
     `;
     
-    // 更新统计信息的函数
     function updateCharStats() {
         const text = contentTextarea.value;
         const charCount = text.length;
         const lineCount = text.split('\n').length;
-        
-        // 计算标点符号数（包括常见中英文标点符号）
         const punctuationRegex = /[，。！？；：""''（）【】《》〈〉「」『』—…·、.,;:!?()[\]{}"'\-]/g;
         const punctuationCount = (text.match(punctuationRegex) || []).length;
         
@@ -3877,23 +3816,19 @@ function createTagManagementForm(tagToEdit = null) {
         lineCountSpan.innerHTML = `行数: <span style="color: white;">${lineCount}</span>`;
         punctuationCountSpan.innerHTML = `标点符号数: <span style="color: white;">${punctuationCount}</span>`;
         
-        // 根据字符数改变颜色提醒
         if (charCount > 1000) {
-            charCountSpan.style.color = '#f59e0b'; // 橙色提醒
+            charCountSpan.style.color = '#f59e0b';
         } else if (charCount > 2000) {
-            charCountSpan.style.color = '#ef4444'; // 红色警告
+            charCountSpan.style.color = '#ef4444';
         } else {
-            charCountSpan.style.color = '#94a3b8'; // 默认颜色
+            charCountSpan.style.color = '#94a3b8';
         }
     }
     
-    // 绑定输入事件，实时更新统计
     contentTextarea.addEventListener('input', updateCharStats);
     
-    // 初始化统计信息
     updateCharStats();
     
-    // 保存按钮
     const saveButton = document.createElement('button');
     saveButton.textContent = '保存';
     saveButton.style.cssText = `
@@ -3920,7 +3855,6 @@ function createTagManagementForm(tagToEdit = null) {
         saveButton.style.boxShadow = 'none';
     });
     
-    // 返回按钮
     const backButton = document.createElement('button');
     backButton.textContent = '返回';
     backButton.style.cssText = `
@@ -3947,7 +3881,6 @@ function createTagManagementForm(tagToEdit = null) {
         backButton.style.boxShadow = 'none';
     });
     
-    // 创建编辑效率功能按钮组（带框架）
     const editToolsFrame = document.createElement('div');
     editToolsFrame.style.cssText = `
         display: flex;
@@ -3966,7 +3899,6 @@ function createTagManagementForm(tagToEdit = null) {
         height: fit-content;
     `;
     
-    // 框架标题
     const frameTitle = document.createElement('div');
     frameTitle.textContent = '编辑工具';
     frameTitle.style.cssText = `
@@ -3984,8 +3916,6 @@ function createTagManagementForm(tagToEdit = null) {
         letter-spacing: 0.5px;
     `;
     editToolsFrame.appendChild(frameTitle);
-    
-    // 编辑工具按钮组
     const editToolsContainer = document.createElement('div');
     editToolsContainer.style.cssText = `
         display: flex;
@@ -3993,7 +3923,6 @@ function createTagManagementForm(tagToEdit = null) {
         flex-wrap: wrap;
     `;
     
-    // 清空内容按钮
     const clearButton = document.createElement('button');
     clearButton.textContent = '清空';
     clearButton.title = '清空所有内容';
@@ -4010,7 +3939,6 @@ function createTagManagementForm(tagToEdit = null) {
         min-width: 40px;
     `;
     
-    // 全选按钮
     const selectAllButton = document.createElement('button');
     selectAllButton.textContent = '全选';
     selectAllButton.title = '全选文本内容';
@@ -4027,7 +3955,6 @@ function createTagManagementForm(tagToEdit = null) {
         min-width: 40px;
     `;
     
-    // 复制按钮
     const copyButton = document.createElement('button');
     copyButton.textContent = '复制';
     copyButton.title = '复制所有内容';
@@ -4044,7 +3971,6 @@ function createTagManagementForm(tagToEdit = null) {
         min-width: 40px;
     `;
     
-    // 粘贴按钮
     const pasteButton = document.createElement('button');
     pasteButton.textContent = '粘贴';
     pasteButton.title = '粘贴剪贴板内容';
@@ -4061,7 +3987,6 @@ function createTagManagementForm(tagToEdit = null) {
         min-width: 40px;
     `;
     
-    // 剪切按钮
     const cutButton = document.createElement('button');
     cutButton.textContent = '剪切';
     cutButton.title = '剪切选中的文本内容';
@@ -4078,8 +4003,6 @@ function createTagManagementForm(tagToEdit = null) {
         min-width: 40px;
     `;
     
-    // 格式化按钮
-    // 撤销按钮
     const undoButton = document.createElement('button');
     undoButton.textContent = '撤销';
     undoButton.title = '撤销上一步操作 (Ctrl+Z)';
@@ -4096,7 +4019,6 @@ function createTagManagementForm(tagToEdit = null) {
         min-width: 40px;
     `;
     
-    // 重做按钮
     const redoButton = document.createElement('button');
     redoButton.textContent = '重做';
     redoButton.title = '重做上一步操作 (Ctrl+Y/Ctrl+Shift+Z)';
@@ -4113,7 +4035,6 @@ function createTagManagementForm(tagToEdit = null) {
         min-width: 40px;
     `;
     
-    // 绑定撤销/重做事件
     undoButton.onclick = () => {
         if (historyIndex > 0) {
             isUpdatingHistory = true;
@@ -4134,7 +4055,6 @@ function createTagManagementForm(tagToEdit = null) {
         }
     };
     
-    // 添加键盘快捷键支持
     document.addEventListener('keydown', (e) => {
         if ((e.ctrlKey || e.metaKey) && e.target === contentTextarea) {
             if (e.key === 'z' && !e.shiftKey) {
@@ -4163,7 +4083,6 @@ function createTagManagementForm(tagToEdit = null) {
         min-width: 40px;
     `;
     
-    // 为所有工具按钮添加悬停效果
     [clearButton, selectAllButton, copyButton, cutButton, pasteButton, undoButton, redoButton, formatButton].forEach(button => {
         button.addEventListener('mouseenter', () => {
             button.style.transform = 'translateY(-1px)';
@@ -4175,10 +4094,8 @@ function createTagManagementForm(tagToEdit = null) {
         });
     });
     
-    // 绑定按钮事件
     clearButton.onclick = () => {
         contentTextarea.value = '';
-        // 手动触发input事件以确保撤销功能能记录清空操作
         contentTextarea.dispatchEvent(new Event('input'));
         updateCharStats();
         showToast('内容已清空，可通过撤销按钮恢复', 'info');
@@ -4213,15 +4130,11 @@ function createTagManagementForm(tagToEdit = null) {
             }
             
             await navigator.clipboard.writeText(selectedText);
-            
-            // 删除选中的文本
             const startPos = contentTextarea.selectionStart;
             const endPos = contentTextarea.selectionEnd;
             const textBefore = contentTextarea.value.substring(0, startPos);
             const textAfter = contentTextarea.value.substring(endPos);
             contentTextarea.value = textBefore + textAfter;
-            
-            // 显示成功反馈
             cutButton.textContent = '已剪切';
             setTimeout(() => {
                 cutButton.textContent = '剪切';
@@ -4254,19 +4167,17 @@ function createTagManagementForm(tagToEdit = null) {
             return;
         }
         
-        // 简单的格式化：去除多余空行，统一空格
         const formattedText = text
             .split('\n')
             .map(line => line.trim())
             .filter(line => line.length > 0)
             .join('\n')
-            .replace(/\n{3,}/g, '\n\n'); // 最多保留两个连续换行
+            .replace(/\n{3,}/g, '\n\n');
         
         contentTextarea.value = formattedText;
         updateCharStats();
     };
     
-    // 将按钮添加到工具容器
     editToolsContainer.appendChild(clearButton);
     editToolsContainer.appendChild(selectAllButton);
     editToolsContainer.appendChild(copyButton);
@@ -4275,22 +4186,14 @@ function createTagManagementForm(tagToEdit = null) {
     editToolsContainer.appendChild(undoButton);
     editToolsContainer.appendChild(redoButton);
     editToolsContainer.appendChild(formatButton);
-    
     editToolsFrame.appendChild(editToolsContainer);
-    
-    // 将保存按钮添加到保存按钮容器
     saveButtonsContainer.appendChild(saveButton);
-    saveButtonsContainer.appendChild(backButton);
-    
-    // 将保存按钮容器、编辑工具框架和统计信息添加到同行容器
+    saveButtonsContainer.appendChild(backButton); 
     toolsAndStatsContainer.appendChild(saveButtonsContainer);
     toolsAndStatsContainer.appendChild(editToolsFrame);
     toolsAndStatsContainer.appendChild(charStatsContainer);
-    
-    // 将同行容器添加到内容容器
     contentContainer.appendChild(toolsAndStatsContainer);
     
-    // 隐藏底部按钮容器
     if (tagSelectorDialog.formButtonsContainer) {
         tagSelectorDialog.formButtonsContainer.style.display = 'none';
     }
@@ -4298,34 +4201,25 @@ function createTagManagementForm(tagToEdit = null) {
     let currentPreviewImage = null;
     let imageDeleted = false;
     
-    // 图片压缩函数
     function compressImage(file, maxWidth = 400, maxHeight = 400, quality = 0.8) {
         return new Promise((resolve, reject) => {
             const reader = new FileReader();
             reader.onload = (e) => {
                 const img = new Image();
                 img.onload = () => {
-                    // 计算压缩后的尺寸
                     let width = img.width;
                     let height = img.height;
-                    
-                    // 保持宽高比缩放
                     if (width > maxWidth || height > maxHeight) {
                         const ratio = Math.min(maxWidth / width, maxHeight / height);
                         width = Math.floor(width * ratio);
                         height = Math.floor(height * ratio);
                     }
                     
-                    // 创建canvas进行压缩
                     const canvas = document.createElement('canvas');
                     canvas.width = width;
                     canvas.height = height;
-                    const ctx = canvas.getContext('2d');
-                    
-                    // 绘制压缩后的图片
-                    ctx.drawImage(img, 0, 0, width, height);
-                    
-                    // 转换为base64格式
+                    const ctx = canvas.getContext('2d');              
+                    ctx.drawImage(img, 0, 0, width, height);              
                     canvas.toBlob((blob) => {
                         const compressedReader = new FileReader();
                         compressedReader.onload = () => {
@@ -4346,11 +4240,9 @@ function createTagManagementForm(tagToEdit = null) {
         const file = e.target.files[0];
         if (file) {
             try {
-                // 检查文件大小，如果大于100KB则进行压缩
                 if (file.size > 100 * 1024) {
                     currentPreviewImage = await compressImage(file);
                 } else {
-                    // 小文件直接读取
                     currentPreviewImage = await new Promise((resolve, reject) => {
                         const reader = new FileReader();
                         reader.onload = (event) => {
@@ -4361,17 +4253,14 @@ function createTagManagementForm(tagToEdit = null) {
                     });
                 }
                 
-                // 显示预览图并调整尺寸
                 previewImg.src = currentPreviewImage;
                 previewImg.style.display = 'block';
-                crossIcon.style.display = 'none'; // 隐藏交叉图标
+                crossIcon.style.display = 'none';
                 
-                // 更新按钮状态
                 previewButton.textContent = '更换图片';
                 deleteButton.style.display = 'block';
-                imageDeleted = false; // 重置删除标记，因为用户上传了新图片
+                imageDeleted = false;
                 
-                // 获取图片原始尺寸并动态调整容器（拉满框架）
                 const tempImg = new Image();
                 tempImg.onload = function() {
                     const containerWidth = 380;
@@ -4380,18 +4269,14 @@ function createTagManagementForm(tagToEdit = null) {
                     
                     let displayWidth, displayHeight;
                     
-                    // 计算图片在容器中拉满显示时的尺寸
                     if (aspectRatio > containerWidth / containerHeight) {
-                        // 图片较宽，以宽度为基准，高度自适应
                         displayWidth = containerWidth;
                         displayHeight = containerWidth / aspectRatio;
                     } else {
-                        // 图片较高，以高度为基准，宽度自适应
                         displayHeight = containerHeight;
                         displayWidth = containerHeight * aspectRatio;
                     }
                     
-                    // 应用计算出的尺寸，确保图片拉满框架
                     previewImg.style.width = displayWidth + 'px';
                     previewImg.style.height = displayHeight + 'px';
                     
@@ -4399,21 +4284,18 @@ function createTagManagementForm(tagToEdit = null) {
                 };
                 tempImg.src = currentPreviewImage;
                 
-                // 显示压缩信息
                 const originalSize = (file.size / 1024).toFixed(1);
                 const compressedSize = Math.floor((currentPreviewImage.length * 0.75) / 1024);
                 console.log(`图片压缩: ${originalSize}KB → ${compressedSize}KB`);
                 
             } catch (error) {
                 console.error('图片压缩失败:', error);
-                // 如果压缩失败，使用原图
                 const reader = new FileReader();
                 reader.onload = (event) => {
                     currentPreviewImage = event.target.result;
                     previewImg.src = currentPreviewImage;
                     previewImg.style.display = 'block';
                     
-                    // 同样获取失败时的图片尺寸（拉满框架）
                     const tempImg = new Image();
                     tempImg.onload = function() {
                         const containerWidth = 380;
@@ -4422,13 +4304,10 @@ function createTagManagementForm(tagToEdit = null) {
                         
                         let displayWidth, displayHeight;
                         
-                        // 计算图片在容器中拉满显示时的尺寸
                         if (aspectRatio > containerWidth / containerHeight) {
-                            // 图片较宽，以宽度为基准，高度自适应
                             displayWidth = containerWidth;
                             displayHeight = containerWidth / aspectRatio;
                         } else {
-                            // 图片较高，以高度为基准，宽度自适应
                             displayHeight = containerHeight;
                             displayWidth = containerHeight * aspectRatio;
                         }
@@ -4436,7 +4315,6 @@ function createTagManagementForm(tagToEdit = null) {
                         previewImg.style.width = displayWidth + 'px';
                         previewImg.style.height = displayHeight + 'px';
                         
-                        // 更新按钮状态（压缩失败时）
                         previewButton.textContent = '更换图片';
                         deleteButton.style.display = 'block';
                     };
@@ -4447,7 +4325,6 @@ function createTagManagementForm(tagToEdit = null) {
         }
     });
     
-    // 保存按钮点击事件
     saveButton.onclick = async () => {
         const name = nameInput.value.trim();
         const content = contentTextarea.value.trim();
@@ -4463,17 +4340,15 @@ function createTagManagementForm(tagToEdit = null) {
             if (currentPreviewImage) {
                 requestData.preview_image = currentPreviewImage;
             } else if (tagToEdit && imageDeleted) {
-                // 如果是编辑模式且图片被删除，添加删除标记
                 requestData.delete_image = true;
             }
             
-            // 编辑模式下，添加原始标签名称以便后端识别
             if (tagToEdit) {
                 requestData.original_name = tagToEdit.display;
             }
             
             const response = await fetch('/zhihui/user_tags', {
-                method: 'POST',  // 统一使用POST方法，后端通过original_name字段判断是否为编辑
+                method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
                 },
@@ -4484,11 +4359,9 @@ function createTagManagementForm(tagToEdit = null) {
             if (response.ok) {
                 await loadTagsData();
                 
-                // 强制刷新自定义标签列表中的图片缓存
                 const customTags = tagsData['自定义']?.['我的标签'] || [];
                 customTags.forEach(tag => {
                     if (tag.display === name) {
-                        // 为刚刚更新的标签添加时间戳，强制刷新图片缓存
                         tag.imageTimestamp = Date.now();
                     }
                 });
@@ -4504,7 +4377,6 @@ function createTagManagementForm(tagToEdit = null) {
         }
     };
     
-    // 返回按钮点击事件
     backButton.onclick = () => {
         showCustomTagManagement();
     };
@@ -4514,7 +4386,6 @@ function showTagsFromSubSub(category, subCategory, subSubCategory) {
     const tagContent = tagSelectorDialog.tagContent;
     tagContent.innerHTML = '';
     
-    // 显示一级和二级分类导航菜单，但隐藏三级分类导航菜单
     if (tagSelectorDialog.subCategoryTabs) {
         tagSelectorDialog.subCategoryTabs.style.display = 'flex';
     }
@@ -4525,7 +4396,6 @@ function showTagsFromSubSub(category, subCategory, subSubCategory) {
         tagSelectorDialog.subSubSubCategoryTabs.style.display = 'none';
     }
     
-    // 控制清空选择按钮的显示 - 在指定的分类中显示
     const categoriesToShowClearButton = ['常规标签', '艺术题材', '人物类', '场景类', '动物生物', '灵感套装', '涩影湿'];
     if (tagSelectorDialog.clearButtonContainer) {
         if (categoriesToShowClearButton.includes(category)) {
@@ -4535,7 +4405,6 @@ function showTagsFromSubSub(category, subCategory, subSubCategory) {
         }
     }
     
-    // 显示恢复选择按钮（与清空选择按钮一同显示）
     if (tagSelectorDialog.restoreBtn) {
         if (categoriesToShowClearButton.includes(category)) {
             tagSelectorDialog.restoreBtn.style.display = 'block';
@@ -4544,7 +4413,6 @@ function showTagsFromSubSub(category, subCategory, subSubCategory) {
         }
     }
     
-    // 隐藏管理按钮和表单按钮
     if (tagSelectorDialog.managementButtonsContainer) {
         tagSelectorDialog.managementButtonsContainer.style.display = 'none';
     }
@@ -4571,7 +4439,6 @@ function showTagsFromSubSub(category, subCategory, subSubCategory) {
             white-space: nowrap;
         `;
 
-        // 限制显示最多13个字符
         const displayText = tagObj.display.length > 13 ? tagObj.display.substring(0, 13) + '...' : tagObj.display;
         tagElement.textContent = displayText;
         tagElement.dataset.value = tagObj.value;
@@ -4656,7 +4523,6 @@ function showTagsFromSubSubSub(category, subCategory, subSubCategory, subSubSubC
     const tagContent = tagSelectorDialog.tagContent;
     tagContent.innerHTML = '';
     
-    // 显示所有级别的分类导航菜单
     if (tagSelectorDialog.subCategoryTabs) {
         tagSelectorDialog.subCategoryTabs.style.display = 'flex';
     }
@@ -4667,7 +4533,6 @@ function showTagsFromSubSubSub(category, subCategory, subSubCategory, subSubSubC
         tagSelectorDialog.subSubSubCategoryTabs.style.display = 'flex';
     }
     
-    // 控制清空选择按钮的显示 - 在指定的分类中显示
     const categoriesToShowClearButton = ['常规标签', '艺术题材', '人物类', '场景类', '动物生物', '灵感套装', '涩影湿'];
     if (tagSelectorDialog.clearButtonContainer) {
         if (categoriesToShowClearButton.includes(category)) {
@@ -4677,7 +4542,6 @@ function showTagsFromSubSubSub(category, subCategory, subSubCategory, subSubSubC
         }
     }
     
-    // 显示恢复选择按钮（与清空选择按钮一同显示）
     if (tagSelectorDialog.restoreBtn) {
         if (categoriesToShowClearButton.includes(category)) {
             tagSelectorDialog.restoreBtn.style.display = 'block';
@@ -4686,7 +4550,6 @@ function showTagsFromSubSubSub(category, subCategory, subSubCategory, subSubSubC
         }
     }
     
-    // 隐藏管理按钮和表单按钮
     if (tagSelectorDialog.managementButtonsContainer) {
         tagSelectorDialog.managementButtonsContainer.style.display = 'none';
     }
@@ -4710,7 +4573,6 @@ function showTagsFromSubSubSub(category, subCategory, subSubCategory, subSubSubC
             position: relative;
         `;
 
-        // 限制显示最多13个字符
         const displayText = tagObj.display.length > 13 ? tagObj.display.substring(0, 13) + '...' : tagObj.display;
         tagElement.textContent = displayText;
         tagElement.dataset.value = tagObj.value;
@@ -4791,7 +4653,7 @@ function showTagsFromSubSubSub(category, subCategory, subSubCategory, subSubSubC
 }
 
 let selectedTags = new Set();
-let previousSelectedTags = new Set(); // 用于存储之前的选择状态
+let previousSelectedTags = new Set();
 
 window.selectedTags = selectedTags;
 window.previousSelectedTags = previousSelectedTags;
@@ -4900,10 +4762,7 @@ function updateCategoryRedDots() {
     if (subCategoryTabs && tagSelectorDialog.activeCategory) {
         const subCategoryItems = subCategoryTabs.querySelectorAll('div');
         subCategoryItems.forEach(item => {
-            const subCategory = item.textContent;
-            
-            // 特殊处理："标签管理"菜单不应该显示绿色圆点
-            // 除非当前正在"标签管理"界面中操作
+            const subCategory = item.textContent;        
             if (subCategory === '标签管理' && tagSelectorDialog.activeSubCategory !== '标签管理') {
                 return;
             }
@@ -5184,13 +5043,11 @@ function loadExistingTags() {
             }
         }
     }
-
     updateSelectedTagsOverview();
     updateCategoryRedDots();
 }
 
 function clearSelectedTags() {
-    // 只有在没有保存的之前选择状态时，才保存当前选择状态
     if (previousSelectedTags.size === 0) {
         selectedTags.forEach(tag => previousSelectedTags.add(tag));
     }
@@ -5209,18 +5066,13 @@ function clearSelectedTags() {
 }
 
 function restoreSelectedTags() {
-    // 如果没有之前的选择状态，则不执行任何操作
     if (previousSelectedTags.size === 0) {
         return;
     }
 
-    // 清除当前选择
     selectedTags.clear();
-    
-    // 恢复之前的选择状态
     previousSelectedTags.forEach(tag => selectedTags.add(tag));
 
-    // 更新标签元素的视觉状态
     const tagElements = tagSelectorDialog.tagContent.querySelectorAll('span');
     tagElements.forEach(element => {
         const tagValue = element.getAttribute('data-value');
@@ -5237,7 +5089,6 @@ function restoreSelectedTags() {
     updateSelectedTagsOverview();
     updateCategoryRedDots();
     
-    // 清除保存的选择状态，以便下次可以保存新的选择状态
     previousSelectedTags.clear();
 }
 
@@ -5260,8 +5111,6 @@ function debounce(fn, wait) {
         t = setTimeout(() => fn.apply(this, args), wait);
     };
 }
-
-// updateManagementActionButtons函数已删除 - 编辑和删除按钮功能已完全移除
 
 function handleSearch(query) {
     if (!tagSelectorDialog) return;
@@ -5358,7 +5207,6 @@ function showSearchResults(results, q) {
             white-space: nowrap;
         `;
 
-        // 限制显示最多13个字符
         const displayText = tagObj.display.length > 13 ? tagObj.display.substring(0, 13) + '...' : tagObj.display;
         tagElement.textContent = displayText;
         tagElement.dataset.value = tagObj.value;
@@ -5469,7 +5317,6 @@ function enableMainUIInteraction() {
     }
 }
 
-// Random settings variables and functions
 let randomSettings = {
     categories: {
         '常规标签.画质': { enabled: true, weight: 2, count: 1 },
@@ -5616,7 +5463,6 @@ function createGlobalSection() {
         padding: 16px;
     `;
 
-    // 整个全局设置内容都在框架容器内
     const settingsContainer = document.createElement('div');
     settingsContainer.style.cssText = `
         background: rgba(30, 41, 59, 0.6);
@@ -5634,7 +5480,6 @@ function createGlobalSection() {
         margin: 0 0 12px 0;
     `;
 
-    // 添加标题下方的分隔线
     const divider = document.createElement('div');
     divider.style.cssText = `
         height: 1px;
@@ -5985,8 +5830,6 @@ function createCategorySettingItem(categoryPath, setting, themeColor = '#60a5fa'
 
     const name = document.createElement('div');
     const displayName = categoryPath.split('.').pop();
-    
-    // 限制显示最多13个字符
     const displayText = displayName.length > 13 ? displayName.substring(0, 13) + '...' : displayName;
     name.textContent = displayText;
     name.style.cssText = `

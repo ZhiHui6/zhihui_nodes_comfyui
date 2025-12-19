@@ -1,5 +1,10 @@
 # 更新日志
 
+## v0.9.5 - 2025-12-19
+- 标签选择器节点(TagSelector)：添加用户标签备份与恢复功能
+<br>
+- TagSelector node: added user tag backup and restore functionality
+
 ## v0.9.4 - 2025-12-18
 - 系统提示词加载器节点(SystemPromptLoader)：
   - 新增预设文本"通用中文反推提示词工程"
