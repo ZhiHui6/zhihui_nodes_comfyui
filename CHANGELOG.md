@@ -1,5 +1,13 @@
 # 更新日志
 
+## 0.9.6 - 2025-12-20
+- Qwen3VLBasic,Qwen3VLAdvanced：添加模型ID和量化跟踪以优化模型加载
+- SystemPromptLoader节点：新增《提示词工程师智能体》预设文本
+<br>
+
+- Qwen3VLBasic, Qwen3VLAdvanced: add model-ID and quantization tracking to optimize model loading
+- SystemPromptLoader node: add preset text "Prompt-Engineer Agent"
+
 ## v0.9.5 - 2025-12-19
 - 标签选择器节点(TagSelector)：添加用户标签备份与恢复功能
 <br>

@@ -107,6 +107,8 @@ class Qwen3VLBasic:
             torch.cuda.is_available()
             and torch.cuda.get_device_capability(self.device)[0] >= 8
         )
+        self.current_model_id = None  # Track the current model id
+        self.current_quantization = None  # Track the current quantization
 
     def check_model_exists(self, model):
         model_id = f"qwen/{model}"
@@ -347,10 +349,27 @@ class Qwen3VLBasic:
         if not (active_path and os.path.isdir(active_path)):
             raise ValueError("未激活模型：请在管理界面选择已下载模型并点击‘激活’")
         self.model_checkpoint = active_path
-        if self.processor is None:
-            self.processor = AutoProcessor.from_pretrained(self.model_checkpoint)
+        model_id = active_path  # Use active_path as model identifier
 
-        if self.model is None:
+        # If model_id or quantization changed, reload processor and model
+        if (
+            self.current_model_id != model_id
+            or self.current_quantization != quantization
+            or self.processor is None
+            or self.model is None
+        ):
+            self.current_model_id = model_id
+            self.current_quantization = quantization
+            if self.processor is not None:
+                del self.processor
+                self.processor = None
+            if self.model is not None:
+                del self.model
+                self.model = None
+            if torch.cuda.is_available():
+                torch.cuda.empty_cache()
+                torch.cuda.ipc_collect()
+            self.processor = AutoProcessor.from_pretrained(self.model_checkpoint)
             if device == "cpu":
                 device_map = {"": "cpu"}
             elif device == "gpu":
@@ -495,6 +514,8 @@ class Qwen3VLBasic:
                 pass
             self.processor = None
             self.model = None
+            self.current_model_id = None
+            self.current_quantization = None
             if torch.cuda.is_available():
                 torch.cuda.empty_cache()
                 try:
@@ -559,10 +580,27 @@ class Qwen3VLBasic:
         if not (active_path and os.path.isdir(active_path)):
             return ("未激活模型：请在管理界面选择已下载模型并点击‘激活’",)
         self.model_checkpoint = active_path
-        if self.processor is None:
-            self.processor = AutoProcessor.from_pretrained(self.model_checkpoint)
+        model_id = active_path  # Use active_path as model identifier
 
-        if self.model is None:
+        # If model_id or quantization changed, reload processor and model
+        if (
+            self.current_model_id != model_id
+            or self.current_quantization != quantization
+            or self.processor is None
+            or self.model is None
+        ):
+            self.current_model_id = model_id
+            self.current_quantization = quantization
+            if self.processor is not None:
+                del self.processor
+                self.processor = None
+            if self.model is not None:
+                del self.model
+                self.model = None
+            if torch.cuda.is_available():
+                torch.cuda.empty_cache()
+                torch.cuda.ipc_collect()
+            self.processor = AutoProcessor.from_pretrained(self.model_checkpoint)
             if device == "cpu":
                 device_map = {"":"cpu"}
             elif device == "gpu":
@@ -718,6 +756,8 @@ class Qwen3VLBasic:
                 pass
             self.processor = None
             self.model = None
+            self.current_model_id = None
+            self.current_quantization = None
             if torch.cuda.is_available():
                 torch.cuda.empty_cache()
                 try:

@@ -2,7 +2,7 @@
 
 # 🎨 潪AI ComfyUI 节点包 
 
-最新版本：`v0.9.5`（2025-12-19），完整更新日志：查看<a href="CHANGELOG.md">`CHANGELOG.md`</a>
+最新版本：`v0.9.6`（2025-12-20），完整更新日志：查看<a href="CHANGELOG.md">`CHANGELOG.md`</a>
 
 ## 📖 项目介绍
 
