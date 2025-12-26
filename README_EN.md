@@ -63,7 +63,7 @@ Provides dedicated Chinese localization files, which can be used with the ComfyU
 <tr>
 <td><b>Photography Prompt Generator</b><br><code>PhotographPromptGenerator</code></td>
 <td>Prompt Processing</td>
-<td>A professional photography style prompt generator, covering 15 dimensions including characters, scenes, lenses, and lighting, generating professional photography prompts with one click.</td>
+<td>Professional photography-style prompt generator, covering 16 dimensions including characters, scenes, lenses, lighting, and clothing. Supports output mode switching (tag combination/template text), integrated AI expansion function. Equipped with user-defined option extension and template editing assistant interface.</td>
 </tr>
 </table>
 
@@ -240,16 +240,25 @@ Provides professional image transformation presets with built-in free online exp
 <td><b>Photography Prompt Generator</b><br><code>PhotographPromptGenerator</code></td>
 <td>
 
-Generates professional photography-style prompts based on preset photography elements (such as camera, lens, lighting, scenes, etc.).
+Professional photography prompt generator with 16 customizable dimensions (camera, lens, lighting, pose, clothing, etc.). Features dual output modes - Tags for tag combinations and Template for formatted text. Includes AI-powered prompt expansion with independent system prompts for each mode. Supports custom user options and template editing helper.
 
 <b>Features</b>:
-- Supports loading options from custom text files for flexible expansion
-- Supports random selection to increase creative diversity
-- Output templates can be customized to adapt to different photography style needs
+- 16 professional photography dimensions including character, clothing, camera, lens, lighting, and more
+- Dual output modes: Tags (comma-separated) and Template (formatted text)
+- AI-powered expansion with mode-specific system prompts for optimal results
+- User-defined options support for flexible customization
+- Built-in template editor helper for easy template creation and management
+- Random selection option for creative inspiration
 
 <div align="left">
-<a href="images/摄影提示词生成器.jpg" target="_blank">
-<img src="images/摄影提示词生成器.jpg" alt="Photography Prompt Generator" width="45%"/>
+<a href="images/Photograph Prompt Generator1.jpg" target="_blank">
+<img src="images/Photograph Prompt Generator1.jpg" alt="Photography Prompt Generator" width="45%"/>
+</a>
+<a href="images/Photograph Prompt Generator2.jpg" target="_blank">
+<img src="images/Photograph Prompt Generator2.jpg" alt="Photography Prompt Generator" width="45%"/>
+</a>
+<a href="images/Photograph Prompt Generator3.jpg" target="_blank">
+<img src="images/Photograph Prompt Generator3.jpg" alt="Photography Prompt Generator" width="45%"/>
 </a>
 </div>
 </td>

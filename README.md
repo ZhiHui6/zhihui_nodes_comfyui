@@ -63,11 +63,11 @@
 <tr>
 <td><b>摄影提示词生成器</b><br><code>PhotographPromptGenerator</code></td>
 <td>提示词处理</td>
-<td>专业摄影风格提示词生成器，涵盖人物、场景、镜头、光线等15个维度，一键生成专业摄影提示词。</td>
+<td>专业摄影风格提示词生成器，涵盖人物、场景、镜头、光线、服装等16个维度。支持输出模式切换（标签组合/模板文本），集成AI扩写功能。配有用户自定义选项扩展和模板编辑助手界面。</td>
 </tr>
 </table>
 
-💡 **使用建议**：新用户建议从 **标签选择器** 开始体验，快速提升您的创作灵感和效率。
+💡 **使用建议**：新用户建议从 **标签选择器** 或 **摄影提示词生成器** 开始体验，快速提升您的创作灵感和效率。
 
 ---
 
@@ -248,8 +248,14 @@
 - 输出模板可自定义，适应不同的摄影风格需求
 
 <div align="left">
-<a href="images/摄影提示词生成器.jpg" target="_blank">
-<img src="images/摄影提示词生成器.jpg" alt="摄影提示词生成器" width="45%"/>
+<a href="images/Photograph Prompt Generator1.jpg" target="_blank">
+<img src="images/Photograph Prompt Generator1.jpg" alt="摄影提示词生成器" width="45%"/>
+</a>
+<a href="images/Photograph Prompt Generator2.jpg" target="_blank">
+<img src="images/Photograph Prompt Generator2.jpg" alt="摄影提示词生成器" width="45%"/>
+</a>
+<a href="images/Photograph Prompt Generator3.jpg" target="_blank">
+<img src="images/Photograph Prompt Generator3.jpg" alt="摄影提示词生成器" width="45%"/>
 </a>
 </div>
 </td>

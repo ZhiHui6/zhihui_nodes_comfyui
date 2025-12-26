@@ -9,6 +9,15 @@
   - 新增用户选项编辑界面，用于管理自定义分类标签选项
   - 新增用户数据导入导出功能，用于备份和恢复用户的自定义数据。
 
+  <br>
+  - Upgraded PhotographPromptGenerator node:
+  - Refactored the calling logic interface to get and manage photography prompt user or preset category tag options
+  - Added output_mode option: can switch to output Tags or Template content
+  - Added expand_mode option: off, Chinese expand, and English expand
+  - Added template assistant interface to generate complete photography prompts based on user input templates and category tags
+  - Added user options editing interface to manage custom category tag options
+  - Added user data import/export function to backup and restore user custom data.
+
 ## 0.9.6 - 2025-12-20
 - Qwen3VLBasic,Qwen3VLAdvanced：添加模型ID和量化跟踪以优化模型加载
 - SystemPromptLoader节点：新增《提示词工程师智能体》预设文本
