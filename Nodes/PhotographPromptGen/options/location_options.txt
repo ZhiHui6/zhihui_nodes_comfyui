@@ -153,4 +153,3 @@
 埃及 | 卡纳克神庙 (Karnak Temple)
 埃及 | 帝王谷 (Valley of the Kings)
 埃及 | 卢克索神庙 (Luxor temple)
-# 下方为用户自行添加的预设项

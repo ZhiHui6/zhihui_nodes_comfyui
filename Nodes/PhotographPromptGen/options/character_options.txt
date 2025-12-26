@@ -14,4 +14,3 @@
 军人 (Soldier)
 警察 (Police)
 消防员 (Firefighter)
-# 下方为用户自行添加的预设项

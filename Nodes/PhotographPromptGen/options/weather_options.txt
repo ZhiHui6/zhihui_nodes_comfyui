@@ -9,4 +9,3 @@
 冰雹 (Hail)
 沙尘暴 (Sandstorm)
 台风 (Typhoon)
-# 下方为用户自行添加的预设项

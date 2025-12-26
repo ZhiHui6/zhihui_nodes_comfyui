@@ -24,4 +24,3 @@ A字裙 (A-line skirt)
 工装短裤 (Cargo shorts)
 运动短裤 (Athletic shorts)
 骑行裤 (Cycling shorts)
-# 下方为用户自行添加的预设项

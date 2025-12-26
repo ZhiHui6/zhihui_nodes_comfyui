@@ -214,5 +214,8 @@
     "aliyun":"阿里云",
     "youdao":"有道",
     "free":"免费",
-    "zhipu":"智谱"
+    "zhipu":"智谱",
+    "Template":"模板",
+    "Chinese Expand":"中文扩写",
+    "English Expand":"英文扩写"
 }

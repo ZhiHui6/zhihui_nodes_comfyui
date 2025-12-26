@@ -15,7 +15,6 @@ from .Nodes.TextSwitch.PriorityTextSwitch import PriorityTextSwitch
 from .Nodes.ShowText import ShowText
 from .Nodes.MultiPlatformTranslate.MultiPlatformTranslate import MultiPlatformTranslate
 from .Nodes.MultiPlatformTranslate.MultiPlatformTranslateAPI import MultiPlatformTranslateAPI
-
 from .Nodes.PhotographPromptGen.PhotographPromptGenerator import PhotographPromptGenerator
 from .Nodes.WanPromptGenerator import WanPromptGenerator
 from .Nodes.ImageScaler import ImageScaler
@@ -50,6 +49,7 @@ from .Nodes.Qwen3VL_API.Qwen3VLAPI import Qwen3VLAPI
 from .Nodes.Sa2VA.Sa2VAAdvanced import Sa2VAAdvanced
 from .Nodes.Sa2VA.Sa2VASegmentationPreset import Sa2VASegmentationPreset
 from .Nodes.Batch_loading_of_images import BatchLoadingOfImages
+from .Nodes.PhotographPromptGen.zhihui_api import *
 
 import os
 
@@ -160,5 +160,4 @@ NODE_DISPLAY_NAME_MAPPINGS = {
 }
 
 WEB_DIRECTORY = os.path.join(os.path.dirname(os.path.abspath(__file__)), "web")
-
 __all__ = ['NODE_CLASS_MAPPINGS', 'NODE_DISPLAY_NAME_MAPPINGS', "WEB_DIRECTORY"]

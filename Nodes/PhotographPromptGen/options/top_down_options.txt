@@ -9,4 +9,3 @@
 视角 (Point-of-View)
 低角度仰拍 (Low Angle Shot)
 高角度俯拍 (High Angle Shot)
-# 下方为用户自行添加的预设项

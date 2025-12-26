@@ -39,7 +39,9 @@
         "free": {
             "name": "免费翻译",
             "enabled": true,
-            "config": {},
+            "config": {
+                "platform": "腾讯翻译君"
+            },
             "api_url": "https://transmart.qq.com/api/imt"
         }
     },

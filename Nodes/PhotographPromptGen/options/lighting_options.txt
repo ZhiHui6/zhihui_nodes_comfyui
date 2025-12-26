@@ -12,4 +12,3 @@
 聚光灯 (Spotlighting)
 闪光灯 (Flash Lighting)
 夜间光 (Nighttime Lighting)
-# 下方为用户自行添加的预设项

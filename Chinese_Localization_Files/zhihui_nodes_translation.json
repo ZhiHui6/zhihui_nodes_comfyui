@@ -390,11 +390,11 @@
         "title": "摄影提示词生成器",
         "description": "摄影提示词生成器：基于预设摄影参数生成专业摄影提示词。包含相机、镜头、光照、姿势、服装等选项，支持自定义模板输出格式。",
         "outputs": {
-            "template": "模板",
-            "tags": "标签",
-            "help": "帮助"
+            "output": "输出"
         },
         "widgets": {
+            "expand_mode": "扩写模式",
+            "output_mode": "输出模式",
             "character": "角色",
             "gender": "性别",
             "pose": "姿势",
