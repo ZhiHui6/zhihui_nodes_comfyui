@@ -3,10 +3,12 @@
 ## 0.9.8 2025-12-29
 - ImageAspectRatio节点：添加新的Z-image预设尺寸集合
 - PromptCardSelector节点：更新一组卡池文件
+- 修正Qwen3VLAdvanced节点加载视频时的报错问题。
 <br>
 
 - ImageAspectRatio node: added new Z-image preset size collection
 - PromptCardSelector node: updated a set of card pool files
+- Fixed the error when Qwen3VLAdvanced node loads videos.
 
 ## 0.9.7 2025-12-26
 - 升级摄影提示词生成器节点(PhotographPromptGenerator)：

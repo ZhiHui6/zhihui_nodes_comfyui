@@ -314,10 +314,7 @@ class Qwen3VLAdvanced:
             system_prompt = unlock_instruction_b
         
         if preset_prompt == "Ignore":
-            if isinstance(user_prompt, str) and user_prompt.strip():
-                final_prompt = user_prompt.strip()
-            else:
-                final_prompt = QWEN_PROMPT_TYPES["[Prompt Style]Detailed"]
+            final_prompt = user_prompt.strip() if (isinstance(user_prompt, str) and user_prompt.strip()) else ""
         else:
             final_prompt = user_prompt.strip() if (isinstance(user_prompt, str) and user_prompt.strip()) else preset_text
         
