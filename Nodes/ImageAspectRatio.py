@@ -41,15 +41,52 @@ class ImageAspectRatio:
          "5:12(640x1536)": (640, 1536),
     }
 
+    PRESETS_ZIMAGE = {
+         "1:1(1024x1024)": (1024, 1024),
+         "1:1(1280x1280)": (1280, 1280),
+         "1:1(1536x1536)": (1536, 1536),
+         "9:7(1152x896)": (1152, 896),
+         "9:7(1440x1120)": (1440, 1120),
+         "9:7(1728x1344)": (1728, 1344),
+         "7:9(896x1152)": (896, 1152),
+         "7:9(1120x1440)": (1120, 1440),
+         "7:9(1344x1728)": (1344, 1728),
+         "4:3(1152x864)": (1152, 864),
+         "4:3(1472x1104)": (1472, 1104),
+         "4:3(1728x1296)": (1728, 1296),
+         "3:4(864x1152)": (864, 1152),
+         "3:4(1104x1472)": (1104, 1472),
+         "3:4(1296x1728)": (1296, 1728),
+         "3:2(1248x832)": (1248, 832),
+         "3:2(1536x1024)": (1536, 1024),
+         "3:2(1872x1248)": (1872, 1248),
+         "2:3(832x1248)": (832, 1248),
+         "2:3(1024x1536)": (1024, 1536),
+         "2:3(1248x1872)": (1248, 1872),
+         "16:9(1280x720)": (1280, 720),
+         "16:9(1536x864)": (1536, 864),
+         "16:9(2048x1152)": (2048, 1152),
+         "9:16(720x1280)": (720, 1280),
+         "9:16(864x1536)": (864, 1536),
+         "9:16(1152x2048)": (1152, 2048),
+         "21:9(1344x576)": (1344, 576),
+         "21:9(1680x720)": (1680, 720),
+         "21:9(2016x864)": (2016, 864),
+         "9:21(576x1344)": (576, 1344),
+         "9:21(720x1680)": (720, 1680),
+         "9:21(864x2016)": (864, 2016),
+    }
+
     @classmethod
     def INPUT_TYPES(s):
         ratio_list = (list(s.PRESETS_QWEN.keys()) + 
                      list(s.PRESETS_FLUX.keys()) + 
                      list(s.PRESETS_WAN.keys()) + 
-                     list(s.PRESETS_SD.keys()))
+                     list(s.PRESETS_SD.keys()) +
+                     list(s.PRESETS_ZIMAGE.keys()))
         return {
             "required": {
-                "preset_mode": (["Qwen image", "Flux", "Wan", "SDXL", "Custom Size"], {"default": "Qwen image"}),
+                "preset_mode": (["Qwen image", "Flux", "Wan", "SDXL", "Z-image", "Custom Size"], {"default": "Qwen image"}),
                 "aspect_ratio": (ratio_list, {"default": "1:1(1328x1328)"}),
             },
             "optional": {
@@ -79,7 +116,8 @@ class ImageAspectRatio:
                 "Qwen image": self.PRESETS_QWEN,
                 "Flux": self.PRESETS_FLUX,
                 "Wan": self.PRESETS_WAN,
-                "SDXL": self.PRESETS_SD
+                "SDXL": self.PRESETS_SD,
+                "Z-image": self.PRESETS_ZIMAGE
             }
             
             preset_map = preset_maps.get(preset_mode, self.PRESETS_QWEN)
@@ -87,7 +125,7 @@ class ImageAspectRatio:
             if aspect_ratio in preset_map:
                 width, height = preset_map[aspect_ratio]
             else:
-                for fallback_map in [self.PRESETS_QWEN, self.PRESETS_FLUX, self.PRESETS_WAN, self.PRESETS_SD]:
+                for fallback_map in [self.PRESETS_QWEN, self.PRESETS_FLUX, self.PRESETS_WAN, self.PRESETS_SD, self.PRESETS_ZIMAGE]:
                     if aspect_ratio in fallback_map:
                         width, height = fallback_map[aspect_ratio]
                         break
