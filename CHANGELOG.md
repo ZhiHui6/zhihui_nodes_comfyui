@@ -1,5 +1,13 @@
 # 更新日志
 
+## 0.9.8 2025-12-29
+- ImageAspectRatio节点：添加新的Z-image预设尺寸集合
+- PromptCardSelector节点：更新一组卡池文件
+<br>
+
+- ImageAspectRatio node: added new Z-image preset size collection
+- PromptCardSelector node: updated a set of card pool files
+
 ## 0.9.7 2025-12-26
 - 升级摄影提示词生成器节点(PhotographPromptGenerator)：
   - 重构全新调用逻辑接口，用于获取和管理摄影提示词用户或预设分类标签选项
@@ -8,8 +16,8 @@
   - 新增模版助手界面，用于根据用户输入的模版和分类标签生成完整的摄影提示词
   - 新增用户选项编辑界面，用于管理自定义分类标签选项
   - 新增用户数据导入导出功能，用于备份和恢复用户的自定义数据。
-
   <br>
+
   - Upgraded PhotographPromptGenerator node:
   - Refactored the calling logic interface to get and manage photography prompt user or preset category tag options
   - Added output_mode option: can switch to output Tags or Template content
@@ -29,6 +37,7 @@
 ## v0.9.5 - 2025-12-19
 - 标签选择器节点(TagSelector)：添加用户标签备份与恢复功能
 <br>
+
 - TagSelector node: added user tag backup and restore functionality
 
 ## v0.9.4 - 2025-12-18

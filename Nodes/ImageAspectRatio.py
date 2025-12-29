@@ -79,15 +79,10 @@ class ImageAspectRatio:
 
     @classmethod
     def INPUT_TYPES(s):
-        ratio_list = (list(s.PRESETS_QWEN.keys()) + 
-                     list(s.PRESETS_FLUX.keys()) + 
-                     list(s.PRESETS_WAN.keys()) + 
-                     list(s.PRESETS_SD.keys()) +
-                     list(s.PRESETS_ZIMAGE.keys()))
         return {
             "required": {
                 "preset_mode": (["Qwen image", "Flux", "Wan", "SDXL", "Z-image", "Custom Size"], {"default": "Qwen image"}),
-                "aspect_ratio": (ratio_list, {"default": "1:1(1328x1328)"}),
+                "aspect_ratio": (list(s.PRESETS_QWEN.keys()), {"default": "1:1(1328x1328)"}),
             },
             "optional": {
                 "custom_width": ("INT", {"default": 1328, "min": 1, "max": 8192, "step": 1}),
@@ -107,29 +102,23 @@ class ImageAspectRatio:
             custom_width = 1328
         if custom_height is None:
             custom_height = 1328
-            
+
         if preset_mode == "Custom Size":
-            width = custom_width
-            height = custom_height
+            return (custom_width, custom_height)
+
+        preset_maps = {
+            "Qwen image": self.PRESETS_QWEN,
+            "Flux": self.PRESETS_FLUX,
+            "Wan": self.PRESETS_WAN,
+            "SDXL": self.PRESETS_SD,
+            "Z-image": self.PRESETS_ZIMAGE
+        }
+
+        preset_map = preset_maps.get(preset_mode, self.PRESETS_QWEN)
+
+        # 直接从对应的预设中获取尺寸，如果不存在则使用默认值
+        if aspect_ratio in preset_map:
+            return preset_map[aspect_ratio]
         else:
-            preset_maps = {
-                "Qwen image": self.PRESETS_QWEN,
-                "Flux": self.PRESETS_FLUX,
-                "Wan": self.PRESETS_WAN,
-                "SDXL": self.PRESETS_SD,
-                "Z-image": self.PRESETS_ZIMAGE
-            }
-            
-            preset_map = preset_maps.get(preset_mode, self.PRESETS_QWEN)
-            
-            if aspect_ratio in preset_map:
-                width, height = preset_map[aspect_ratio]
-            else:
-                for fallback_map in [self.PRESETS_QWEN, self.PRESETS_FLUX, self.PRESETS_WAN, self.PRESETS_SD, self.PRESETS_ZIMAGE]:
-                    if aspect_ratio in fallback_map:
-                        width, height = fallback_map[aspect_ratio]
-                        break
-                else:
-                    width, height = (custom_width, custom_height)
-        
-        return (width, height)
+            # 如果找不到，返回自定义尺寸
+            return (custom_width, custom_height)
