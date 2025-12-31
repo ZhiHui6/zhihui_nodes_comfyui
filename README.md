@@ -2,7 +2,7 @@
 
 # 🎨 潪AI ComfyUI 节点包 
 
-最新版本：`v0.9.8`（2025-12-29），完整更新日志：查看<a href="CHANGELOG.md">`CHANGELOG.md`</a>
+最新版本：`v0.9.9`（2025-12-31），完整更新日志：查看<a href="CHANGELOG.md">`CHANGELOG.md`</a>
 
 ## 📖 项目介绍
 
@@ -116,6 +116,17 @@
 <div align="left">
 <a href="images/提示词合并器.jpg" target="_blank">
 <img src="images/提示词合并器.jpg" alt="提示词合并器" width="45%"/>
+</a>
+</div></td>
+</tr>
+<tr>
+<td><b>文本合并器</b><br><code>TextMergerNode</code></td>
+<td>将多个文本输入合并为一个输出文本，支持灵活配置输入端口数量。<b>user_text</b> 输入框内容优先显示在最前面，后续通过 <b>inputcount</b> 滑块控制 <b>text_2</b> 到 <b>text_N</b> 端口数量。所有非空文本按顺序用分隔符连接，适用于批量合并多个提示词或文本片段。
+
+<br>
+<div align="left">
+<a href="images/Text Merger Node.png" target="_blank">
+<img src="images/Text Merger Node.png" alt="文本合并器" width="45%"/>
 </a>
 </div></td>
 </tr>

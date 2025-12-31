@@ -1,5 +1,11 @@
 # 更新日志
 
+## 0.9.9 2025-12-31
+- 添加文本合并器节点(TextMergerNode)节点用于合并多个文本输入
+<br>
+
+- Added TextMergerNode for merging multiple text inputs
+
 ## 0.9.8 2025-12-29
 - ImageAspectRatio节点：添加新的Z-image预设尺寸集合
 - PromptCardSelector节点：更新一组卡池文件

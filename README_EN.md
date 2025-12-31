@@ -2,7 +2,7 @@
 
 # 🎨 Zhi.AI ComfyUI Node Pack 
 
-Latest version: `v0.9.8` (2025-12-29), For complete changelog: See <a href="CHANGELOG.md">`CHANGELOG.md`</a>
+Latest version: `v0.9.9` (2025-12-31), For complete changelog: See <a href="CHANGELOG.md">`CHANGELOG.md`</a>   
 
 ## 📖 Project Introduction
 
@@ -116,6 +116,17 @@ This node collection contains numerous nodes with different functionalities, div
 <div align="left">
 <a href="images/提示词合并器.jpg" target="_blank">
 <img src="images/提示词合并器.jpg" alt="Prompt Merger" width="45%"/>
+</a>
+</div></td>
+</tr>
+<tr>
+<td><b>Text Merger</b><br><code>TextMergerNode</code></td>
+<td>Merges multiple text inputs into a single output text, supporting flexible configuration of input port quantity. The content of the <b>user_text</b> input box is displayed first, followed by controlling the number of <b>text_2</b> to <b>text_N</b> ports through the <b>inputcount</b> slider. All non-empty texts are connected in sequence using a separator, suitable for batch merging of multiple prompts or text fragments.
+
+<br>
+<div align="left">
+<a href="images/Text Merger Node.png" target="_blank">
+<img src="images/Text Merger Node.png" alt="Text Merger" width="45%"/>
 </a>
 </div></td>
 </tr>

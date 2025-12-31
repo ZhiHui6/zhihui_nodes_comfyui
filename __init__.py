@@ -7,6 +7,7 @@ from .Nodes.TextExpander import TextExpander
 from .Nodes.ExtraOptions import ExtraOptions
 from .Nodes.MultiLineTextNode import MultiLineTextNode
 from .Nodes.TextCombinerNode import TextCombinerNode
+from .Nodes.TextMergerNode import TextMergerNode
 from .Nodes.TextModifier import TextModifier
 from .Nodes.TextExtractor import TextExtractor
 from .Nodes.TriggerWordMerger import TriggerWordMerger
@@ -63,6 +64,7 @@ NODE_CLASS_MAPPINGS = {
     "ExtraOptions": ExtraOptions,
     "MultiLineTextNode": MultiLineTextNode,
     "TextCombinerNode": TextCombinerNode,
+    "TextMergerNode": TextMergerNode,
     "TextModifier": TextModifier,
     "TextExtractor": TextExtractor,
     "TriggerWordMerger": TriggerWordMerger,
@@ -116,6 +118,7 @@ NODE_DISPLAY_NAME_MAPPINGS = {
     "ExtraOptions": "Extra Options",
     "MultiLineTextNode": "Multi Line Text Node",
     "TextCombinerNode": "Text Combiner Node",
+    "TextMergerNode": "Text Merger Node",
     "TextModifier": "Text Modifier",
     "TextExtractor": "Text Extractor",
     "TriggerWordMerger": "Trigger Word Merger",
