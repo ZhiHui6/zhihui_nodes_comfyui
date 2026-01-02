@@ -79,10 +79,18 @@ class ImageAspectRatio:
 
     @classmethod
     def INPUT_TYPES(s):
+        all_aspect_ratios = list(set(
+            list(s.PRESETS_QWEN.keys()) +
+            list(s.PRESETS_FLUX.keys()) +
+            list(s.PRESETS_WAN.keys()) +
+            list(s.PRESETS_SD.keys()) +
+            list(s.PRESETS_ZIMAGE.keys())
+        ))
+
         return {
             "required": {
-                "preset_mode": (["Qwen image", "Flux", "Wan", "SDXL", "Z-image", "Custom Size"], {"default": "Qwen image"}),
-                "aspect_ratio": (list(s.PRESETS_QWEN.keys()), {"default": "1:1(1328x1328)"}),
+                "preset_mode": (["Qwen image", "Flux", "Wan", "SDXL", "Z-image", "Custom Size"], {"default": "Z-image"}),
+                "aspect_ratio": (all_aspect_ratios, {"default": "1:1(1328x1328)"}),
             },
             "optional": {
                 "custom_width": ("INT", {"default": 1328, "min": 1, "max": 8192, "step": 1}),
@@ -116,9 +124,7 @@ class ImageAspectRatio:
 
         preset_map = preset_maps.get(preset_mode, self.PRESETS_QWEN)
 
-        # 直接从对应的预设中获取尺寸，如果不存在则使用默认值
         if aspect_ratio in preset_map:
             return preset_map[aspect_ratio]
         else:
-            # 如果找不到，返回自定义尺寸
             return (custom_width, custom_height)

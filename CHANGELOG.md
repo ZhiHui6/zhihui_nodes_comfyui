@@ -1,5 +1,11 @@
 # 更新日志
 
+## 1.0.0 2026-1-3
+- 修复PhotographPromptGenerator和ImageAspectRatio节点的已知问题。
+<br>
+
+- Fixed known issues in PhotographPromptGenerator and ImageAspectRatio nodes.
+
 ## 0.9.9 2025-12-31
 - 添加文本合并器节点(TextMergerNode)节点用于合并多个文本输入
 <br>

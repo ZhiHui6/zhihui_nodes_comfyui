@@ -55,8 +55,8 @@ class PhotographPromptGenerator:
                 "location": (cls._load_options("location_options.txt"),),
                 "weather": (cls._load_options("weather_options.txt"),),
                 "season": (cls._load_options("season_options.txt"),),
-                "output_mode": (["Tags", "Template"],),
-                "expand_mode": (["Off", "Chinese Expand", "English Expand"],),
+                "output_mode": (["Tags", "Template"], {"default": "Tags"}),
+                "expand_mode": (["Off", "Chinese Expand", "English Expand"], {"default": "Off"}),
                 "template": ("STRING", {
                     "multiline": True,
                     "default": ""
