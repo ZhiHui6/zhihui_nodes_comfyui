@@ -1,0 +1,50 @@
+[
+    {
+        "name": "时尚大片 · Fashion Editorial",
+        "template": "High-fashion editorial photograph captured with {camera} and {lens}, {lighting} creates dramatic mood. A stunning {gender} model with {hair_style} {hair_color} hair, {facial_expressions} expression, the model is {pose}, {orientation}, wearing luxurious {top} and {bottom}, complemented by designer {boots} and {accessories}. Shot in {photography_style} style with {depth_of_field}, {composition}, {color_tone} color grading, {post_processing}. Magazine cover quality, ultra-sharp details, professional fashion photography."
+    },
+    {
+        "name": "人像特写 · Portrait Headshot",
+        "template": "Intimate portrait headshot taken with {camera} using {lens}, soft {lighting} beautifully illuminates the face. Close-up of {gender} {character} with {hair_style} {hair_color} hair, captivating {facial_expressions} expression, {hand_movements} gesture near face. Sharp focus on eyes with {depth_of_field}, {color_tone} tones, {mood_atmosphere} atmosphere. Professional headshot photography, studio quality, tack-sharp details, emotional connection."
+    },
+    {
+        "name": "街头纪实 · Street Documentary",
+        "template": "Candid street documentary photograph at {location} during {season}, captured with {camera} and {lens} in {weather} conditions. A {gender} {character} in natural moment, {pose}, wearing {top} and {bottom}. Shot in {photography_style} aesthetic, natural lighting, {composition}, raw unfiltered {color_tone} palette. Authentic street photography, decisive moment, storytelling through imagery."
+    },
+    {
+        "name": "商业产品 · Commercial Product",
+        "template": "Professional commercial product photograph shot with {camera} using {lens}, perfect studio {lighting} setup. Model wearing premium {top}, {bottom}, and {boots}, showcasing the products elegantly. {perspective} angle with {depth_of_field}, {composition}, clean {color_tone} palette, {post_processing}. High-resolution commercial photography, advertising quality, perfect product visibility, professional retouching."
+    },
+    {
+        "name": "电影氛围 · Cinematic Mood",
+        "template": "Cinematic photograph with dramatic storytelling, shot with {camera} and {lens}, atmospheric {lighting} in {weather}. A {gender} {character} with {facial_expressions} expression, {pose}, {orientation}, wearing {top} and {bottom}. Captured at {location} with {depth_of_field}, {composition}, moody {color_tone} color grading, {mood_atmosphere} feeling, film grain texture. Movie still aesthetic, narrative photography, emotional depth, cinematic post-processing."
+    },
+    {
+        "name": "自然光人像 · Natural Light Portrait",
+        "template": "Beautiful natural light portrait photograph at {location} during golden hour, {season} season. Soft window light illuminates {gender} model with {hair_style} hair, genuine {facial_expressions} expression, {pose} naturally. Wearing casual {top} and {bottom} with {accessories}. Shot with {camera} and {lens}, {depth_of_field}, {composition}, warm {color_tone} tones, gentle {mood_atmosphere}. Organic photography style, natural beauty, soft focus, authentic moments."
+    },
+    {
+        "name": "工作室精修 · Studio Retouched",
+        "template": "Premium studio portrait captured with {camera} using {lens}, controlled multi-light setup with {lighting}. Professional {gender} model with styled {hair_style} {hair_color} hair, perfect {facial_expressions}, elegantly {pose}, {orientation}. Wearing sophisticated {top}, {bottom}, {boots}, and luxury {accessories}. Shot with {depth_of_field}, {composition}, harmonious {color_tone}, {photography_technique}. High-end retouching, flawless skin, magazine-ready, professional color grading."
+    },
+    {
+        "name": "运动动态 · Sports Action",
+        "template": "Dynamic sports action photograph captured with {camera} and {lens} at high shutter speed. Athletic {gender} in explosive {pose} with powerful {hand_movements} and {leg_foot_movements}, frozen motion at peak action. Natural {lighting} at {location}, fast {photography_technique}, sharp focus with {depth_of_field}, {composition}. Professional sports photography, peak performance moment, motion blur background, dramatic energy, vivid colors."
+    },
+    {
+        "name": "艺术创意 · Fine Art Creative",
+        "template": "Fine art conceptual photograph with creative vision, {camera} and {lens}, artistic {lighting} setup. {gender} {character} with expressive {facial_expressions}, artistic {pose} with dramatic {hand_movements}, {orientation}. Wearing avant-garde {top} and conceptual {accessories}, {tattoo} visible {tattoo_location}. Shot with {photography_style}, experimental {photography_technique}, creative {depth_of_field}, unique {composition}, bold {color_tone}, {mood_atmosphere} atmosphere, {texture} details. Gallery-worthy fine art, visual storytelling, artistic expression."
+    },
+    {
+        "name": "生活纪实 · Lifestyle Documentary",
+        "template": "Authentic lifestyle documentary photograph capturing real moments at {location}. Natural {gender} {character} in candid {pose}, genuine {facial_expressions}, spontaneous interaction. Wearing everyday {top} and {bottom} with personal {accessories}. Shot with {camera} and {lens}, available light, {composition}, warm {color_tone}, {mood_atmosphere} feeling. Real-life storytelling, authentic emotions, documentary style, unposed naturalness, human connection."
+    },
+    {
+        "name": "黑白经典 · Black & White Classic",
+        "template": "Timeless black and white photograph shot with {camera} using {lens}, dramatic {lighting} creates strong contrast. {gender} {character} with striking {facial_expressions}, classic {pose}, {orientation}. Wearing elegant {top} and {bottom}. Monochrome aesthetic with {depth_of_field}, {composition}, rich tonal range from deep blacks to bright whites, {texture} details emphasized. Classic black and white photography, timeless elegance, strong contrast, film photography aesthetic, emotional depth."
+    },
+    {
+        "name": "户外环境 · Environmental Portrait",
+        "template": "Environmental portrait photograph at scenic {location} during {season} with {weather} conditions. {gender} {character} integrated into the environment, {pose} naturally, wearing {top}, {bottom}, and {boots} appropriate for the setting. Shot with {camera} and {lens}, natural {lighting}, {perspective} angle, {depth_of_field}, {composition}, natural {color_tone} palette. Storytelling through environment, context and character, landscape integration, natural beauty, wide-angle perspective."
+    }
+]

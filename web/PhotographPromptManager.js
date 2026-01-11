@@ -1,7 +1,6 @@
 import { app } from "../../../scripts/app.js";
 import { api } from "../../../scripts/api.js";
 
-// Photograph Prompt Manager Extension
 app.registerExtension({
     name: "zhihui.PhotographPromptManager",
     async beforeRegisterNodeDef(nodeType, nodeData, app) {
@@ -11,39 +10,40 @@ app.registerExtension({
             nodeType.prototype.onNodeCreated = function () {
                 const r = onNodeCreated ? onNodeCreated.apply(this, arguments) : undefined;
 
-                // Store for previous state (initialize before widgets)
                 this._previousState = null;
                 this._isRandomMode = false;
 
-                // Find the output_mode widget index
-                const outputModeWidgetIndex = this.widgets.findIndex(w => w.name === "output_mode");
+                const photographFieldsToHide = [
+                    'character', 'gender', 'facial_expressions', 'hair_style', 'hair_color',
+                    'pose', 'head_movements', 'hand_movements', 'leg_foot_movements', 'orientation',
+                    'top', 'bottom', 'boots', 'socks', 'accessories', 'tattoo', 'tattoo_location',
+                    'camera', 'lens', 'lighting', 'perspective', 'location',
+                    'weather', 'season', 'color_tone', 'mood_atmosphere',
+                    'photography_style', 'photography_technique', 'post_processing', 'depth_of_field',
+                    'composition', 'texture', 'template'
+                ];
 
-                // Add random toggle button after season (before output_mode)
-                if (outputModeWidgetIndex !== -1) {
-                    const randomToggleButton = this.addWidget("button", "🎲一键随机·Random Toggle", "random_toggle", () => {
-                        toggleRandomMode(this);
-                    });
-                    randomToggleButton.serialize = false;
-
-                    // Move the random toggle button to be right before the output_mode widget
-                    const buttonIndex = this.widgets.indexOf(randomToggleButton);
-                    if (buttonIndex !== -1 && buttonIndex !== outputModeWidgetIndex) {
-                        this.widgets.splice(buttonIndex, 1);
-                        this.widgets.splice(outputModeWidgetIndex, 0, randomToggleButton);
+                for (const widget of this.widgets) {
+                    if (photographFieldsToHide.includes(widget.name)) {
+                        widget.type = "hidden";
+                        widget.computeSize = () => [0, -4];
                     }
                 }
 
-                // Add the management button to the node
-                const manageButton = this.addWidget("button", "🛠️用户选项编辑·User Option Editing", "user_option_editing", () => {
+                const categoryBrowserButton = this.addWidget("button", "🏷️标签选择·Select Tags", "category_browser", () => {
+                    openCategoryBrowser(this);
+                });
+                categoryBrowserButton.serialize = false;
+
+                const templateHelperButton = this.addWidget("button", "📝模版编辑·Template Editing", "template_helper", () => {
+                    openTemplateEditorHelper(this);
+                });
+                templateHelperButton.serialize = false;
+
+                const manageButton = this.addWidget("button", "⚙️自定标签·Custom Tags", "user_option_editing", () => {
                     openPhotographPromptManager(this);
                 });
                 manageButton.serialize = false;
-
-                // Add the template editor helper button to the node
-                const templateHelperButton = this.addWidget("button", "📝模版助手·Template Helper", "template_helper", () => {
-                    openTemplateEditorHelper(this); // Pass the node reference
-                });
-                templateHelperButton.serialize = false;
 
                 return r;
             };
@@ -51,146 +51,81 @@ app.registerExtension({
     }
 });
 
-// State management for the prompt manager
 let currentManagerDialog = null;
 let categoryData = {};
 
-// Toggle random mode for all system preset options
-function toggleRandomMode(node) {
-    // List of all system preset option widgets
-    const presetWidgetNames = [
-        'character', 'gender', 'pose', 'movement', 'orientation',
-        'top', 'bottom', 'boots', 'accessories',
-        'camera', 'lens', 'lighting', 'perspective',
-        'location', 'weather', 'season'
-    ];
-
-    if (!node._isRandomMode) {
-        // Save current state and switch to random mode
-        node._previousState = {};
-
-        presetWidgetNames.forEach(widgetName => {
-            const widget = node.widgets.find(w => w.name === widgetName);
-            if (widget) {
-                // Save current value
-                node._previousState[widgetName] = widget.value;
-                // Set to Random
-                widget.value = "Random";
-            }
-        });
-
-        node._isRandomMode = true;
-
-        // Update button text to indicate restore mode
-        const toggleButton = node.widgets.find(w => w.name === "random_toggle");
-        if (toggleButton) {
-            toggleButton.name = "↩️恢复状态·Restore";
-        }
-
-        // Mark node as modified
-        node.setDirtyCanvas(true, true);
-
-        showToast('✅ 已设置为随机模式 · Switched to Random Mode', 'success');
-    } else {
-        // Restore previous state
-        if (node._previousState) {
-            presetWidgetNames.forEach(widgetName => {
-                const widget = node.widgets.find(w => w.name === widgetName);
-                if (widget && node._previousState[widgetName] !== undefined) {
-                    widget.value = node._previousState[widgetName];
-                }
-            });
-        }
-
-        node._isRandomMode = false;
-        node._previousState = null;
-
-        // Update button text back to random mode
-        const toggleButton = node.widgets.find(w => w.name === "random_toggle");
-        if (toggleButton) {
-            toggleButton.name = "🎲一键随机·Random Toggle";
-        }
-
-        // Mark node as modified
-        node.setDirtyCanvas(true, true);
-
-        showToast('✅ 已恢复到之前状态 · Restored Previous State', 'success');
-    }
-}
-
-// Translation function using Pollinations AI API
 async function translateText(text, targetLang) {
     try {
-        const prompt = targetLang === 'en'
-            ? `Translate the following Chinese text to English, return only the translation without any explanation: "${text}"`
-            : `Translate the following English text to Chinese, return only the translation without any explanation: "${text}"`;
+        // 使用腾讯翻译君API（免费，无需API key）
+        const url = "https://transmart.qq.com/api/imt";
 
-        const response = await fetch('https://text.pollinations.ai/openai/', {
+        // 生成唯一的client_key
+        const clientKey = `browser-chrome-${generateUUID()}`;
+
+        const postData = {
+            "header": {
+                "fn": "auto_translation",
+                "client_key": clientKey
+            },
+            "type": "plain",
+            "model_category": "normal",
+            "source": {
+                "lang": targetLang === 'en' ? 'zh' : 'en',
+                "text_list": [text]
+            },
+            "target": {
+                "lang": targetLang === 'en' ? 'en' : 'zh'
+            }
+        };
+
+        const response = await fetch(url, {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
+                'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36',
+                'Referer': 'https://transmart.qq.com/zh-CN/index'
             },
-            body: JSON.stringify({
-                messages: [
-                    {
-                        role: 'user',
-                        content: prompt
-                    }
-                ],
-                model: 'openai',
-                seed: Math.floor(Math.random() * 1000000),
-                jsonMode: false
-            })
+            body: JSON.stringify(postData)
         });
 
         if (!response.ok) {
-            throw new Error('Translation request failed');
+            throw new Error(`Translation request failed with status ${response.status}`);
         }
 
-        // Try to parse as JSON first
-        const contentType = response.headers.get('content-type');
-        let result;
+        const result = await response.json();
 
-        if (contentType && contentType.includes('application/json')) {
-            // Response is JSON, extract the message content
-            const data = await response.json();
-
-            // Extract translated text from the response
-            if (data.choices && data.choices.length > 0 && data.choices[0].message) {
-                result = data.choices[0].message.content;
-            } else {
-                throw new Error('Unexpected JSON response format');
-            }
+        if (result.auto_translation && result.auto_translation.length > 0) {
+            return result.auto_translation[0].trim();
         } else {
-            // Response is plain text
-            result = await response.text();
+            throw new Error('Translation failed: No result returned');
         }
-
-        // Clean up the result - remove quotes and extra whitespace
-        return result.trim().replace(/^["']|["']$/g, '');
     } catch (error) {
         console.error('Translation error:', error);
         throw error;
     }
 }
 
-// State management for template editor helper
+// 生成UUID的辅助函数
+function generateUUID() {
+    return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, function(c) {
+        const r = Math.random() * 16 | 0;
+        const v = c === 'x' ? r : (r & 0x3 | 0x8);
+        return v.toString(16);
+    });
+}
+
 let currentTemplateHelperDialog = null;
 let currentTemplateEditor = null;
-let currentTemplateNode = null; // Store reference to the parent node
-let customTemplates = []; // Store custom templates
+let currentTemplateNode = null;
+let customTemplates = [];
 
-// Template file manager
 class TemplateManager {
-    // Initialize templates - try to load from JSON file, fallback to localStorage
     static async initialize() {
-        // Try to load from JSON file first
         try {
-            const response = await fetch('../Nodes/PhotographPromptGen/custom-templates.json');
+            const response = await fetch('../Nodes/PhotographPromptGen/templates/user_templates.txt');
             if (response.ok) {
                 const data = await response.json();
                 customTemplates = data;
-                // Save to localStorage as backup
                 localStorage.setItem('customTemplates', JSON.stringify(data));
                 console.log('Loaded templates from JSON file');
                 return data;
@@ -199,7 +134,6 @@ class TemplateManager {
             console.log('Could not load from JSON file, checking localStorage');
         }
         
-        // Fallback to localStorage
         const stored = localStorage.getItem('customTemplates');
         if (stored) {
             try {
@@ -215,14 +149,12 @@ class TemplateManager {
         return [];
     }
     
-    // Save templates to localStorage and offer JSON export
     static saveTemplates(templates) {
         customTemplates = templates;
         localStorage.setItem('customTemplates', JSON.stringify(templates));
         return true;
     }
     
-    // Export templates to JSON file
     static exportTemplates() {
         const dataStr = JSON.stringify(customTemplates, null, 2);
         const blob = new Blob([dataStr], { type: 'application/json' });
@@ -237,7 +169,6 @@ class TemplateManager {
         showToast('✅ 模版已导出到JSON文件', 'success');
     }
     
-    // Import templates from JSON file
     static importTemplates() {
         const input = document.createElement('input');
         input.type = 'file';
@@ -252,7 +183,6 @@ class TemplateManager {
                         if (Array.isArray(imported)) {
                             customTemplates = imported;
                             this.saveTemplates(customTemplates);
-                            // Refresh the template lists
                             const presetList = document.querySelector('#preset-list');
                             const customList = document.querySelector('#custom-list');
                             if (presetList) {
@@ -285,25 +215,19 @@ class TemplateManager {
     }
 }
 
-// Open the photograph prompt manager dialog
 function openPhotographPromptManager() {
-    // Close any existing dialog
     if (currentManagerDialog) {
         currentManagerDialog.remove();
     }
 
-    // Create the dialog
     currentManagerDialog = createPhotographPromptManagerDialog();
     document.body.appendChild(currentManagerDialog);
 
-    // Load category data
     loadCategoryData();
 
-    // Show the dialog
     currentManagerDialog.style.display = 'block';
 }
 
-// Create the photograph prompt manager dialog
 function createPhotographPromptManagerDialog() {
     const overlay = document.createElement('div');
     overlay.style.cssText = `
@@ -337,7 +261,6 @@ function createPhotographPromptManagerDialog() {
         border: 1px solid rgba(255, 255, 255, 0.1);
     `;
     
-    // Header
     const header = document.createElement('div');
     header.style.cssText = `
         padding: 12px 20px;
@@ -349,7 +272,7 @@ function createPhotographPromptManagerDialog() {
     `;
     
     const title = document.createElement('h2');
-    title.textContent = '用户选项编辑 - User Option Editing';
+    title.textContent = '自定义标签 - Custom Tags';
     title.style.cssText = `
         margin: 0;
         color: #fff;
@@ -401,7 +324,6 @@ function createPhotographPromptManagerDialog() {
     header.appendChild(title);
     header.appendChild(closeButton);
     
-    // Content area
     const content = document.createElement('div');
     content.style.cssText = `
         flex: 1;
@@ -411,10 +333,9 @@ function createPhotographPromptManagerDialog() {
         gap: 20px;
     `;
     
-    // Category list sidebar
     const sidebar = document.createElement('div');
     sidebar.style.cssText = `
-        width: 250px;
+        width: 350px;
         background: rgba(0, 0, 0, 0.2);
         border-radius: 12px;
         padding: 15px;
@@ -445,7 +366,6 @@ function createPhotographPromptManagerDialog() {
     sidebar.appendChild(sidebarTitle);
     sidebar.appendChild(categoryList);
     
-    // Main editor area
     const editorArea = document.createElement('div');
     editorArea.style.cssText = `
         flex: 1;
@@ -497,14 +417,11 @@ function createPhotographPromptManagerDialog() {
     `;
 
     editorContent.appendChild(entryList);
-    
     editorArea.appendChild(editorHeader);
     editorArea.appendChild(editorContent);
-    
     content.appendChild(sidebar);
     content.appendChild(editorArea);
     
-    // Footer
     const footer = document.createElement('div');
     footer.style.cssText = `
         padding: 15px 20px;
@@ -529,7 +446,6 @@ function createPhotographPromptManagerDialog() {
         gap: 10px;
     `;
 
-    // 添加新条目按钮
     const addButton = document.createElement('button');
     addButton.id = 'add-entry-button';
     addButton.textContent = '添加新条目 · Add New Entry';
@@ -561,7 +477,6 @@ function createPhotographPromptManagerDialog() {
         showAddEntryForm();
     });
 
-    // 导出按钮
     const exportButton = document.createElement('button');
     exportButton.innerHTML = '导出 · Export';
     exportButton.style.cssText = `
@@ -594,7 +509,6 @@ function createPhotographPromptManagerDialog() {
 
     actionButtons.appendChild(exportButton);
 
-    // 导入按钮
     const importButton = document.createElement('button');
     importButton.innerHTML = '导入 · Import';
     importButton.style.cssText = `
@@ -627,7 +541,6 @@ function createPhotographPromptManagerDialog() {
 
     actionButtons.appendChild(importButton);
 
-    // 添加新条目按钮（最右边）
     actionButtons.appendChild(addButton);
 
     footer.appendChild(statusText);
@@ -639,27 +552,19 @@ function createPhotographPromptManagerDialog() {
     
     overlay.appendChild(dialog);
     
-    // Make the dialog non-draggable as requested
-    // makeDraggable(dialog, header);
-    
-    // Optimize keyboard event handling to ensure template helper interactions don't affect outside UI
     overlay.addEventListener('keydown', (event) => {
-        // Allow all keys if focus is on textarea or input elements
         const target = event.target;
         if (target.tagName === 'TEXTAREA' || target.tagName === 'INPUT') {
-            // Contain the event within the helper UI
             event.stopImmediatePropagation();
             return;
         }
         
-        // For other elements in the helper UI, still contain the event
         event.stopImmediatePropagation();
     });
     
     return overlay;
 }
 
-// Make an element draggable
 function makeDraggable(element, handle) {
     let pos1 = 0, pos2 = 0, pos3 = 0, pos4 = 0;
     
@@ -691,12 +596,10 @@ function makeDraggable(element, handle) {
     }
 }
 
-// Load category data
 async function loadCategoryData() {
     try {
         updateStatus('正在加载数据... · Loading data...');
         
-        // Get the list of category files
         const response = await api.fetchApi('/zhihui/photograph/categories', {
             method: 'GET'
         });
@@ -709,11 +612,9 @@ async function loadCategoryData() {
         console.log('Loaded categories from API:', categories);
         categoryData = {};
         
-        // If no categories are returned from API, use default categories matching the node's actual options
         const effectiveCategories = categories && categories.length > 0 ? categories :
-            ['character', 'gender', 'pose', 'movement', 'orientation', 'top', 'bottom', 'boots', 'accessories', 'camera', 'lens', 'lighting', 'perspective', 'location', 'weather', 'season'];
+            ['character', 'gender', 'facial_expressions', 'hair_style', 'hair_color', 'pose', 'head_movements', 'hand_movements', 'leg_foot_movements', 'orientation', 'top', 'bottom', 'boots', 'socks', 'accessories', 'tattoo', 'tattoo_location', 'camera', 'lens', 'lighting', 'perspective', 'location', 'weather', 'season', 'color_tone', 'mood_atmosphere', 'photography_style', 'photography_technique', 'post_processing', 'depth_of_field', 'composition', 'texture'];
         
-        // Load data for each category
         for (const category of effectiveCategories) {
             try {
                 const dataResponse = await api.fetchApi(`/zhihui/photograph/category/${category}`, {
@@ -723,11 +624,8 @@ async function loadCategoryData() {
                 if (dataResponse.ok) {
                     const data = await dataResponse.json();
 
-                    // Convert user entries from "中文 (english)" or "中文(english)" format to object format
                     const userEntries = (data.user_entries || []).map(entry => {
                         if (typeof entry === 'string') {
-                            // Parse "中文 (english)" or "中文(english)" format
-                            // The space before parenthesis is optional
                             const match = entry.match(/^(.+?)\s*\((.+)\)$/);
                             if (match) {
                                 return {
@@ -736,7 +634,6 @@ async function loadCategoryData() {
                                 };
                             }
                         }
-                        // If it's already an object or doesn't match the format, return as-is
                         return entry;
                     });
 
@@ -759,7 +656,6 @@ async function loadCategoryData() {
             }
         }
         
-        // Render the category list
         renderCategoryList(effectiveCategories);
         
         updateStatus('数据加载完成 · Data loaded successfully');
@@ -768,50 +664,64 @@ async function loadCategoryData() {
         updateStatus('数据加载失败 · Failed to load data');
         showToast('❌ 数据加载失败，请检查网络连接', 'error');
         
-        // Fallback: show default categories matching the node's actual options even on error
-        const defaultCategories = ['character', 'gender', 'pose', 'movement', 'orientation', 'top', 'bottom', 'boots', 'accessories', 'camera', 'lens', 'lighting', 'perspective', 'location', 'weather', 'season'];
+        const defaultCategories = ['character', 'gender', 'facial_expressions', 'hair_style', 'hair_color', 'pose', 'head_movements', 'hand_movements', 'leg_foot_movements', 'orientation', 'top', 'bottom', 'boots', 'socks', 'accessories', 'tattoo', 'tattoo_location', 'camera', 'lens', 'lighting', 'perspective', 'location', 'weather', 'season', 'color_tone', 'mood_atmosphere', 'photography_style', 'photography_technique', 'post_processing', 'depth_of_field', 'composition', 'texture'];
         renderCategoryList(defaultCategories);
         showToast('⚠️ 显示默认分类 · Showing default categories', 'warning');
     }
 }
 
-// Category name mapping with bilingual display
 const CATEGORY_NAME_MAP = {
+    // 节点参数名映射
     'character': '人物 · Character',
     'gender': '性别 · Gender',
-    'pose': '姿势 · Pose',
-    'movement': '动作 · Movement',
+    'facial_expressions': '面部表情 · Facial Expressions',
+    'hair_style': '发型 · Hair Style',
+    'hair_color': '发色 · Hair Color',
+    'pose': '身躯姿势 · Body Pose',
+    'head_movements': '头部动作 · Head Movements',
+    'hand_movements': '手部动作 · Hand Movements',
+    'leg_foot_movements': '腿脚动作 · Leg/Foot Movements',
     'orientation': '朝向 · Orientation',
     'top': '上衣 · Top',
     'bottom': '下装 · Bottom',
     'boots': '鞋子 · Boots',
+    'socks': '袜子 · Socks',
     'accessories': '配饰 · Accessories',
+    'tattoo': '纹身 · Tattoo',
+    'tattoo_location': '纹身位置 · Tattoo Location',
     'camera': '相机 · Camera',
     'lens': '镜头 · Lens',
     'lighting': '灯光 · Lighting',
     'perspective': '视角 · Perspective',
     'location': '位置 · Location',
     'weather': '天气 · Weather',
-    'season': '季节 · Season'
+    'season': '季节 · Season',
+    'color_tone': '色调 · Color Tone',
+    'mood_atmosphere': '氛围 · Mood Atmosphere',
+    'photography_style': '摄影风格 · Photography Style',
+    'photography_technique': '摄影技法 · Photography Technique',
+    'post_processing': '后期处理 · Post Processing',
+    'depth_of_field': '景深 · Depth of Field',
+    'composition': '构图 · Composition',
+    'texture': '质感 · Texture',
+    // 文件名映射（当文件名与节点参数名不同时）
+    'body_pose': '身躯姿势 · Body Pose',
+    'bottoms': '下装 · Bottom',
+    'tops': '上衣 · Top',
+    'top_down': '视角 · Perspective'
 };
 
-// Get bilingual display name for a category
 function getCategoryDisplayName(category) {
     return CATEGORY_NAME_MAP[category] || category;
 }
 
-// Render the category list
 function renderCategoryList(categories) {
     const categoryList = document.getElementById('category-list');
     categoryList.innerHTML = '';
 
     categories.forEach(category => {
         const categoryItem = document.createElement('div');
-
-        // Get entry counts for this category (only count user entries)
         const userCount = categoryData[category]?.user_entries?.length || 0;
-
-        // Create category display with count badge
         const categoryName = document.createElement('span');
         categoryName.textContent = getCategoryDisplayName(category);
         categoryName.style.cssText = `
@@ -863,7 +773,6 @@ function renderCategoryList(categories) {
         });
 
         categoryItem.addEventListener('click', () => {
-            // Highlight selected category
             document.querySelectorAll('#category-list > div').forEach(item => {
                 item.style.background = 'rgba(255, 255, 255, 0.05)';
                 item.style.borderColor = 'transparent';
@@ -877,7 +786,6 @@ function renderCategoryList(categories) {
             categoryItem.style.boxShadow = '0 2px 8px rgba(79, 172, 254, 0.3)';
             categoryItem.classList.add('selected');
 
-            // Load entries for this category
             loadCategoryEntries(category);
         });
 
@@ -885,7 +793,6 @@ function renderCategoryList(categories) {
     });
 }
 
-// Load entries for a specific category
 function loadCategoryEntries(category) {
     const categoryName = document.getElementById('current-category-name');
     categoryName.textContent = getCategoryDisplayName(category);
@@ -896,12 +803,10 @@ function loadCategoryEntries(category) {
 
     const userEntries = categoryData[category]?.user_entries || [];
 
-    // Add user entries section
     if (userEntries.length > 0) {
         const userSection = createSectionHeader('用户自定义 · User-defined', '#10b981', true);
         entryList.appendChild(userSection);
 
-        // Create grid container for entries
         const gridContainer = document.createElement('div');
         gridContainer.style.cssText = `
             display: grid;
@@ -911,7 +816,7 @@ function loadCategoryEntries(category) {
         `;
 
         userEntries.forEach((entry, index) => {
-            const entryItem = createEntryItem(entry, index, false); // isPreset = false
+            const entryItem = createEntryItem(entry, index, false);
             entryItem.dataset.userIndex = index;
             gridContainer.appendChild(entryItem);
         });
@@ -919,7 +824,6 @@ function loadCategoryEntries(category) {
         entryList.appendChild(gridContainer);
     }
 
-    // If no user entries
     if (userEntries.length === 0) {
         const emptyMessage = document.createElement('div');
         emptyMessage.textContent = '该分类暂无用户条目 · No user entries in this category';
@@ -933,7 +837,6 @@ function loadCategoryEntries(category) {
     }
 }
 
-// Create section header
 function createSectionHeader(title, color, isUserSection) {
     const header = document.createElement('div');
     header.style.cssText = `
@@ -979,7 +882,6 @@ function createSectionHeader(title, color, isUserSection) {
     return header;
 }
 
-// Create entry item (new card-style layout with hover controls)
 function createEntryItem(entry, index, isPreset) {
     const entryItem = document.createElement('div');
     entryItem.className = 'entry-item';
@@ -997,16 +899,14 @@ function createEntryItem(entry, index, isPreset) {
         justify-content: center;
     `;
 
-    // Display text (non-editable)
     const displayText = document.createElement('div');
     displayText.className = 'entry-display-text';
 
-    // Handle both object format (new) and string format (legacy)
     let displayValue = '';
     if (typeof entry === 'object' && entry !== null && entry.chinese !== undefined && entry.english !== undefined) {
         displayValue = `${entry.chinese}(${entry.english})`;
     } else {
-        displayValue = entry; // Legacy string format
+        displayValue = entry;
     }
 
     displayText.textContent = displayValue;
@@ -1023,7 +923,6 @@ function createEntryItem(entry, index, isPreset) {
         padding: 0 4px;
     `;
 
-    // Action buttons container (hidden by default, shown on hover)
     const actionButtons = document.createElement('div');
     actionButtons.className = 'entry-action-buttons';
     actionButtons.style.cssText = `
@@ -1035,7 +934,6 @@ function createEntryItem(entry, index, isPreset) {
         z-index: 10;
     `;
 
-    // Edit button
     const editButton = document.createElement('button');
     editButton.innerHTML = '✏️';
     editButton.title = '编辑条目 · Edit entry';
@@ -1067,7 +965,6 @@ function createEntryItem(entry, index, isPreset) {
         showEditEntryDialog(entry, index);
     });
 
-    // Delete button
     const deleteButton = document.createElement('button');
     deleteButton.innerHTML = '🗑️';
     deleteButton.title = '删除条目 · Delete entry';
@@ -1104,7 +1001,6 @@ function createEntryItem(entry, index, isPreset) {
     actionButtons.appendChild(editButton);
     actionButtons.appendChild(deleteButton);
 
-    // Add hover effect
     entryItem.addEventListener('mouseenter', () => {
         if (!entryItem.classList.contains('selected')) {
             entryItem.style.background = 'rgba(16, 185, 129, 0.2)';
@@ -1119,19 +1015,15 @@ function createEntryItem(entry, index, isPreset) {
         }
     });
 
-    // Click to select (single selection only, click again to deselect)
     entryItem.addEventListener('click', (e) => {
         if (e.target === editButton || e.target === deleteButton) {
             return;
         }
 
         const isCurrentlySelected = entryItem.classList.contains('selected');
-
-        // Find all entry items in the current grid
         const gridContainer = entryItem.parentElement;
         const allEntryItems = gridContainer.querySelectorAll('.entry-item');
 
-        // Deselect all items
         allEntryItems.forEach(item => {
             item.classList.remove('selected');
             item.style.background = 'rgba(16, 185, 129, 0.1)';
@@ -1143,7 +1035,6 @@ function createEntryItem(entry, index, isPreset) {
             }
         });
 
-        // If the item was not selected, select it; if it was selected, leave it deselected
         if (!isCurrentlySelected) {
             entryItem.classList.add('selected');
             entryItem.style.background = 'rgba(16, 185, 129, 0.3)';
@@ -1159,9 +1050,7 @@ function createEntryItem(entry, index, isPreset) {
     return entryItem;
 }
 
-// Show edit entry dialog
 function showEditEntryDialog(entry, index) {
-    // Remove existing modal if any
     const existingModal = document.getElementById('edit-entry-modal');
     if (existingModal) {
         existingModal.remove();
@@ -1210,7 +1099,6 @@ function showEditEntryDialog(entry, index) {
         background-clip: text;
     `;
 
-    // Get current values
     let chineseValue = '';
     let englishValue = '';
     if (typeof entry === 'object' && entry !== null && entry.chinese !== undefined && entry.english !== undefined) {
@@ -1218,7 +1106,6 @@ function showEditEntryDialog(entry, index) {
         englishValue = entry.english;
     }
 
-    // Chinese name input container
     const chineseLabel = document.createElement('label');
     chineseLabel.textContent = '中文名称 · Chinese Name:';
     chineseLabel.style.cssText = `
@@ -1264,7 +1151,6 @@ function showEditEntryDialog(entry, index) {
         chineseInput.style.boxShadow = 'none';
     });
 
-    // Auto-translate button for Chinese input
     const chineseTranslateBtn = document.createElement('button');
     chineseTranslateBtn.innerHTML = '🌐 自动填充';
     chineseTranslateBtn.title = '自动翻译到英文';
@@ -1304,7 +1190,6 @@ function showEditEntryDialog(entry, index) {
     chineseInputContainer.appendChild(chineseInput);
     chineseInputContainer.appendChild(chineseTranslateBtn);
 
-    // English name input container
     const englishLabel = document.createElement('label');
     englishLabel.textContent = '英文名称 · English Name:';
     englishLabel.style.cssText = `
@@ -1350,7 +1235,6 @@ function showEditEntryDialog(entry, index) {
         englishInput.style.boxShadow = 'none';
     });
 
-    // Auto-translate button for English input
     const englishTranslateBtn = document.createElement('button');
     englishTranslateBtn.innerHTML = '🌐 自动填充';
     englishTranslateBtn.title = '自动翻译到中文';
@@ -1390,7 +1274,6 @@ function showEditEntryDialog(entry, index) {
     englishInputContainer.appendChild(englishInput);
     englishInputContainer.appendChild(englishTranslateBtn);
 
-    // Button container
     const buttonContainer = document.createElement('div');
     buttonContainer.style.cssText = `
         display: flex;
@@ -1399,7 +1282,6 @@ function showEditEntryDialog(entry, index) {
         margin-top: 25px;
     `;
 
-    // Cancel button
     const cancelButton = document.createElement('button');
     cancelButton.textContent = '取消 · Cancel';
     cancelButton.style.cssText = `
@@ -1418,7 +1300,6 @@ function showEditEntryDialog(entry, index) {
         modal.remove();
     });
 
-    // Save button
     const saveButton = document.createElement('button');
     saveButton.textContent = '保存 · Save';
     saveButton.style.cssText = `
@@ -1443,7 +1324,6 @@ function showEditEntryDialog(entry, index) {
             return;
         }
 
-        // Update the entry
         const categoryNameElement = document.getElementById('current-category-name');
         const currentCategory = categoryNameElement.dataset.category;
 
@@ -1453,10 +1333,7 @@ function showEditEntryDialog(entry, index) {
                 english: newEnglishName
             };
 
-            // Auto-save
             await autoSaveCategory(currentCategory);
-
-            // Refresh the entry list
             loadCategoryEntries(currentCategory);
 
             showToast('✅ 条目已更新并自动保存', 'success');
@@ -1467,7 +1344,6 @@ function showEditEntryDialog(entry, index) {
     buttonContainer.appendChild(cancelButton);
     buttonContainer.appendChild(saveButton);
 
-    // Assemble dialog
     dialogContent.appendChild(title);
     dialogContent.appendChild(chineseLabel);
     dialogContent.appendChild(chineseInputContainer);
@@ -1477,21 +1353,10 @@ function showEditEntryDialog(entry, index) {
 
     modal.appendChild(dialogContent);
     document.body.appendChild(modal);
-
-    // Focus on first input
     chineseInput.focus();
-
-    // Close on outside click
-    modal.addEventListener('click', (e) => {
-        if (e.target === modal) {
-            modal.remove();
-        }
-    });
 }
 
-// Show the add entry form with Chinese and English name inputs
 function showAddEntryForm() {
-    // Check if a category is selected
     const categoryNameElement = document.getElementById('current-category-name');
     const categoryName = categoryNameElement?.dataset.category;
 
@@ -1503,19 +1368,16 @@ function showAddEntryForm() {
     const editorContent = document.querySelector('#entry-list')?.parentElement;
     if (!editorContent) return;
 
-    // Remove existing form if any
     const existingForm = document.getElementById('add-entry-form');
     if (existingForm) {
         existingForm.remove();
     }
 
-    // Hide the add button
     const addButton = document.getElementById('add-entry-button');
     if (addButton) {
         addButton.style.display = 'none';
     }
 
-    // Create the modal overlay
     const modal = document.createElement('div');
     modal.id = 'add-entry-modal';
     modal.style.cssText = `
@@ -1533,7 +1395,6 @@ function showAddEntryForm() {
         -webkit-backdrop-filter: blur(5px);
     `;
 
-    // Create the form container
     const formContainer = document.createElement('div');
     formContainer.id = 'add-entry-form';
     formContainer.style.cssText = `
@@ -1547,7 +1408,6 @@ function showAddEntryForm() {
         animation: modalSlideIn 0.3s ease;
     `;
 
-    // Add slide down animation
     const style = document.createElement('style');
     style.textContent = `
         @keyframes slideDown {
@@ -1563,7 +1423,6 @@ function showAddEntryForm() {
     `;
     document.head.appendChild(style);
 
-    // Form title
     const title = document.createElement('h3');
     title.textContent = '添加新条目 · Add New Entry';
     title.style.cssText = `
@@ -1573,7 +1432,6 @@ function showAddEntryForm() {
         text-align: center;
     `;
 
-    // Chinese name input container
     const chineseLabel = document.createElement('label');
     chineseLabel.textContent = '中文名称 · Chinese Name:';
     chineseLabel.style.cssText = `
@@ -1607,7 +1465,6 @@ function showAddEntryForm() {
         box-sizing: border-box;
     `;
 
-    // Auto-translate button for Chinese input
     const chineseTranslateBtn = document.createElement('button');
     chineseTranslateBtn.innerHTML = '🌐 自动填充';
     chineseTranslateBtn.title = '自动翻译到英文 · Auto-translate to English';
@@ -1661,7 +1518,6 @@ function showAddEntryForm() {
     chineseInputContainer.appendChild(chineseInput);
     chineseInputContainer.appendChild(chineseTranslateBtn);
 
-    // English name input container
     const englishLabel = document.createElement('label');
     englishLabel.textContent = '英文名称 · English Name:';
     englishLabel.style.cssText = `
@@ -1695,7 +1551,6 @@ function showAddEntryForm() {
         box-sizing: border-box;
     `;
 
-    // Auto-translate button for English input
     const englishTranslateBtn = document.createElement('button');
     englishTranslateBtn.innerHTML = '🌐 自动填充';
     englishTranslateBtn.title = '自动翻译到中文 · Auto-translate to Chinese';
@@ -1749,19 +1604,16 @@ function showAddEntryForm() {
     englishInputContainer.appendChild(englishInput);
     englishInputContainer.appendChild(englishTranslateBtn);
 
-    // Function to update button visibility based on input values
     function updateTranslateButtonsVisibility() {
         const chineseValue = chineseInput.value.trim();
         const englishValue = englishInput.value.trim();
 
-        // Show Chinese translate button only if Chinese has value and English is empty
         if (chineseValue && !englishValue) {
             chineseTranslateBtn.style.display = 'block';
         } else {
             chineseTranslateBtn.style.display = 'none';
         }
 
-        // Show English translate button only if English has value and Chinese is empty
         if (englishValue && !chineseValue) {
             englishTranslateBtn.style.display = 'block';
         } else {
@@ -1769,14 +1621,11 @@ function showAddEntryForm() {
         }
     }
 
-    // Add input event listeners to update button visibility
     chineseInput.addEventListener('input', updateTranslateButtonsVisibility);
     englishInput.addEventListener('input', updateTranslateButtonsVisibility);
 
-    // Initial visibility check
     updateTranslateButtonsVisibility();
 
-    // Button container
     const buttonContainer = document.createElement('div');
     buttonContainer.style.cssText = `
         display: flex;
@@ -1784,7 +1633,6 @@ function showAddEntryForm() {
         justify-content: flex-end;
     `;
 
-    // Cancel button
     const cancelButton = document.createElement('button');
     cancelButton.textContent = '取消 · Cancel';
     cancelButton.style.cssText = `
@@ -1799,7 +1647,6 @@ function showAddEntryForm() {
         outline: none;
     `;
 
-    // Submit button
     const submitButton = document.createElement('button');
     submitButton.textContent = '确认添加 · Confirm Add';
     submitButton.style.cssText = `
@@ -1826,10 +1673,8 @@ function showAddEntryForm() {
         outline: none;
     `;
 
-    // Event listeners
     cancelButton.addEventListener('click', () => {
         modal.remove();
-        // Restore the add button
         const addButton = document.getElementById('add-entry-button');
         if (addButton) {
             addButton.style.display = '';
@@ -1867,7 +1712,6 @@ function showAddEntryForm() {
         modal.remove();
     });
 
-    // Enter key support
     chineseInput.addEventListener('keypress', (e) => {
         if (e.key === 'Enter') {
             englishInput.focus();
@@ -1880,45 +1724,25 @@ function showAddEntryForm() {
         }
     });
 
-    // Assemble the form
     buttonContainer.appendChild(cancelButton);
     buttonContainer.appendChild(submitButton);
-
     formContainer.appendChild(title);
     formContainer.appendChild(chineseLabel);
     formContainer.appendChild(chineseInputContainer);
     formContainer.appendChild(englishLabel);
     formContainer.appendChild(englishInputContainer);
     formContainer.appendChild(buttonContainer);
-
-    // Assemble modal
     modal.appendChild(formContainer);
     document.body.appendChild(modal);
-
-    // Focus on first input
     chineseInput.focus();
-
-    // Close on outside click
-    modal.addEventListener('click', (e) => {
-        if (e.target === modal) {
-            modal.remove();
-            // Restore the add button
-            const addButton = document.getElementById('add-entry-button');
-            if (addButton) {
-                addButton.style.display = '';
-            }
-        }
-    });
 }
 
-// Add a new entry to the current category
 async function addNewEntry(chineseName, englishName) {
     if (!chineseName || !englishName) {
         showToast('⚠️ 请输入有效的条目内容', 'warning');
         return;
     }
 
-    // Get current category from the header
     const categoryNameElement = document.getElementById('current-category-name');
     const categoryName = categoryNameElement.dataset.category;
 
@@ -1927,7 +1751,6 @@ async function addNewEntry(chineseName, englishName) {
         return;
     }
 
-    // Add to user entries in category data
     if (!categoryData[categoryName]) {
         categoryData[categoryName] = { preset_entries: [], user_entries: [] };
     }
@@ -1935,7 +1758,6 @@ async function addNewEntry(chineseName, englishName) {
         categoryData[categoryName].user_entries = [];
     }
 
-    // Create entry object with both Chinese and English names
     const entryObject = {
         chinese: chineseName,
         english: englishName
@@ -1943,21 +1765,13 @@ async function addNewEntry(chineseName, englishName) {
 
     categoryData[categoryName].user_entries.push(entryObject);
 
-    // Auto-save after adding entry
     await autoSaveCategory(categoryName);
-
-    // Refresh the entry list
     loadCategoryEntries(categoryName);
-
-    // Update the category count badge
     updateCategoryCount(categoryName);
-
     showToast('✅ 条目已添加并自动保存', 'success');
 }
 
-// Delete an entry from a category
 async function deleteEntry(category, index, isPreset) {
-    // Prevent deletion of preset entries
     if (isPreset) {
         showToast('⚠️ 预置选项不能删除 · Preset options cannot be deleted', 'warning');
         return;
@@ -1970,28 +1784,20 @@ async function deleteEntry(category, index, isPreset) {
     if (confirm(`确定要删除 "${categoryData[category].user_entries[index]}" 吗？\nAre you sure you want to delete "${categoryData[category].user_entries[index]}"?`)) {
         categoryData[category].user_entries.splice(index, 1);
 
-        // Auto-save after deleting entry
         await autoSaveCategory(category);
-
         loadCategoryEntries(category);
-
-        // Update the category count badge
         updateCategoryCount(category);
-
         showToast('✅ 条目已删除并自动保存', 'success');
     }
 }
 
-// Update category count badge in the sidebar
 function updateCategoryCount(categoryName) {
     const categoryList = document.getElementById('category-list');
     if (!categoryList) return;
 
-    // Find the category item
     const categoryItems = categoryList.querySelectorAll('[data-category]');
     for (const item of categoryItems) {
         if (item.dataset.category === categoryName) {
-            // Find the count badge
             const countBadge = item.querySelector('span:last-child');
             if (countBadge) {
                 const userCount = categoryData[categoryName]?.user_entries?.length || 0;
@@ -2002,7 +1808,6 @@ function updateCategoryCount(categoryName) {
     }
 }
 
-// Auto-save category data (called after adding/deleting entries)
 async function autoSaveCategory(categoryName) {
     if (!categoryName) {
         console.error('No category name provided for auto-save');
@@ -2012,20 +1817,14 @@ async function autoSaveCategory(categoryName) {
     try {
         updateStatus('自动保存中... · Auto-saving...');
 
-        // Get current user entries from category data
         const userEntries = categoryData[categoryName]?.user_entries || [];
-
-        // Convert entries to the format expected by Python: "中文 (english)"
-        // Note: Space before parenthesis is required for Python parsing
         const formattedEntries = userEntries.map(entry => {
             if (typeof entry === 'object' && entry !== null && entry.chinese && entry.english) {
                 return `${entry.chinese} (${entry.english})`;
             }
-            // If it's already a string, return as-is (for backward compatibility)
             return entry;
         });
 
-        // Send only user entries to server
         const response = await api.fetchApi(`/zhihui/photograph/category/${categoryName}`, {
             method: 'POST',
             headers: {
@@ -2039,7 +1838,6 @@ async function autoSaveCategory(categoryName) {
         if (response.ok) {
             updateStatus('自动保存成功 · Auto-saved successfully');
 
-            // Refresh node definitions to update the dropdown options
             await refreshNodeDefinitions();
         } else {
             throw new Error('Auto-save failed');
@@ -2051,42 +1849,32 @@ async function autoSaveCategory(categoryName) {
     }
 }
 
-// Refresh node definitions to update dropdown options without restarting
 async function refreshNodeDefinitions() {
     try {
-        // Request ComfyUI to refresh node definitions
         const response = await api.fetchApi('/object_info', { cache: 'no-store' });
 
         if (response.ok) {
             const nodeDefinitions = await response.json();
 
-            // Update the app's node definitions
             if (app && app.nodeOutputs) {
                 app.nodeOutputs = nodeDefinitions;
             }
 
-            // Find all PhotographPromptGenerator nodes in the graph and update their widgets
             if (app && app.graph && app.graph._nodes) {
                 for (const node of app.graph._nodes) {
                     if (node.type === 'PhotographPromptGenerator') {
-                        // Get updated node definition
                         const nodeDef = nodeDefinitions['PhotographPromptGenerator'];
                         if (nodeDef && nodeDef.input && nodeDef.input.required) {
-                            // Update each widget with new options
                             for (const widget of node.widgets) {
                                 const inputDef = nodeDef.input.required[widget.name];
                                 if (inputDef && Array.isArray(inputDef[0])) {
-                                    // Update widget options
                                     widget.options.values = inputDef[0];
-
-                                    // If current value is not in new options, reset to first option
                                     if (!inputDef[0].includes(widget.value)) {
                                         widget.value = inputDef[0][0];
                                     }
                                 }
                             }
 
-                            // Mark node as dirty to trigger redraw
                             node.setDirtyCanvas(true, true);
                         }
                     }
@@ -2100,11 +1888,8 @@ async function refreshNodeDefinitions() {
     }
 }
 
-// Export all user options to a JSON file
 function exportUserOptions() {
     const exportData = {};
-
-    // Collect all user entries from all categories
     for (const category in categoryData) {
         const userEntries = categoryData[category]?.user_entries || [];
         if (userEntries.length > 0) {
@@ -2123,7 +1908,6 @@ function exportUserOptions() {
     const a = document.createElement('a');
     a.href = url;
 
-    // Generate filename with timestamp
     const timestamp = new Date().toISOString().slice(0, 10);
     a.download = `photograph-prompt-user-options-${timestamp}.json`;
 
@@ -2136,7 +1920,6 @@ function exportUserOptions() {
     showToast('✅ 用户选项已导出', 'success');
 }
 
-// Import user options from a JSON file
 function importUserOptions() {
     const input = document.createElement('input');
     input.type = 'file';
@@ -2158,24 +1941,19 @@ function importUserOptions() {
                 let importCount = 0;
                 const errors = [];
 
-                // Process each category in the imported data
                 for (const category in importedData) {
                     const entries = importedData[category];
 
-                    // Skip if no entries for this category
                     if (!entries || !Array.isArray(entries) || entries.length === 0) {
                         continue;
                     }
 
-                    // Validate and format entries
                     const formattedEntries = entries.map(entry => {
                         if (typeof entry === 'string') {
-                            // Check if already in "中文 (english)" format
                             const match = entry.match(/^(.+?)\s*\((.+)\)$/);
                             if (match) {
                                 return entry;
                             }
-                            // If it's a single string without format, try to parse
                             return entry;
                         }
                         if (typeof entry === 'object' && entry.chinese && entry.english) {
@@ -2184,7 +1962,6 @@ function importUserOptions() {
                         return entry;
                     });
 
-                    // Update local category data
                     if (!categoryData[category]) {
                         categoryData[category] = { preset_entries: [], user_entries: [] };
                     }
@@ -2192,7 +1969,6 @@ function importUserOptions() {
                         categoryData[category].user_entries = [];
                     }
 
-                    // Merge entries (avoid duplicates)
                     const existingEntries = categoryData[category].user_entries.map(ent => {
                         if (typeof ent === 'string') return ent;
                         return `${ent.chinese} (${ent.english})`;
@@ -2204,7 +1980,6 @@ function importUserOptions() {
                         categoryData[category].user_entries.push(...newEntries);
                         importCount += newEntries.length;
 
-                        // Save to server
                         try {
                             const response = await api.fetchApi(`/zhihui/photograph/category/${category}`, {
                                 method: 'POST',
@@ -2226,10 +2001,7 @@ function importUserOptions() {
                     }
                 }
 
-                // Refresh UI
                 await refreshNodeDefinitions();
-
-                // Refresh current category display if one is selected
                 const categoryNameElement = document.getElementById('current-category-name');
                 const currentCategory = categoryNameElement?.dataset.category;
                 if (currentCategory) {
@@ -2237,7 +2009,6 @@ function importUserOptions() {
                     updateCategoryCount(currentCategory);
                 }
 
-                // Update category list counts
                 for (const cat in categoryData) {
                     updateCategoryCount(cat);
                 }
@@ -2260,7 +2031,6 @@ function importUserOptions() {
     input.click();
 }
 
-// Update status text
 function updateStatus(text) {
     const statusText = document.getElementById('status-text');
     if (statusText) {
@@ -2268,31 +2038,21 @@ function updateStatus(text) {
     }
 }
 
-// Open the template editor helper dialog
 function openTemplateEditorHelper(node) {
-    // Close any existing dialog
     if (currentTemplateHelperDialog) {
         currentTemplateHelperDialog.remove();
     }
 
-    // Store the node reference
     currentTemplateNode = node;
 
-    // Initialize template manager
     TemplateManager.initialize().then(() => {
-        // Create the dialog
         currentTemplateHelperDialog = createTemplateEditorHelperDialog();
         document.body.appendChild(currentTemplateHelperDialog);
-
-        // Show the dialog
         currentTemplateHelperDialog.style.display = 'block';
-
-        // Sync node template content to editor
         syncNodeToTemplate();
     });
 }
 
-// Create the template editor helper dialog
 function createTemplateEditorHelperDialog() {
     const overlay = document.createElement('div');
     overlay.style.cssText = `
@@ -2326,7 +2086,6 @@ function createTemplateEditorHelperDialog() {
         border: 1px solid rgba(255, 255, 255, 0.1);
     `;
     
-    // Header
     const header = document.createElement('div');
     header.style.cssText = `
         padding: 12px 20px;
@@ -2338,7 +2097,7 @@ function createTemplateEditorHelperDialog() {
     `;
     
     const title = document.createElement('h2');
-    title.textContent = '模版助手 - Template Helper';
+    title.textContent = '模版编辑·Template Editor';
     title.style.cssText = `
         margin: 0;
         color: #fff;
@@ -2390,7 +2149,6 @@ function createTemplateEditorHelperDialog() {
     header.appendChild(title);
     header.appendChild(closeButton);
     
-    // Content area
     const content = document.createElement('div');
     content.style.cssText = `
         flex: 1;
@@ -2400,7 +2158,6 @@ function createTemplateEditorHelperDialog() {
         gap: 20px;
     `;
     
-    // Template panels container (left side)
     const templatePanelsContainer = document.createElement('div');
     templatePanelsContainer.style.cssText = `
         width: 230px;
@@ -2409,7 +2166,6 @@ function createTemplateEditorHelperDialog() {
         gap: 12px;
     `;
     
-    // Preset templates panel
     const presetPanel = document.createElement('div');
     presetPanel.style.cssText = `
         background: rgba(0, 0, 0, 0.2);
@@ -2444,7 +2200,6 @@ function createTemplateEditorHelperDialog() {
     presetPanel.appendChild(presetPanelTitle);
     presetPanel.appendChild(presetList);
     
-    // Custom templates panel
     const customPanel = document.createElement('div');
     customPanel.style.cssText = `
         background: rgba(0, 0, 0, 0.2);
@@ -2482,12 +2237,9 @@ function createTemplateEditorHelperDialog() {
     templatePanelsContainer.appendChild(presetPanel);
     templatePanelsContainer.appendChild(customPanel);
     
-    // Populate preset templates
     populatePresetTemplates(presetList);
-    // Populate custom templates
     populateCustomTemplates(customList);
     
-    // Editor area (right side)
     const editorArea = document.createElement('div');
     editorArea.style.cssText = `
         flex: 1;
@@ -2515,9 +2267,8 @@ function createTemplateEditorHelperDialog() {
         font-size: 15px;
     `;
     
-    // Sync to node button
     const syncToNodeButton = document.createElement('button');
-    syncToNodeButton.innerHTML = '同步至节点 · Sync to Node';
+    syncToNodeButton.innerHTML = '应用 · Apply';
     syncToNodeButton.style.cssText = `
         padding: 6px 12px;
         border-radius: 6px;
@@ -2534,22 +2285,21 @@ function createTemplateEditorHelperDialog() {
         box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
         min-width: 60px;
     `;
-    
+
     syncToNodeButton.addEventListener('mouseenter', () => {
         syncToNodeButton.style.transform = 'translateY(-2px)';
         syncToNodeButton.style.boxShadow = '0 4px 8px rgba(168, 85, 247, 0.3)';
     });
-    
+
     syncToNodeButton.addEventListener('mouseleave', () => {
         syncToNodeButton.style.transform = 'translateY(0)';
         syncToNodeButton.style.boxShadow = '0 2px 4px rgba(0, 0, 0, 0.1)';
     });
-    
+
     syncToNodeButton.addEventListener('click', () => {
-        syncTemplateToNode();
+        applyTemplateToNode();
     });
     
-    // Save template button
     const saveTemplateButton = document.createElement('button');
     saveTemplateButton.innerHTML = '保存模版 · Save Template';
     saveTemplateButton.style.cssText = `
@@ -2583,7 +2333,6 @@ function createTemplateEditorHelperDialog() {
         saveCustomTemplate();
     });
     
-    // Create button container for better layout
     const buttonContainer = document.createElement('div');
     buttonContainer.style.cssText = `
         display: flex;
@@ -2591,7 +2340,6 @@ function createTemplateEditorHelperDialog() {
         align-items: center;
     `;
     
-    // Clear editor button
     const clearButton = document.createElement('button');
     clearButton.innerHTML = '清除 · Clear';
     clearButton.style.cssText = `
@@ -2629,7 +2377,6 @@ function createTemplateEditorHelperDialog() {
         }
     });
     
-    // Export templates button
     const exportButton = document.createElement('button');
     exportButton.innerHTML = '导出 · Export';
     exportButton.style.cssText = `
@@ -2663,7 +2410,6 @@ function createTemplateEditorHelperDialog() {
         TemplateManager.exportTemplates();
     });
     
-    // Import templates button
     const importButton = document.createElement('button');
     importButton.innerHTML = '导入 · Import';
     importButton.style.cssText = `
@@ -2706,7 +2452,6 @@ function createTemplateEditorHelperDialog() {
     editorHeader.appendChild(editorTitle);
     editorHeader.appendChild(buttonContainer);
     
-    // Quick insert symbols container (moved to be below the editor header)
     const quickInsertContainer = document.createElement('div');
     quickInsertContainer.style.cssText = `
         padding: 10px 15px;
@@ -2714,7 +2459,7 @@ function createTemplateEditorHelperDialog() {
         display: flex;
         flex-wrap: wrap;
         gap: 10px;
-        max-height: 160px;
+        max-height: 280px;
         overflow-y: auto;
         overflow-x: hidden;
     `;
@@ -2729,11 +2474,7 @@ function createTemplateEditorHelperDialog() {
     `;
     
     quickInsertContainer.appendChild(quickInsertContent);
-    
-
-    
-    // Removed duplicate appendChild calls
-    
+        
     const editorContent = document.createElement('div');
     editorContent.style.cssText = `
         flex: 1;
@@ -2742,7 +2483,6 @@ function createTemplateEditorHelperDialog() {
         flex-direction: column;
     `;
     
-    // Create a custom contenteditable div instead of textarea for rich editing
     const editorWrapper = document.createElement('div');
     editorWrapper.style.cssText = `
         flex: 1;
@@ -2772,7 +2512,6 @@ function createTemplateEditorHelperDialog() {
         word-wrap: break-word;
     `;
 
-    // Add placeholder styling
     const placeholderStyle = document.createElement('style');
     placeholderStyle.textContent = `
         #template-editor:empty:before {
@@ -2858,30 +2597,24 @@ function createTemplateEditorHelperDialog() {
     `;
     document.head.appendChild(placeholderStyle);
 
-    // Set up the current template editor reference
     currentTemplateEditor = templateEditor;
 
-    // Handle paste events to parse reference symbols
     templateEditor.addEventListener('paste', (e) => {
         e.preventDefault();
         const text = e.clipboardData.getData('text/plain');
 
-        // Check if text contains reference symbols
         if (text.match(/\{[^}]+\}/)) {
-            // Parse and insert with tags
             const fragment = parseTemplateToElements(text);
             const selection = window.getSelection();
             if (selection.rangeCount > 0) {
                 const range = selection.getRangeAt(0);
                 range.deleteContents();
                 range.insertNode(fragment);
-                // Move cursor to end of inserted content
                 range.collapse(false);
                 selection.removeAllRanges();
                 selection.addRange(range);
             }
         } else {
-            // Insert plain text
             insertPlainText(text);
         }
     });
@@ -2890,7 +2623,7 @@ function createTemplateEditorHelperDialog() {
     editorContent.appendChild(editorWrapper);
     
     editorArea.appendChild(editorHeader);
-    editorArea.appendChild(quickInsertContainer); // Add the quick insert container below the header
+    editorArea.appendChild(quickInsertContainer);
     editorArea.appendChild(editorContent);
     
     content.appendChild(templatePanelsContainer);
@@ -2901,85 +2634,47 @@ function createTemplateEditorHelperDialog() {
     
     overlay.appendChild(dialog);
     
-    // Populate the quick insert panel
     populateQuickInsertPanel(quickInsertContent);
-    
-    // Make the dialog draggable (disabled as requested - fixed position)
-    // makeDraggable(dialog, header);
-    
-    // Optimize keyboard event handling to ensure interactions don't affect outside UI
     overlay.addEventListener('keydown', (event) => {
-        // Allow all keys if focus is on textarea or input elements
         const target = event.target;
         if (target.tagName === 'TEXTAREA' || target.tagName === 'INPUT') {
-            // Contain the event within the UI
             event.stopImmediatePropagation();
             return;
         }
         
-        // For other elements in the UI, still contain the event
         event.stopImmediatePropagation();
     });
-    
-    // Dialog positioning is fixed and non-draggable as requested
-    
+        
     return overlay;
 }
 
-// Populate the preset templates panel with one-click template options
-function populatePresetTemplates(container) {
-    const templatePresets = [
-        {
-            name: '时尚人像 · Fashion Portrait',
-            template: 'This is a photo from a fashion magazine, A photo taken with {camera} with {lens}, {lighting}, Shoot from a {perspective} perspective, a beautiful {gender} model wearing a {top} and {bottom} at the {location}, The model is {pose}, {orientation}, {gender} was wearing {boots} and {accessories}, {movement} movements, strong visual impact, professional fashion photography style, high resolution, perfect composition.'
-        },
-        {
-            name: '户外风景 · Landscape',
-            template: 'This is a breathtaking landscape photograph, captured with {camera} using {lens}, shot in {weather} conditions with {lighting}, photographed from a {perspective} perspective, showing the magnificent {location} during {season}, the scene features {movement} elements, professional landscape photography, dramatic composition, award-winning quality.'
-        },
-        {
-            name: '街头摄影 · Street Photography',
-            template: 'This is a candid street photography shot, taken with {camera} and {lens}, natural {lighting} creates the mood, captured from a {perspective} angle, showing {gender} {character} in {movement} at {location}, the person is {pose}, {orientation}, wearing {top} and {bottom}, authentic urban photography style, documentary aesthetic.'
-        },
-        {
-            name: '室内人像 · Indoor Portrait',
-            template: 'This is an intimate indoor portrait, photographed with {camera} using {lens}, dramatic {lighting} illuminates the scene, shot from a {perspective} perspective, featuring a {gender} model in {location}, the subject is {pose}, {orientation}, dressed in {top} and {bottom}, with {boots} and {accessories}, professional studio portrait style.'
-        },
-        {
-            name: '运动摄影 · Sports Photography',
-            template: 'This is a dynamic sports photograph, captured with {camera} using {lens} for action shots, taken during {movement} with {lighting}, photographed from a {perspective} perspective showing {character} in action at {location}, the athlete is {pose}, {orientation}, wearing professional sportswear {top} and {bottom}, high-speed photography technique, dramatic frozen motion.'
-        },
-        {
-            name: '艺术创作 · Artistic Creation',
-            template: 'This is an artistic creative photograph, shot with {camera} using {lens}, artistic {lighting} creates mood and atmosphere, captured from a unique {perspective} viewpoint, featuring {gender} {character} in {location}, the model is artistically {pose}, {orientation}, wearing creative {top} and {bottom}, complemented by {accessories}, fine art photography style, gallery-worthy composition.'
-        }
-    ];
-    
-    // Clear existing content
-    container.innerHTML = '';
-    
-    // Add preset templates
-    templatePresets.forEach(preset => {
-        const button = createTemplateButton(preset.name, preset.template, 'preset');
-        container.appendChild(button);
-    });
+async function populatePresetTemplates(container) {
+    try {
+        const response = await fetch('/zhihui/photograph/template_presets');
+        const templatePresets = await response.json();
+        
+        container.innerHTML = '';
+        
+        templatePresets.forEach(preset => {
+            const button = createTemplateButton(preset.name, preset.template, 'preset');
+            container.appendChild(button);
+        });
+    } catch (error) {
+        console.error('Failed to load template presets:', error);
+        container.innerHTML = '<div style="color: rgba(255, 255, 255, 0.5); font-size: 14px; text-align: center; padding: 20px;">加载失败 · Failed to load</div>';
+    }
 }
 
-// Populate the custom templates panel with user templates
 function populateCustomTemplates(container) {
-    // Clear existing content
     container.innerHTML = '';
     
-    // Add custom templates if any
     const currentCustomTemplates = TemplateManager.getTemplates();
     if (currentCustomTemplates.length > 0) {
-        // Add custom templates
         currentCustomTemplates.forEach((customTemplate, index) => {
             const button = createTemplateButton(customTemplate.name, customTemplate.template, 'custom', index);
             container.appendChild(button);
         });
     } else {
-        // Show empty state message
         const emptyMessage = document.createElement('div');
         emptyMessage.textContent = '暂无自定义模版\nNo custom templates';
         emptyMessage.style.cssText = `
@@ -2993,22 +2688,17 @@ function populateCustomTemplates(container) {
     }
 }
 
-// Populate the template presets panel with one-click template options (legacy function - now split)
 function populateTemplatePresets(container) {
-    // This function is now split into populatePresetTemplates and populateCustomTemplates
-    // For backward compatibility, we'll create a combined view
     const presetContainer = document.createElement('div');
     const customContainer = document.createElement('div');
     
     populatePresetTemplates(presetContainer);
     populateCustomTemplates(customContainer);
     
-    // Clear the original container and add both sections
     container.innerHTML = '';
     container.appendChild(presetContainer);
     
     if (customContainer.children.length > 0) {
-        // Add separator if there are custom templates
         const separator = document.createElement('div');
         separator.style.cssText = `
             width: 100%;
@@ -3021,12 +2711,10 @@ function populateTemplatePresets(container) {
     }
 }
 
-// Create template button
 function createTemplateButton(name, template, type = 'preset', index = null) {
     const button = document.createElement('button');
     button.textContent = name;
     
-    // Define colors based on template type
     const presetColor = { border: 'rgba(16, 185, 129, 0.5)', bg: 'rgba(16, 185, 129, 0.1)', hover: 'rgba(16, 185, 129, 0.2)', shadow: 'rgba(16, 185, 129, 0.2)' };
     const customColor = { border: 'rgba(255, 140, 0, 0.8)', bg: 'rgba(255, 140, 0, 0.15)', hover: 'rgba(255, 140, 0, 0.25)', shadow: 'rgba(255, 140, 0, 0.3)' };
     
@@ -3051,7 +2739,6 @@ function createTemplateButton(name, template, type = 'preset', index = null) {
         position: relative;
     `;
     
-    // Add delete button for custom templates
     if (type === 'custom' && index !== null) {
         const deleteButton = document.createElement('button');
         deleteButton.innerHTML = '×';
@@ -3116,47 +2803,37 @@ function createTemplateButton(name, template, type = 'preset', index = null) {
     return button;
 }
 
-// Apply template preset to the editor
 function applyTemplatePreset(template) {
     if (!currentTemplateEditor) return;
 
-    // Clear the editor
     currentTemplateEditor.innerHTML = '';
 
-    // Parse the template and convert {symbol} to tag elements
     const parsedContent = parseTemplateToElements(template);
     currentTemplateEditor.appendChild(parsedContent);
-
     currentTemplateEditor.focus();
 
-    // Show feedback
     showToast('✅ 模版已应用', 'success');
 }
 
-// Parse template text and convert reference symbols to tag elements
 function parseTemplateToElements(text) {
     const fragment = document.createDocumentFragment();
 
-    // Regular expression to match {symbol} patterns
     const regex = /\{[^}]+\}/g;
     let lastIndex = 0;
     let match;
 
     while ((match = regex.exec(text)) !== null) {
-        // Add text before the match
         if (match.index > lastIndex) {
             const textNode = document.createTextNode(text.substring(lastIndex, match.index));
             fragment.appendChild(textNode);
         }
 
-        // Add the tag element
         const tag = createReferenceTagElement(match[0]);
         fragment.appendChild(tag);
 
         lastIndex = regex.lastIndex;
     }
 
-    // Add remaining text
     if (lastIndex < text.length) {
         const textNode = document.createTextNode(text.substring(lastIndex));
         fragment.appendChild(textNode);
@@ -3165,25 +2842,20 @@ function parseTemplateToElements(text) {
     return fragment;
 }
 
-// Get template content from editor (convert tags back to text)
 function getTemplateContent() {
     if (!currentTemplateEditor) return '';
 
     let content = '';
 
-    // Recursively process child nodes
     function processNode(node) {
         if (node.nodeType === Node.TEXT_NODE) {
-            // Only add text nodes that are not inside reference tags
             if (!node.parentElement.classList || !node.parentElement.classList.contains('reference-tag')) {
                 content += node.textContent;
             }
         } else if (node.nodeType === Node.ELEMENT_NODE) {
             if (node.classList.contains('reference-tag')) {
-                // Add the symbol for reference tags
                 content += node.dataset.symbol;
             } else {
-                // Process children for other elements
                 node.childNodes.forEach(child => processNode(child));
             }
         }
@@ -3194,7 +2866,6 @@ function getTemplateContent() {
     return content;
 }
 
-// Save custom template
 function saveCustomTemplate() {
     if (!currentTemplateEditor) return;
 
@@ -3204,13 +2875,10 @@ function saveCustomTemplate() {
         return;
     }
 
-    // Create custom modal dialog
     showCustomTemplateDialog(templateContent);
 }
 
-// Show custom template dialog
 function showCustomTemplateDialog(templateContent) {
-    // Remove existing modal if any
     const existingModal = document.getElementById('custom-template-modal');
     if (existingModal) {
         existingModal.remove();
@@ -3246,7 +2914,6 @@ function showCustomTemplateDialog(templateContent) {
         animation: modalSlideIn 0.3s ease;
     `;
     
-    // Add animation keyframes
     const style = document.createElement('style');
     style.textContent = `
         @keyframes modalSlideIn {
@@ -3276,7 +2943,6 @@ function showCustomTemplateDialog(templateContent) {
         background-clip: text;
     `;
     
-    // Chinese name input
     const chineseLabel = document.createElement('label');
     chineseLabel.textContent = '中文名称';
     chineseLabel.style.cssText = `
@@ -3314,7 +2980,6 @@ function showCustomTemplateDialog(templateContent) {
         chineseInput.style.boxShadow = 'none';
     });
     
-    // English name input
     const englishLabel = document.createElement('label');
     englishLabel.textContent = 'English Name';
     englishLabel.style.cssText = `
@@ -3352,7 +3017,6 @@ function showCustomTemplateDialog(templateContent) {
         englishInput.style.boxShadow = 'none';
     });
     
-    // Button container
     const buttonContainer = document.createElement('div');
     buttonContainer.style.cssText = `
         display: flex;
@@ -3360,7 +3024,6 @@ function showCustomTemplateDialog(templateContent) {
         justify-content: flex-end;
     `;
     
-    // Cancel button
     const cancelButton = document.createElement('button');
     cancelButton.textContent = '取消 Cancel';
     cancelButton.style.cssText = `
@@ -3383,7 +3046,6 @@ function showCustomTemplateDialog(templateContent) {
         cancelButton.style.background = 'rgba(255, 255, 255, 0.1)';
     });
     
-    // Save button
     const saveButton = document.createElement('button');
     saveButton.textContent = '保存 Save';
     saveButton.style.cssText = `
@@ -3411,7 +3073,6 @@ function showCustomTemplateDialog(templateContent) {
         saveButton.style.boxShadow = 'none';
     });
     
-    // Add event listeners
     cancelButton.addEventListener('click', () => {
         modal.remove();
         style.remove();
@@ -3440,14 +3101,12 @@ function showCustomTemplateDialog(templateContent) {
             return;
         }
         
-        // Check if template name already exists
         const existingTemplate = customTemplates.find(t => t.name === `${chineseName} · ${englishName}`);
         if (existingTemplate) {
             showToast('❌ 模版名称已存在', 'error');
             return;
         }
         
-        // Add new template
         customTemplates.push({
             name: `${chineseName} · ${englishName}`,
             chineseName: chineseName,
@@ -3455,10 +3114,8 @@ function showCustomTemplateDialog(templateContent) {
             template: templateContent
         });
         
-        // Save templates using TemplateManager
         TemplateManager.saveTemplates(customTemplates);
         
-        // Refresh the template lists
         const presetList = document.querySelector('#preset-list');
         const customList = document.querySelector('#custom-list');
         if (presetList) {
@@ -3468,14 +3125,12 @@ function showCustomTemplateDialog(templateContent) {
             populateCustomTemplates(customList);
         }
         
-        // Close modal
         modal.remove();
         style.remove();
         
         showToast('✅ 模版已保存', 'success');
     });
     
-    // Assemble dialog
     dialogContent.appendChild(title);
     dialogContent.appendChild(chineseLabel);
     dialogContent.appendChild(chineseInput);
@@ -3489,19 +3144,14 @@ function showCustomTemplateDialog(templateContent) {
     modal.appendChild(dialogContent);
     document.body.appendChild(modal);
     
-    // Focus on first input
     chineseInput.focus();
 }
 
-// Delete custom template
 function deleteCustomTemplate(index) {
-    // Create custom delete confirmation dialog
     showDeleteConfirmDialog(index);
 }
 
-// Show delete confirmation dialog
 function showDeleteConfirmDialog(index) {
-    // Remove existing modal if any
     const existingModal = document.getElementById('delete-confirm-modal');
     if (existingModal) {
         existingModal.remove();
@@ -3524,7 +3174,6 @@ function showDeleteConfirmDialog(index) {
         -webkit-backdrop-filter: blur(5px);
     `;
     
-    // Add animation styles
     const style = document.createElement('style');
     style.textContent = `
         @keyframes modalSlideIn {
@@ -3582,7 +3231,6 @@ function showDeleteConfirmDialog(index) {
         opacity: 0.9;
     `;
     
-    // Button container
     const buttonContainer = document.createElement('div');
     buttonContainer.style.cssText = `
         display: flex;
@@ -3590,7 +3238,6 @@ function showDeleteConfirmDialog(index) {
         justify-content: center;
     `;
     
-    // Cancel button
     const cancelButton = document.createElement('button');
     cancelButton.textContent = '取消 Cancel';
     cancelButton.style.cssText = `
@@ -3616,7 +3263,6 @@ function showDeleteConfirmDialog(index) {
         cancelButton.style.transform = 'translateY(0)';
     });
     
-    // Delete button
     const deleteButton = document.createElement('button');
     deleteButton.textContent = '删除 Delete';
     deleteButton.style.cssText = `
@@ -3643,20 +3289,14 @@ function showDeleteConfirmDialog(index) {
         deleteButton.style.boxShadow = 'none';
     });
     
-    // Add event listeners
     cancelButton.addEventListener('click', () => {
         modal.remove();
         style.remove();
     });
     
     deleteButton.addEventListener('click', () => {
-        // Perform the actual deletion
         customTemplates.splice(index, 1);
-        
-        // Save templates using TemplateManager
-        TemplateManager.saveTemplates(customTemplates);
-        
-        // Refresh the template lists
+        TemplateManager.saveTemplates(customTemplates);     
         const presetList = document.querySelector('#preset-list');
         const customList = document.querySelector('#custom-list');
         if (presetList) {
@@ -3666,7 +3306,6 @@ function showDeleteConfirmDialog(index) {
             populateCustomTemplates(customList);
         }
         
-        // Close modal
         modal.remove();
         style.remove();
         
@@ -3680,40 +3319,52 @@ function showDeleteConfirmDialog(index) {
         }
     });
     
-    // Assemble dialog
     dialogContent.appendChild(icon);
     dialogContent.appendChild(title);
-    dialogContent.appendChild(message);
-    
+    dialogContent.appendChild(message); 
     buttonContainer.appendChild(cancelButton);
     buttonContainer.appendChild(deleteButton);
     dialogContent.appendChild(buttonContainer);
-    
     modal.appendChild(dialogContent);
     document.body.appendChild(modal);
 }
 
-// Reference symbol mapping with bilingual names
 const REFERENCE_SYMBOL_MAP = {
     '{character}': { cn: '人物', en: 'Character' },
     '{gender}': { cn: '性别', en: 'Gender' },
-    '{pose}': { cn: '姿势', en: 'Pose' },
-    '{movement}': { cn: '动作', en: 'Movement' },
+    '{facial_expressions}': { cn: '面部表情', en: 'Facial Expressions' },
+    '{hair_style}': { cn: '发型', en: 'Hair Style' },
+    '{hair_color}': { cn: '发色', en: 'Hair Color' },
+    '{body_pose}': { cn: '身躯姿势', en: 'Body Pose' },
+    '{head_movements}': { cn: '头部动作', en: 'Head Movements' },
+    '{hand_movements}': { cn: '手部动作', en: 'Hand Movements' },
+    '{leg_foot_movements}': { cn: '腿脚动作', en: 'Leg/Foot Movements' },
     '{orientation}': { cn: '朝向', en: 'Orientation' },
     '{top}': { cn: '上衣', en: 'Top' },
     '{bottom}': { cn: '下装', en: 'Bottom' },
     '{boots}': { cn: '鞋子', en: 'Boots' },
+    '{socks}': { cn: '袜子', en: 'Socks' },
     '{accessories}': { cn: '配饰', en: 'Accessories' },
+    '{tattoo}': { cn: '纹身', en: 'Tattoo' },
+    '{tattoo_location}': { cn: '纹身位置', en: 'Tattoo Location' },
     '{camera}': { cn: '相机', en: 'Camera' },
     '{lens}': { cn: '镜头', en: 'Lens' },
     '{lighting}': { cn: '灯光', en: 'Lighting' },
     '{perspective}': { cn: '视角', en: 'Perspective' },
     '{location}': { cn: '位置', en: 'Location' },
     '{weather}': { cn: '天气', en: 'Weather' },
-    '{season}': { cn: '季节', en: 'Season' }
+    '{season}': { cn: '季节', en: 'Season' },
+    '{color_tone}': { cn: '色调', en: 'Color Tone' },
+    '{mood_atmosphere}': { cn: '氛围', en: 'Mood/Atmosphere' },
+    '{photography_style}': { cn: '摄影风格', en: 'Photography Style' },
+    '{photography_technique}': { cn: '摄影技法', en: 'Photography Technique' },
+    '{post_processing}': { cn: '后期处理', en: 'Post Processing' },
+    '{depth_of_field}': { cn: '景深', en: 'Depth of Field' },
+    '{composition}': { cn: '构图', en: 'Composition' },
+    '{texture}': { cn: '质感', en: 'Texture' },
+    '{theme}': { cn: '主题', en: 'Theme' }
 };
 
-// Get bilingual display name for a symbol
 function getBilingualName(symbol) {
     const mapping = REFERENCE_SYMBOL_MAP[symbol];
     if (mapping) {
@@ -3722,25 +3373,41 @@ function getBilingualName(symbol) {
     return symbol;
 }
 
-// Populate the quick insert panel with reference symbols
 function populateQuickInsertPanel(container) {
     const referenceSymbols = [
-        { name: '人物 Character {character}', symbol: '{character}', description: '人物类型 · Character type' },
-        { name: '性别 Gender {gender}', symbol: '{gender}', description: '性别 · Gender' },
-        { name: '姿势 Pose {pose}', symbol: '{pose}', description: '姿势 · Pose' },
-        { name: '动作 Movement {movement}', symbol: '{movement}', description: '动作 · Movement' },
-        { name: '朝向 Orientation {orientation}', symbol: '{orientation}', description: '朝向 · Orientation' },
-        { name: '上衣 Top {top}', symbol: '{top}', description: '上衣 · Top' },
-        { name: '下装 Bottom {bottom}', symbol: '{bottom}', description: '下装 · Bottom' },
-        { name: '鞋子 Shoes {boots}', symbol: '{boots}', description: '鞋子 · Shoes' },
-        { name: '配饰 Accessories {accessories}', symbol: '{accessories}', description: '配饰 · Accessories' },
-        { name: '相机 Camera {camera}', symbol: '{camera}', description: '相机 · Camera' },
-        { name: '镜头 Lens {lens}', symbol: '{lens}', description: '镜头 · Lens' },
-        { name: '灯光 Lighting {lighting}', symbol: '{lighting}', description: '灯光 · Lighting' },
-        { name: '视角 Perspective {perspective}', symbol: '{perspective}', description: '视角 · Perspective' },
-        { name: '位置 Location {location}', symbol: '{location}', description: '位置 · Location' },
-        { name: '天气 Weather {weather}', symbol: '{weather}', description: '天气 · Weather' },
-        { name: '季节 Season {season}', symbol: '{season}', description: '季节 · Season' }
+        { name: '人物 {character}', symbol: '{character}', description: '人物类型 · Character type' },
+        { name: '性别 {gender}', symbol: '{gender}', description: '性别 · Gender' },
+        { name: '面部表情 {facial_expressions}', symbol: '{facial_expressions}', description: '面部表情 · Facial Expressions' },
+        { name: '发型 {hair_style}', symbol: '{hair_style}', description: '发型 · Hair Style' },
+        { name: '发色 {hair_color}', symbol: '{hair_color}', description: '发色 · Hair Color' },
+        { name: '身躯姿势 {body_pose}', symbol: '{body_pose}', description: '身躯姿势 · Body Pose' },
+        { name: '头部动作 {head_movements}', symbol: '{head_movements}', description: '头部动作 · Head Movements' },
+        { name: '手部动作 {hand_movements}', symbol: '{hand_movements}', description: '手部动作 · Hand Movements' },
+        { name: '腿脚动作 {leg_foot_movements}', symbol: '{leg_foot_movements}', description: '腿脚动作 · Leg/Foot Movements' },
+        { name: '朝向 {orientation}', symbol: '{orientation}', description: '朝向 · Orientation' },
+        { name: '上衣 {top}', symbol: '{top}', description: '上衣 · Top' },
+        { name: '下装 {bottom}', symbol: '{bottom}', description: '下装 · Bottom' },
+        { name: '鞋子 {boots}', symbol: '{boots}', description: '鞋子 · Shoes' },
+        { name: '袜子 {socks}', symbol: '{socks}', description: '袜子 · Socks' },
+        { name: '配饰 {accessories}', symbol: '{accessories}', description: '配饰 · Accessories' },
+        { name: '纹身 {tattoo}', symbol: '{tattoo}', description: '纹身 · Tattoo' },
+        { name: '纹身位置 {tattoo_location}', symbol: '{tattoo_location}', description: '纹身位置 · Tattoo Location' },
+        { name: '相机 {camera}', symbol: '{camera}', description: '相机 · Camera' },
+        { name: '镜头 {lens}', symbol: '{lens}', description: '镜头 · Lens' },
+        { name: '灯光 {lighting}', symbol: '{lighting}', description: '灯光 · Lighting' },
+        { name: '视角 {perspective}', symbol: '{perspective}', description: '视角 · Perspective' },
+        { name: '位置 {location}', symbol: '{location}', description: '位置 · Location' },
+        { name: '天气 {weather}', symbol: '{weather}', description: '天气 · Weather' },
+        { name: '季节 {season}', symbol: '{season}', description: '季节 · Season' },
+        { name: '色调 {color_tone}', symbol: '{color_tone}', description: '色调 · Color Tone' },
+        { name: '氛围 {mood_atmosphere}', symbol: '{mood_atmosphere}', description: '氛围 · Mood/Atmosphere' },
+        { name: '摄影风格 {photography_style}', symbol: '{photography_style}', description: '摄影风格 · Photography Style' },
+        { name: '摄影技法 {photography_technique}', symbol: '{photography_technique}', description: '摄影技法 · Photography Technique' },
+        { name: '后期处理 {post_processing}', symbol: '{post_processing}', description: '后期处理 · Post Processing' },
+        { name: '景深 {depth_of_field}', symbol: '{depth_of_field}', description: '景深 · Depth of Field' },
+        { name: '构图 {composition}', symbol: '{composition}', description: '构图 · Composition' },
+        { name: '质感 {texture}', symbol: '{texture}', description: '质感 · Texture' },
+        { name: '主题 {theme}', symbol: '{theme}', description: '主题 · Theme' }
     ];
     
     referenceSymbols.forEach(item => {
@@ -3765,7 +3432,6 @@ function populateQuickInsertPanel(container) {
             flex-shrink: 0;
         `;
         
-        // Get the bilingual name part (Chinese + English) without the symbol
         const namePart = item.name.split(' {')[0];
         const nameContainer = document.createElement('span');
         nameContainer.textContent = namePart;
@@ -3774,7 +3440,6 @@ function populateQuickInsertPanel(container) {
             font-size: 14px;
         `;
         
-        // Create colored symbol text on the right
         const symbolText = document.createElement('span');
         symbolText.textContent = item.symbol;
         symbolText.style.cssText = `
@@ -3807,27 +3472,20 @@ function populateQuickInsertPanel(container) {
     });
 }
 
-// Insert text at cursor position in the template editor
 function insertTextAtCursor(text) {
     if (!currentTemplateEditor) return;
 
-    // Check if it's a reference symbol (enclosed in {})
     if (text.match(/^\{.+\}$/)) {
-        // Create a reference tag button
         insertReferenceTag(text);
     } else {
-        // Insert plain text
         insertPlainText(text);
     }
 
-    // Focus the editor
     currentTemplateEditor.focus();
 
-    // Show feedback
     showToast(`✅ 已插入: ${text}`, 'success');
 }
 
-// Insert plain text at cursor position
 function insertPlainText(text) {
     const selection = window.getSelection();
     if (!selection.rangeCount) {
@@ -3840,15 +3498,12 @@ function insertPlainText(text) {
 
     const textNode = document.createTextNode(text);
     range.insertNode(textNode);
-
-    // Move cursor after inserted text
     range.setStartAfter(textNode);
     range.setEndAfter(textNode);
     selection.removeAllRanges();
     selection.addRange(range);
 }
 
-// Insert a reference tag (button) at cursor position
 function insertReferenceTag(symbolText) {
     const selection = window.getSelection();
     let range;
@@ -3856,15 +3511,12 @@ function insertReferenceTag(symbolText) {
     if (selection.rangeCount > 0) {
         range = selection.getRangeAt(0);
 
-        // Make sure we're inserting within the editor
         if (!currentTemplateEditor.contains(range.commonAncestorContainer)) {
-            // If not in editor, append to end
             range = document.createRange();
             range.selectNodeContents(currentTemplateEditor);
             range.collapse(false);
         }
     } else {
-        // No selection, append to end
         range = document.createRange();
         range.selectNodeContents(currentTemplateEditor);
         range.collapse(false);
@@ -3872,30 +3524,23 @@ function insertReferenceTag(symbolText) {
 
     range.deleteContents();
 
-    // Create the tag button
     const tag = createReferenceTagElement(symbolText);
 
-    // Insert the tag
     range.insertNode(tag);
-
-    // Move cursor after the tag
     range.setStartAfter(tag);
     range.setEndAfter(tag);
     selection.removeAllRanges();
     selection.addRange(range);
 }
 
-// Create a reference tag element
 function createReferenceTagElement(symbolText) {
     const tag = document.createElement('span');
     tag.className = 'reference-tag';
     tag.contentEditable = false;
 
-    // Display bilingual name instead of raw symbol
     tag.textContent = getBilingualName(symbolText);
     tag.dataset.symbol = symbolText;
 
-    // Add click handler to show menu
     tag.addEventListener('click', (e) => {
         e.stopPropagation();
         showReferenceTagMenu(tag);
@@ -3904,41 +3549,52 @@ function createReferenceTagElement(symbolText) {
     return tag;
 }
 
-// Show menu for reference tag
 function showReferenceTagMenu(tagElement) {
-    // Remove any existing menu
     const existingMenu = document.querySelector('.tag-menu');
     if (existingMenu) {
         existingMenu.remove();
     }
 
     const currentSymbol = tagElement.dataset.symbol;
-
-    // Available reference symbols with their Chinese names
     const referenceSymbols = [
         { name: '人物', symbol: '{character}' },
         { name: '性别', symbol: '{gender}' },
-        { name: '姿势', symbol: '{pose}' },
-        { name: '动作', symbol: '{movement}' },
+        { name: '面部表情', symbol: '{facial_expressions}' },
+        { name: '发型', symbol: '{hair_style}' },
+        { name: '发色', symbol: '{hair_color}' },
+        { name: '姿势', symbol: '{body_pose}' },
+        { name: '头部动作', symbol: '{head_movements}' },
+        { name: '手部动作', symbol: '{hand_movements}' },
+        { name: '腿脚动作', symbol: '{leg_foot_movements}' },
         { name: '朝向', symbol: '{orientation}' },
         { name: '上衣', symbol: '{top}' },
         { name: '下装', symbol: '{bottom}' },
         { name: '鞋子', symbol: '{boots}' },
+        { name: '袜子', symbol: '{socks}' },
         { name: '配饰', symbol: '{accessories}' },
+        { name: '纹身', symbol: '{tattoo}' },
+        { name: '纹身位置', symbol: '{tattoo_location}' },
         { name: '相机', symbol: '{camera}' },
         { name: '镜头', symbol: '{lens}' },
         { name: '灯光', symbol: '{lighting}' },
         { name: '视角', symbol: '{perspective}' },
         { name: '位置', symbol: '{location}' },
         { name: '天气', symbol: '{weather}' },
-        { name: '季节', symbol: '{season}' }
+        { name: '季节', symbol: '{season}' },
+        { name: '色调', symbol: '{color_tone}' },
+        { name: '氛围', symbol: '{mood_atmosphere}' },
+        { name: '摄影风格', symbol: '{photography_style}' },
+        { name: '摄影技法', symbol: '{photography_technique}' },
+        { name: '后期处理', symbol: '{post_processing}' },
+        { name: '景深', symbol: '{depth_of_field}' },
+        { name: '构图', symbol: '{composition}' },
+        { name: '质感', symbol: '{texture}' },
+        { name: '主题', symbol: '{theme}' }
     ];
 
-    // Create menu
     const menu = document.createElement('div');
     menu.className = 'tag-menu';
 
-    // Add menu items
     referenceSymbols.forEach(item => {
         const menuItem = document.createElement('div');
         menuItem.className = 'tag-menu-item';
@@ -3948,7 +3604,6 @@ function showReferenceTagMenu(tagElement) {
         menuItem.textContent = `${item.name} ${item.symbol}`;
 
         menuItem.addEventListener('click', () => {
-            // Update the tag with bilingual name
             tagElement.textContent = getBilingualName(item.symbol);
             tagElement.dataset.symbol = item.symbol;
             menu.remove();
@@ -3958,12 +3613,10 @@ function showReferenceTagMenu(tagElement) {
         menu.appendChild(menuItem);
     });
 
-    // Add divider
     const divider = document.createElement('div');
     divider.className = 'tag-menu-divider';
     menu.appendChild(divider);
 
-    // Add delete option
     const deleteItem = document.createElement('div');
     deleteItem.className = 'tag-menu-item tag-menu-delete';
     deleteItem.textContent = '🗑️ 删除标签';
@@ -3974,14 +3627,12 @@ function showReferenceTagMenu(tagElement) {
     });
     menu.appendChild(deleteItem);
 
-    // Position menu near the tag
     document.body.appendChild(menu);
 
     const tagRect = tagElement.getBoundingClientRect();
     menu.style.left = tagRect.left + 'px';
     menu.style.top = (tagRect.bottom + 5) + 'px';
 
-    // Adjust if menu goes off screen
     setTimeout(() => {
         const menuRect = menu.getBoundingClientRect();
         if (menuRect.right > window.innerWidth) {
@@ -3992,7 +3643,6 @@ function showReferenceTagMenu(tagElement) {
         }
     }, 0);
 
-    // Close menu when clicking outside
     const closeMenu = (e) => {
         if (!menu.contains(e.target) && e.target !== tagElement) {
             menu.remove();
@@ -4005,7 +3655,6 @@ function showReferenceTagMenu(tagElement) {
     }, 0);
 }
 
-// Copy template content to clipboard
 function copyTemplateContent() {
     if (!currentTemplateEditor) return;
 
@@ -4015,21 +3664,17 @@ function copyTemplateContent() {
         return;
     }
 
-    // Try to use the modern clipboard API
     if (navigator.clipboard && navigator.clipboard.writeText) {
         navigator.clipboard.writeText(content).then(() => {
             showToast('✅ 内容已复制到剪贴板', 'success');
         }).catch(() => {
-            // Fallback to older method
             fallbackCopyText(content);
         });
     } else {
-        // Fallback for older browsers
         fallbackCopyText(content);
     }
 }
 
-// Fallback copy method for older browsers
 function fallbackCopyText(text) {
     const textArea = document.createElement('textarea');
     textArea.value = text;
@@ -4050,9 +3695,7 @@ function fallbackCopyText(text) {
     }
 }
 
-// Show toast notification
 function showToast(message, type = 'info') {
-    // Remove any existing toast
     const existingToast = document.getElementById('toast-notification');
     if (existingToast) {
         existingToast.remove();
@@ -4087,13 +3730,11 @@ function showToast(message, type = 'info') {
     
     document.body.appendChild(toast);
     
-    // Animate in
     setTimeout(() => {
         toast.style.transform = 'translateY(0)';
         toast.style.opacity = '1';
     }, 10);
     
-    // Auto remove after delay
     setTimeout(() => {
         toast.style.transform = 'translateY(100px)';
         toast.style.opacity = '0';
@@ -4105,70 +3746,51 @@ function showToast(message, type = 'info') {
     }, 3000);
 }
 
-// Sync template content to the main node
-function syncTemplateToNode() {
+function applyTemplateToNode() {
     if (!currentTemplateEditor) return;
 
     const content = getTemplateContent();
-    if (!content.trim()) {
-        showToast('⚠️ 没有内容可同步', 'warning');
-        return;
-    }
 
-    // Check if we have a valid node reference
     if (!currentTemplateNode) {
-        showToast('❌ 无法同步到节点：未找到节点引用', 'error');
+        showToast('❌ 无法应用到节点：未找到节点引用', 'error');
         return;
     }
 
-    // Find the template widget in the node
     const templateWidget = currentTemplateNode.widgets.find(widget => widget.name === "template");
     if (!templateWidget) {
-        showToast('❌ 无法同步到节点：未找到template控件', 'error');
+        showToast('❌ 无法应用到节点：未找到template控件', 'error');
         return;
     }
 
-    // Set the template widget value
     templateWidget.value = content;
-
-    // Trigger node update
     currentTemplateNode.setDirtyCanvas(true);
 
-    // Show success message
-    showToast('✅ 内容已同步到节点', 'success');
-
-    // Close the template helper dialog after sync
-    if (currentTemplateHelperDialog) {
-        currentTemplateHelperDialog.remove();
-        currentTemplateHelperDialog = null;
+    if (content.trim()) {
+        showToast('✅ 模版内容已应用', 'success');
+    } else {
+        showToast('✅ 已清空模版内容', 'success');
     }
 }
 
-// Sync node template content to the template editor
 function syncNodeToTemplate() {
     if (!currentTemplateEditor) return;
 
-    // Check if we have a valid node reference
     if (!currentTemplateNode) {
         console.warn('No node reference found');
         return;
     }
 
-    // Find the template widget in the node
     const templateWidget = currentTemplateNode.widgets.find(widget => widget.name === "template");
     if (!templateWidget) {
         console.warn('Template widget not found in node');
         return;
     }
 
-    // Get the template content from the node
     const nodeTemplateContent = templateWidget.value || '';
 
     if (nodeTemplateContent.trim()) {
-        // Clear the editor
         currentTemplateEditor.innerHTML = '';
 
-        // Parse and populate the editor with the node's template content
         const parsedContent = parseTemplateToElements(nodeTemplateContent);
         currentTemplateEditor.appendChild(parsedContent);
 
@@ -4176,3 +3798,907 @@ function syncNodeToTemplate() {
     }
 }
 
+let currentCategoryBrowserDialog = null;
+let currentBrowserNode = null;
+let browserInitialState = {};
+let browserPendingChanges = {};
+let randomButtonState = { active: false, savedState: {} };
+let ignoreButtonState = { active: false, savedState: {} };
+
+function openCategoryBrowser(node) {
+    if (currentCategoryBrowserDialog) {
+        currentCategoryBrowserDialog.remove();
+    }
+
+    currentBrowserNode = node;
+
+    browserInitialState = {};
+    browserPendingChanges = {};
+    const categories = Object.keys(BROWSER_CATEGORY_MAP);
+    categories.forEach(category => {
+        const categoryInfo = BROWSER_CATEGORY_MAP[category];
+        const widget = node.widgets.find(w => w.name === categoryInfo.field);
+        if (widget) {
+            browserInitialState[categoryInfo.field] = widget.value;
+            browserPendingChanges[categoryInfo.field] = widget.value;
+        }
+    });
+
+    currentCategoryBrowserDialog = createCategoryBrowserDialog();
+    document.body.appendChild(currentCategoryBrowserDialog);
+    currentCategoryBrowserDialog.style.display = 'block';
+
+    loadBrowserCategoryData();
+}
+
+function createCategoryBrowserDialog() {
+    const overlay = document.createElement('div');
+    overlay.style.cssText = `
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background: rgba(0, 0, 0, 0.5);
+        z-index: 10001;
+        display: none;
+        backdrop-filter: blur(10px);
+        -webkit-backdrop-filter: blur(10px);
+    `;
+
+    const dialog = document.createElement('div');
+    dialog.style.cssText = `
+        position: absolute;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+        width: 90%;
+        max-width: 1400px;
+        height: 85vh;
+        background: linear-gradient(135deg, #1a1a2e 0%, #16213e 50%, #0f3460 100%);
+        border-radius: 16px;
+        box-shadow: 0 20px 50px rgba(0, 0, 0, 0.5);
+        overflow: hidden;
+        display: flex;
+        flex-direction: column;
+        border: 1px solid rgba(255, 255, 255, 0.1);
+    `;
+
+    const header = document.createElement('div');
+    header.style.cssText = `
+        padding: 12px 20px;
+        background: rgba(0, 0, 0, 0.2);
+        border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+    `;
+
+    const title = document.createElement('h2');
+    title.textContent = '标签选择·Select Tags';
+    title.style.cssText = `
+        margin: 0;
+        color: #fff;
+        font-size: 18px;
+        font-weight: 600;
+        background: linear-gradient(90deg, #4facfe 0%, #00f2fe 100%);
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+        background-clip: text;
+    `;
+
+    const closeButton = document.createElement('button');
+    closeButton.innerHTML = '✕';
+    closeButton.style.cssText = `
+        width: 28px;
+        height: 28px;
+        border-radius: 6px;
+        border: none;
+        background: rgba(255, 255, 255, 0.1);
+        color: #fff;
+        font-size: 14px;
+        font-weight: bold;
+        cursor: pointer;
+        transition: all 0.3s ease;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        line-height: 1;
+        text-align: center;
+    `;
+
+    closeButton.addEventListener('mouseenter', () => {
+        closeButton.style.background = 'linear-gradient(135deg, #ff4444, #ff6666)';
+        closeButton.style.transform = 'scale(1.1)';
+        closeButton.style.boxShadow = '0 4px 15px rgba(255, 68, 68, 0.5)';
+    });
+
+    closeButton.addEventListener('mouseleave', () => {
+        closeButton.style.background = 'rgba(255, 255, 255, 0.1)';
+        closeButton.style.transform = 'scale(1)';
+        closeButton.style.boxShadow = 'none';
+    });
+
+    closeButton.addEventListener('click', () => {
+        overlay.remove();
+        currentCategoryBrowserDialog = null;
+    });
+
+    header.appendChild(title);
+    header.appendChild(closeButton);
+
+    const content = document.createElement('div');
+    content.style.cssText = `
+        flex: 1;
+        overflow-y: auto;
+        padding: 25px 30px;
+    `;
+
+    const fieldsContainer = document.createElement('div');
+    fieldsContainer.id = 'browser-fields-container';
+    fieldsContainer.style.cssText = `
+        display: grid;
+        grid-template-columns: repeat(3, 1fr);
+        gap: 20px;
+    `;
+
+    content.appendChild(fieldsContainer);
+
+    const footer = document.createElement('div');
+    footer.style.cssText = `
+        padding: 15px 30px;
+        background: rgba(0, 0, 0, 0.2);
+        border-top: 1px solid rgba(255, 255, 255, 0.1);
+        display: flex;
+        justify-content: center;
+        gap: 15px;
+    `;
+
+    const randomAllButton = createToggleButton(
+        '全部随机 · Random All',
+        '恢复随机前 · Restore',
+        '#8b5cf6',
+        null
+    );
+
+    const ignoreAllButton = createToggleButton(
+        '全部忽略 · Ignore All',
+        '恢复忽略前 · Restore',
+        '#3b82f6',
+        null
+    );
+
+    const shuffleButton = document.createElement('button');
+    shuffleButton.textContent = '洗牌抽签 · Shuffle';
+    shuffleButton.style.cssText = `
+        padding: 10px 24px;
+        background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%);
+        color: #fff;
+        border: none;
+        border-radius: 8px;
+        font-size: 14px;
+        font-weight: 600;
+        cursor: pointer;
+        transition: all 0.2s ease;
+        box-shadow: 0 2px 8px rgba(245, 158, 11, 0.3);
+    `;
+
+    shuffleButton.addEventListener('mouseenter', () => {
+        shuffleButton.style.transform = 'translateY(-2px)';
+        shuffleButton.style.boxShadow = '0 4px 12px rgba(245, 158, 11, 0.5)';
+        shuffleButton.style.filter = 'brightness(1.1)';
+    });
+
+    shuffleButton.addEventListener('mouseleave', () => {
+        shuffleButton.style.transform = 'translateY(0)';
+        shuffleButton.style.boxShadow = '0 2px 8px rgba(245, 158, 11, 0.3)';
+        shuffleButton.style.filter = 'brightness(1)';
+    });
+
+    shuffleButton.addEventListener('click', () => {
+        shuffleAllFields();
+    });
+
+    const applyButton = document.createElement('button');
+    applyButton.textContent = '应用 · Apply';
+    applyButton.style.cssText = `
+        padding: 10px 24px;
+        background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+        color: #fff;
+        border: none;
+        border-radius: 8px;
+        font-size: 14px;
+        font-weight: 600;
+        cursor: pointer;
+        transition: all 0.2s ease;
+        box-shadow: 0 2px 8px rgba(16, 185, 129, 0.3);
+    `;
+
+    applyButton.addEventListener('mouseenter', () => {
+        applyButton.style.transform = 'translateY(-2px)';
+        applyButton.style.boxShadow = '0 4px 12px rgba(16, 185, 129, 0.5)';
+        applyButton.style.filter = 'brightness(1.1)';
+    });
+
+    applyButton.addEventListener('mouseleave', () => {
+        applyButton.style.transform = 'translateY(0)';
+        applyButton.style.boxShadow = '0 2px 8px rgba(16, 185, 129, 0.3)';
+        applyButton.style.filter = 'brightness(1)';
+    });
+
+    applyButton.addEventListener('click', () => {
+        applyAllBrowserChanges();
+    });
+
+    randomAllButton.addEventListener('click', () =>
+        toggleAllFields('Random', randomButtonState, ignoreButtonState, randomAllButton, ignoreAllButton)
+    );
+
+    ignoreAllButton.addEventListener('click', () =>
+        toggleAllFields('Ignore', ignoreButtonState, randomButtonState, ignoreAllButton, randomAllButton)
+    );
+
+    footer.appendChild(randomAllButton);
+    footer.appendChild(ignoreAllButton);
+    footer.appendChild(shuffleButton);
+    footer.appendChild(applyButton);
+
+    dialog.appendChild(header);
+    dialog.appendChild(content);
+    dialog.appendChild(footer);
+    overlay.appendChild(dialog);
+
+    overlay.addEventListener('keydown', (event) => {
+        const target = event.target;
+        if (target.tagName === 'TEXTAREA' || target.tagName === 'INPUT' || target.tagName === 'SELECT') {
+            event.stopImmediatePropagation();
+            return;
+        }
+        event.stopImmediatePropagation();
+    });
+
+    return overlay;
+}
+
+const BROWSER_CATEGORY_MAP = {
+    'character': { cn: '人物/角色', en: 'Character', field: 'character' },
+    'gender': { cn: '性别', en: 'Gender', field: 'gender' },
+    'facial_expressions': { cn: '面部表情', en: 'Facial Expressions', field: 'facial_expressions' },
+    'hair_style': { cn: '发型', en: 'Hair Style', field: 'hair_style' },
+    'hair_color': { cn: '发色', en: 'Hair Color', field: 'hair_color' },
+    'pose': { cn: '身躯姿势', en: 'Body Pose', field: 'pose' },
+    'head_movements': { cn: '头部动作', en: 'Head Movements', field: 'head_movements' },
+    'hand_movements': { cn: '手部动作', en: 'Hand Movements', field: 'hand_movements' },
+    'leg_foot_movements': { cn: '腿脚动作', en: 'Leg/Foot Movements', field: 'leg_foot_movements' },
+    'orientation': { cn: '朝向', en: 'Orientation', field: 'orientation' },
+    'top': { cn: '上衣', en: 'Top', field: 'top' },
+    'bottom': { cn: '下装', en: 'Bottom', field: 'bottom' },
+    'boots': { cn: '鞋子', en: 'Boots', field: 'boots' },
+    'socks': { cn: '袜子', en: 'Socks', field: 'socks' },
+    'accessories': { cn: '配饰', en: 'Accessories', field: 'accessories' },
+    'tattoo': { cn: '纹身', en: 'Tattoo', field: 'tattoo' },
+    'tattoo_location': { cn: '纹身位置', en: 'Tattoo Location', field: 'tattoo_location' },
+    'camera': { cn: '相机', en: 'Camera', field: 'camera' },
+    'lens': { cn: '镜头', en: 'Lens', field: 'lens' },
+    'lighting': { cn: '灯光', en: 'Lighting', field: 'lighting' },
+    'perspective': { cn: '视角', en: 'Perspective', field: 'perspective' },
+    'location': { cn: '位置', en: 'Location', field: 'location' },
+    'weather': { cn: '天气', en: 'Weather', field: 'weather' },
+    'season': { cn: '季节', en: 'Season', field: 'season' },
+    'color_tone': { cn: '色调', en: 'Color Tone', field: 'color_tone' },
+    'mood_atmosphere': { cn: '氛围', en: 'Mood/Atmosphere', field: 'mood_atmosphere' },
+    'photography_style': { cn: '摄影风格', en: 'Photography Style', field: 'photography_style' },
+    'photography_technique': { cn: '摄影技法', en: 'Photography Technique', field: 'photography_technique' },
+    'post_processing': { cn: '后期处理', en: 'Post Processing', field: 'post_processing' },
+    'depth_of_field': { cn: '景深', en: 'Depth of Field', field: 'depth_of_field' },
+    'composition': { cn: '构图', en: 'Composition', field: 'composition' },
+    'texture': { cn: '质感', en: 'Texture', field: 'texture' }
+};
+
+async function loadBrowserCategoryData() {
+    renderBrowserFields();
+}
+
+function renderBrowserFields() {
+    const fieldsContainer = document.getElementById('browser-fields-container');
+    if (!fieldsContainer || !currentBrowserNode) return;
+
+    fieldsContainer.innerHTML = '';
+
+    const categories = Object.keys(BROWSER_CATEGORY_MAP);
+
+    categories.forEach(category => {
+        const categoryInfo = BROWSER_CATEGORY_MAP[category];
+        const fieldName = categoryInfo.field;
+
+        const widget = currentBrowserNode.widgets.find(w => w.name === fieldName);
+        if (!widget || !widget.options || !widget.options.values) return;
+
+        const fieldItem = createBrowserFieldItem(categoryInfo, widget);
+        fieldsContainer.appendChild(fieldItem);
+    });
+}
+
+function createBrowserFieldItem(categoryInfo, widget) {
+    const fieldWrapper = document.createElement('div');
+    fieldWrapper.className = 'browser-field-item';
+    fieldWrapper.style.cssText = `
+        display: flex;
+        flex-direction: column;
+        gap: 8px;
+    `;
+
+    const labelContainer = document.createElement('div');
+    labelContainer.style.cssText = `
+        display: flex;
+        align-items: center;
+        gap: 6px;
+    `;
+
+    const label = document.createElement('label');
+    label.textContent = `${categoryInfo.cn} · ${categoryInfo.en}`;
+    label.style.cssText = `
+        color: #4facfe;
+        font-size: 13px;
+        font-weight: 600;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+    `;
+
+    const searchIcon = document.createElement('button');
+    searchIcon.innerHTML = '🔍';
+    searchIcon.title = '快速搜索 · Quick Search';
+    searchIcon.style.cssText = `
+        width: 22px;
+        height: 22px;
+        border-radius: 5px;
+        border: 1px solid rgba(79, 172, 254, 0.5);
+        background: rgba(79, 172, 254, 0.15);
+        color: white;
+        font-size: 13px;
+        cursor: pointer;
+        transition: all 0.2s ease;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        padding: 0;
+        flex-shrink: 0;
+    `;
+
+    searchIcon.addEventListener('mouseenter', () => {
+        searchIcon.style.background = 'rgba(79, 172, 254, 0.3)';
+        searchIcon.style.transform = 'scale(1.1)';
+    });
+
+    searchIcon.addEventListener('mouseleave', () => {
+        searchIcon.style.background = 'rgba(79, 172, 254, 0.15)';
+        searchIcon.style.transform = 'scale(1)';
+    });
+
+    searchIcon.addEventListener('click', (e) => {
+        e.stopPropagation();
+        showFieldSearchDialog(categoryInfo, widget, select);
+    });
+
+    labelContainer.appendChild(label);
+    labelContainer.appendChild(searchIcon);
+
+    const selectWrapper = document.createElement('div');
+    selectWrapper.style.cssText = `
+        position: relative;
+    `;
+
+    const select = document.createElement('select');
+    select.className = 'browser-select';
+    select.dataset.field = categoryInfo.field;
+    select.style.cssText = `
+        width: 100%;
+        padding: 10px 12px;
+        background: rgba(0, 0, 0, 0.3);
+        border: 1px solid rgba(255, 255, 255, 0.2);
+        border-radius: 8px;
+        color: #fff;
+        font-size: 13px;
+        cursor: pointer;
+        transition: all 0.2s ease;
+        appearance: none;
+        -webkit-appearance: none;
+        -moz-appearance: none;
+        background-image: url('data:image/svg+xml;charset=UTF-8,%3csvg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"%3e%3cpolyline points="6 9 12 15 18 9"%3e%3c/polyline%3e%3c/svg%3e');
+        background-repeat: no-repeat;
+        background-position: right 8px center;
+        background-size: 16px;
+        padding-right: 32px;
+    `;
+
+    const currentValue = widget.value || 'Ignore';
+
+    widget.options.values.forEach(value => {
+        const option = document.createElement('option');
+        option.value = value;
+
+        // 统一显示格式为 "中文 (English)"
+        let displayText = value;
+        if (value.includes(' | ')) {
+            // 将 "中文 | English" 转换为 "中文 (English)"
+            const parts = value.split(' | ');
+            displayText = `${parts[0]} (${parts[1]})`;
+        }
+
+        option.textContent = displayText;
+        option.style.cssText = `
+            background: #1a1a2e;
+            color: #fff;
+            padding: 8px;
+        `;
+
+        if (value === currentValue) {
+            option.selected = true;
+        }
+
+        select.appendChild(option);
+    });
+
+    select.addEventListener('mouseenter', () => {
+        select.style.borderColor = 'rgba(79, 172, 254, 0.6)';
+        select.style.background = 'rgba(0, 0, 0, 0.4)';
+    });
+
+    select.addEventListener('mouseleave', () => {
+        select.style.borderColor = 'rgba(255, 255, 255, 0.2)';
+        select.style.background = 'rgba(0, 0, 0, 0.3)';
+    });
+
+    select.addEventListener('focus', () => {
+        select.style.borderColor = '#4facfe';
+        select.style.boxShadow = '0 0 0 3px rgba(79, 172, 254, 0.2)';
+    });
+
+    select.addEventListener('blur', () => {
+        select.style.borderColor = 'rgba(255, 255, 255, 0.2)';
+        select.style.boxShadow = 'none';
+    });
+
+    select.addEventListener('change', (e) => {
+        const selectedValue = e.target.value;
+        browserPendingChanges[categoryInfo.field] = selectedValue;
+    });
+
+    selectWrapper.appendChild(select);
+    fieldWrapper.appendChild(labelContainer);
+    fieldWrapper.appendChild(selectWrapper);
+
+    return fieldWrapper;
+}
+
+function applyAllBrowserChanges() {
+    if (!currentBrowserNode) {
+        return;
+    }
+
+    const categories = Object.keys(BROWSER_CATEGORY_MAP);
+    let changeCount = 0;
+
+    categories.forEach(category => {
+        const categoryInfo = BROWSER_CATEGORY_MAP[category];
+        const fieldName = categoryInfo.field;
+
+        if (browserPendingChanges[fieldName] !== undefined) {
+            const widget = currentBrowserNode.widgets.find(w => w.name === fieldName);
+            if (widget && widget.value !== browserPendingChanges[fieldName]) {
+                widget.value = browserPendingChanges[fieldName];
+                changeCount++;
+            }
+        }
+    });
+
+    if (changeCount > 0) {
+        currentBrowserNode.setDirtyCanvas(true);
+        showToast(`✅ 成功应用 ${changeCount} 个字段的更改`, 'success');
+        console.log(`Applied ${changeCount} changes to node`);
+    } else {
+        showToast(`ℹ️ 没有需要应用的更改`, 'info');
+    }
+}
+
+function applyBrowserFieldToNode(fieldName, value) {
+    if (!currentBrowserNode) {
+        return;
+    }
+
+    const widget = currentBrowserNode.widgets.find(w => w.name === fieldName);
+    if (!widget) {
+        return;
+    }
+
+    widget.value = value;
+    browserPendingChanges[fieldName] = value;
+    currentBrowserNode.setDirtyCanvas(true);
+}
+
+function createToggleButton(normalText, activeText, color, onClick) {
+    const button = document.createElement('button');
+    button.textContent = normalText;
+    button.style.cssText = `
+        padding: 10px 24px;
+        background: ${color};
+        color: #fff;
+        border: none;
+        border-radius: 8px;
+        font-size: 14px;
+        font-weight: 600;
+        cursor: pointer;
+        transition: all 0.2s ease;
+        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
+    `;
+
+    button.normalText = normalText;
+    button.activeText = activeText;
+    button.normalColor = color;
+    button.activeColor = '#10b981';
+
+    button.addEventListener('mouseenter', () => {
+        button.style.transform = 'translateY(-2px)';
+        button.style.boxShadow = '0 4px 12px rgba(0, 0, 0, 0.4)';
+        button.style.filter = 'brightness(1.1)';
+    });
+
+    button.addEventListener('mouseleave', () => {
+        button.style.transform = 'translateY(0)';
+        button.style.boxShadow = '0 2px 8px rgba(0, 0, 0, 0.3)';
+        button.style.filter = 'brightness(1)';
+    });
+
+    if (onClick) {
+        button.addEventListener('click', onClick);
+    }
+
+    return button;
+}
+
+function shuffleAllFields() {
+    if (!currentBrowserNode) return;
+
+    const categories = Object.keys(BROWSER_CATEGORY_MAP);
+    let count = 0;
+
+    categories.forEach(category => {
+        const categoryInfo = BROWSER_CATEGORY_MAP[category];
+        const fieldName = categoryInfo.field;
+
+        const select = document.querySelector(`.browser-select[data-field="${fieldName}"]`);
+        if (select && select.options.length > 0) {
+            // 获取所有可选项，排除 "Ignore" 和 "Random"
+            const validOptions = Array.from(select.options)
+                .map(opt => opt.value)
+                .filter(val => val !== 'Ignore' && val !== 'Random');
+
+            if (validOptions.length > 0) {
+                // 随机选择一个选项
+                const randomIndex = Math.floor(Math.random() * validOptions.length);
+                const randomValue = validOptions[randomIndex];
+
+                // 更新界面和待变更数据
+                select.value = randomValue;
+                browserPendingChanges[fieldName] = randomValue;
+                count++;
+            }
+        }
+    });
+
+    showToast(`✅ 已随机选择 ${count} 个字段（请点击应用生效）`, 'success');
+}
+
+function toggleAllFields(value, currentState, otherState, button, otherButton) {
+    if (!currentBrowserNode) return;
+
+    const categories = Object.keys(BROWSER_CATEGORY_MAP);
+
+    if (currentState.active) {
+        // 当前按钮已激活，点击则恢复
+        let count = 0;
+        categories.forEach(category => {
+            const categoryInfo = BROWSER_CATEGORY_MAP[category];
+            const fieldName = categoryInfo.field;
+
+            if (currentState.savedState[fieldName] !== undefined) {
+                browserPendingChanges[fieldName] = currentState.savedState[fieldName];
+                count++;
+
+                const select = document.querySelector(`.browser-select[data-field="${fieldName}"]`);
+                if (select) {
+                    select.value = currentState.savedState[fieldName];
+                }
+            }
+        });
+
+        currentState.active = false;
+        currentState.savedState = {};
+        button.textContent = button.normalText;
+        button.style.background = button.normalColor;
+
+        const actionText = value === 'Random' ? '随机' : '忽略';
+        showToast(`✅ 已恢复${actionText}前的 ${count} 个字段（请点击应用生效）`, 'success');
+    } else {
+        // 当前按钮未激活，点击则应用
+
+        // 如果另一个按钮是激活的，先将其重置（只重置状态和UI，不恢复字段值）
+        if (otherState.active) {
+            otherState.active = false;
+            otherState.savedState = {};
+            if (otherButton) {
+                otherButton.textContent = otherButton.normalText;
+                otherButton.style.background = otherButton.normalColor;
+            }
+        }
+
+        currentState.savedState = {};
+        let count = 0;
+
+        categories.forEach(category => {
+            const categoryInfo = BROWSER_CATEGORY_MAP[category];
+            const fieldName = categoryInfo.field;
+
+            if (browserPendingChanges[fieldName] !== undefined) {
+                currentState.savedState[fieldName] = browserPendingChanges[fieldName];
+                browserPendingChanges[fieldName] = value;
+                count++;
+
+                const select = document.querySelector(`.browser-select[data-field="${fieldName}"]`);
+                if (select) {
+                    select.value = value;
+                }
+            }
+        });
+
+        currentState.active = true;
+        button.textContent = button.activeText;
+        button.style.background = button.activeColor;
+
+        const actionText = value === 'Random' ? '随机' : '忽略';
+        showToast(`✅ 已将 ${count} 个字段设置为${actionText}（请点击应用生效）`, 'success');
+    }
+}
+
+function showFieldSearchDialog(categoryInfo, widget, selectElement) {
+    const existingModal = document.getElementById('field-search-modal');
+    if (existingModal) {
+        existingModal.remove();
+    }
+
+    const modal = document.createElement('div');
+    modal.id = 'field-search-modal';
+    modal.style.cssText = `
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background: rgba(0, 0, 0, 0.6);
+        z-index: 10003;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        backdrop-filter: blur(5px);
+        -webkit-backdrop-filter: blur(5px);
+    `;
+
+    const dialogContent = document.createElement('div');
+    dialogContent.style.cssText = `
+        background: linear-gradient(135deg, #1a1a2e 0%, #16213e 50%, #0f3460 100%);
+        border-radius: 16px;
+        padding: 24px;
+        width: 90%;
+        max-width: 600px;
+        max-height: 80vh;
+        border: 1px solid rgba(255, 255, 255, 0.2);
+        box-shadow: 0 20px 50px rgba(0, 0, 0, 0.5);
+        display: flex;
+        flex-direction: column;
+        gap: 16px;
+    `;
+
+    const header = document.createElement('div');
+    header.style.cssText = `
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+    `;
+
+    const title = document.createElement('h3');
+    title.textContent = `🔍 ${categoryInfo.cn} · ${categoryInfo.en}`;
+    title.style.cssText = `
+        color: #4facfe;
+        margin: 0;
+        font-size: 18px;
+        font-weight: 600;
+    `;
+
+    const closeButton = document.createElement('button');
+    closeButton.innerHTML = '✕';
+    closeButton.style.cssText = `
+        width: 28px;
+        height: 28px;
+        border-radius: 6px;
+        border: none;
+        background: rgba(255, 255, 255, 0.1);
+        color: #fff;
+        font-size: 14px;
+        font-weight: bold;
+        cursor: pointer;
+        transition: all 0.3s ease;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    `;
+
+    closeButton.addEventListener('mouseenter', () => {
+        closeButton.style.background = 'linear-gradient(135deg, #ff4444, #ff6666)';
+        closeButton.style.transform = 'scale(1.1)';
+    });
+
+    closeButton.addEventListener('mouseleave', () => {
+        closeButton.style.background = 'rgba(255, 255, 255, 0.1)';
+        closeButton.style.transform = 'scale(1)';
+    });
+
+    closeButton.addEventListener('click', () => {
+        modal.remove();
+    });
+
+    header.appendChild(title);
+    header.appendChild(closeButton);
+
+    const searchInput = document.createElement('input');
+    searchInput.type = 'text';
+    searchInput.placeholder = '输入关键词搜索... · Type to search...';
+    searchInput.style.cssText = `
+        width: 100%;
+        padding: 12px 16px;
+        border-radius: 8px;
+        border: 1px solid rgba(255, 255, 255, 0.3);
+        background: rgba(0, 0, 0, 0.3);
+        color: white;
+        font-size: 14px;
+        outline: none;
+        transition: all 0.3s ease;
+        box-sizing: border-box;
+    `;
+
+    searchInput.addEventListener('focus', () => {
+        searchInput.style.borderColor = '#4facfe';
+        searchInput.style.boxShadow = '0 0 0 2px rgba(79, 172, 254, 0.2)';
+    });
+
+    searchInput.addEventListener('blur', () => {
+        searchInput.style.borderColor = 'rgba(255, 255, 255, 0.3)';
+        searchInput.style.boxShadow = 'none';
+    });
+
+    const resultCount = document.createElement('div');
+    resultCount.style.cssText = `
+        color: rgba(255, 255, 255, 0.6);
+        font-size: 13px;
+        padding: 0 4px;
+    `;
+
+    const resultsContainer = document.createElement('div');
+    resultsContainer.style.cssText = `
+        flex: 1;
+        overflow-y: auto;
+        display: grid;
+        grid-template-columns: repeat(2, 1fr);
+        gap: 8px;
+        padding: 4px;
+        max-height: 50vh;
+    `;
+
+    const allOptions = Array.from(widget.options.values).filter(v => !['Ignore', 'Random'].includes(v));
+
+    function renderResults(searchTerm = '') {
+        resultsContainer.innerHTML = '';
+
+        const trimmedSearch = searchTerm.trim();
+        const filtered = trimmedSearch
+            ? allOptions.filter(option => {
+                const lowerSearch = trimmedSearch.toLowerCase();
+                return option.toLowerCase().includes(lowerSearch);
+            })
+            : [];
+
+        resultCount.textContent = `找到 ${filtered.length} 个结果 · Found ${filtered.length} results`;
+
+        filtered.forEach(option => {
+            const optionButton = document.createElement('button');
+
+            let displayText = option;
+            if (option.includes(' | ')) {
+                const parts = option.split(' | ');
+                displayText = `${parts[0]} (${parts[1]})`;
+            }
+
+            optionButton.textContent = displayText;
+            optionButton.style.cssText = `
+                padding: 10px 12px;
+                border-radius: 8px;
+                border: 1px solid rgba(79, 172, 254, 0.3);
+                background: rgba(79, 172, 254, 0.1);
+                color: white;
+                font-size: 13px;
+                cursor: pointer;
+                transition: all 0.2s ease;
+                text-align: left;
+                white-space: nowrap;
+                overflow: hidden;
+                text-overflow: ellipsis;
+            `;
+
+            const isSelected = selectElement.value === option;
+            if (isSelected) {
+                optionButton.style.background = 'rgba(16, 185, 129, 0.3)';
+                optionButton.style.borderColor = 'rgba(16, 185, 129, 0.8)';
+                optionButton.style.fontWeight = 'bold';
+            }
+
+            optionButton.addEventListener('mouseenter', () => {
+                if (!isSelected) {
+                    optionButton.style.background = 'rgba(79, 172, 254, 0.25)';
+                    optionButton.style.borderColor = 'rgba(79, 172, 254, 0.6)';
+                }
+                optionButton.style.transform = 'translateY(-2px)';
+                optionButton.style.boxShadow = '0 4px 8px rgba(79, 172, 254, 0.3)';
+            });
+
+            optionButton.addEventListener('mouseleave', () => {
+                if (!isSelected) {
+                    optionButton.style.background = 'rgba(79, 172, 254, 0.1)';
+                    optionButton.style.borderColor = 'rgba(79, 172, 254, 0.3)';
+                }
+                optionButton.style.transform = 'translateY(0)';
+                optionButton.style.boxShadow = 'none';
+            });
+
+            optionButton.addEventListener('click', () => {
+                selectElement.value = option;
+                browserPendingChanges[categoryInfo.field] = option;
+
+                const event = new Event('change', { bubbles: true });
+                selectElement.dispatchEvent(event);
+
+                showToast(`✅ 已选择: ${displayText}（请点击应用生效）`, 'success');
+                modal.remove();
+            });
+
+            resultsContainer.appendChild(optionButton);
+        });
+
+        if (filtered.length === 0) {
+            const emptyMessage = document.createElement('div');
+            emptyMessage.textContent = '未找到匹配结果 · No results found';
+            emptyMessage.style.cssText = `
+                grid-column: 1 / -1;
+                text-align: center;
+                color: rgba(255, 255, 255, 0.5);
+                padding: 40px 20px;
+                font-style: italic;
+            `;
+            resultsContainer.appendChild(emptyMessage);
+        }
+    }
+
+    searchInput.addEventListener('input', (e) => {
+        renderResults(e.target.value);
+    });
+
+    renderResults();
+
+    dialogContent.appendChild(header);
+    dialogContent.appendChild(searchInput);
+    dialogContent.appendChild(resultCount);
+    dialogContent.appendChild(resultsContainer);
+    modal.appendChild(dialogContent);
+    document.body.appendChild(modal);
+
+    searchInput.focus();
+}

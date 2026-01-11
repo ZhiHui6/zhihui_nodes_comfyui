@@ -1,0 +1,11 @@
+# 摄影技法选项 / Photography Technique Options
+双重曝光 (Double Exposure)
+慢速快门 (Slow Shutter)
+高速快门 (High Speed Shutter)
+长曝光 (Long Exposure)
+光绘 (Light Painting)
+光斑 (Bokeh)
+运动模糊 (Motion Blur)
+静态模糊 (Static Blur)
+多重曝光 (Multiple Exposure)
+HDR高动态范围 (HDR)

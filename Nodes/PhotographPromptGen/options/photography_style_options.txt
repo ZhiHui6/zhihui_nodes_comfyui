@@ -1,0 +1,6 @@
+# 摄影风格选项 / Photography Style Options
+人像摄影 (Portrait Photography)
+时尚摄影 (Fashion Photography)
+复古摄影 (Vintage Photography)
+纪实摄影 (Documentary Photography)
+电影写真 (Cinematic Portrait)

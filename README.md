@@ -2,7 +2,7 @@
 
 # 🎨 潪AI ComfyUI 节点包 
 
-最新版本：`v1.0.0`（2026-1-3），完整更新日志：查看<a href="CHANGELOG.md">`CHANGELOG.md`</a>
+最新版本：`v1.0.1`（2026-1-11），完整更新日志：查看<a href="CHANGELOG.md">`CHANGELOG.md`</a>
 
 ## 📖 项目介绍
 
@@ -267,6 +267,9 @@
 </a>
 <a href="images/Photograph Prompt Generator3.jpg" target="_blank">
 <img src="images/Photograph Prompt Generator3.jpg" alt="摄影提示词生成器" width="45%"/>
+</a>
+<a href="images/Photograph Prompt Generator4.jpg" target="_blank">
+<img src="images/Photograph Prompt Generator4.jpg" alt="摄影提示词生成器" width="45%"/>
 </a>
 </div>
 </td>

@@ -72,3 +72,20 @@ async def save_photograph_category_data(request):
         return web.json_response({"status": "success"})
     except Exception as e:
         return web.json_response({"error": str(e)}, status=500)
+
+@PromptServer.instance.routes.get("/zhihui/photograph/template_presets")
+async def get_template_presets(request):
+    """Get the template presets from templates/system_presets.txt"""
+    try:
+        templates_dir = os.path.join(os.path.dirname(__file__), "templates")
+        filepath = os.path.join(templates_dir, "system_presets.txt")
+        
+        if not os.path.exists(filepath):
+            return web.json_response([])
+        
+        with open(filepath, "r", encoding="utf-8") as f:
+            presets = json.load(f)
+        
+        return web.json_response(presets)
+    except Exception as e:
+        return web.json_response({"error": str(e)}, status=500)

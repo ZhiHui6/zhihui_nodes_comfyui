@@ -1,5 +1,15 @@
 # 更新日志
 
+## 1.0.1 2026-1-11
+- 升级摄影提示词生成器节点(PhotographPromptGenerator)：
+  - 摄影类标签选择方式更改为 全新Web风格操作界面，可便捷地在界面上进行选择丰富的选项
+  - 优化模版预设，覆盖更广泛的摄影场景
+<br> 
+
+- Upgraded PhotographPromptGenerator node:
+  - Replaced photography tag selection with a brand-new web-style UI, allowing easy selection of rich options
+  - Refined template presets to cover a wider range of photography scenarios
+
 ## 1.0.0 2026-1-3
 - 修复PhotographPromptGenerator和ImageAspectRatio节点的已知问题。
 <br>

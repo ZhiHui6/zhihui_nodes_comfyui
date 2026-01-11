@@ -424,7 +424,15 @@
             "perspective": "视角",
             "location": "地点",
             "weather": "天气",
-            "season": "季节"
+            "season": "季节",
+            "color_tone": "色调",
+            "mood_atmosphere": "氛围",
+            "photography_style": "摄影风格",
+            "post_processing": "后处理",
+            "depth_of_field": "景深",
+            "composition": "构图",
+            "texture": "纹理",
+            "theme": "主题"
         }
     },
     "PromptPresetMultipleChoice": {

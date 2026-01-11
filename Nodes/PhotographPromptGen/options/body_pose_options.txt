@@ -1,0 +1,70 @@
+# 身躯姿势选项 / Body Pose Options
+
+# 站姿 / Standing Poses
+正面站立 (Front Standing)
+侧面站立 (Side Standing)
+转身站立 (Turned Standing)
+重心转移 (Weight Shift)
+S曲线站姿 (S-Curve Standing)
+
+# 行走 / Walking Poses
+动感行走 (Dynamic Walking)
+侧身回眸 (Walking Looking Back)
+高跟鞋步态 (High Heel Gait)
+台步 (Catwalk)
+
+# 坐姿 / Sitting Poses
+正面坐姿 (Front Sitting)
+侧面坐姿 (Side Sitting)
+转身坐姿 (Turned Sitting)
+前倾坐姿 (Leaning Forward)
+后靠坐姿 (Leaning Back)
+侧靠坐姿 (Leaning Side)
+高坐姿 (High Position)
+低坐姿 (Low Position)
+边缘坐姿 (Sitting Edge)
+椅上坐姿 (On Chair)
+台阶坐姿 (On Steps)
+地面坐姿 (Sitting On Floor)
+
+# 蹲姿 / Squatting Poses
+正面蹲姿 (Front Squatting)
+侧面蹲姿 (Side Squatting)
+转身蹲姿 (Turned Squatting)
+重心后移 (Weight Back)
+重心前移 (Weight Forward)
+
+# 跪姿 / Kneeling Poses
+正面跪姿 (Front Kneeling)
+侧面跪姿 (Side Kneeling)
+转身跪姿 (Turned Kneeling)
+上身前倾 (Leaning Forward)
+上身后仰 (Leaning Back)
+
+# 卧姿 / Lying Poses
+正面仰躺 (Supine)
+侧面侧躺 (Side Lying)
+俯卧 (Prone)
+转身卧姿 (Turned Lying)
+身体曲线卧 (Body Curves Lying)
+
+# 靠姿 / Leaning Poses
+靠墙正面 (Wall Front Leaning)
+靠墙侧面 (Wall Side Leaning)
+靠墙转身 (Wall Turned Leaning)
+靠墙背部紧贴 (Wall Back Pressed)
+靠墙臀部紧贴 (Wall Hip Pressed)
+靠物侧面 (Object Side Leaning)
+靠物转身 (Object Turned Leaning)
+靠物背部 (Object Back Leaning)
+
+# 曲线展现 / Body Curves
+S曲线站 (S-Curve Standing)
+S曲线坐 (S-Curve Sitting)
+S曲线卧 (S-Curve Lying)
+C曲线姿态 (C-Curve Pose)
+前凸后翘 (Curves Forward Back)
+身体侧弯 (Body Side Bend)
+身体扭转 (Body Twist)
+前倾曲线 (Forward Curves)
+后仰曲线 (Back Curves)

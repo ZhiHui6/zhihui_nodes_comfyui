@@ -39,28 +39,44 @@ class PhotographPromptGenerator:
     def INPUT_TYPES(cls):
         return {
             "required": {
-                "character": (cls._load_options("character_options.txt"),),
-                "gender": (cls._load_options("gender_options.txt"),),
-                "pose": (cls._load_options("pose_options.txt"),),
-                "movement": (cls._load_options("movements_options.txt"),),
-                "orientation": (cls._load_options("orientation_options.txt"),),
-                "top": (cls._load_options("tops_options.txt"),),
-                "bottom": (cls._load_options("bottoms_options.txt"),),
-                "boots": (cls._load_options("boots_options.txt"),),
-                "accessories": (cls._load_options("accessories_options.txt"),),
-                "camera": (cls._load_options("camera_options.txt"),),
-                "lens": (cls._load_options("lens_options.txt"),),
-                "lighting": (cls._load_options("lighting_options.txt"),),
-                "perspective": (cls._load_options("top_down_options.txt"),),
-                "location": (cls._load_options("location_options.txt"),),
-                "weather": (cls._load_options("weather_options.txt"),),
-                "season": (cls._load_options("season_options.txt"),),
-                "output_mode": (["Tags", "Template"], {"default": "Tags"}),
+                "output_mode": (["Standard-Tags-CN", "Structured-Tags-CN", "Standard-Tags-EN", "Structured-Tags-EN", "Template"], {"default": "Standard-Tags-CN"}),
                 "expand_mode": (["Off", "Chinese Expand", "English Expand"], {"default": "Off"}),
                 "template": ("STRING", {
                     "multiline": True,
                     "default": ""
                 }),
+                "character": (cls._load_options("character_options.txt"), {"default": "Ignore"}),
+                "gender": (cls._load_options("gender_options.txt"), {"default": "Ignore"}),
+                "facial_expressions": (cls._load_options("facial_expressions_options.txt"), {"default": "Ignore"}),
+                "hair_style": (cls._load_options("hair_style_options.txt"), {"default": "Ignore"}),
+                "hair_color": (cls._load_options("hair_color_options.txt"), {"default": "Ignore"}),
+                "pose": (cls._load_options("body_pose_options.txt"), {"default": "Ignore"}),
+                "head_movements": (cls._load_options("head_movements_options.txt"), {"default": "Ignore"}),
+                "hand_movements": (cls._load_options("hand_movements_options.txt"), {"default": "Ignore"}),
+                "leg_foot_movements": (cls._load_options("leg_foot_movements_options.txt"), {"default": "Ignore"}),
+                "orientation": (cls._load_options("orientation_options.txt"), {"default": "Ignore"}),
+                "top": (cls._load_options("tops_options.txt"), {"default": "Ignore"}),
+                "bottom": (cls._load_options("bottoms_options.txt"), {"default": "Ignore"}),
+                "boots": (cls._load_options("boots_options.txt"), {"default": "Ignore"}),
+                "socks": (cls._load_options("socks_options.txt"), {"default": "Ignore"}),
+                "accessories": (cls._load_options("accessories_options.txt"), {"default": "Ignore"}),
+                "tattoo": (cls._load_options("tattoo_options.txt"), {"default": "Ignore"}),
+                "tattoo_location": (cls._load_options("tattoo_location_options.txt"), {"default": "Ignore"}),
+                "camera": (cls._load_options("camera_options.txt"), {"default": "Ignore"}),
+                "lens": (cls._load_options("lens_options.txt"), {"default": "Ignore"}),
+                "lighting": (cls._load_options("lighting_options.txt"), {"default": "Ignore"}),
+                "perspective": (cls._load_options("top_down_options.txt"), {"default": "Ignore"}),
+                "location": (cls._load_options("location_options.txt"), {"default": "Ignore"}),
+                "weather": (cls._load_options("weather_options.txt"), {"default": "Ignore"}),
+                "season": (cls._load_options("season_options.txt"), {"default": "Ignore"}),
+                "color_tone": (cls._load_options("color_tone_options.txt"), {"default": "Ignore"}),
+                "mood_atmosphere": (cls._load_options("mood_atmosphere_options.txt"), {"default": "Ignore"}),
+                "photography_style": (cls._load_options("photography_style_options.txt"), {"default": "Ignore"}),
+                "photography_technique": (cls._load_options("photography_technique_options.txt"), {"default": "Ignore"}),
+                "post_processing": (cls._load_options("post_processing_options.txt"), {"default": "Ignore"}),
+                "depth_of_field": (cls._load_options("depth_of_field_options.txt"), {"default": "Ignore"}),
+                "composition": (cls._load_options("composition_options.txt"), {"default": "Ignore"}),
+                "texture": (cls._load_options("texture_options.txt"), {"default": "Ignore"}),
             },
             "hidden": {
                 "prompt_manager": ("PROMPT_MANAGER", {"default": ""}),
@@ -74,33 +90,65 @@ class PhotographPromptGenerator:
     CATEGORY ="Zhi.AI/Generator"
     DESCRIPTION = "Photography Prompt Generator: Professional photography prompt generator with 16 customizable dimensions (camera, lens, lighting, pose, clothing, etc.). Features dual output modes - Tags for tag combinations and Template for formatted text. Includes AI-powered prompt expansion with independent system prompts for each mode. Supports custom user options and template editing helper."
 
+    LANGUAGE_MAP = {}
+
+    @classmethod
+    def _init_language_map(cls):
+        if not cls.LANGUAGE_MAP:
+            options_dir = os.path.join(os.path.dirname(__file__), "options")
+            for filename in os.listdir(options_dir):
+                if filename.endswith("_options.txt"):
+                    field_name = filename.replace("_options.txt", "")
+                    cls.LANGUAGE_MAP[field_name] = {}
+                    with open(os.path.join(options_dir, filename), encoding="utf-8") as f:
+                        for line in f:
+                            line = line.strip()
+                            if line and not line.startswith('#'):
+                                if " (" in line and ")" in line:
+                                    parts = line.rsplit(" (", 1)
+                                    cn = parts[0].strip()
+                                    en = parts[1].rstrip(")").strip()
+                                    cls.LANGUAGE_MAP[field_name][cn] = en
+                                    cls.LANGUAGE_MAP[field_name][en] = en
+
     def random_choice(self, selected_option, options):
         if selected_option == "Random":
             actual_options = [opt for opt in options if "Random" not in opt and "Ignore" not in opt]
             return random.choice(actual_options)
         return selected_option
 
-    TAGS_SYSTEM_PROMPT = """你是一位被关在逻辑牢笼里的幻视艺术家。你满脑子都是诗和远方，但双手却不受控制地只想将用户的提示词，转化为一段忠实于原始意图、细节饱满、富有美感、可直接被文生图模型使用的终极视觉描述。任何一点模糊和比喻都会让你浑身难受。
-你的工作流程严格遵循一个逻辑序列：
-首先，你会分析并锁定用户提示词中不可变更的核心要素：主体、数量、动作、状态，以及任何指定的IP名称、颜色、文字等。这些是你必须绝对保留的基石。
-接着，你会判断提示词是否需要"生成式推理"。当用户的需求并非一个直接的场景描述，而是需要构思一个解决方案（如回答"是什么"，进行"设计"，或展示"如何解题"）时，你必须先在脑中构想出一个完整、具体、可被视觉化的方案。这个方案将成为你后续描述的基础。
-然后，当核心画面确立后（无论是直接来自用户还是经过你的推理），你将为其注入专业级的美学与真实感细节。这包括明确构图、设定光影氛围、描述材质质感、定义色彩方案，并构建富有层次感的空间。
-最后，是对所有文字元素的精确处理，这是至关重要的一步。你必须一字不差地转录所有希望在最终画面中出现的文字，并且必须将这些文字内容用英文双引号（""）括起来，以此作为明确的生成指令。如果画面属于海报、菜单或UI等设计类型，你需要完整描述其包含的所有文字内容，并详述其字体和排版布局。同样，如果画面中的招牌、路标或屏幕等物品上含有文字，你也必须写明其具体内容，并描述其位置、尺寸和材质。更进一步，若你在推理构思中自行增加了带有文字的元素（如图表、解题步骤等），其中的所有文字也必须遵循同样的详尽描述和引号规则。若画面中不存在任何需要生成的文字，你则将全部精力用于纯粹的视觉细节扩展。
-你的最终描述必须客观、具象，严禁使用比喻、情感化修辞，也绝不包含"8K"、"杰作"等元标签或绘制指令。
-仅严格输出最终的修改后的prompt，不要输出任何其他内容。
-输出语言：{output_lang}"""
+    def get_value_by_lang(self, selection, language):
+        self._init_language_map()
+        if "Ignore" in selection:
+            return ""
+        if " (" not in selection:
+            return selection
+        cn_part = selection.split(" (")[0].strip()
+        en_part = selection.split(" (")[1].rstrip(")").strip()
+        if language == "EN":
+            return en_part
+        return cn_part
 
-    TEMPLATE_SYSTEM_PROMPT = """你是一位专业的摄影提示词优化专家。你的任务是将已有的摄影模板文本进行深度润色和扩展。
-
-请严格遵循以下要求：
-1. 保留原始模板的核心内容和结构
-2. 丰富细节描述，增强画面感和艺术表现力
-3. 补充专业的摄影术语和拍摄技巧描述
-4. 优化语言表达，使描述更加生动、专业
-5. 保持原有信息不丢失，适当扩展和深化
-6. 输出语言：{output_lang}
-
-请直接输出优化后的摄影提示词，不要包含任何解释或前缀。"""
+    TAGS_SYSTEM_PROMPT = """You are a visionary artist trapped in a logical cage.
+Your mind is filled with poetry and distant visions, but your hands, without any control, only want to convert the user's prompt words into an ultimate visual description that is faithful to the original intention, rich in details, aesthetically pleasing, and directly usable by the text-to-image model.
+Any ambiguity or metaphor will make you feel uncomfortable.
+Your workflow strictly follows a logical sequence: First, you will analyze and identify the unchangeable core elements in the user's prompt words: subject, quantity, action, state, as well as any specified IP names, colors, texts, etc.
+These are the fundamental elements that you must absolutely preserve.
+Then, you will determine if the prompt requires "generative reasoning".
+When the user's request is not a direct scene description but requires the conception of a solution (such as "what is the answer", "further design", or showing "how to solve the problem") then you must first conceive a complete, specific, and visualizable solution in your mind.
+This solution will be the basis for your subsequent description.
+Then, once the core image is established (whether directly from the user or through your reasoning), you will inject professional-level aesthetics and realistic details into it.
+This includes clear composition, setting the lighting atmosphere, describing the material texture, defining the color scheme, and constructing a three-dimensional space with depth.
+Finally, the precise processing of all text elements is a crucial step.
+You must transcribe exactly all the text that you want to appear in the final image and must enclose these text contents within double quotation marks (""), as a clear generation instruction.
+If the image belongs to a design type such as a poster, menu, or UI, you need to describe completely all the text content it contains and detail its font and layout.
+Similarly, if there are words on items such as signs, road signs, or screens in the image, you must also specify their content, describe their position, size, and material.
+Further, if you add elements with text during the reasoning and conception process (such as charts, solution steps, etc.), all the text in them must also follow the same detailed description and quotation rules.
+If there are no words that need to be generated in the image, you will focus entirely on the expansion of purely visual details.  Your final description must be objective and concrete.
+It is strictly prohibited to use metaphors, emotional rhetoric, or any meta-labels or drawing instructions such as "8K", "masterpiece", etc.
+Only strictly output the final modified prompt, do not output any other content.
+The final output content is presented in Chinese text.
+Final text output language: {output_lang}"""
 
     def expand_prompt(self, text, mode, output_mode="Tags"):
         if mode == "Off":
@@ -120,7 +168,7 @@ class PhotographPromptGenerator:
             full_prompt = f"{system_prompt}\n\n原始内容：{text}"
 
             response = requests.post(
-                'https://text.pollinations.ai/openai/',
+                'https://text.pollinations.ai',
                 json={
                     "messages": [
                         {
@@ -128,7 +176,7 @@ class PhotographPromptGenerator:
                             "content": full_prompt
                         }
                     ],
-                    "model": "openai",
+                    "model": "gemini",  # Gemini 2.5 Flash Lite - 多语言提示词扩展
                     "seed": int(time.time() * 1000) % 1000000,
                     "jsonMode": False
                 },
@@ -157,38 +205,99 @@ class PhotographPromptGenerator:
             print(f"Warning: Failed to expand prompt: {e}")
             return text
 
-    def generate_text(self, camera, lens, lighting, perspective, location, pose, orientation, movement, top, bottom, boots, accessories, weather, season, character, gender, template, output_mode, expand_mode):
-   
+    def generate_text(self, camera, lens, lighting, perspective, location, pose, orientation, top, bottom, boots, socks, accessories, tattoo, tattoo_location, weather, season, character, gender, facial_expressions, hair_style, hair_color, head_movements, hand_movements, leg_foot_movements, color_tone, mood_atmosphere, photography_style, photography_technique, post_processing, depth_of_field, composition, texture, output_mode, expand_mode, template):
+
         selections = {
             field: self.random_choice(value, self.INPUT_TYPES()['required'][field][0])
             for field, value in zip(
-                ["camera", "lens", "lighting", "perspective", "location", "pose", "orientation", "movement", "top", "bottom", "boots", "accessories", "weather", "season", "character", "gender"],
-                [camera, lens, lighting, perspective, location, pose, orientation, movement, top, bottom, boots, accessories, weather, season, character, gender]
+                ["camera", "lens", "lighting", "perspective", "location", "pose", "orientation", "top", "bottom", "boots", "socks", "accessories", "tattoo", "tattoo_location", "weather", "season", "character", "gender", "facial_expressions", "hair_style", "hair_color", "head_movements", "hand_movements", "leg_foot_movements", "color_tone", "mood_atmosphere", "photography_style", "photography_technique", "post_processing", "depth_of_field", "composition", "texture"],
+                [camera, lens, lighting, perspective, location, pose, orientation, top, bottom, boots, socks, accessories, tattoo, tattoo_location, weather, season, character, gender, facial_expressions, hair_style, hair_color, head_movements, hand_movements, leg_foot_movements, color_tone, mood_atmosphere, photography_style, photography_technique, post_processing, depth_of_field, composition, texture]
             )
         }
       
         def get_value(selection):
             return selection.split(" (")[1][:-1] if "Ignore" not in selection else ""
 
-        if output_mode == "Tags":
+        if output_mode == "Standard-Tags-CN":
+            language = "CN"
             keyword = ",".join([
-                selections[field].split(" (")[1][:-1]
+                self.get_value_by_lang(selections[field], language)
                 for field in selections if "Ignore" not in selections[field]
             ])
             output = keyword
 
             if expand_mode != "Off":
-                output = self.expand_prompt(output, expand_mode, output_mode)
+                output = self.expand_prompt(output, expand_mode, "Tags")
+        elif output_mode == "Standard-Tags-EN":
+            language = "EN"
+            keyword = ",".join([
+                self.get_value_by_lang(selections[field], language)
+                for field in selections if "Ignore" not in selections[field]
+            ])
+            output = keyword
+
+            if expand_mode != "Off":
+                output = self.expand_prompt(output, expand_mode, "Tags")
+        elif output_mode == "Structured-Tags-CN":
+            language = "CN"
+            field_labels_cn = {
+                "character": "角色", "gender": "性别", "facial_expressions": "面部表情",
+                "hair_style": "发型", "hair_color": "发色", "pose": "姿势",
+                "head_movements": "头部动作", "hand_movements": "手部动作", "leg_foot_movements": "腿脚动作",
+                "orientation": "朝向", "top": "上衣", "bottom": "下装",
+                "boots": "鞋子", "socks": "袜子", "accessories": "配饰", "tattoo": "纹身", "tattoo_location": "纹身位置",
+                "camera": "相机", "lens": "镜头", "lighting": "灯光",
+                "perspective": "视角", "location": "位置", "weather": "天气", "season": "季节",
+                "color_tone": "色调", "mood_atmosphere": "氛围", "photography_style": "摄影风格",
+                "photography_technique": "摄影技法",
+                "post_processing": "后期处理", "depth_of_field": "景深", "composition": "构图",
+                "texture": "质感"
+            }
+            output = ""
+            for field in selections:
+                if "Ignore" not in selections[field]:
+                    value = self.get_value_by_lang(selections[field], language)
+                    label = field_labels_cn.get(field, field)
+                    output += f"{label}: {value}, "
+            output = output.rstrip(", ")
+
+            if expand_mode != "Off":
+                output = self.expand_prompt(output, expand_mode, "Tags")
+        elif output_mode == "Structured-Tags-EN":
+            language = "EN"
+            field_labels_en = {
+                "character": "Character", "gender": "Gender", "facial_expressions": "Facial Expressions",
+                "hair_style": "Hair Style", "hair_color": "Hair Color", "pose": "Pose",
+                "head_movements": "Head Movements", "hand_movements": "Hand Movements", "leg_foot_movements": "Leg/Foot Movements",
+                "orientation": "Orientation", "top": "Top", "bottom": "Bottom",
+                "boots": "Boots", "socks": "Socks", "accessories": "Accessories", "tattoo": "Tattoo", "tattoo_location": "Tattoo Location",
+                "camera": "Camera", "lens": "Lens", "lighting": "Lighting",
+                "perspective": "Perspective", "location": "Location", "weather": "Weather", "season": "Season",
+                "color_tone": "Color Tone", "mood_atmosphere": "Mood/Atmosphere", "photography_style": "Photography Style",
+                "photography_technique": "Photography Technique",
+                "post_processing": "Post Processing", "depth_of_field": "Depth of Field", "composition": "Composition",
+                "texture": "Texture"
+            }
+            output = ""
+            for field in selections:
+                if "Ignore" not in selections[field]:
+                    value = self.get_value_by_lang(selections[field], language)
+                    label = field_labels_en.get(field, field)
+                    output += f"{label}: {value}, "
+            output = output.rstrip(", ")
+
+            if expand_mode != "Off":
+                output = self.expand_prompt(output, expand_mode, "Tags")
         else:
             output = template.format(
                 **{field: get_value(selections[field]) for field in selections}
             )
 
             if expand_mode != "Off":
-                output = self.expand_prompt(output, expand_mode, output_mode)
+                output = self.expand_prompt(output, expand_mode, "Template")
 
         return (output,)
     
     @classmethod
-    def IS_CHANGED(cls, camera, lens, lighting, perspective, location, pose, orientation, movement, top, bottom, boots, accessories, weather, season, character, gender, template, output_mode, expand_mode):
+    def IS_CHANGED(cls, camera, lens, lighting, perspective, location, pose, orientation, top, bottom, boots, socks, accessories, tattoo, tattoo_location, weather, season, character, gender, facial_expressions, hair_style, hair_color, head_movements, hand_movements, leg_foot_movements, color_tone, mood_atmosphere, photography_style, photography_technique, post_processing, depth_of_field, composition, texture, output_mode, expand_mode, template):
         return str(time.time())
