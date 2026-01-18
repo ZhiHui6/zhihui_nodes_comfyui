@@ -128,7 +128,7 @@
     },
     "ImageAspectRatio": {
         "title": "图像宽高比",
-        "description": "智能图像宽高比设置节点，支持Qwen、Flux、Wan、SDXL等多种模型的预设尺寸，可快速选择常用比例或自定义尺寸",
+        "description": "智能图像宽高比设置节点，支持为诸如 Qwen、Flux、Wan、SDXL 等多种模型预设尺寸，还能快速选择常见的比例或自定义尺寸。", 
         "widgets": {
             "preset_mode": "预设模式",
             "aspect_ratio": "宽高比",

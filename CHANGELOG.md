@@ -1,4 +1,11 @@
 # 更新日志
+## 1.0.2 2026-1-18
+- 更新图像宽高比节点(ImageAspectRatio)：添加 Flux.2 和 Flux2 klein 预设尺寸选项
+- 优化摄影提示词生成器节点(PhotographPromptGenerator)：优化了相机和镜头选项列表
+<br>
+
+- Updated ImageAspectRatio node: added Flux.2 and Flux2 klein preset size options  
+- Refined PhotographPromptGenerator node: improved camera and lens option lists
 
 ## 1.0.1 2026-1-11
 - 升级摄影提示词生成器节点(PhotographPromptGenerator)：

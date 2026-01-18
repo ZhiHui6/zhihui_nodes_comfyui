@@ -18,6 +18,66 @@ class ImageAspectRatio:
          "3:2(1216x832)": (1216, 832),
          "2:3(832x1216)": (832, 1216),
     }
+
+    PRESETS_FLUX2 = {
+         "1:1·S(1024x1024)": (1024, 1024),
+         "1:1·M(1280x1280)": (1280, 1280),
+         "1:1·L(1536x1536)": (1536, 1536),
+
+         "16:9·S(1344x768)": (1344, 768),
+         "16:9·M(1728x960)": (1728, 960),
+         "16:9·L(2048x1152)": (2048, 1152),
+
+         "9:16·S(768x1344)": (768, 1344),
+         "9:16·M(960x1728)": (960, 1728),
+         "9:16·L(1152x2048)": (1152, 2048),
+
+         "4:3·S(1152x864)": (1152, 864),
+         "4:3·M(1408x1056)": (1408, 1056),
+         "4:3·L(1728x1296)": (1728, 1296),
+
+         "3:4·S(864x1152)": (864, 1152),
+         "3:4·M(1088x1472)": (1088, 1472),
+         "3:4·L(1280x1728)": (1280, 1728),
+
+         "3:2·S(1216x832)": (1216, 832),
+         "3:2·M(1536x1024)": (1536, 1024),
+         "3:2·L(1920x1280)": (1920, 1280),
+
+         "2:3·S(832x1216)": (832, 1216),
+         "2:3·M(1024x1536)": (1024, 1536),
+         "2:3·L(1280x1920)": (1280, 1920),
+    }
+
+    PRESETS_FLUX2_KLEIN = {
+         "1:1·S(768x768)": (768, 768),
+         "1:1·M(896x896)": (896, 896),
+         "1:1·L(1024x1024)": (1024, 1024),
+
+         "16:9·S(1024x576)": (1024, 576),
+         "16:9·M(1152x640)": (1152, 640),
+         "16:9·L(1344x768)": (1344, 768),
+
+         "9:16·S(576x1024)": (576, 1024),
+         "9:16·M(640x1152)": (640, 1152),
+         "9:16·L(768x1344)": (768, 1344),
+
+         "4:3·S(768x576)": (768, 576),
+         "4:3·M(960x704)": (960, 704),
+         "4:3·L(1024x768)": (1024, 768),
+
+         "3:4·S(576x768)": (576, 768),
+         "3:4·M(704x960)": (704, 960),
+         "3:4·L(768x1024)": (768, 1024),
+
+         "3:2·S(960x640)": (960, 640),
+         "3:2·M(1152x768)": (1152, 768),
+         "3:2·L(1344x896)": (1344, 896),
+
+         "2:3·S(640x960)": (640, 960),
+         "2:3·M(768x1152)": (768, 1152),
+         "2:3·L(896x1344)": (896, 1344),
+    }
     
     PRESETS_WAN = {
          "1:1(1024x1024)": (1024, 1024),
@@ -82,6 +142,8 @@ class ImageAspectRatio:
         all_aspect_ratios = list(set(
             list(s.PRESETS_QWEN.keys()) +
             list(s.PRESETS_FLUX.keys()) +
+            list(s.PRESETS_FLUX2.keys()) +
+            list(s.PRESETS_FLUX2_KLEIN.keys()) +
             list(s.PRESETS_WAN.keys()) +
             list(s.PRESETS_SD.keys()) +
             list(s.PRESETS_ZIMAGE.keys())
@@ -89,7 +151,7 @@ class ImageAspectRatio:
 
         return {
             "required": {
-                "preset_mode": (["Qwen image", "Flux", "Wan", "SDXL", "Z-image", "Custom Size"], {"default": "Z-image"}),
+                "preset_mode": (["Qwen image", "Flux", "Flux.2", "Flux2 klein", "Wan", "SDXL", "Z-image", "Custom Size"], {"default": "Z-image"}),
                 "aspect_ratio": (all_aspect_ratios, {"default": "1:1(1328x1328)"}),
             },
             "optional": {
@@ -117,6 +179,8 @@ class ImageAspectRatio:
         preset_maps = {
             "Qwen image": self.PRESETS_QWEN,
             "Flux": self.PRESETS_FLUX,
+            "Flux.2": self.PRESETS_FLUX2,
+            "Flux2 klein": self.PRESETS_FLUX2_KLEIN,
             "Wan": self.PRESETS_WAN,
             "SDXL": self.PRESETS_SD,
             "Z-image": self.PRESETS_ZIMAGE

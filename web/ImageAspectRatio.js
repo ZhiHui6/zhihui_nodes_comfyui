@@ -31,6 +31,67 @@ app.registerExtension({
                     "3:2(1216x832)",
                     "2:3(832x1216)",
                 ];
+
+                const FLUX2_PRESETS = [
+                    "1:1·S(1024x1024)",
+                    "1:1·M(1280x1280)",
+                    "1:1·L(1536x1536)",
+
+                    "16:9·S(1344x768)",
+                    "16:9·M(1728x960)",
+                    "16:9·L(2048x1152)",
+
+                    "9:16·S(768x1344)",
+                    "9:16·M(960x1728)",
+                    "9:16·L(1152x2048)",
+
+                    "4:3·S(1152x864)",
+                    "4:3·M(1408x1056)",
+                    "4:3·L(1728x1296)",
+
+                    "3:4·S(864x1152)",
+                    "3:4·M(1088x1472)",
+                    "3:4·L(1280x1728)",
+
+                    "3:2·S(1216x832)",
+                    "3:2·M(1536x1024)",
+                    "3:2·L(1920x1280)",
+
+                    "2:3·S(832x1216)",
+                    "2:3·M(1024x1536)",
+                    "2:3·L(1280x1920)",
+                ];
+
+                const FLUX2_KLEIN_PRESETS = [
+                    "1:1·S(768x768)",
+                    "1:1·M(896x896)",
+                    "1:1·L(1024x1024)",
+
+                    "16:9·S(1024x576)",
+                    "16:9·M(1152x640)",
+                    "16:9·L(1344x768)",
+
+                    "9:16·S(576x1024)",
+                    "9:16·M(640x1152)",
+                    "9:16·L(768x1344)",
+
+                    "4:3·S(768x576)",
+                    "4:3·M(960x704)",
+                    "4:3·L(1024x768)",
+
+                    "3:4·S(576x768)",
+                    "3:4·M(704x960)",
+                    "3:4·L(768x1024)",
+
+                    "3:2·S(960x640)",
+                    "3:2·M(1152x768)",
+                    "3:2·L(1344x896)",
+
+                    "2:3·S(640x960)",
+                    "2:3·M(768x1152)",
+                    "2:3·L(896x1344)",
+                ];
+
                 const WAN_PRESETS = [
                     "1:1(1024x1024)",
                     "16:9(1280x720)",
@@ -89,6 +150,7 @@ app.registerExtension({
                     "9:21(864x2016)",
                 ];
 
+
                 const setComboOptions = (widget, values) => {
                     if (!widget) return;
                     if (Array.isArray(widget.options)) {
@@ -100,18 +162,18 @@ app.registerExtension({
                     }
                 };
 
-                const getComboOptions = (widget) => {
-                    if (!widget) return [];
-                    if (Array.isArray(widget.options)) return widget.options;
-                    if (widget.options && Array.isArray(widget.options.values)) return widget.options.values;
-                    return [];
-                };
 
                 const applyAspectOptionsByMode = (mode, aspectRatioWidget) => {
                     let presets;
                     switch (mode) {
                         case "Flux":
                             presets = FLUX_PRESETS;
+                            break;
+                        case "Flux.2":
+                            presets = FLUX2_PRESETS;
+                            break;
+                        case "Flux2 klein":
+                            presets = FLUX2_KLEIN_PRESETS;
                             break;
                         case "Wan":
                             presets = WAN_PRESETS;
