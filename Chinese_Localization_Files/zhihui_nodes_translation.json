@@ -899,5 +899,21 @@
         "outputs": {
             "translation_result": "翻译结果"
         }
+    },
+    "ResourceCleaner": {
+        "title": "资源清理器",
+        "description": "资源清理节点：提供三个独立的清理选项，可选择性清理内存(RAM)、显存(VRAM)和缓存。每个清理功能都配备独立开关，允许用户根据需要执行特定类型的资源释放，彻底释放系统资源。",
+        "widgets": {
+            "clear_ram": "清理内存",
+            "clear_vram": "清理显存",
+            "clear_cache": "清理缓存"
+        },
+        "inputs": {
+            "any_input": "任意输入"
+        },
+        "outputs": {
+            "passthrough": "透传输出",
+            "clean_report": "清理报告"
+        }
     }
 }

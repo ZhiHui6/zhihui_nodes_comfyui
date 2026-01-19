@@ -2,7 +2,7 @@
 
 # 🎨 Zhi.AI ComfyUI Node Pack 
 
-Latest version: `v1.0.2` (2026-1-18), For complete changelog: See <a href="CHANGELOG.md">`CHANGELOG.md`</a>   
+Latest version: `v1.0.3` (2026-1-19), For complete changelog: See <a href="CHANGELOG.md">`CHANGELOG.md`</a>   
 
 ## 📖 Project Introduction
 
@@ -878,6 +878,18 @@ Local file browsing and selection tool, providing an intuitive file management i
 <img src="images/本地文件画廊.jpg" alt="Local File Gallery" width="45%"/>
 </a>
 </div>
+</td>
+</tr>
+<tr>
+<td><b>Resource Cleaner</b><br><code>ResourceCleaner</code></td>
+<td>
+
+System resource cleanup tool providing independent controls for clearing RAM, VRAM, and cache, allowing selective release of system resources.
+
+<b>Features</b>:
+- <b>Independent Control</b>: Three cleanup functions equipped with independent switches, can be used individually or in combination
+- <b>Detailed Report</b>: Outputs detailed report of the cleanup process for monitoring resource release
+
 </td>
 </tr>
 <tr>

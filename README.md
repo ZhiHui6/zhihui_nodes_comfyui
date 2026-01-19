@@ -2,7 +2,7 @@
 
 # 🎨 潪AI ComfyUI 节点包 
 
-最新版本：`v1.0.2`（2026-1-18），完整更新日志：查看<a href="CHANGELOG.md">`CHANGELOG.md`</a>
+最新版本：`v1.0.3`（2026-1-19），完整更新日志：查看<a href="CHANGELOG.md">`CHANGELOG.md`</a>
 
 ## 📖 项目介绍
 
@@ -880,6 +880,18 @@
 <img src="images/本地文件画廊.jpg" alt="本地文件画廊" width="45%"/>
 </a>
 </div>
+</td>
+</tr>
+<tr>
+<td><b>资源清理器</b><br><code>ResourceCleaner</code></td>
+<td>
+
+系统资源清理工具，提供独立的内存(RAM)、显存(VRAM)和缓存清理控制，可选择性释放系统资源。
+
+<b>特点</b>：
+- <b>独立控制</b>：三个清理功能配备独立开关，可单独或组合使用
+- <b>详细报告</b>：输出清理过程的详细报告，便于监控资源释放情况
+
 </td>
 </tr>
 <tr>

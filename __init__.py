@@ -51,6 +51,7 @@ from .Nodes.Sa2VA.Sa2VAAdvanced import Sa2VAAdvanced
 from .Nodes.Sa2VA.Sa2VASegmentationPreset import Sa2VASegmentationPreset
 from .Nodes.Batch_loading_of_images import BatchLoadingOfImages
 from .Nodes.PhotographPromptGen.zhihui_api import *
+from .Nodes.ResourceCleaner import ResourceCleaner
 
 import os
 
@@ -106,6 +107,7 @@ NODE_CLASS_MAPPINGS = {
     "Sa2VASegmentationPreset": Sa2VASegmentationPreset,
     "BatchLoadingOfImages": BatchLoadingOfImages,
     "Qwen3VLAPI": Qwen3VLAPI,
+    "ResourceCleaner": ResourceCleaner,
 }
 
 NODE_DISPLAY_NAME_MAPPINGS = {
@@ -160,6 +162,7 @@ NODE_DISPLAY_NAME_MAPPINGS = {
     "Sa2VASegmentationPreset": "Sa2VA Segmentation Preset",
     "BatchLoadingOfImages": "Batch Loading Of Images",
     "Qwen3VLAPI": "Qwen3-VL API",
+    "ResourceCleaner": "Resource Cleaner",
 }
 
 WEB_DIRECTORY = os.path.join(os.path.dirname(os.path.abspath(__file__)), "web")
