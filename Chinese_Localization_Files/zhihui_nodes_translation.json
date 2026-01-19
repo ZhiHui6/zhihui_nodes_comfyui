@@ -913,7 +913,7 @@
         },
         "outputs": {
             "passthrough": "透传输出",
-            "clean_report": "清理报告"
+            "cleaning_report": "清理报告"
         }
     }
 }
