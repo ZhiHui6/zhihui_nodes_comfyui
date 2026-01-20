@@ -2,7 +2,7 @@
 
 # 🎨 Zhi.AI ComfyUI Node Pack 
 
-Latest version: `v1.0.3` (2026-1-19), For complete changelog: See <a href="CHANGELOG.md">`CHANGELOG.md`</a>   
+Latest version: `v1.0.4` (2026-1-21), For complete changelog: See <a href="CHANGELOG.md">`CHANGELOG.md`</a>   
 
 ## 📖 Project Introduction
 
@@ -380,6 +380,18 @@ A comprehensive prompt generator written based on WanXiang 2.2 official document
 <tr>
 <th width="30%">Node Name</th>
 <th>Function Description</th>
+</tr>
+<tr>
+<td><b>Get Image Sizes</b><br><code>GetImageSizes</code></td>
+<td>Extracts the width and height information of the input image and displays the size preview in real-time on the node. Supports multiple image format inputs and provides accurate pixel size information.
+
+<br>
+<div align="left">
+<a href="images/Get Image Sizes.jpg" target="_blank">
+<img src="images/Get Image Sizes.jpg" alt="Get Image Sizes" width="45%"/>
+</a>
+</div>
+</td>
 </tr>
 <tr>
 <td><b>Image Aspect Ratio Settings</b><br><code>ImageAspectRatio</code></td>
@@ -890,6 +902,25 @@ System resource cleanup tool providing independent controls for clearing RAM, VR
 - <b>Independent Control</b>: Three cleanup functions equipped with independent switches, can be used individually or in combination
 - <b>Detailed Report</b>: Outputs detailed report of the cleanup process for monitoring resource release
 
+</td>
+</tr>
+<tr>
+<td><b>Reserved VRAM Setter</b><br><code>ReservedVRAMSetter</code></td>
+<td>
+
+Professional GPU VRAM reservation management tool for controlling ComfyUI's VRAM usage strategy, effectively preventing Out-of-Memory (OOM) errors and improving workflow stability. Supports both manual and automatic modes, with the automatic mode intelligently calculating appropriate VRAM reservation amounts based on current GPU usage.
+
+<b>Features</b>:
+- <b>Dual Mode Support</b>: Manual mode sets fixed VRAM reservation, automatic mode intelligently adjusts based on current GPU usage
+- <b>Smart Cleanup</b>: Supports automatic GPU VRAM cleanup before setting, releasing unused resources
+- <b>Automatic Limits</b>: Automatic mode can set maximum reservation limits to prevent excessive reservations affecting other applications
+- <b>Seed Control</b>: Built-in random seed management to ensure workflow consistency
+- <b>Real-time Feedback</b>: Provides detailed VRAM setting logs for debugging and optimization
+
+<br>
+<div align="left">
+<img src="images/Reserved VRAM Setter.jpg" alt="Reserved VRAM Setter" width="45%"/>
+</div>
 </td>
 </tr>
 <tr>

@@ -141,6 +141,17 @@
             "height": "高度"
         }
     },
+    "GetImageSizes": {
+        "title": "获取图像尺寸",
+        "description": "获取图像尺寸：从输入图像中提取宽度和高度，并在节点下方实时显示尺寸预览。",
+        "inputs": {
+            "image": "图像"
+        },
+        "outputs": {
+            "width": "宽度",
+            "height": "高度"
+        }
+    },
     "ImageScaler": {
         "title": "图像缩放器",
         "description": "图像缩放器：根据长边或短边智能缩放图像到指定尺寸。支持多种插值方法（最近邻、双线性、双三次等），在调整尺寸的同时保持图像比例。适用于图像预处理、尺寸标准化和批量处理。",
@@ -914,6 +925,25 @@
         "outputs": {
             "passthrough": "透传输出",
             "cleaning_report": "清理报告"
+        }
+    },
+    "ReservedVRAMSetter": {
+        "title": "预留显存设置器",
+        "description": "预留显存设置器：用于设置GPU显存预留量，支持手动模式和自动模式。手动模式直接设置固定显存预留值，自动模式根据当前GPU使用情况动态调整预留值。支持显存清理功能，在设置前自动清理已使用的显存，有助于优化显存管理。",
+        "widgets": {
+            "reserved": "预留显存",
+            "mode": "模式",
+            "seed": "随机种子",
+            "auto_max_reserved": "自动最大预留显存",
+            "clean_gpu_before": "前置GPU显存清理"
+        },
+        "inputs": {
+            "anything": "任意输入"
+        },
+        "outputs": {
+            "output": "输出",
+            "SEED": "随机种子",
+            "Reserved(GB)": "预留显存(GB)"
         }
     }
 }

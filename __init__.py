@@ -50,8 +50,10 @@ from .Nodes.Qwen3VL_API.Qwen3VLAPI import Qwen3VLAPI
 from .Nodes.Sa2VA.Sa2VAAdvanced import Sa2VAAdvanced
 from .Nodes.Sa2VA.Sa2VASegmentationPreset import Sa2VASegmentationPreset
 from .Nodes.Batch_loading_of_images import BatchLoadingOfImages
+from .Nodes.GetImageSizes import GetImageSizes
 from .Nodes.PhotographPromptGen.zhihui_api import *
 from .Nodes.ResourceCleaner import ResourceCleaner
+from .Nodes.ReservedVRAMSetter import ReservedVRAMSetter
 
 import os
 
@@ -88,6 +90,7 @@ NODE_CLASS_MAPPINGS = {
     "PathSwitch": PathSwitch,
     "LocalFileGallery": LocalFileGallery,
     "ImageAspectRatio": ImageAspectRatio,
+    "GetImageSizes": GetImageSizes,
     "PreviewOrCompareImages": PreviewOrCompareImages,
     "PauseWorkflow": PauseWorkflow,
     "TextEditorWithContinue": TextEditorWithContinue,
@@ -108,6 +111,7 @@ NODE_CLASS_MAPPINGS = {
     "BatchLoadingOfImages": BatchLoadingOfImages,
     "Qwen3VLAPI": Qwen3VLAPI,
     "ResourceCleaner": ResourceCleaner,
+    "ReservedVRAMSetter": ReservedVRAMSetter,
 }
 
 NODE_DISPLAY_NAME_MAPPINGS = {
@@ -142,6 +146,7 @@ NODE_DISPLAY_NAME_MAPPINGS = {
     "LatentSwitchDualMode": "Latent Switch Dual Mode",
     "LocalFileGallery": "Local File Gallery",
     "ImageAspectRatio": "Image Aspect Ratio",
+    "GetImageSizes": "Get Image Sizes",
     "PreviewOrCompareImages": "Preview or Compare Images",
     "PauseWorkflow": "Pause Workflow",
     "TextEditorWithContinue": "Text Editor with Continue",
@@ -163,6 +168,7 @@ NODE_DISPLAY_NAME_MAPPINGS = {
     "BatchLoadingOfImages": "Batch Loading Of Images",
     "Qwen3VLAPI": "Qwen3-VL API",
     "ResourceCleaner": "Resource Cleaner",
+    "ReservedVRAMSetter": "Reserved VRAM Setter",
 }
 
 WEB_DIRECTORY = os.path.join(os.path.dirname(os.path.abspath(__file__)), "web")

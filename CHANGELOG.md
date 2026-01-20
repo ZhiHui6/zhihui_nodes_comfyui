@@ -1,5 +1,12 @@
 # 更新日志
 
+## 1.0.4 2026-1-21
+- 新增 获取图像尺寸 节点(GetImageSize)：用于获取图像的宽度和高度。
+- 集成 预留显存设置器 节点(VRAMPreserver)：用于在运行时预留显存，避免显存不足导致的运行失败。
+  <br>
+- Added GetImageSize node: retrieves the width and height of an image.
+- Integrated VRAMPreserver node: reserves VRAM at runtime to prevent failures caused by insufficient memory.
+
 ## 1.0.3 2026-1-19
 - 新增资源清理节点(ResourceCleaner)：用于清理ComfyUI运行过程中产生的缓存文件、内存占用、显存占用，释放系统资源。
     <br>

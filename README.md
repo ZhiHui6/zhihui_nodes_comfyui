@@ -2,7 +2,7 @@
 
 # 🎨 潪AI ComfyUI 节点包 
 
-最新版本：`v1.0.3`（2026-1-19），完整更新日志：查看<a href="CHANGELOG.md">`CHANGELOG.md`</a>
+最新版本：`v1.0.4`（2026-1-21），完整更新日志：查看<a href="CHANGELOG.md">`CHANGELOG.md`</a>
 
 ## 📖 项目介绍
 
@@ -381,6 +381,18 @@
 <tr>
 <th width="30%">节点名称</th>
 <th>功能描述</th>
+</tr>
+<tr>
+<td><b>获取图像尺寸</b><br><code>GetImageSizes</code></td>
+<td>提取输入图像的宽度和高度信息，并在节点上实时显示尺寸预览。支持多种图像格式输入，提供准确的像素尺寸信息。
+
+<br>
+<div align="left">
+<a href="images/Get Image Sizes.jpg" target="_blank">
+<img src="images/Get Image Sizes.jpg" alt="Get Image Sizes" width="45%"/>
+</a>
+</div>
+</td>
 </tr>
 <tr>
 <td><b>图像宽高比设置</b><br><code>ImageAspectRatio</code></td>
@@ -906,6 +918,24 @@
 - <b>状态管理</b>：智能管理每个节点实例的暂停状态
 - <b>异常处理</b>：取消时抛出中断异常，安全终止工作流
 
+</td>
+</tr>
+<tr>
+<td><b>预留显存设置器</b><br><code>ReservedVRAMSetter</code></td>
+<td>
+
+专业的GPU显存预留管理工具，用于控制ComfyUI的显存使用策略，有效防止显存溢出(OOM)错误，提升工作流稳定性。支持手动和自动两种模式，自动模式可根据当前GPU使用情况智能计算合适的预留显存量。
+
+<b>特点</b>：
+- <b>双模式支持</b>：手动模式固定设置预留显存量，自动模式根据当前GPU使用情况智能调整
+- <b>智能清理</b>：支持在设置前自动清理GPU显存，释放无用资源
+- <b>自动限制</b>：自动模式下可设置最大预留上限，防止过度预留影响其他应用
+- <b>种子控制</b>：内置随机种子管理，确保工作流的一致性
+
+<br>
+<div align="left">
+<img src="images/Reserved VRAM Setter.jpg" alt="预留显存设置器" width="45%"/>
+</div>
 </td>
 </tr>
 </table>
