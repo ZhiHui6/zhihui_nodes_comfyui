@@ -18,3 +18,6 @@ triton-windows; sys_platform == 'win32'
 triton; sys_platform == 'linux'
 openai>=1.0.0
 nvidia-ml-py
+timm>=0.9.16
+sentencepiece
+einops

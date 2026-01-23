@@ -2,11 +2,11 @@
 
 # 🎨 Zhi.AI ComfyUI Node Pack 
 
-Latest version: `v1.0.4` (2026-1-21), For complete changelog: See <a href="CHANGELOG.md">`CHANGELOG.md`</a>   
+Latest version: `v1.0.5` (2026-1-23), For complete changelog: See <a href="CHANGELOG.md">`CHANGELOG.md`</a>   
 
 ## 📖 Project Introduction
 
-This is a ComfyUI custom node tool collection carefully created by <span style="color: red;">**Binity**</span>, designed to provide users with a series of practical and efficient nodes to enhance and extend ComfyUI's functionality. This node collection contains 30+ functional nodes, covering text processing, prompt optimization, image processing, translation tools, music creation assistance, Latent processing, and other aspects, providing comprehensive support for your AI creation.
+This is a ComfyUI custom node tool collection carefully created by <span style="color: red;">**Binity**</span>, designed to provide users with a series of practical and efficient nodes to enhance and extend ComfyUI's functionality. This node collection contains 55+ functional nodes, covering text processing, prompt optimization, image processing, translation tools, music creation assistance, AI vision understanding, Latent processing, and other aspects, providing comprehensive support for your AI creation.
 
 ***If this project helps you, please give us a ⭐Star! Your support is our motivation for continuous improvement.***
 
@@ -52,12 +52,6 @@ Provides dedicated Chinese localization files, which can be used with the ComfyU
 <td><b>WanXiang Video Prompt Generator</b><br><code>WanPromptGenerator</code></td>
 <td>Prompt Processing</td>
 <td>A comprehensive prompt generator written based on WanXiang 2.2 official documentation, supporting both custom and preset combination methods, covering 17 professional dimensions of video prompts including camera movement, scenes, lighting, and composition.</td>
-</tr>
-
-<tr>
-<td><b>Kontext Presets Plus</b><br><code>KontextPresetsPlus</code></td>
-<td>Prompt Processing</td>
-<td>A Kontext image editing preset tool with 20+ built-in creative presets, supporting user-defined preset extensions and integrated multiple LLM models for free online intelligent expansion.</td>
 </tr>
 
 <tr>
@@ -734,6 +728,35 @@ Dual-channel path switcher, supporting both manual and automatic switching modes
 </tr>
 
 <tr>
+<td><b>Florence2 Plus</b><br><code>Florence2Plus</code></td>
+<td>
+Professional image analysis node based on Microsoft's Florence-2 vision understanding model, supporting multiple task types and batch processing functionality.
+
+<b>Core Features</b>:
+- <b>Multi-Model Support</b>: Supports Microsoft Florence-2 base and large models, as well as MiaoshouAI PromptGen series
+- <b>Rich Task Types</b>: Supports 7 tasks including title generation, detailed description, tag generation, mixed mode, and analysis mode
+- <b>Batch Processing</b>: Supports single image, multiple images, and entire folder batch processing
+- <b>Performance Optimization</b>: Supports fp16/bf16/fp32 precision, flash_attention_2/sdpa/eager attention mechanisms
+- <b>Intelligent Memory Management</b>: Provides three memory management modes: unload to CPU, full unload, and keep loaded
+
+<b>Usage Recommendations</b>:
+- Use Microsoft models for basic tasks, MiaoshouAI PromptGen models for complex tasks
+- Use bf16 for best quality with sufficient VRAM, fp16 for balanced performance with limited VRAM
+- Choose appropriate memory management mode based on usage frequency
+
+<br>
+<div align="left">
+<a href="images/Florence2 Plus1.jpg" target="_blank">
+<img src="images/Florence2 Plus1.jpg" alt="Florence2 Plus" width="45%"/>
+</a>
+<a href="images/Florence2 Plus2.jpg" target="_blank">
+<img src="images/Florence2 Plus2.jpg" alt="Florence2 Plus" width="45%"/>
+</a>
+</div>
+</td>
+</tr>
+
+<tr>
 <td><b>Sa2VA Advanced</b><br><code>Sa2VAAdvanced</code></td>
 <td>
 Professional-grade image segmentation node based on ByteDance's Sa2VA model, providing precise intelligent segmentation functionality, supporting multiple model versions and quantization configurations. Controls segmentation regions through natural language prompts, achieving precise segmentation of specific objects in images, outputting high-quality mask data.
@@ -871,27 +894,7 @@ Multi-platform translation node, supporting Baidu, Alibaba Cloud, Youdao, Zhipu 
 </td>
 </tr>
 
-<tr>
-<td><b>Local File Gallery</b><br><code>LocalFileGallery</code></td>
-<td>
 
-Local file browsing and selection tool, providing an intuitive file management interface, supporting preview and selection of image and text files.
-
-<b>Supported Formats</b>:
-- <b>Image Formats</b>: jpg, jpeg, png, bmp, gif, webp
-- <b>Text Formats</b>: txt, json, js
-
-<b>Features</b>:
-- <b>Visual Interface</b>: Provides a user-friendly file browser interface
-- <b>Thumbnail Support</b>: Quick preview of image content
-
-<div align="left">
-<a href="images/本地文件画廊.jpg" target="_blank">
-<img src="images/本地文件画廊.jpg" alt="Local File Gallery" width="45%"/>
-</a>
-</div>
-</td>
-</tr>
 <tr>
 <td><b>Resource Cleaner</b><br><code>ResourceCleaner</code></td>
 <td>

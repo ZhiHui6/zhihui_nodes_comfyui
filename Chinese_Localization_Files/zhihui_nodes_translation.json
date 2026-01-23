@@ -531,15 +531,6 @@
             "prompt_output": "提示词输出"
         }
     },
-    "LocalFileGallery": {
-        "title": "本地文件画廊",
-        "description": "本地文件画廊节点：用于浏览和选择本地图像和文本文件。支持的图像格式：jpg、jpeg、png、bmp、gif、webp；支持的文本格式：txt、json、js。选中的图像将以IMAGE类型输出，文本内容将以STRING类型输出。",
-        "inputs": {},
-        "outputs": {
-            "image_output": "图像输出",
-            "text_content": "文本内容"
-        }
-    },
     "PreviewOrCompareImages": {
         "title": "图像预览/对比",
         "description": "多功能图像预览和对比节点：支持单张图像预览或两张图像的并排对比显示。image_1为必需输入，image_2为可选输入，当提供两张图像时自动启用对比模式。鼠标悬停时显示交互式滑动分割线进行直观对比。",
@@ -944,6 +935,30 @@
             "output": "输出",
             "SEED": "随机种子",
             "Reserved(GB)": "预留显存(GB)"
+        }
+    },
+    "Florence2Plus": {
+        "title": "Florence2 增强版",
+        "description": "Florence2 增强版：基于微软Florence-2视觉语言模型，提供多种图像描述和分析功能。支持多种任务模式（如详细描述、标签生成、混合描述等），可自定义模型精度、注意力机制和生成参数，适用于图像理解和提示词生成。",
+        "inputs": {
+            "image": "图像"
+        },
+        "widgets": {
+            "model_name": "模型名称",
+            "precision": "精度",
+            "attention": "注意力机制",
+            "unload_mode": "卸载方式",
+            "task": "任务类型",
+            "batch_mode": "批量模式",
+            "batch_directory": "批量文件夹路径",
+            "seed": "随机种子",
+            "max_new_tokens": "最大生成长度",
+            "num_beams": "波束搜索数量",
+            "do_sample": "启用采样",
+            "manage_models": "模型管理"
+        },
+        "outputs": {
+            "text": "文本"
         }
     }
 }

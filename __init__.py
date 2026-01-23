@@ -28,7 +28,6 @@ from .Nodes.MovieTools.USMSharpen import USMSharpen
 from .Nodes.MovieTools.ColorMatchToReference import ColorMatchToReference
 from .Nodes.MovieTools.FilmGrain import FilmGrain
 from .Nodes.LatentSwitchDualMode import LatentSwitchDualMode
-from .Nodes.LocalFileGallery.LocalFileGallery import LocalFileGallery
 from .Nodes.ImageAspectRatio import ImageAspectRatio
 from .Nodes.Preview_or_Compare_Images import PreviewOrCompareImages
 from .Nodes.PauseWorkflow import PauseWorkflow
@@ -54,6 +53,7 @@ from .Nodes.GetImageSizes import GetImageSizes
 from .Nodes.PhotographPromptGen.zhihui_api import *
 from .Nodes.ResourceCleaner import ResourceCleaner
 from .Nodes.ReservedVRAMSetter import ReservedVRAMSetter
+from .Nodes.Florence2Plus.florence2plus import Florence2Plus
 
 import os
 
@@ -88,7 +88,6 @@ NODE_CLASS_MAPPINGS = {
     "FilmGrain": FilmGrain,
     "LatentSwitchDualMode": LatentSwitchDualMode,
     "PathSwitch": PathSwitch,
-    "LocalFileGallery": LocalFileGallery,
     "ImageAspectRatio": ImageAspectRatio,
     "GetImageSizes": GetImageSizes,
     "PreviewOrCompareImages": PreviewOrCompareImages,
@@ -112,6 +111,7 @@ NODE_CLASS_MAPPINGS = {
     "Qwen3VLAPI": Qwen3VLAPI,
     "ResourceCleaner": ResourceCleaner,
     "ReservedVRAMSetter": ReservedVRAMSetter,
+    "Florence2Plus": Florence2Plus,
 }
 
 NODE_DISPLAY_NAME_MAPPINGS = {
@@ -144,7 +144,6 @@ NODE_DISPLAY_NAME_MAPPINGS = {
     "ColorMatchToReference": "Color Match To Reference",
     "FilmGrain": "Film Grain",
     "LatentSwitchDualMode": "Latent Switch Dual Mode",
-    "LocalFileGallery": "Local File Gallery",
     "ImageAspectRatio": "Image Aspect Ratio",
     "GetImageSizes": "Get Image Sizes",
     "PreviewOrCompareImages": "Preview or Compare Images",
@@ -169,6 +168,7 @@ NODE_DISPLAY_NAME_MAPPINGS = {
     "Qwen3VLAPI": "Qwen3-VL API",
     "ResourceCleaner": "Resource Cleaner",
     "ReservedVRAMSetter": "Reserved VRAM Setter",
+    "Florence2Plus": "Florence2 Plus",
 }
 
 WEB_DIRECTORY = os.path.join(os.path.dirname(os.path.abspath(__file__)), "web")

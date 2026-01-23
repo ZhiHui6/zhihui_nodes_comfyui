@@ -2,11 +2,11 @@
 
 # 🎨 潪AI ComfyUI 节点包 
 
-最新版本：`v1.0.4`（2026-1-21），完整更新日志：查看<a href="CHANGELOG.md">`CHANGELOG.md`</a>
+最新版本：`v1.0.5`（2026-1-23），完整更新日志：查看<a href="CHANGELOG.md">`CHANGELOG.md`</a>
 
 ## 📖 项目介绍
 
-这是一个由<span style="color: red;"> **Binity** </span>精心创建的 ComfyUI 自定义节点工具合集，旨在为用户提供一系列实用、高效的节点，以增强和扩展 ComfyUI 的功能。本节点集包含30+功能节点，涵盖文本处理、提示词优化、图像处理、翻译工具、音乐创作辅助、Latent处理等多个方面，为您的 AI 创作提供全方位支持。
+这是一个由<span style="color: red;"> **Binity** </span>精心创建的 ComfyUI 自定义节点工具合集，旨在为用户提供一系列实用、高效的节点，以增强和扩展 ComfyUI 的功能。本节点集包含55+功能节点，涵盖文本处理、提示词优化、图像处理、翻译工具、音乐创作辅助、AI视觉理解、Latent处理等多个方面，为您的 AI 创作提供全方位支持。
 
 ***如果这个项目对您有帮助，请给我们一个⭐Star！您的支持是我们持续改进的动力。***
 
@@ -52,12 +52,6 @@
 <td><b>万相视频提示词生成器</b><br><code>WanPromptGenerator</code></td>
 <td>提示词处理</td>
 <td>基于万相2.2官方文档编写的全能型提示词生成器，支持自定义和预设两种组合方法，涵盖运镜、场景、光线、构图等17个维度的专业视频提示词生成。</td>
-</tr>
-
-<tr>
-<td><b>Kontext预设增强版</b><br><code>KontextPresetsPlus</code></td>
-<td>提示词处理</td>
-<td>内置20+创意预设的Kontext图像编辑预设工具，支持用户自定义预设扩展，集成多种LLM模型免费在线智能扩写。</td>
 </tr>
 
 <tr>
@@ -707,6 +701,7 @@
 </div>
 </td>
 </tr>
+
 <tr>
 <td><b>Qwen3-VL多路径输入</b><br><code>MultiplePathsInput</code></td>
 <td>
@@ -729,6 +724,35 @@
 <div align="left">
 <a href="images/Qwen3-VL Path Switch.jpg" target="_blank">
 <img src="images/Qwen3-VL Path Switch.jpg" alt="Qwen3-VL Path Switch" width="45%"/>
+</a>
+</div>
+</td>
+</tr>
+
+<tr>
+<td><b>Florence2 Plus</b><br><code>Florence2Plus</code></td>
+<td>
+基于微软Florence-2视觉理解模型的专业图像分析节点，支持多种任务类型和批量处理功能。
+
+<b>核心特性</b>：
+- <b>多模型支持</b>：支持Microsoft Florence-2基础和大型模型，以及MiaoshouAI PromptGen系列
+- <b>丰富任务类型</b>：支持标题生成、详细描述、标签生成、混合模式、分析模式等7种任务
+- <b>批量处理</b>：支持单张图片、多张图片和整个文件夹的批量处理
+- <b>性能优化</b>：支持fp16/bf16/fp32精度，flash_attention_2/sdpa/eager注意力机制
+- <b>智能内存管理</b>：提供卸载到CPU、完全卸载、保持加载三种内存管理模式
+
+<b>使用建议</b>：
+- 基础任务使用Microsoft模型，复杂任务使用MiaoshouAI PromptGen模型
+- 显存充足时使用bf16获得最佳质量，有限时使用fp16平衡性能
+- 根据使用频率选择合适的内存管理模式
+
+<br>
+<div align="left">
+<a href="images/Florence2 Plus1.jpg" target="_blank">
+<img src="images/Florence2 Plus1.jpg" alt="Florence2 Plus" width="45%"/>
+</a>
+<a href="images/Florence2 Plus2.jpg" target="_blank">
+<img src="images/Florence2 Plus2.jpg" alt="Florence2 Plus" width="45%"/>
 </a>
 </div>
 </td>
@@ -873,27 +897,7 @@
 </td>
 </tr>
 
-<tr>
-<td><b>本地文件画廊</b><br><code>LocalFileGallery</code></td>
-<td>
 
-本地文件浏览和选择工具，提供直观的文件管理界面，支持图片和文本文件的预览与选择。
-
-<b>支持格式</b>：
-- <b>图片格式</b>：jpg, jpeg, png, bmp, gif, webp
-- <b>文本格式</b>：txt, json, js
-
-<b>特点</b>：
-- <b>可视化界面</b>：提供友好的文件浏览器界面
-- <b>缩略图支持</b>：快速预览图片内容
-
-<div align="left">
-<a href="images/本地文件画廊.jpg" target="_blank">
-<img src="images/本地文件画廊.jpg" alt="本地文件画廊" width="45%"/>
-</a>
-</div>
-</td>
-</tr>
 <tr>
 <td><b>资源清理器</b><br><code>ResourceCleaner</code></td>
 <td>
