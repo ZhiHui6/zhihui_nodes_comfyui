@@ -1,5 +1,10 @@
 # 更新日志
-
+## 1.0.5 2026-1-25
+- Qwen3VL API 新增高级参数项，通过节点管理开启。
+- Qwen3VL系列参数项描述中文化
+  <br>
+- Added advanced parameters to Qwen3VL API, enabled via node management.
+- Localized descriptions for Qwen3VL parameter options.
 
 ## 1.0.4 2026-1-21
 - 新增 获取图像尺寸 节点(GetImageSize)：用于获取图像的宽度和高度。

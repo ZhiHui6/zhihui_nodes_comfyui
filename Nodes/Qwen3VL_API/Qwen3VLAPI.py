@@ -972,21 +972,21 @@ class Qwen3VLAPI:
                     "multiline": True,
                     "default": "",
                     "placeholder": "user prompt",
-                    "tooltip": "User prompt for image analysis. Describe what you want to know about the image."
+                    "tooltip": "用于图像分析的用户提示词。描述你想了解的图像内容。"
                 }),
                 "system_prompt": ("STRING", {
                     "multiline": True,
                     "default": "",
                     "placeholder": "system prompt",
-                    "tooltip": "System prompt to guide the AI's behavior and response style."
+                    "tooltip": "用于引导模型行为与回复风格的系统提示词。"
                 }),
                 "llm_mode": ("BOOLEAN", {
                     "default": False,
-                    "tooltip": "Enable LLM mode. This will allow the model to generate text responses based on the input prompt."
+                    "tooltip": "启用 LLM 模式。启用后模型将基于输入提示词生成文本回复。"
                 }),
                 "aggressive_creative": ("BOOLEAN", {
                     "default": False,
-                    "tooltip": "Enable aggressive creative mode. This will apply high randomness and diverse sampling in LLM mode."
+                    "tooltip": "启用激进创意模式。在 LLM 模式下使用更高随机性和更丰富的采样。"
                 }),
                 "remove_think_tags": ("BOOLEAN", {
                     "default": False,
@@ -1004,29 +1004,57 @@ class Qwen3VLAPI:
                     "min": 256,
                     "max": 8192,
                     "step": 1,
-                    "tooltip": "Maximum number of tokens in the generated response."
+                    "tooltip": "生成回复的最大 tokens 数量。"
                 }),
                 "temperature": ("FLOAT", {
                     "default": 0.7,
                     "min": 0.1,
                     "max": 2.0,
                     "step": 0.1,
-                    "tooltip": "Temperature parameter controlling randomness in text generation. Lower values = more focused, higher values = more creative."
+                    "tooltip": "温度参数控制生成随机性。值越低越稳定集中，值越高越有创意。"
+                }),
+                "repetition_penalty": ("FLOAT", {
+                    "default": 1.0,
+                    "min": 0.1,
+                    "max": 2.0,
+                    "step": 0.1,
+                    "tooltip": "重复惩罚系数，防止生成重复内容。较大的值使输出更保守，避免重复。"
+                }),
+                "top_k": ("INT", {
+                    "default": 50,
+                    "min": 1,
+                    "max": 100,
+                    "step": 1,
+                    "tooltip": "Top K采样参数，控制从概率最高的K个词中采样。较小的值使输出更集中，较大的值增加多样性。"
+                }),
+                "min_p": ("FLOAT", {
+                    "default": 0.05,
+                    "min": 0.0,
+                    "max": 1.0,
+                    "step": 0.01,
+                    "tooltip": "最小P采样参数，控制最小概率阈值。较小的值使输出更集中，较大的值增加多样性。"
+                }),
+                "top_p": ("FLOAT", {
+                    "default": 0.9,
+                    "min": 0.0,
+                    "max": 1.0,
+                    "step": 0.05,
+                    "tooltip": "Top P采样参数（核采样），控制累积概率阈值。较小的值使输出更集中，较大的值增加多样性。"
                 }),
                 "seed": ("INT", {
                     "default": -1,
                     "min": -1,
                     "max": 0xffffffffffffffff,
-                    "tooltip": "Random seed for reproducible results. Use -1 for random seed."
+                    "tooltip": "随机种子用于复现结果。使用 -1 表示随机种子。"
                 }),
                 "batch_mode": ("BOOLEAN", {
                     "default": False,
-                    "tooltip": "Enable batch processing mode."
+                    "tooltip": "启用批量处理模式。"
                 }),
                 "batch_folder_path": ("STRING", {
                     "multiline": False,
                     "default": "",
-                    "tooltip": "Path to folder containing images for batch processing."
+                    "tooltip": "批量处理的图片文件夹路径。"
                 }),
             },
             "optional": {
@@ -1034,7 +1062,7 @@ class Qwen3VLAPI:
                     "tooltip": "Source path: 本地图片/URL，或由多路径节点输出的多图列表；与 images 和 batch_mode 互斥。"
                 }),
                 "images": ("IMAGE", {
-                    "tooltip": "Input images for analysis."
+                    "tooltip": "用于分析的图像输入。"
                 }),
             }
         }
@@ -1095,7 +1123,7 @@ class Qwen3VLAPI:
         else:
             return user_prompt.strip()
 
-    def analyze_image(self, user_prompt, system_prompt, llm_mode, aggressive_creative, size_limitation, max_tokens, temperature, seed, remove_think_tags, batch_mode, batch_folder_path, source_path=None, images=None):
+    def analyze_image(self, user_prompt, system_prompt, llm_mode, aggressive_creative, size_limitation, max_tokens, temperature, top_k, repetition_penalty, min_p, top_p, seed, remove_think_tags, batch_mode, batch_folder_path, source_path=None, images=None):
         import random
         import time
         
@@ -1185,7 +1213,7 @@ class Qwen3VLAPI:
             if llm_mode:
                 status_messages.append("🔄 正在进行纯文本对话模式调用…")
                 try:
-                    effective_temperature, sampling_params = self._prepare_sampling(llm_mode, aggressive_creative, temperature, seed)
+                    effective_temperature, sampling_params = self._prepare_sampling(llm_mode, aggressive_creative, temperature, top_k, repetition_penalty, min_p, top_p, seed)
                     if aggressive_creative:
                         status_messages.append("✨ Aggressive Creative Mode enabled: applying high-random sampling")
                     result = self._process_single_image(
@@ -1238,7 +1266,7 @@ class Qwen3VLAPI:
 
                     status_messages.append("ℹ️ 未提供图片输入，改为纯文本对话模式")
                     try:
-                        effective_temperature, sampling_params = self._prepare_sampling(True, aggressive_creative, temperature, seed)
+                        effective_temperature, sampling_params = self._prepare_sampling(True, aggressive_creative, temperature, top_k, repetition_penalty, min_p, top_p, seed)
                         if aggressive_creative:
                             status_messages.append("✨ Aggressive Creative Mode enabled: applying high-random sampling")
                         result = self._process_single_image(
@@ -1390,7 +1418,7 @@ class Qwen3VLAPI:
         except Exception as e:
             raise Exception(f"API调用失败: {str(e)}")
 
-    def _prepare_sampling(self, llm_mode, creative_mode, temperature, seed):
+    def _prepare_sampling(self, llm_mode, creative_mode, temperature, top_k, repetition_penalty, min_p, top_p, seed):
         import random
         import time
         params = {}
@@ -1405,6 +1433,11 @@ class Qwen3VLAPI:
             params["top_p"] = rnd.uniform(0.85, 1.0)
             params["presence_penalty"] = rnd.uniform(0.6, 1.2)
             params["frequency_penalty"] = rnd.uniform(0.5, 1.1)
+        else:
+            params["top_k"] = top_k
+            params["repetition_penalty"] = repetition_penalty
+            params["min_p"] = min_p
+            params["top_p"] = top_p
         return effective_temperature, params
     
     def _remove_think_content(self, text):

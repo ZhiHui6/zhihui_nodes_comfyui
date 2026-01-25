@@ -134,23 +134,23 @@ class Qwen3VLBasic:
                 "user_prompt": ("STRING", {
                     "default": "", 
                     "multiline": True,
-                    "tooltip": "Custom user prompt to guide the model in generating specific content"
+                    "tooltip": "用户自定义提示词，用于引导模型生成特定内容。"
                 }),
                 "system_prompt": ("STRING", {
                     "default": "", 
                     "multiline": True,
-                    "tooltip": "System-level prompt to define the model's behavior pattern and role positioning"
+                    "tooltip": "系统级提示词，用于设定模型的行为模式和角色定位。"
                 }),
                 "remove_think_tags": ("BOOLEAN", {
                     "default": False, 
-                    "tooltip": "When enabled, removes </think> tags and all content before them from output text, keeping only clean description text"
+                    "tooltip": "启用后将删除输出文本中</think>标签及其之前的所有内容，保留纯净的描述文本。"
                 }),
                 
                 "quantization": (
                     ["none", "4bit", "8bit"],
                     {
                         "default": "none",
-                        "tooltip": "Model quantization settings to reduce VRAM usage. 8bit balances performance and resources, 4bit saves more VRAM but may affect quality"
+                        "tooltip": "模型量化设置，用于降低显存占用。8bit 兼顾性能与资源，4bit 更省显存但可能影响质量。"
                     },
                 ),
                 "temperature": (
@@ -160,7 +160,7 @@ class Qwen3VLBasic:
                         "min": 0, 
                         "max": 1, 
                         "step": 0.1,
-                        "tooltip": "Controls randomness of generated text. Higher values are more creative, lower values are more conservative and stable"
+                        "tooltip": "控制生成文本的随机性。值越高越有创意，值越低越保守稳定。"
                     },
                 ),
                 "max_new_tokens": (
@@ -170,7 +170,7 @@ class Qwen3VLBasic:
                         "min": 128, 
                         "max": 8192, 
                         "step": 1,
-                        "tooltip": "Maximum length of generated text. Higher values allow longer content but consume more resources"
+                        "tooltip": "生成文本最大长度。值越大可生成更长内容，但消耗更多资源。"
                     },
                 ),
                 "image_size_limitation": ("INT", {
@@ -178,11 +178,11 @@ class Qwen3VLBasic:
                     "min": 0,
                     "max": 2500,
                     "step": 1,
-                    "tooltip": "Image size limit in pixels. 0 means no limit, higher values may cause memory overflow"
+                    "tooltip": "图像长边限制（像素）。0 表示不限制，值过大可能导致内存溢出。"
                 }),
                 "seed": ("INT", {
                     "default": -1,
-                    "tooltip": "Random seed to control generation randomness. Same seed produces same results, -1 for random seed"
+                    "tooltip": "随机种子用于控制生成随机性。相同种子可复现结果，-1 为随机种子。"
                 }),
                 "attention": (
                     [
@@ -192,35 +192,35 @@ class Qwen3VLBasic:
                     ],
                     {
                         "default": "sdpa",
-                        "tooltip": "Attention mechanism implementation, affects performance and compatibility. SDPA is the recommended option"
+                        "tooltip": "注意力机制实现，影响性能与兼容性。推荐使用 SDPA。"
                     },
                 ),
                 "device": (
                     ["auto", "gpu", "cpu"],
                     {
                         "default": "auto",
-                        "tooltip": "Computing device selection. Auto automatically selects the best device, GPU uses GPU, CPU uses CPU"
+                        "tooltip": "计算设备选择。auto 自动选择最佳设备，gpu 使用显卡，cpu 使用处理器。"
                     },
                 ),
                 "unload_mode": (["Full Unload", "Unload to CPU", "Keep Loaded"], {
                     "default": "Full Unload",
-                    "tooltip": "Model unloading strategy. Full Unload releases VRAM and memory; Unload to CPU moves model to CPU and releases VRAM; Keep Loaded retains model in GPU for next acceleration"
+                    "tooltip": "模型卸载策略。完全卸载释放显存与内存；卸载到 CPU 释放显存；保持加载可加速下一次。"
                 }),
                 "batch_mode": ("BOOLEAN", {
                     "default": False,
-                    "tooltip": "Batch processing mode, when enabled can process multiple image files in specified directory"
+                    "tooltip": "批量处理模式，启用后可处理指定目录中的多张图片。"
                 }),
                 "batch_directory": ("STRING", {
                     "default": "",
-                    "tooltip": "Batch processing directory path, specify the folder path containing images to be processed"
+                    "tooltip": "批量处理目录路径，指定待处理图片所在文件夹。"
                 }),
             },
             "optional": {
                 "source_path": ("PATH", {
-                    "tooltip": "Source path: Specify the path to the image or video file to be processed. Can be a local file path or network URL. When both source_path and image are provided, source_path takes priority. Supports common image and video formats."
+                    "tooltip": "源路径：指定待处理图片或视频文件路径，可为本地路径或网络 URL。当 source_path 与 image 同时提供时，以 source_path 为准。支持常见图片与视频格式。"
                 }), 
                 "image": ("IMAGE", {
-                    "tooltip": "Image input: Direct input of image data for processing. Usually comes from image output of other ComfyUI nodes. When both source_path and image are provided, source_path has higher priority."
+                    "tooltip": "图像输入：直接输入图像数据，通常来自其他节点。当 source_path 与 image 同时提供时，以 source_path 为准。"
                 }),
             },
         }

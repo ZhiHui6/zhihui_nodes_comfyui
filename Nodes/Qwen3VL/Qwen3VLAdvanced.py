@@ -179,55 +179,55 @@ class Qwen3VLAdvanced:
                 
                 "quantization": (
                     ["none", "4bit", "8bit"],
-                    {"default": "none", "tooltip": "Model quantization setting to reduce VRAM usage. 8bit balances performance and resource consumption, 4bit saves more VRAM but may affect quality"},
+                    {"default": "none", "tooltip": "模型量化设置，用于降低显存占用。8bit 兼顾性能与资源，4bit 更省显存但可能影响质量。"},
                 ),
                 "temperature": (
                     "FLOAT",
-                    {"default": 0.7, "min": 0, "max": 1, "step": 0.1, "tooltip": "Controls the randomness of the generated text. Higher values make the output more creative, while lower values make it more conservative and stable"},
+                    {"default": 0.7, "min": 0, "max": 1, "step": 0.1, "tooltip": "控制生成文本的随机性。值越高越有创意，值越低越保守稳定。"},
                 ),
                 "top_p": (
                     "FLOAT",
-                    {"default": 0.9, "min": 0, "max": 1, "step": 0.1, "tooltip": "Core sampling parameter, controls the range of vocabulary selection. Smaller values make the output more focused, while larger values increase diversity"},
+                    {"default": 0.9, "min": 0, "max": 1, "step": 0.1, "tooltip": "核心采样参数，控制词汇选择范围。值越小越集中，值越大越多样。"},
                 ),
                 "num_beams": (
                     "INT",
-                    {"default": 1, "min": 1, "max": 10, "step": 1, "tooltip": "Number of beams for beam search. Values greater than 1 enable beam search, which can improve output quality but increase computation time"},
+                    {"default": 1, "min": 1, "max": 10, "step": 1, "tooltip": "束搜索数量。大于 1 启用束搜索，可提升质量但增加计算时间。"},
                 ),
                 "repetition_penalty": (
                     "FLOAT",
-                    {"default": 1.2, "min": 0.1, "max": 2.0, "step": 0.1, "tooltip": "Repetition penalty coefficient to prevent generating repeated content. Larger values make the output more conservative and avoid repetition"},
+                    {"default": 1.2, "min": 0.1, "max": 2.0, "step": 0.1, "tooltip": "重复惩罚系数，防止生成重复内容。值越大输出更保守，避免重复。"},
                 ),
                 "frame_count": (
                     "INT",
-                    {"default": 23, "min": 1, "max": 64, "step": 1, "tooltip": "Number of frames to process in video. Higher values improve accuracy but increase processing time"},
+                    {"default": 23, "min": 1, "max": 64, "step": 1, "tooltip": "视频处理帧数。值越大精度更高但耗时更长。"},
                 ),
                 "max_new_tokens": (
                     "INT",
-                    {"default": 1024, "min": 128, "max": 8192, "step": 1, "tooltip": "Maximum length of the generated text. Larger values allow for longer outputs but consume more resources"},
+                    {"default": 1024, "min": 128, "max": 8192, "step": 1, "tooltip": "生成文本最大长度。值越大可生成更长内容，但消耗更多资源。"},
                 ),
                 "image_size_limitation": ("INT", {
                     "default": 1080,
                     "min": 0,
                     "max": 2500,
                     "step": 1,
-                    "tooltip": "Maximum size (in pixels) for the longer side of the image. 0 means no scaling, upper limit is 2500 pixels. Affects image input ports, batch mode, and multi-path input ports."
+                    "tooltip": "图像长边最大尺寸（像素）。0 表示不缩放，上限 2500。影响图片输入端口、批量模式与多路径输入端口。"
                 }),
-                "seed": ("INT", {"default": -1, "tooltip": "Random seed for reproducibility. Set to -1 for random values, or use a fixed value to ensure reproducible results"}),
+                "seed": ("INT", {"default": -1, "tooltip": "随机种子用于复现结果。-1 为随机值，固定值可复现。"}),
                 "attention": (
                     [
                         "eager",
                         "sdpa",
                         "flash_attention_2",
                     ],
-                    {"default": "sdpa", "tooltip": "Attention mechanism type. sdpa balances performance, while flash_attention_2 is faster but requires specific hardware support"},
+                    {"default": "sdpa", "tooltip": "注意力机制类型。sdpa 性能均衡，flash_attention_2 更快但需要特定硬件。"},
                 ),
                 "device": (
                     ["auto", "gpu", "cpu"],
-                    {"default": "auto", "tooltip": "Device to use for computation. auto selects the best available device, gpu uses GPU acceleration, and cpu uses the processor"},
+                    {"default": "auto", "tooltip": "计算设备选择。auto 自动选择最佳设备，gpu 使用显卡，cpu 使用处理器。"},
                 ),
-                "unload_mode": (["Full Unload", "Unload to CPU", "Keep Loaded"], {"default": "Full Unload", "tooltip": "Unloading strategy after inference. Full Unload frees VRAM and memory; Unload to CPU moves the model to CPU and frees VRAM; Keep Loaded keeps the model in GPU for faster acceleration next time"}),
-                "batch_mode": ("BOOLEAN", {"default": False, "tooltip": "Enable batch mode to process multiple images from a specified directory"}),
-                "batch_directory": ("STRING", {"default": "", "tooltip": "Path to the directory containing images to be processed in batch mode"}),            
+                "unload_mode": (["Full Unload", "Unload to CPU", "Keep Loaded"], {"default": "Full Unload", "tooltip": "推理完成后的卸载策略。完全卸载释放显存与内存；卸载到 CPU 释放显存；保持加载便于下次加速。"}),
+                "batch_mode": ("BOOLEAN", {"default": False, "tooltip": "启用批量模式，从指定目录处理多张图片。"}),
+                "batch_directory": ("STRING", {"default": "", "tooltip": "批量处理目录路径，指定待处理图片文件夹。"}),            
             },
             "optional": {
                 "extra_options": ("QWEN3VL_EXTRA_OPTIONS",),

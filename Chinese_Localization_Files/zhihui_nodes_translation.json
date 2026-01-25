@@ -809,19 +809,11 @@
             "batch_folder_path": "批处理文件夹路径",
             "access_method": "接入方式",
             "size_limitation": "尺寸限制",
-            "remove_think_tags": "移除思考标签"
-        },
-        "tooltips": {
-            "config_mode": "选择配置模式：平台预设使用内置平台设置，完全自定义允许手动设置所有参数",
-            "llm_mode": "启用大语言模型模式（允许无图片，纯文本对话）",
-            "aggressive_creative_mode": "激进创意模式：在LLM模式下应用高随机性和多样化采样",
-            "user_prompt": "用于图像分析的用户提示词。描述您想了解的关于图像的内容",
-            "system_prompt": "系统提示词，用于指导AI的行为和响应风格",
-            "max_tokens": "生成响应中的最大令牌数",
-            "temperature": "控制文本生成随机性的温度参数。较低值=更专注，较高值=更有创意",
-            "seed": "随机种子，用于可重现的结果。使用-1表示随机种子",
-            "batch_mode": "启用批处理模式",
-            "batch_folder_path": "包含用于批处理的图像的文件夹路径"
+            "remove_think_tags": "移除思考标签",
+            "top_k": "Top K采样",
+            "repetition_penalty": "重复惩罚",
+            "min_p": "最小P采样",
+            "top_p": "Top P采样"
         },
         "outputs": {
             "result":"结果",

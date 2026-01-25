@@ -2,7 +2,7 @@
 
 # 🎨 Zhi.AI ComfyUI Node Pack 
 
-Latest version: `v1.0.5` (2026-1-23), For complete changelog: See <a href="CHANGELOG.md">`CHANGELOG.md`</a>   
+For complete changelog: See <a href="CHANGELOG.md">`CHANGELOG.md`</a>   
 
 ## 📖 Project Introduction
 

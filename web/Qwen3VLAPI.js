@@ -68,6 +68,9 @@ class APIConfigManager {
                 if (fileConfig.custom_configs) {
                     this.config.custom_configs = { ...this.config.custom_configs, ...fileConfig.custom_configs };
                 }
+                if (fileConfig.advanced_params_enabled !== undefined) {
+                    this.config.advanced_params_enabled = fileConfig.advanced_params_enabled;
+                }
             } else {
                 this.config = defaultConfig;
             }
@@ -141,7 +144,7 @@ class APIConfigManager {
                 }
             },
             active_target: "SiliconFlow",
-            config_version: "3.0"
+            advanced_params_enabled: false
         };
     }
 
@@ -209,6 +212,23 @@ class APIConfigManager {
                 
                 <!-- 主配置区域 - 两行布局 -->
                 <div style="display: flex; flex-direction: column; gap: 20px;">
+                    <!-- 高级参数复选框 -->
+                    <div style="flex: 1;">
+                        <h3 style="
+                            margin: 0 0 10px 0; 
+                            color: var(--input-text); 
+                            font-size: 14px; 
+                            font-weight: bold;
+                            border-bottom: 1px solid var(--border-color);
+                            padding-bottom: 5px;
+                        ">高级参数设置</h3>
+                        <label style="display: flex; align-items: center; gap: 8px; cursor: pointer; padding: 10px; background: var(--comfy-input-bg); border: 1px solid var(--border-color); border-radius: 6px;">
+                            <input type="checkbox" id="advanced-params-checkbox" style="margin: 0; accent-color: #22c55e; width: 18px; height: 18px;">
+                            <span style="color: var(--input-text); font-size: 14px; font-weight: bold;">高级参数</span>
+                            <span style="color: var(--descrip-text); font-size: 12px; margin-left: auto;">勾选后显示Top K采样、重复惩罚、最小P采样、Top P采样参数</span>
+                        </label>
+                    </div>
+                    
                     <!-- 平台服务配置（包含自定义配置） -->
                     <div style="flex: 1;">
                         <h3 style="
@@ -289,6 +309,27 @@ class APIConfigManager {
         
         this.renderPlatformConfigs(config);
         this.attachActiveTargetHandlers(dialog);
+
+        const advancedParamsCheckbox = dialog.querySelector("#advanced-params-checkbox");
+        if (advancedParamsCheckbox) {
+            advancedParamsCheckbox.checked = config.advanced_params_enabled || false;
+            advancedParamsCheckbox.onchange = async () => {
+                const previousValue = config.advanced_params_enabled || false;
+                const currentValue = advancedParamsCheckbox.checked;
+                config.advanced_params_enabled = currentValue;
+                this.updateAdvancedParamsVisibility(currentValue);
+                const ok = await this.saveConfig(config);
+                if (ok) {
+                    this.config = { ...config };
+                } else {
+                    config.advanced_params_enabled = previousValue;
+                    advancedParamsCheckbox.checked = previousValue;
+                    this.updateAdvancedParamsVisibility(previousValue);
+                    alert("高级参数状态保存失败，请重试。");
+                }
+            };
+            this.updateAdvancedParamsVisibility(advancedParamsCheckbox.checked);
+        }
 
         const closeDialog = () => {
             if (overlay && overlay.parentNode) {
@@ -1026,6 +1067,45 @@ class APIConfigManager {
         updateAll();
     }
 
+    applyAdvancedParamsToNode(node, show) {
+        if (!node || !node.widgets) {
+            return;
+        }
+        const advancedParamNames = ['top_k', 'repetition_penalty', 'min_p', 'top_p'];
+        advancedParamNames.forEach(paramName => {
+            const widget = node.widgets.find(w => w.name === paramName);
+            if (widget) {
+                widget.hidden = !show;
+                widget.disabled = !show;
+                if (widget.options && typeof widget.options === "object") {
+                    widget.options.hidden = !show;
+                }
+                if (widget.inputEl) {
+                    widget.inputEl.disabled = !show;
+                }
+            }
+        });
+        if (typeof node.computeSize === "function") {
+            const currentSize = node.size;
+            const computedSize = node.computeSize();
+            if (currentSize && currentSize.length > 0) {
+                 node.size = [currentSize[0], computedSize[1]];
+            } else {
+                 node.size = computedSize;
+            }
+        }
+    }
+
+    updateAdvancedParamsVisibility(show) {
+        const nodes = app.graph._nodes;
+        nodes.forEach(node => {
+            if (node.type === 'Qwen3VLAPI') {
+                this.applyAdvancedParamsToNode(node, show);
+            }
+        });
+        app.graph.setDirtyCanvas(true, true);
+    }
+
     async saveSingleCardConfig(cardElement) {
         const type = cardElement?.dataset?.cardType;
         const key = cardElement?.dataset?.cardKey;
@@ -1135,6 +1215,12 @@ class APIConfigManager {
             this.renderCustomConfigs(this.config);
         }
         this.attachActiveTargetHandlers(dialog);
+        
+        const advancedParamsCheckbox = dialog.querySelector("#advanced-params-checkbox");
+        if (advancedParamsCheckbox) {
+            advancedParamsCheckbox.checked = this.config.advanced_params_enabled || false;
+            this.updateAdvancedParamsVisibility(this.config.advanced_params_enabled || false);
+        }
 
         if (ok) {
             alert("已恢复默认配置并已自动保存！");
@@ -1147,7 +1233,6 @@ class APIConfigManager {
         try {
             const config = await this.loadConfig();
             const exportData = {
-                version: config.config_version || "3.0",
                 export_time: new Date().toISOString(),
                 config: config
             };
@@ -1205,8 +1290,7 @@ class APIConfigManager {
                     const currentConfig = await this.loadConfig();
                     const mergedConfig = {
                         ...importedConfig,
-                        active_target: currentConfig.active_target || importedConfig.active_target || "SiliconFlow",
-                        config_version: importedConfig.config_version || "3.0"
+                        active_target: currentConfig.active_target || importedConfig.active_target || "SiliconFlow"
                     };
                     
                     // 保存导入的配置
@@ -1222,6 +1306,12 @@ class APIConfigManager {
                             this.renderCustomConfigs(this.config);
                         }
                         this.attachActiveTargetHandlers(dialog);
+                        
+                        const advancedParamsCheckbox = dialog.querySelector("#advanced-params-checkbox");
+                        if (advancedParamsCheckbox) {
+                            advancedParamsCheckbox.checked = this.config.advanced_params_enabled || false;
+                            this.updateAdvancedParamsVisibility(this.config.advanced_params_enabled || false);
+                        }
                         
                         alert("配置导入成功！");
                     } else {
@@ -1258,10 +1348,17 @@ app.registerExtension({
                 nodeType.prototype.onNodeCreated = function () {
                     const r = onNodeCreated ? onNodeCreated.apply(this, arguments) : undefined;
                     
-                    const configButton = this.addWidget("button", "⚙️模型管理·Model Manager", null, () => {
+                    const configButton = this.addWidget("button", "⚙️节点设置·Node Settings", null, () => {
                         const buttonElement = document.querySelector('.comfy-widget-value[value="Settings·设置"]');
                         apiConfigManager.showConfigDialog(buttonElement);
                     });
+                    
+                    setTimeout(async () => {
+                        const config = await apiConfigManager.loadConfig();
+                        const advancedParamsEnabled = config.advanced_params_enabled || false;
+                        apiConfigManager.applyAdvancedParamsToNode(this, advancedParamsEnabled);
+                        app.graph.setDirtyCanvas(true, true);
+                    }, 100);
                     
                     return r;
                 };
