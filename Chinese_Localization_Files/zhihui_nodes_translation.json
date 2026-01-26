@@ -877,6 +877,14 @@
             "open_card_pool": "卡池管理器"
         }
     },
+    "PromptGallery": {
+        "title": "提示词图库",
+        "description": "提示词图库：从图文库中选择图片后，输出与图片同名的 .txt 提示词文本。",
+        "inputs": {},
+        "outputs": {
+            "text_content": "提示词文本"
+        }
+    },
     "MultiPlatformTranslate": {
         "title": "多平台翻译器",
         "description": "多平台翻译节点，支持阿里云、有道和免费翻译服务。点击下方的'配置管理'按钮来管理各平台的API设置。",

@@ -366,6 +366,18 @@ A comprehensive prompt generator written based on WanXiang 2.2 official document
 </div>
 </td>
 </tr>
+<tr>
+<td><b>Prompt Gallery</b><br><code>PromptGallery</code></td>
+<td>Prompt gallery node: loads an image-prompt library from a specified directory, then outputs the content of the <code>.txt</code> file that shares the same filename as the selected image. Useful for managing “image–prompt” pairs and quickly retrieving prompts in workflows.
+
+<br>
+<div align="left">
+<a href="images/Prompt Gallery.jpg" target="_blank">
+<img src="images/Prompt Gallery.jpg" alt="Prompt Gallery" width="60%"/>
+</a>
+</div>
+</td>
+</tr>
 </table>
 
 ### 🖼️ Image Processing Nodes

@@ -54,6 +54,8 @@ from .Nodes.PhotographPromptGen.zhihui_api import *
 from .Nodes.ResourceCleaner import ResourceCleaner
 from .Nodes.ReservedVRAMSetter import ReservedVRAMSetter
 from .Nodes.Florence2Plus.florence2plus import Florence2Plus
+from .Nodes.PromptGallery.PromptGallery import PromptGallery
+from .Nodes.PromptGallery import gallery_api
 
 import os
 
@@ -112,6 +114,7 @@ NODE_CLASS_MAPPINGS = {
     "ResourceCleaner": ResourceCleaner,
     "ReservedVRAMSetter": ReservedVRAMSetter,
     "Florence2Plus": Florence2Plus,
+    "PromptGallery": PromptGallery,
 }
 
 NODE_DISPLAY_NAME_MAPPINGS = {
@@ -169,6 +172,7 @@ NODE_DISPLAY_NAME_MAPPINGS = {
     "ResourceCleaner": "Resource Cleaner",
     "ReservedVRAMSetter": "Reserved VRAM Setter",
     "Florence2Plus": "Florence2 Plus",
+    "PromptGallery": "Prompt Gallery",
 }
 
 WEB_DIRECTORY = os.path.join(os.path.dirname(os.path.abspath(__file__)), "web")

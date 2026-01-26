@@ -367,6 +367,18 @@
 </div>
 </td>
 </tr>
+<tr>
+<td><b>提示词图库</b><br><code>PromptGallery</code></td>
+<td>提示词图库节点：从指定目录加载包含缩略图和文本的图文库，从用户选择的图片输出与图片同名的 <code>.txt</code> 文件内容（提示词文本）。适用于将“图像-提示词”成对管理并在工作流中快速取用。
+
+<br>
+<div align="left">
+<a href="images/Prompt Gallery.jpg" target="_blank">
+<img src="images/Prompt Gallery.jpg" alt="提示词图库" width="60%"/>
+</a>
+</div>
+</td>
+</tr>
 </table>
 
 ### 🖼️ 图像处理类节点

@@ -1,4 +1,9 @@
 # 更新日志
+## 1.0.6 2026-1-26
+- 新增 提示词图库 节点(PromptGallery)：从已加载的图文库中通过选择图片将与之对应名称的提示词文本输出。
+    <br>
+- Added PromptGallery node: outputs the prompt text corresponding to the selected image from the loaded image-prompt gallery.
+
 ## 1.0.5 2026-1-25
 - Qwen3VL API 新增高级参数项，通过节点管理开启。
 - Qwen3VL系列参数项描述中文化
