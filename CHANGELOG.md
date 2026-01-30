@@ -1,8 +1,10 @@
 # 更新日志
 ## 1.0.7 2026-1-30
 - 新增 字体设计师 节点(TypeDesigner)：用于设计和生成自定义字体样式。
+- 更新 图像宽高比节点(ImageAspectRatio)：为部分模型预设添加影院及标准分辨率
     <br>
 - Added TypeDesigner node: allows users to design and generate custom font styles.
+- Updated ImageAspectRatio node: added cinema and standard resolution presets for some models
 
 ## 1.0.6 2026-1-26
 - 新增 提示词图库 节点(PromptGallery)：从已加载的图文库中通过选择图片将与之对应名称的提示词文本输出。
