@@ -960,5 +960,15 @@
         "outputs": {
             "text": "文本"
         }
+    },
+    "TypeDesigner": {
+        "title": "字体设计师",
+        "description": "提供可视化界面，让用户浏览和选择各种字体艺术风格（如3D、霓虹、金属等），自动提供对应的预设提示词，方便进行艺术字创作。",
+        "inputs": {
+            "text": "文本"
+        },
+        "outputs": {
+            "prompt_text": "提示词文本"
+        }
     }
 }

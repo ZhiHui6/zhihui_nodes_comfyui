@@ -198,6 +198,21 @@ Uses multiple LLM models to intelligently expand and creatively enhance input te
 </div>
 </td>
 </tr>
+<tr>
+<td><b>Type Designer</b><br><code>TypeDesigner</code></td>
+<td>Provides a visual interface for users to browse and select various font art styles (such as 3D, neon, metal, etc.), automatically providing corresponding preset prompts to facilitate artistic text creation.
+
+<br>
+<div align="left">
+<a href="images/Type-Designer1.jpg" target="_blank">
+<img src="images/Type-Designer1.jpg" alt="Type Designer 1" width="45%"/>
+</a>
+<a href="images/Type-Designer2.jpg" target="_blank">
+<img src="images/Type-Designer2.jpg" alt="Type Designer 2" width="45%"/>
+</a>
+</div>
+</td>
+</tr>
 </table>
 
 ### 🎯 Prompt Processing Nodes

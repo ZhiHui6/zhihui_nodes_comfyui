@@ -198,6 +198,21 @@
 </div>
 </td>
 </tr>
+<tr>
+<td><b>字体设计师</b><br><code>TypeDesigner</code></td>
+<td>提供可视化界面，让用户浏览和选择各种字体艺术风格（如3D、霓虹、金属等），自动提供对应的预设提示词，方便进行艺术字创作。
+
+<br>
+<div align="left">
+<a href="images/Type-Designer1.jpg" target="_blank">
+<img src="images/Type-Designer1.jpg" alt="Type Designer 1" width="45%"/>
+</a>
+<a href="images/Type-Designer2.jpg" target="_blank">
+<img src="images/Type-Designer2.jpg" alt="Type Designer 2" width="45%"/>
+</a>
+</div>
+</td>
+</tr>
 </table>
 
 ### 🎯 提示词处理类节点
