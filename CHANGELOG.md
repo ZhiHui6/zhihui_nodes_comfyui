@@ -1,5 +1,5 @@
 # 更新日志
-## 1.0.7 2026-1-27
+## 1.0.7 2026-1-30
 - 新增 字体设计师 节点(TypeDesigner)：用于设计和生成自定义字体样式。
     <br>
 - Added TypeDesigner node: allows users to design and generate custom font styles.
