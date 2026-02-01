@@ -57,6 +57,7 @@ from .Nodes.Florence2Plus.florence2plus import Florence2Plus
 from .Nodes.PromptGallery.PromptGallery import PromptGallery
 from .Nodes.PromptGallery import gallery_api
 from .Nodes.TypeDesigner.TypeDesigner import TypeDesigner
+from .Nodes.PromptReplace import PromptReplace
 
 import os
 
@@ -117,6 +118,7 @@ NODE_CLASS_MAPPINGS = {
     "Florence2Plus": Florence2Plus,
     "PromptGallery": PromptGallery,
     "TypeDesigner": TypeDesigner,
+    "PromptReplace": PromptReplace,
 }
 
 NODE_DISPLAY_NAME_MAPPINGS = {
@@ -176,6 +178,7 @@ NODE_DISPLAY_NAME_MAPPINGS = {
     "Florence2Plus": "Florence2 Plus",
     "PromptGallery": "Prompt Gallery",
     "TypeDesigner": "Type Designer",
+    "PromptReplace": "Prompt Replace",
 }
 
 WEB_DIRECTORY = os.path.join(os.path.dirname(os.path.abspath(__file__)), "web")

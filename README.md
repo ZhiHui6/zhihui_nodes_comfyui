@@ -49,12 +49,6 @@
 </tr>
 
 <tr>
-<td><b>万相视频提示词生成器</b><br><code>WanPromptGenerator</code></td>
-<td>提示词处理</td>
-<td>基于万相2.2官方文档编写的全能型提示词生成器，支持自定义和预设两种组合方法，涵盖运镜、场景、光线、构图等17个维度的专业视频提示词生成。</td>
-</tr>
-
-<tr>
 <td><b>摄影提示词生成器</b><br><code>PhotographPromptGenerator</code></td>
 <td>提示词处理</td>
 <td>专业摄影风格提示词生成器，涵盖人物、场景、镜头、光线、服装等16个维度。支持输出模式切换（标签组合/模板文本），集成AI扩写功能。配有用户自定义选项扩展和模板编辑助手界面。</td>
@@ -165,10 +159,22 @@
 </div>
 </td>
 </tr>
+
+<tr>
+<td><b>提示词替换</b><br><code>PromptReplace</code></td>
+<td>提示词替换节点：支持动态数量的查找与替换操作，适合批量替换触发词、风格词或模型相关文本。
+<br>
+<div align="left">
+<a href="images/Prompt Replace.jpg" target="_blank">
+<img src="images/Prompt Replace.jpg" alt="提示词替换" width="45%"/>
+</a>
+</div>
+</td>
+</tr>
+
 <tr>
 <td><b>文本显示器</b><br><code>ShowText</code></td>
 <td>用于在ComfyUI界面中显示文本内容的节点，支持多行文本展示，可实时显示上游节点传递的文本信息，便于调试和查看中间结果。
-
 <br>
 <div align="left">
 <a href="images/文本显示器.jpg" target="_blank">

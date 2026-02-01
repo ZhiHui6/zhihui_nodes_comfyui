@@ -37,13 +37,10 @@
     },
     "TextMergerNode": {
         "title": "文本合并器",
-        "description": "文本合并器：合并多个文本输入为一个文本输出。user_text 优先显示在最前面，后续通过 inputcount 控制输入端口数量（text_2 到 text_N），使用分隔符连接所有非空文本，适用于多个提示词的批量合并。",
+        "description": "文本合并器：合并多个文本输入为一个文本输出。通过 inputcount 控制输入端口数量（text_1 到 text_N），使用分隔符连接所有非空文本，适用于多个提示词的批量合并。",
         "widgets": {
             "inputcount": "输入数量",
             "separator": "分隔符"
-        },
-        "inputs": {
-            "user_text": "用户文本"
         },
         "outputs": {
             "merged_text": "合并文本"
@@ -969,6 +966,39 @@
         },
         "outputs": {
             "prompt_text": "提示词文本"
+        }
+    },
+    "PromptReplace": {
+        "title": "提示词替换",
+        "description": "提示词替换：支持动态数量的查找和替换操作。",
+        "inputs": {
+            "text_input": "提示词"
+        },
+        "widgets": {
+            "inputcount": "输入数量",
+            "find_1": "搜索_1",
+            "replace_1": "替换_1",
+            "find_2": "搜索_2",
+            "replace_2": "替换_2",
+            "find_3": "搜索_3",
+            "replace_3": "替换_3",
+            "find_4": "搜索_4",
+            "replace_4": "替换_4",
+            "find_5": "搜索_5",
+            "replace_5": "替换_5",
+            "find_6": "搜索_6",
+            "replace_6": "替换_6",
+            "find_7": "搜索_7",
+            "replace_7": "替换_7",
+            "find_8": "搜索_8",
+            "replace_8": "替换_8",
+            "find_9": "搜索_9",
+            "replace_9": "替换_9",
+            "find_10": "搜索_10",
+            "replace_10": "替换_10"
+        },
+        "outputs": {
+            "text_output": "提示词"
         }
     }
 }

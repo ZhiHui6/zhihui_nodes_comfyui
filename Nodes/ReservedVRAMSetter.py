@@ -88,7 +88,7 @@ class ReservedVRAMSetter:
     RETURN_NAMES = ("output", "SEED", "Reserved(GB)")
     OUTPUT_NODE = True
     FUNCTION = "set_vram"
-    CATEGORY = "Zhi.AI/VRAM"
+    CATEGORY = "Zhi.AI/Toolkit"
 
     @classmethod
     def IS_CHANGED(cls, seed=0, **kwargs):

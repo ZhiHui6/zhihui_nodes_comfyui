@@ -49,12 +49,6 @@ Provides dedicated Chinese localization files, which can be used with the ComfyU
 </tr>
 
 <tr>
-<td><b>WanXiang Video Prompt Generator</b><br><code>WanPromptGenerator</code></td>
-<td>Prompt Processing</td>
-<td>A comprehensive prompt generator written based on WanXiang 2.2 official documentation, supporting both custom and preset combination methods, covering 17 professional dimensions of video prompts including camera movement, scenes, lighting, and composition.</td>
-</tr>
-
-<tr>
 <td><b>Photography Prompt Generator</b><br><code>PhotographPromptGenerator</code></td>
 <td>Prompt Processing</td>
 <td>Professional photography-style prompt generator, covering 16 dimensions including characters, scenes, lenses, lighting, and clothing. Supports output mode switching (tag combination/template text), integrated AI expansion function. Equipped with user-defined option extension and template editing assistant interface.</td>
@@ -161,6 +155,17 @@ Uses multiple LLM models to intelligently expand and creatively enhance input te
 <div align="left">
 <a href="images/提示词扩展(通用).jpg" target="_blank">
 <img src="images/提示词扩展(通用).jpg" alt="Text Expander" width="45%"/>
+</a>
+</div>
+</td>
+</tr>
+<tr>
+<td><b>Prompt Replace</b><br><code>PromptReplace</code></td>
+<td>Prompt replacement node: supports a dynamic number of find/replace operations, suitable for batch replacing trigger words, style terms, or model-related text.
+<br>
+<div align="left">
+<a href="images/Prompt Replace.jpg" target="_blank">
+<img src="images/Prompt Replace.jpg" alt="Prompt Replace" width="45%"/>
 </a>
 </div>
 </td>

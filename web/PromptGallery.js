@@ -1,7 +1,6 @@
 import { app } from "../../../scripts/app.js";
 import { api } from "../../../scripts/api.js";
 
-// Load CSS
 const link = document.createElement("link");
 link.rel = "stylesheet";
 link.type = "text/css";
@@ -17,7 +16,7 @@ app.registerExtension({
                 const r = onNodeCreated ? onNodeCreated.apply(this, arguments) : undefined;
 
                 const node = this;
-                node.setSize([400, 500]); // Set default larger size
+                node.setSize([400, 500]);
 
                 node.properties = node.properties || {};
                 const defaultSettings = { rememberPath: true, useWindowsPicker: false, lastDir: "" };
@@ -27,17 +26,13 @@ app.registerExtension({
                 settings = { ...defaultSettings, ...settings };
                 node.properties.zhihuiGallerySettings = settings;
                 
-                // --- Create Custom Widgets (Hidden/Data only) ---
-                // We create them but prevent them from being drawn or taking space
-                // This ensures ComfyUI still passes their values to the backend
-                
                 function createHiddenWidget(name, value = "") {
                     const w = node.addWidget("text", name, value, (v) => {}, {});
-                    // Override methods to make it invisible
-                    w.computeSize = () => [0, -4]; // Tiny size
-                    w.draw = () => {}; // No drawing
-                    w.type = "converted-widget"; // Treat as internal
-                    // Also setting serialized to true is default, which is what we want
+
+                    w.computeSize = () => [0, -4];
+                    w.draw = () => {};
+                    w.type = "converted-widget";
+
                     return w;
                 }
 
@@ -74,7 +69,6 @@ app.registerExtension({
                         imgWidget.draw = () => {};
                         imgWidget.type = "converted-widget";
                     }
-
                     removeInputPortByName("directory");
                     removeInputPortByName("selected_image");
                 };
@@ -88,14 +82,12 @@ app.registerExtension({
                     return rr;
                 };
 
-                // --- Create DOM Elements ---
                 const container = document.createElement("div");
                 container.className = "zhihui-gallery-container";
                 container.style.position = "absolute"; 
                 container.style.pointerEvents = "auto";
                 container.style.display = "none";
 
-                // Top Bar for Path
                 const topBar = document.createElement("div");
                 topBar.className = "zhihui-gallery-topbar";
                 
@@ -103,9 +95,7 @@ app.registerExtension({
                 pathInput.className = "zhihui-gallery-path-input";
                 pathInput.type = "text";
                 pathInput.placeholder = "输入目录路径 · Enter directory path...";
-                pathInput.value = dirWidget.value || "";
-                
-                // Sync input to widget
+                pathInput.value = dirWidget.value || "";            
                 pathInput.onchange = (e) => {
                     applyDirectory(e.target.value, true);
                 };
@@ -155,7 +145,6 @@ app.registerExtension({
                 const grid = document.createElement("div");
                 grid.className = "zhihui-gallery-grid";
                 container.appendChild(grid);
-
                 const footer = document.createElement("div");
                 footer.className = "zhihui-gallery-footer";
                 const footerLeft = document.createElement("div");
@@ -171,14 +160,11 @@ app.registerExtension({
                 footer.appendChild(footerLeft);
                 footer.appendChild(footerRight);
                 container.appendChild(footer);
-
                 const settingsOverlay = document.createElement("div");
                 settingsOverlay.className = "zhihui-gallery-settings-overlay";
-
                 const settingsDialog = document.createElement("div");
                 settingsDialog.className = "zhihui-gallery-settings-dialog";
                 settingsOverlay.appendChild(settingsDialog);
-
                 const settingsTitle = document.createElement("div");
                 settingsTitle.className = "zhihui-gallery-settings-title";
                 const settingsTitleText = document.createElement("div");
@@ -305,7 +291,6 @@ app.registerExtension({
                     updateBrowseBtnVisibility();
                 };
 
-                // --- Lazy Loading Observer ---
                 const observer = new IntersectionObserver((entries) => {
                     entries.forEach(entry => {
                         if (entry.isIntersecting) {
@@ -318,7 +303,7 @@ app.registerExtension({
                         }
                     });
                 }, {
-                    root: grid, // Changed root to grid for scrolling context
+                    root: grid,
                     rootMargin: "50px"
                 });
 
@@ -351,7 +336,6 @@ app.registerExtension({
                     }
                 };
 
-                // --- Widget Creation (The HTML Overlay) ---
                 const widget = {
                     type: "HTML",
                     name: "gallery_preview",
@@ -364,7 +348,6 @@ app.registerExtension({
                         const transform = ctx.getTransform();
                         const scale = app.canvas.ds.scale;
                         const offset = app.canvas.ds.offset;
-
                         const marginLeft = 10;
                         const marginRight = 10;
                         const marginBottom = 10;
@@ -390,17 +373,13 @@ app.registerExtension({
                             }
                         }
 
-                        // Use the remaining height of the node for the gallery
                         const availableHeight = node.size[1] - safeY - marginBottom;
                         const elHeight = Math.max(availableHeight, 100); 
-
                         const baseCellAndGap = 88;
                         const columns = Math.max(1, Math.floor(elWidth / baseCellAndGap));
-                        grid.style.gridTemplateColumns = `repeat(${columns}, minmax(0, 1fr))`;
-                        
+                        grid.style.gridTemplateColumns = `repeat(${columns}, minmax(0, 1fr))`;    
                         const canvasX = node.pos[0] + marginLeft;
                         const canvasY = node.pos[1] + safeY;
-
                         const screenX = (canvasX + offset[0]) * scale;
                         const screenY = (canvasY + offset[1]) * scale;
                         const screenWidth = elWidth * scale;
@@ -439,7 +418,6 @@ app.registerExtension({
                     }
                 };
 
-                // --- Logic ---
                 const fetchImages = async (dir) => {
                     const trimmed = (dir || "").trim();
                     if (!trimmed) {
@@ -488,15 +466,14 @@ app.registerExtension({
                         }
 
                         const img = document.createElement("img");
-                        // Use data-src for lazy loading and request thumbnail
                         const thumbUrl = `/zhihui/gallery/view_image?path=${encodeURIComponent(dir)}&filename=${encodeURIComponent(file.filename)}&thumbnail=true`;
                         
                         img.dataset.src = thumbUrl;
-                        img.src = ""; // Placeholder or empty
+                        img.src = "";
                         img.title = file.filename;
                         img.draggable = false;
                         
-                        observer.observe(img); // Start observing
+                        observer.observe(img);
                         
                         item.appendChild(img);
 
@@ -525,7 +502,6 @@ app.registerExtension({
                     setStatus("");
                 };
 
-                // Initial load if value exists
                 if (dirWidget.value) {
                     applyDirectory(dirWidget.value, true);
                 } else if (settings.rememberPath && settings.lastDir) {

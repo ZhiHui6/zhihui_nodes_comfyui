@@ -64,6 +64,10 @@ app.registerExtension({
                     }
                 }
             };
+
+            if (inputcountWidget) {
+                 this.updateInputs(inputcountWidget.value);
+            }
         };
     }
 });

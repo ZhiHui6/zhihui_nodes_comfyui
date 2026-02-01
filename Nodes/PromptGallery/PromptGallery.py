@@ -13,7 +13,7 @@ class PromptGallery:
     RETURN_TYPES = ("STRING",)
     RETURN_NAMES = ("text_content",)
     FUNCTION = "load_content"
-    CATEGORY = "Zhihui/Gallery"
+    CATEGORY = "Zhi.AI/Generator"
 
     def load_content(self, directory="", selected_image=""):
         if not directory or not selected_image:
