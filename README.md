@@ -161,6 +161,18 @@
 </tr>
 
 <tr>
+<td><b>提示词删除</b><br><code>PromptDelete</code></td>
+<td>提示词删除节点：支持动态数量的查找与删除操作，适合批量删除不需要的触发词、风格词或模型相关文本。并支持自动格式化功能，清理残留符号。
+<br>
+<div align="left">
+<a href="images/Prompt Delete.jpg" target="_blank">
+<img src="images/Prompt Delete.jpg" alt="提示词删除" width="45%"/>
+</a>
+</div>
+</td>
+</tr>
+
+<tr>
 <td><b>提示词替换</b><br><code>PromptReplace</code></td>
 <td>提示词替换节点：支持动态数量的查找与替换操作，适合批量替换触发词、风格词或模型相关文本。
 <br>

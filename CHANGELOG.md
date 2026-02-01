@@ -1,10 +1,12 @@
 # 更新日志
 ## 1.0.8 2026-2-1
 - 新增 提示词替换 节点(PromptReplace)：用于在提示词中替换指定文本。
+- 新增 提示词删除 节点(PromptDelete)：用于在提示词中删除指定文本。
 - 重构 文本合并 节点(TextMergerNode)，移除 user_text 输入，调整端口逻辑
 - 以及其他各项优化 
     <br>
 - Added PromptReplace node: allows users to replace specified text in prompts.
+- Added PromptDelete node: allows users to delete specified text in prompts.
 - Refactored TextMergerNode: removed user_text input and adjusted port logic
 - Various other optimizations
 

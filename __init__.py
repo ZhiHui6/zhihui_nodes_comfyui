@@ -58,6 +58,7 @@ from .Nodes.PromptGallery.PromptGallery import PromptGallery
 from .Nodes.PromptGallery import gallery_api
 from .Nodes.TypeDesigner.TypeDesigner import TypeDesigner
 from .Nodes.PromptReplace import PromptReplace
+from .Nodes.PromptDelete import PromptDelete
 
 import os
 
@@ -119,6 +120,7 @@ NODE_CLASS_MAPPINGS = {
     "PromptGallery": PromptGallery,
     "TypeDesigner": TypeDesigner,
     "PromptReplace": PromptReplace,
+    "PromptDelete": PromptDelete,
 }
 
 NODE_DISPLAY_NAME_MAPPINGS = {
@@ -179,6 +181,7 @@ NODE_DISPLAY_NAME_MAPPINGS = {
     "PromptGallery": "Prompt Gallery",
     "TypeDesigner": "Type Designer",
     "PromptReplace": "Prompt Replace",
+    "PromptDelete": "Prompt Delete",
 }
 
 WEB_DIRECTORY = os.path.join(os.path.dirname(os.path.abspath(__file__)), "web")

@@ -160,6 +160,18 @@ Uses multiple LLM models to intelligently expand and creatively enhance input te
 </td>
 </tr>
 <tr>
+<td><b>Prompt Delete</b><br><code>PromptDelete</code></td>
+<td>Prompt Deletion Node: Supports dynamic number of search and delete operations, suitable for batch deleting unwanted trigger words, style words, or model-related text. Also supports auto-formatting to clean up residual symbols.
+<br>
+<div align="left">
+<a href="images/Prompt Delete.jpg" target="_blank">
+<img src="images/Prompt Delete.jpg" alt="Prompt Delete" width="45%"/>
+</a>
+</div>
+</td>
+</tr>
+
+<tr>
 <td><b>Prompt Replace</b><br><code>PromptReplace</code></td>
 <td>Prompt replacement node: supports a dynamic number of find/replace operations, suitable for batch replacing trigger words, style terms, or model-related text.
 <br>
