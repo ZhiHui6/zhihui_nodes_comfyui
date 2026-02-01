@@ -9,12 +9,60 @@ app.registerExtension({
         nodeType.prototype.onNodeCreated = function () {
             const r = onNodeCreated ? onNodeCreated.apply(this, arguments) : undefined;
 
+            const applyWidgetVisibility = (widget, show) => {
+                if (!widget) return;
+                widget.hidden = !show;
+                widget.disabled = !show;
+                if (widget.options && typeof widget.options === "object") {
+                    widget.options.hidden = !show;
+                }
+                if (widget.inputEl) {
+                    widget.inputEl.disabled = !show;
+                }
+            };
+
+            const getIsChinese = () => {
+                const inputcountWidget = this.widgets?.find(w => w.name === "inputcount");
+                return inputcountWidget && (inputcountWidget.label === "输入数量" || inputcountWidget.name === "输入数量");
+            };
+
+            const applyUnifyReplaceUI = () => {
+                const unifyWidget = this.widgets?.find(w => w.name === "unify_replace");
+                const unifiedReplaceWidget = this.widgets?.find(w => w.name === "unified_replace");
+                const enabled = !!unifyWidget?.value;
+
+                const isChinese = getIsChinese();
+                if (unifyWidget) unifyWidget.label = isChinese ? "统一替换" : (unifyWidget.label || "Unified Replace");
+                if (unifiedReplaceWidget) unifiedReplaceWidget.label = isChinese ? "统一替换内容" : (unifiedReplaceWidget.label || "Unified Replacement");
+
+                applyWidgetVisibility(unifiedReplaceWidget, enabled);
+
+                const target = parseInt(this.widgets?.find(w => w.name === "inputcount")?.value) || 0;
+                for (let i = 1; i <= 10; i++) {
+                    const w = this.widgets?.find(w => w.name === `replace_${i}`);
+                    const show = !enabled && i <= target;
+                    applyWidgetVisibility(w, show);
+                }
+
+                this.size = this.computeSize(this.size);
+                app.graph.setDirtyCanvas(true, true);
+            };
+
             const inputcountWidget = this.widgets.find(w => w.name === "inputcount");
             if (inputcountWidget) {
                 const originalCallback = inputcountWidget.callback;
                 inputcountWidget.callback = (value) => {
                     if (originalCallback) originalCallback.call(this, value);
                     this.updateWidgets(value);
+                };
+            }
+
+            const unifyReplaceWidget = this.widgets?.find(w => w.name === "unify_replace");
+            if (unifyReplaceWidget) {
+                const originalCallback = unifyReplaceWidget.callback;
+                unifyReplaceWidget.callback = (value) => {
+                    if (originalCallback) originalCallback.call(this, value);
+                    applyUnifyReplaceUI();
                 };
             }
 
@@ -64,12 +112,15 @@ app.registerExtension({
                     }
                 }
 
-                // Sort widgets: inputcount first, then find/replace pairs, then button
                 this.widgets.sort((a, b) => {
-                    if (a.name === "inputcount") return -1;
-                    if (b.name === "inputcount") return 1;
+                    if (a.name === "unify_replace") return -1;
+                    if (b.name === "unify_replace") return 1;
+                    if (a.name === "unified_replace") return -1;
+                    if (b.name === "unified_replace") return 1;
                     if (a.type === "button") return 1;
                     if (b.type === "button") return -1;
+                    if (a.name === "inputcount") return 1;
+                    if (b.name === "inputcount") return -1;
 
                     const aIsFind = a.name.startsWith("find_");
                     const aIsReplace = a.name.startsWith("replace_");
@@ -82,7 +133,7 @@ app.registerExtension({
                         if (aIndex !== bIndex) {
                             return aIndex - bIndex;
                         }
-                        // Same index: find before replace
+
                         if (aIsFind && bIsReplace) return -1;
                         if (aIsReplace && bIsFind) return 1;
                     }
@@ -91,11 +142,14 @@ app.registerExtension({
 
                 this.onResize?.(this.size);
                 this.setSize([this.size[0], 0]);
+                applyUnifyReplaceUI();
             };
 
             if (inputcountWidget) {
                  this.updateWidgets(inputcountWidget.value);
             }
+
+            applyUnifyReplaceUI();
         };
     }
 });
