@@ -131,7 +131,7 @@ class WanPromptGenerator:
                 "preset_combination": (s.preset_combination_options, {"default": "不使用预设"}),
                 "add_prefix": ("BOOLEAN", {"default": False}),
                 "enable_expansion": ("BOOLEAN", {"default": False}),
-                "model_brand": (["deepseek", "deepseek-reasoning", "gemini", "mistral", "nova-fast", "openai", "openai-large", "openai-reasoning", "evil", "unity"], {"default": "openai"}), 
+                "model_brand": (["gemini", "mistral", "nova-fast", "openai", "openai-large", "openai-reasoning", "evil", "unity"], {"default": "openai"}), 
                 "supplementary_text": ("STRING", {"default": "", "multiline": True}),
                 "custom_system_prompt": ("STRING", {"default": "", "multiline": True, "forceInput": True}),
             }
@@ -194,8 +194,6 @@ class WanPromptGenerator:
         encoded_prompt = urllib.parse.quote(full_prompt)
     
         model_mapping = {
-            "deepseek": "deepseek",
-            "deepseek-reasoning": "deepseek-reasoning",
             "gemini": "gemini",
             "gemini-search": "gemini-search",
             "mistral": "mistral",

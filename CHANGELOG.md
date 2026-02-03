@@ -1,4 +1,17 @@
 # 更新日志
+## 1.0.9 2026-2-3
+- 新增 音频时长 节点(AudioDuration)：用于计算音频的持续时间，并以多种格式（秒、格式化时间字符串、毫秒）输出。
+- 修复自动翻译安装脚本的编码问题
+- 修复腾讯翻译君auto语言映射错误
+- 所有带扩写功能的节点中，移除已失效模型（deepseek和deepseek-reasoning）
+- Qwen3VL全系列节点，增加“跳过已存在”选项开关（输出目录如已存在标签文件时，跳过该文件的处理）
+    <br>
+- Added AudioDuration node: calculates the duration of audio and outputs it in various formats (seconds, formatted time string, milliseconds).
+- Fixed encoding issue in auto-translation installation script.
+- Fixed incorrect language mapping in Tencent Translation API.
+- Removed invalid models (deepseek and deepseek-reasoning) from nodes with expansion features.
+- Added "Skip if exists" toggle to all Qwen3VL nodes: when a label file already exists in the output directory, that file will be skipped.
+
 ## 1.0.8 2026-2-1
 - 新增 提示词替换 节点(PromptReplace)：用于在提示词中替换指定文本。
 - 新增 提示词删除 节点(PromptDelete)：用于在提示词中删除指定文本。

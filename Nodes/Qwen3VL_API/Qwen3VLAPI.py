@@ -1047,6 +1047,10 @@ class Qwen3VLAPI:
                     "max": 0xffffffffffffffff,
                     "tooltip": "随机种子用于复现结果。使用 -1 表示随机种子。"
                 }),
+                "skip_exists": ("BOOLEAN", {
+                    "default": False,
+                    "tooltip": "启用后将跳过已存在同名txt文件的图片的打标处理，防止重复打标"
+                }),
                 "batch_mode": ("BOOLEAN", {
                     "default": False,
                     "tooltip": "启用批量处理模式。"
@@ -1123,7 +1127,7 @@ class Qwen3VLAPI:
         else:
             return user_prompt.strip()
 
-    def analyze_image(self, user_prompt, system_prompt, llm_mode, aggressive_creative, size_limitation, max_tokens, temperature, top_k, repetition_penalty, min_p, top_p, seed, remove_think_tags, batch_mode, batch_folder_path, source_path=None, images=None):
+    def analyze_image(self, user_prompt, system_prompt, llm_mode, aggressive_creative, size_limitation, max_tokens, temperature, top_k, repetition_penalty, min_p, top_p, seed, remove_think_tags, skip_exists, batch_mode, batch_folder_path, source_path=None, images=None):
         import random
         import time
         
@@ -1321,6 +1325,12 @@ class Qwen3VLAPI:
                         
                         for i, image_path in enumerate(image_paths):
                             try:
+                                if skip_exists:
+                                    txt_file = os.path.splitext(image_path)[0] + ".txt"
+                                    if os.path.exists(txt_file):
+                                        status_messages.append(f"⏩ 跳过 {os.path.basename(image_path)} (已存在标签文件)")
+                                        continue
+
                                 status_messages.append(f"🔄 正在处理图片 {i+1}/{total_images}: {os.path.basename(image_path)}")
                                 
                                 image_tensor = self.load_image_from_path(image_path)

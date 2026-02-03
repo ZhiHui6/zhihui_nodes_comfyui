@@ -59,6 +59,7 @@ from .Nodes.PromptGallery import gallery_api
 from .Nodes.TypeDesigner.TypeDesigner import TypeDesigner
 from .Nodes.PromptReplace import PromptReplace
 from .Nodes.PromptDelete import PromptDelete
+from .Nodes.AudioDuration import AudioDuration
 
 import os
 
@@ -121,6 +122,7 @@ NODE_CLASS_MAPPINGS = {
     "TypeDesigner": TypeDesigner,
     "PromptReplace": PromptReplace,
     "PromptDelete": PromptDelete,
+    "AudioDuration": AudioDuration,
 }
 
 NODE_DISPLAY_NAME_MAPPINGS = {
@@ -182,6 +184,7 @@ NODE_DISPLAY_NAME_MAPPINGS = {
     "TypeDesigner": "Type Designer",
     "PromptReplace": "Prompt Replace",
     "PromptDelete": "Prompt Delete",
+    "AudioDuration": "Audio Duration",
 }
 
 WEB_DIRECTORY = os.path.join(os.path.dirname(os.path.abspath(__file__)), "web")

@@ -1,39 +1,38 @@
 @echo off
-chcp 65001 >nul
 setlocal enabledelayedexpansion
 
 echo ========================================
-echo    æ½ªAIèŠ‚ç‚¹åŒ…ä¸­æ–‡æœ¬åœ°åŒ–æ–‡ä»¶å®‰è£…å·¥å…·
+echo    AI½Úµã°üÖĞÎÄ±¾µØ»¯ÎÄ¼ş°²×°¹¤¾ß
 echo ========================================
 echo.
 
-:: è·å–å½“å‰è„šæœ¬æ‰€åœ¨ç›®å½•ï¼Œç„¶åæŒ‡å‘Chinese_Localization_Fileså­ç›®å½•
+rem »ñÈ¡µ±Ç°½Å±¾ËùÔÚÄ¿Â¼£¬È»ºóÖ¸ÏòChinese_Localization_Files×ÓÄ¿Â¼
 set "SCRIPT_DIR=%~dp0"
 set "SOURCE_DIR=%SCRIPT_DIR%Chinese_Localization_Files\"
 
-:: æ£€æŸ¥æºæ–‡ä»¶æ˜¯å¦å­˜åœ¨
-echo æ­£åœ¨æ£€æŸ¥æºæ–‡ä»¶...
+rem ¼ì²éÔ´ÎÄ¼şÊÇ·ñ´æÔÚ
+echo ÕıÔÚ¼ì²éÔ´ÎÄ¼ş...
 if not exist "%SOURCE_DIR%\zhihui_nodes_comfyui.json" (
-    echo é”™è¯¯ï¼šæ‰¾ä¸åˆ°æºæ–‡ä»¶ zhihui_nodes_comfyui.json
-    echo è¯·ç¡®ä¿ Chinese_Localization_Files ç›®å½•å­˜åœ¨ä¸”åŒ…å«å¿…è¦æ–‡ä»¶
+    echo ´íÎó£ºÕÒ²»µ½Ô´ÎÄ¼ş zhihui_nodes_comfyui.json
+    echo ÇëÈ·±£ Chinese_Localization_Files Ä¿Â¼´æÔÚÇÒ°üº¬±ØÒªÎÄ¼ş
     pause
     exit /b 1
 )
 
 if not exist "%SOURCE_DIR%\zhihui_nodes_translation.json" (
-    echo é”™è¯¯ï¼šæ‰¾ä¸åˆ°æºæ–‡ä»¶ zhihui_nodes_translation.json
-    echo è¯·ç¡®ä¿ Chinese_Localization_Files ç›®å½•å­˜åœ¨ä¸”åŒ…å«å¿…è¦æ–‡ä»¶
+    echo ´íÎó£ºÕÒ²»µ½Ô´ÎÄ¼ş zhihui_nodes_translation.json
+    echo ÇëÈ·±£ Chinese_Localization_Files Ä¿Â¼´æÔÚÇÒ°üº¬±ØÒªÎÄ¼ş
     pause
     exit /b 1
 )
 
-echo âœ“ æºæ–‡ä»¶æ£€æŸ¥å®Œæˆ
+echo [OK] Ô´ÎÄ¼ş¼ì²éÍê³É
 echo.
 
-:: æ£€æŸ¥ComfyUI-DD-Translationæ‰©å±•æ˜¯å¦å­˜åœ¨
-echo æ­£åœ¨æ£€æŸ¥ ComfyUI-DD-Translation æ‰©å±•...
+rem ¼ì²éComfyUI-DD-TranslationÀ©Õ¹ÊÇ·ñ´æÔÚ
+echo ÕıÔÚ¼ì²é ComfyUI-DD-Translation À©Õ¹...
 
-:: å‘ä¸ŠæŸ¥æ‰¾custom_nodesç›®å½•
+rem ÏòÉÏ²éÕÒcustom_nodesÄ¿Â¼
 set "CURRENT_DIR=%SCRIPT_DIR%"
 set "CUSTOM_NODES_DIR="
 
@@ -43,10 +42,10 @@ if exist "%CURRENT_DIR%custom_nodes" (
     goto :found_custom_nodes
 )
 
-:: å‘ä¸Šä¸€çº§ç›®å½•æŸ¥æ‰¾
+rem ÏòÉÏÒ»¼¶Ä¿Â¼²éÕÒ
 for %%i in ("%CURRENT_DIR%..") do set "CURRENT_DIR=%%~fi\"
 if "%CURRENT_DIR%"=="%CURRENT_DIR:~0,3%" (
-    echo é”™è¯¯ï¼šæ— æ³•æ‰¾åˆ° custom_nodes ç›®å½•
+    echo ´íÎó£ºÎŞ·¨ÕÒµ½ custom_nodes Ä¿Â¼
     goto :extension_not_found
 )
 goto :find_custom_nodes
@@ -55,76 +54,76 @@ goto :find_custom_nodes
 set "DD_TRANSLATION_DIR=%CUSTOM_NODES_DIR%\ComfyUI-DD-Translation"
 
 if exist "%DD_TRANSLATION_DIR%" (
-    echo âœ“ æ‰¾åˆ° ComfyUI-DD-Translation æ‰©å±•
-    echo   æ‰©å±•è·¯å¾„: %DD_TRANSLATION_DIR%
+    echo [OK] ÕÒµ½ ComfyUI-DD-Translation À©Õ¹
+    echo   À©Õ¹Â·¾¶: %DD_TRANSLATION_DIR%
     echo.
     goto :install_files
 ) else (
-    echo ! æœªæ‰¾åˆ° ComfyUI-DD-Translation æ‰©å±•
+    echo ! Î´ÕÒµ½ ComfyUI-DD-Translation À©Õ¹
     goto :extension_not_found
 )
 
 :install_files
-echo å¼€å§‹å®‰è£…æœ¬åœ°åŒ–æ–‡ä»¶...
+echo ¿ªÊ¼°²×°±¾µØ»¯ÎÄ¼ş...
 echo.
 
-:: åˆ›å»ºç›®æ ‡ç›®å½•ï¼ˆå¦‚æœä¸å­˜åœ¨ï¼‰
+rem ´´½¨Ä¿±êÄ¿Â¼£¨Èç¹û²»´æÔÚ£©
 set "MENU_TARGET_DIR=%DD_TRANSLATION_DIR%\zh-CN\Menus"
 set "NODES_TARGET_DIR=%DD_TRANSLATION_DIR%\zh-CN\Nodes"
 
 if not exist "%MENU_TARGET_DIR%" (
-    echo åˆ›å»ºç›®å½•: %MENU_TARGET_DIR%
+    echo ´´½¨Ä¿Â¼: %MENU_TARGET_DIR%
     mkdir "%MENU_TARGET_DIR%" 2>nul
     if errorlevel 1 (
-        echo é”™è¯¯ï¼šæ— æ³•åˆ›å»ºç›®å½• %MENU_TARGET_DIR%
+        echo ´íÎó£ºÎŞ·¨´´½¨Ä¿Â¼ %MENU_TARGET_DIR%
         pause
         exit /b 1
     )
 )
 
 if not exist "%NODES_TARGET_DIR%" (
-    echo åˆ›å»ºç›®å½•: %NODES_TARGET_DIR%
+    echo ´´½¨Ä¿Â¼: %NODES_TARGET_DIR%
     mkdir "%NODES_TARGET_DIR%" 2>nul
     if errorlevel 1 (
-        echo é”™è¯¯ï¼šæ— æ³•åˆ›å»ºç›®å½• %NODES_TARGET_DIR%
+        echo ´íÎó£ºÎŞ·¨´´½¨Ä¿Â¼ %NODES_TARGET_DIR%
         pause
         exit /b 1
     )
 )
 
-:: å¤åˆ¶æ–‡ä»¶
-echo æ­£åœ¨å¤åˆ¶æ–‡ä»¶...
+rem ¸´ÖÆÎÄ¼ş
+echo ÕıÔÚ¸´ÖÆÎÄ¼ş...
 
-echo   å¤åˆ¶ zhihui_nodes_comfyui.json åˆ° Menus ç›®å½•...
-copy "%SOURCE_DIR%\zhihui_nodes_comfyui.json" "%MENU_TARGET_DIR%\" >nul 2>&1
+echo   ¸´ÖÆ zhihui_nodes_comfyui.json µ½ Menus Ä¿Â¼...
+copy /Y "%SOURCE_DIR%\zhihui_nodes_comfyui.json" "%MENU_TARGET_DIR%\" >nul 2>&1
 if errorlevel 1 (
-    echo âœ— å¤åˆ¶ zhihui_nodes_comfyui.json å¤±è´¥
+    echo [ERROR] ¸´ÖÆ zhihui_nodes_comfyui.json Ê§°Ü
     pause
     exit /b 1
 ) else (
-    echo âœ“ zhihui_nodes_comfyui.json å¤åˆ¶æˆåŠŸ
+    echo [OK] zhihui_nodes_comfyui.json ¸´ÖÆ³É¹¦
 )
 
-echo   å¤åˆ¶ zhihui_nodes_translation.json åˆ° Nodes ç›®å½•...
-copy "%SOURCE_DIR%\zhihui_nodes_translation.json" "%NODES_TARGET_DIR%\" >nul 2>&1
+echo   ¸´ÖÆ zhihui_nodes_translation.json µ½ Nodes Ä¿Â¼...
+copy /Y "%SOURCE_DIR%\zhihui_nodes_translation.json" "%NODES_TARGET_DIR%\" >nul 2>&1
 if errorlevel 1 (
-    echo âœ— å¤åˆ¶ zhihui_nodes_translation.json å¤±è´¥
+    echo [ERROR] ¸´ÖÆ zhihui_nodes_translation.json Ê§°Ü
     pause
     exit /b 1
 ) else (
-    echo âœ“ zhihui_nodes_translation.json å¤åˆ¶æˆåŠŸ
+    echo [OK] zhihui_nodes_translation.json ¸´ÖÆ³É¹¦
 )
 
 echo.
 echo ========================================
-echo     æœ¬åœ°åŒ–æ–‡ä»¶å®‰è£…å®Œæˆï¼
+echo     ±¾µØ»¯ÎÄ¼ş°²×°Íê³É£¡
 echo ========================================
 echo.
-echo å®‰è£…è¯¦æƒ…ï¼š
-echo   â€¢ zhihui_nodes_comfyui.json â†’ %MENU_TARGET_DIR%
-echo   â€¢ zhihui_nodes_translation.json â†’ %NODES_TARGET_DIR%
+echo °²×°ÏêÇé£º
+echo   * zhihui_nodes_comfyui.json ¡ú %MENU_TARGET_DIR%
+echo   * zhihui_nodes_translation.json ¡ú %NODES_TARGET_DIR%
 echo.
-echo æ³¨æ„ï¼šè¯·é‡å¯ ComfyUI ä»¥ä½¿æœ¬åœ°åŒ–ç”Ÿæ•ˆ
+echo ×¢Òâ£ºÇëÖØÆô ComfyUI ÒÔÊ¹±¾µØ»¯ÉúĞ§
 echo.
 pause
 exit /b 0
@@ -132,25 +131,25 @@ exit /b 0
 :extension_not_found
 echo.
 echo ========================================
-echo     æœªæ‰¾åˆ° ComfyUI-DD-Translation æ‰©å±•
+echo     Î´ÕÒµ½ ComfyUI-DD-Translation À©Õ¹
 echo ========================================
 echo.
-echo è¦ä½¿ç”¨æ½ªAIèŠ‚ç‚¹çš„ä¸­æ–‡æœ¬åœ°åŒ–åŠŸèƒ½ï¼Œæ‚¨éœ€è¦å…ˆå®‰è£… ComfyUI-DD-Translation æ‰©å±•ã€‚
+echo ÒªÊ¹ÓÃAI½ÚµãµÄÖĞÎÄ±¾µØ»¯¹¦ÄÜ£¬ÄúĞèÒªÏÈ°²×° ComfyUI-DD-Translation À©Õ¹¡£
 echo.
-echo å®‰è£…æ–¹æ³•ï¼š
-echo   1. æ‰“å¼€ ComfyUI Manager
-echo   2. æœç´¢å¹¶å®‰è£… "ComfyUI-DD-Translation"
+echo °²×°·½·¨£º
+echo   1. ´ò¿ª ComfyUI Manager
+echo   2. ËÑË÷²¢°²×° "ComfyUI-DD-Translation"
 echo.
-echo æˆ–è€…æ‰‹åŠ¨å®‰è£…ï¼š
-echo   1. è¿›å…¥ ComfyUI çš„ custom_nodes ç›®å½•
-echo   2. æ‰§è¡Œå‘½ä»¤ï¼šgit clone https://github.com/Dontdrunk/ComfyUI-DD-Translation
-echo   3. é‡å¯ ComfyUI
-echo   4. å†æ¬¡è¿è¡Œæ­¤å®‰è£…è„šæœ¬
+echo »òÕßÊÖ¶¯°²×°£º
+echo   1. ½øÈë ComfyUI µÄ custom_nodes Ä¿Â¼
+echo   2. Ö´ĞĞÃüÁî£ºgit clone https://github.com/Dontdrunk/ComfyUI-DD-Translation
+echo   3. ÖØÆô ComfyUI
+echo   4. ÔÙ´ÎÔËĞĞ´Ë°²×°½Å±¾
 echo.
-echo æ‰©å±•åœ°å€ï¼š
+echo À©Õ¹µØÖ·£º
 echo   https://github.com/Dontdrunk/ComfyUI-DD-Translation
 echo.
-echo å®‰è£…å®Œæˆåï¼Œè¯·é‡æ–°è¿è¡Œæ­¤è„šæœ¬æ¥å®‰è£…æœ¬åœ°åŒ–æ–‡ä»¶ã€‚
+echo °²×°Íê³Éºó£¬ÇëÖØĞÂÔËĞĞ´Ë½Å±¾À´°²×°±¾µØ»¯ÎÄ¼ş¡£
 echo.
 pause
 exit /b 1

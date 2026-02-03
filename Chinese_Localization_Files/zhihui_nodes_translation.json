@@ -627,6 +627,7 @@
             "seed": "随机种子",
             "attention": "注意力机制",
             "device": "设备",
+            "skip_exists": "跳过已存在",
             "batch_mode": "批处理模式",
             "batch_directory": "批处理目录",
             "unlock_restrictions": "解锁限制",
@@ -656,6 +657,7 @@
             "attention": "注意力机制",
             "device": "计算设备",
             "remove_think_tags": "移除思考标签",
+            "skip_exists": "跳过已存在",
             "batch_mode": "批处理模式",
             "batch_directory": "批处理目录路径",
             "unload_mode": "卸载模式",
@@ -810,7 +812,8 @@
             "top_k": "Top K采样",
             "repetition_penalty": "重复惩罚",
             "min_p": "最小P采样",
-            "top_p": "Top P采样"
+            "top_p": "Top P采样",
+            "skip_exists": "跳过已存在"
         },
         "outputs": {
             "result":"结果",
@@ -999,6 +1002,18 @@
         },
         "outputs": {
             "text_output": "提示词"
+        }
+    },
+    "AudioDuration": {
+        "title": "音频时长",
+        "description": "音频时长节点：计算音频的持续时间，并以多种格式（秒、格式化时间字符串、毫秒）输出。支持自动处理音频维度，适用于音频处理流程中的时长统计和显示。",
+        "inputs": {
+            "audio": "音频"
+        },
+        "outputs": {
+            "duration_seconds": "时长(秒)",
+            "formatted_time": "格式化时间",
+            "duration_ms": "时长(毫秒)"
         }
     }
 }

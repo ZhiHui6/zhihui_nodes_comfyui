@@ -206,6 +206,10 @@ class Qwen3VLBasic:
                     "default": "Full Unload",
                     "tooltip": "模型卸载策略。完全卸载释放显存与内存；卸载到 CPU 释放显存；保持加载可加速下一次。"
                 }),
+                "skip_exists": ("BOOLEAN", {
+                    "default": False,
+                    "tooltip": "启用后将跳过已存在同名txt文件的图片的打标处理，防止重复打标"
+                }),
                 "batch_mode": ("BOOLEAN", {
                     "default": False,
                     "tooltip": "批量处理模式，启用后可处理指定目录中的多张图片。"
@@ -301,6 +305,7 @@ class Qwen3VLBasic:
         batch_mode=False,
         batch_directory="",
         remove_think_tags=False,
+        skip_exists=False,
     ):
 
         if source_path is not None and image is not None:
@@ -333,7 +338,8 @@ class Qwen3VLBasic:
             return self.batch_inference(
                 user_prompt, batch_directory, quantization, unload_mode,
                 temperature, max_new_tokens, image_size_limitation,
-                seed, attention, device, system_prompt, remove_think_tags
+                seed, attention, device, system_prompt, remove_think_tags,
+                skip_exists
             )
         
         if seed != -1:
@@ -559,6 +565,7 @@ class Qwen3VLBasic:
         device,
         system_prompt,
         remove_think_tags=False,
+        skip_exists=False,
     ):
         if seed != -1:
             torch.manual_seed(seed)
@@ -625,6 +632,11 @@ class Qwen3VLBasic:
         failed_count = 0
         
         for image_file in image_files:
+            if skip_exists:
+                txt_file = os.path.splitext(image_file)[0] + ".txt"
+                if os.path.exists(txt_file):
+                    print(f"Skipping {image_file} as {txt_file} already exists.")
+                    continue
             try:
                 if system_prompt:
                     try:

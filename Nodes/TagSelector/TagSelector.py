@@ -286,8 +286,6 @@ Output: A beautiful young girl with expressive eyes and a gentle smile, sitting 
             full_prompt = f"{system_prompt}\n\n输入标签：{tags_text}\n\n请扩写："
             encoded_prompt = urllib.parse.quote(full_prompt)
             model_mapping = {
-                "deepseek": "deepseek",
-                "deepseek-reasoning": "deepseek-reasoning",
                 "gemini": "gemini",
                 "mistral": "mistral",
                 "nova-fast": "nova-fast",

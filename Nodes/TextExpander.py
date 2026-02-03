@@ -10,7 +10,7 @@ class TextExpander:
     DESCRIPTION = "Text Expander: Uses AI models to intelligently expand input prompts. Supports multiple AI models, optional character count limits (controlled via system prompts - leave empty to disable), and custom system prompts to control expansion style and direction."
 
     model_options = [
-        "deepseek", "deepseek-reasoning", "gemini", "mistral", "nova-fast", 
+        "gemini", "mistral", "nova-fast", 
         "openai", "openai-large", "openai-reasoning", "evil", "unity"
     ]
 
@@ -29,7 +29,7 @@ class TextExpander:
             }
         }
 
-    def _call_llm_api(self, text, model="deepseek", custom_system_prompt="", char_limit=""):
+    def _call_llm_api(self, text, model="openai", custom_system_prompt="", char_limit=""):
         system_content = custom_system_prompt if custom_system_prompt and custom_system_prompt.strip() else ""
         
         if char_limit and char_limit.strip():
@@ -52,8 +52,6 @@ class TextExpander:
         encoded_prompt = urllib.parse.quote(full_prompt)
     
         model_mapping = {
-            "deepseek": "deepseek",
-            "deepseek-reasoning": "deepseek-reasoning",
             "gemini": "gemini",
             "mistral": "mistral",
             "nova-fast": "nova-fast",
@@ -64,7 +62,7 @@ class TextExpander:
             "unity": "unity"
         }
         
-        model_name = model_mapping.get(model, "deepseek")
+        model_name = model_mapping.get(model, "openai")
         api_url = f"https://text.pollinations.ai/{model_name}/{encoded_prompt}"
         
         try:

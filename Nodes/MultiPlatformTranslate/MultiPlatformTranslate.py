@@ -216,7 +216,7 @@ class MultiPlatformTranslate:
     def _translate_with_tencent(self, source_language, target_language, text):
         """使用腾讯翻译君进行翻译"""
         lang_map = {
-            "auto": "zh",
+            "auto": "auto",
             "zh": "zh", 
             "en": "en",
             "ja": "ja",

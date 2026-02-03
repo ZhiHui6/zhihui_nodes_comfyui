@@ -226,6 +226,7 @@ class Qwen3VLAdvanced:
                     {"default": "auto", "tooltip": "计算设备选择。auto 自动选择最佳设备，gpu 使用显卡，cpu 使用处理器。"},
                 ),
                 "unload_mode": (["Full Unload", "Unload to CPU", "Keep Loaded"], {"default": "Full Unload", "tooltip": "推理完成后的卸载策略。完全卸载释放显存与内存；卸载到 CPU 释放显存；保持加载便于下次加速。"}),
+                "skip_exists": ("BOOLEAN", {"default": False, "tooltip": "启用后将跳过已存在同名txt文件的图片的打标处理，防止重复打标"}),
                 "batch_mode": ("BOOLEAN", {"default": False, "tooltip": "启用批量模式，从指定目录处理多张图片。"}),
                 "batch_directory": ("STRING", {"default": "", "tooltip": "批量处理目录路径，指定待处理图片文件夹。"}),            
             },
@@ -262,6 +263,7 @@ class Qwen3VLAdvanced:
         image=None,
         source_path=None,
         attention="eager",
+        skip_exists=False,
         batch_mode=False,
         batch_directory="",
         extra_options=None,
@@ -358,7 +360,7 @@ class Qwen3VLAdvanced:
                 temperature, top_p, num_beams, repetition_penalty, frame_count, 
                 max_new_tokens, image_size_limitation,
                 seed, attention, output_language, device, system_prompt, unlock_restrictions, 
-                remove_think_tags, extra_options
+                remove_think_tags, extra_options, skip_exists
             )
         
         if seed != -1:
@@ -577,6 +579,7 @@ class Qwen3VLAdvanced:
         unlock_restrictions,
         remove_think_tags,
         extra_options=None,
+        skip_exists=False,
     ):
         if seed != -1:
             torch.manual_seed(seed)
@@ -644,6 +647,12 @@ class Qwen3VLAdvanced:
         failed_count = 0
         
         for image_file in image_files:
+            if skip_exists:
+                txt_file = os.path.splitext(image_file)[0] + ".txt"
+                if os.path.exists(txt_file):
+                    print(f"Skipping {image_file} as {txt_file} already exists.")
+                    continue
+
             try:
                 with torch.no_grad():
                     try:
