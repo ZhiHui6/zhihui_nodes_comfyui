@@ -140,27 +140,6 @@
 </tr>
 
 <tr>
-<td><b>提示词扩展(通用)</b><br><code>TextExpander</code></td>
-<td>
-
-使用多种LLM模型对输入文本进行智能扩写和创意增强，支持字符量控制和自定义系统引导词。
-
-<b>特点</b>：
-- <b>多模型支持</b>：支持claude、deepseek、gemini、openai、mistral、qwen-coder、llama、sur、unity、searchgpt、evil等11种AI模型
-- <b>字符量控制</b>：可精确控制输出文本的字符数量，确保生成内容符合要求
-- <b>创意温度调节</b>：通过温度参数控制生成内容的创意程度（0.1-2.0）
-- <b>系统引导词</b>：支持自定义系统引导词，引导AI生成特定风格的内容
-- <b>灵活输入</b>：支持直接输入系统引导词或通过外部节点加载
-
-<div align="left">
-<a href="images/提示词扩展(通用).jpg" target="_blank">
-<img src="images/提示词扩展(通用).jpg" alt="文本扩展器" width="45%"/>
-</a>
-</div>
-</td>
-</tr>
-
-<tr>
 <td><b>提示词删除</b><br><code>PromptDelete</code></td>
 <td>提示词删除节点：支持动态数量的查找与删除操作，适合批量删除不需要的触发词、风格词或模型相关文本。并支持自动格式化功能，清理残留符号。
 <br>

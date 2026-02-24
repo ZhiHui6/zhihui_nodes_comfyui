@@ -1,4 +1,19 @@
 # 更新日志
+## 1.0.10 2026-2-24
+- 移除一些节点中含Pollinations AI调用的部分（平台失效）
+- 移除 老旧过时的TextExpander节点
+- 将ShowText节点升级为ShowAny，支持双模式显示（标准模式和排错模式）
+- 更改MultiPlatformTranslate节点，增加谷歌翻译支持并改进错误处理。
+- 移除KontextPresetsBasic和KontextPresetsPlus节点，合并为ImageEditingPresets
+- 修复其余部分节点的一些错误。
+    <br>
+- Removed Pollinations AI calls in some nodes (platform discontinued)
+- Removed outdated TextExpander node
+- Upgraded ShowText to ShowAny, now supports dual-mode display (standard and debug)
+- Updated MultiPlatformTranslate node: added Google Translate support and improved error handling
+- Merged KontextPresetsBasic and KontextPresetsPlus into a single ImageEditingPresets node
+- Fixed various bugs in remaining nodes
+
 ## 1.0.9 2026-2-3
 - 新增 音频时长 节点(AudioDuration)：用于计算音频的持续时间，并以多种格式（秒、格式化时间字符串、毫秒）输出。
 - 修复自动翻译安装脚本的编码问题

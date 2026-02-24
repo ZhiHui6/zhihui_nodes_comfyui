@@ -6,7 +6,6 @@ import time
 import random
 import hmac
 import base64
-from urllib.parse import quote
 import uuid
 import os
 import json
@@ -248,21 +247,25 @@ class MultiPlatformTranslateAPI:
                     if 'auto_translation' in result:
                         return {"success": True, "message": "腾讯翻译君连接成功"}
             
-            elif platform == "Pollinations AI":
-                url = "https://text.pollinations.ai/openai/"
-                response = requests.get(
-                    url,
-                    params={
-                        "prompt": "Translate the following text from English to Chinese: hello"
-                    },
-                    timeout=10
-                )
+            elif platform == "谷歌翻译":
+                url = "https://translate.googleapis.com/translate_a/single"
+                params = {
+                    "client": "gtx",
+                    "sl": "en",
+                    "tl": "zh-CN",
+                    "dt": "t",
+                    "q": "hello"
+                }
+                headers = {
+                    'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/110.0.0.0 Safari/537.36'
+                }
+                response = requests.get(url, params=params, headers=headers, timeout=10)
                 
                 if response.status_code == 200:
-                    result = response.text
-                    if result.strip():
-                        return {"success": True, "message": "Pollinations AI连接成功"}
-            
+                    result = response.json()
+                    if result and isinstance(result, list) and len(result) > 0:
+                        return {"success": True, "message": "谷歌翻译连接成功"}
+                
             return {"success": False, "error": f"{platform}测试失败"}
         except Exception as e:
             return {"success": False, "error": f"连接异常: {str(e)}"}

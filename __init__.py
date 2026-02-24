@@ -1,9 +1,7 @@
 from .Nodes.PromptPreset.PromptPresetOneChoice import PromptPresetOneChoice
 from .Nodes.PromptPreset.PromptPresetMultipleChoice import PromptPresetMultipleChoice
-from .Nodes.KontextPresets.KontextPresetsBasic import LoadKontextPresetsBasic
-from .Nodes.KontextPresets.KontextPresetsPlus.KontextPresetsPlus import KontextPresetsPlus
+from .Nodes.ImageEditingPresets.ImageEditingPresets import ImageEditingPresets
 from .Nodes.SystemPrompt.SystemPromptLoader import SystemPromptLoader
-from .Nodes.TextExpander import TextExpander
 from .Nodes.ExtraOptions import ExtraOptions
 from .Nodes.MultiLineTextNode import MultiLineTextNode
 from .Nodes.TextCombinerNode import TextCombinerNode
@@ -13,7 +11,7 @@ from .Nodes.TextExtractor import TextExtractor
 from .Nodes.TriggerWordMerger import TriggerWordMerger
 from .Nodes.TextSwitch.TextSwitchDualMode import TextSwitchDualMode
 from .Nodes.TextSwitch.PriorityTextSwitch import PriorityTextSwitch
-from .Nodes.ShowText import ShowText
+from .Nodes.ShowAny import ShowAny
 from .Nodes.MultiPlatformTranslate.MultiPlatformTranslate import MultiPlatformTranslate
 from .Nodes.MultiPlatformTranslate.MultiPlatformTranslateAPI import MultiPlatformTranslateAPI
 from .Nodes.PhotographPromptGen.PhotographPromptGenerator import PhotographPromptGenerator
@@ -66,10 +64,8 @@ import os
 NODE_CLASS_MAPPINGS = {
     "PromptPresetOneChoice": PromptPresetOneChoice,
     "PromptPresetMultipleChoice": PromptPresetMultipleChoice,
-    "LoadKontextPresetsBasic": LoadKontextPresetsBasic,
-    "KontextPresetsPlus": KontextPresetsPlus,
+    "ImageEditingPresets": ImageEditingPresets,
     "SystemPromptLoader": SystemPromptLoader,
-    "TextExpander": TextExpander,
     "ExtraOptions": ExtraOptions,
     "MultiLineTextNode": MultiLineTextNode,
     "TextCombinerNode": TextCombinerNode,
@@ -79,7 +75,7 @@ NODE_CLASS_MAPPINGS = {
     "TriggerWordMerger": TriggerWordMerger,
     "TextSwitchDualMode": TextSwitchDualMode,
     "PriorityTextSwitch": PriorityTextSwitch,
-    "ShowText": ShowText,
+    "ShowAny": ShowAny,
     "MultiPlatformTranslate": MultiPlatformTranslate,
     "PhotographPromptGenerator": PhotographPromptGenerator,
     "WanPromptGenerator": WanPromptGenerator,
@@ -128,10 +124,8 @@ NODE_CLASS_MAPPINGS = {
 NODE_DISPLAY_NAME_MAPPINGS = {
     "PromptPresetOneChoice": "Prompt Preset One Choice",
     "PromptPresetMultipleChoice": "Prompt Preset Multiple Choice",
-    "LoadKontextPresetsBasic": "Load Kontext Presets Basic",
-    "KontextPresetsPlus": "Kontext Presets Plus",
+    "ImageEditingPresets": "Image Editing Presets",
     "SystemPromptLoader": "System Prompt Loader",
-    "TextExpander": "Text Expander",
     "ExtraOptions": "Extra Options",
     "MultiLineTextNode": "Multi Line Text Node",
     "TextCombinerNode": "Text Combiner Node",
@@ -141,7 +135,7 @@ NODE_DISPLAY_NAME_MAPPINGS = {
     "TriggerWordMerger": "Trigger Word Merger",
     "TextSwitchDualMode": "Text Switch Dual Mode",
     "PriorityTextSwitch": "Priority Text Switch",
-    "ShowText": "Show Text",
+    "ShowAny": "Show Any",
     "MultiPlatformTranslate": "Multi Platform Translate",
     "PhotographPromptGenerator": "Photograph Prompt Generator",
     "WanPromptGenerator": "Wan Prompt Generator",

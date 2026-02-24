@@ -1,9 +1,9 @@
 {
-    "ShowText": {
-        "title": "显示文本",
-        "description": "显示文本节点：用于在界面中显示文本内容，支持多行文本显示，可用于调试、预览文本内容或作为工作流程中的文本输出节点。",
+    "ShowAny": {
+        "title": "显示任何",
+        "description": "显示任何节点：用于在界面中显示任意类型内容，支持多行文本显示，可用于调试、预览内容或作为工作流程中的输出节点。",
         "inputs": {
-            "text": "文本"
+            "input": "输入"
         },
         "outputs": {
             "STRING": "字符串"
@@ -109,7 +109,7 @@
     },
     "TagSelector": {
         "title": "标签选择器",
-        "description": "提供可视化标签选择界面，允许用户从预设分类中选择标签。支持层级浏览、搜索功能和自动去重，选中的标签以逗号分隔字符串输出。新增AI扩写功能，支持标签风格和自然语言两种扩写模式，可选择多种AI模型进行扩写。",
+        "description": "提供可视化标签选择界面，允许用户从预设分类中选择标签。支持层级浏览、搜索功能和自动去重，选中的标签以逗号分隔字符串输出。",
         "inputs": {
             "tag_edit": "标签编辑"
         },
@@ -117,9 +117,6 @@
             "tags": "标签"
         },
         "widgets": {
-            "expand_mode": "扩写模式",
-            "Expanded_result": "扩写结果",
-            "expand_model": "扩写模型",
             "auto_random_tags": "自动随机标签"
         }
     },
@@ -309,22 +306,6 @@
             "sharpen_strength": "锐化强度"
         }
     },
-    "TextExpander": {
-        "title": "文本扩展器",
-        "description": "文本扩展器：通过AI模型扩展和优化输入文本。支持多种AI模型选择，可以对文本进行扩写、改写和优化，适用于提示词生成和文本创作。",
-        "inputs": {
-            "load_system_prompt": "加载系统提示词"
-        },
-        "outputs": {
-            "text_output": "文本输出"
-        },
-        "widgets": {
-            "node_switch": "节点开关",
-            "character_limit": "字符限制",
-            "creativity_temperature": "创意温度",
-            "model_brand": "模型品牌"
-        }
-    },
     "ExtraOptions": {
         "title": "额外引导选项（通用）",
         "description": "额外引导选项节点：为图像反向工程提供详细的引导选项配置。支持多种反向类型（描述性、训练提示词、MidJourney提示词等），并提供丰富的可选参数来控制输出内容细节，如光照信息、相机角度、构图风格等，适用于精确的图像描述和提示词生成。",
@@ -415,7 +396,6 @@
             "output": "输出"
         },
         "widgets": {
-            "expand_mode": "扩写模式",
             "output_mode": "输出模式",
             "character": "角色",
             "gender": "性别",
@@ -468,25 +448,14 @@
             "prompt6_comment": "提示词6注释"
         }
     },
-    "LoadKontextPresetsBasic": {
-        "title": "Kontext预设基础版",
-        "description": "Kontext预设基础版：提供各种图像编辑和变换的预设指令，包括场景传送、相机移动、重新打光、产品摄影等。适用于图像风格转换和创意编辑。",
+
+
+    "ImageEditingPresets": {
+        "title": "图像编辑预设",
+        "description": "图像编辑预设：提供分类管理的预设库，支持完整信息输出。适用于高级图像编辑和创意生成工作流。",
         "widgets": {
-            "preset": "预设"
-        },
-        "outputs": {
-            "prompt_content": "提示词内容"
-        }
-    },
-    "KontextPresetsPlus": {
-        "title": "Kontext预设增强版",
-        "description": "Kontext预设增强版：提供分类管理的预设库，支持完整信息输出、内置AI扩写功能，以及自定义内容输入。适用于高级图像编辑和创意生成工作流。",
-        "widgets": {    
             "preset": "预设",
-            "output_full_info": "输出完整信息",
-            "enable_builtin_expansion": "启用内置扩写",
-            "expansion_model": "扩写模型",
-            "custom_content": "自定义内容"
+            "output_full_info": "输出完整信息"
         },
         "outputs": {
             "prompt_content": "提示词内容"
@@ -494,7 +463,7 @@
     },
     "WanPromptGenerator": {
         "title": "万相视频提示词生成器",
-        "description": "万相视频提示词生成器：基于万相2.2官方文档编写的全能型提示词生成器，支持自定义和预设两种组合方法，涵盖运镜、场景、光线、构图等17个维度的专业视频提示词生成。内置电影级画面、记录风格、动作风格等预设组合，支持AI扩写功能。",
+        "description": "万相视频提示词生成器：基于万相2.2官方文档编写的全能型提示词生成器，支持自定义和预设两种组合方法，涵盖运镜、场景、光线、构图等17个维度的专业视频提示词生成。内置电影级画面、记录风格、动作风格等预设组合。",
         "inputs": {
             "custom_system_prompt": "自定义系统提示"
         },
@@ -519,7 +488,6 @@
             "special_effect": "特殊效果",
             "preset_combination": "预设组合",
             "add_prefix": "添加前缀",
-            "enable_expansion": "启用扩写",
             "model_brand": "模型品牌",
             "supplementary_text": "补充文本"
         },

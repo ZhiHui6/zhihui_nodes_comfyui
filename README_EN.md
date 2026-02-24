@@ -140,26 +140,6 @@ This node collection contains numerous nodes with different functionalities, div
 </tr>
 
 <tr>
-<td><b>Prompt Expander (Universal)</b><br><code>TextExpander</code></td>
-<td>
-
-Uses multiple LLM models to intelligently expand and creatively enhance input text, supporting character count control and custom system prompts.
-
-<b>Features</b>:
-- <b>Multi-model Support</b>: Supports 11 AI models including claude, deepseek, gemini, openai, mistral, qwen-coder, llama, sur, unity, searchgpt, and evil
-- <b>Character Count Control</b>: Precisely control the character count of output text to ensure generated content meets requirements
-- <b>Creative Temperature Adjustment</b>: Control the creativity level of generated content through temperature parameters (0.1-2.0)
-- <b>System Prompts</b>: Support custom system prompts to guide AI to generate content in specific styles
-- <b>Flexible Input</b>: Support direct input of system prompts or loading through external nodes
-
-<div align="left">
-<a href="images/提示词扩展(通用).jpg" target="_blank">
-<img src="images/提示词扩展(通用).jpg" alt="Text Expander" width="45%"/>
-</a>
-</div>
-</td>
-</tr>
-<tr>
 <td><b>Prompt Delete</b><br><code>PromptDelete</code></td>
 <td>Prompt Deletion Node: Supports dynamic number of search and delete operations, suitable for batch deleting unwanted trigger words, style words, or model-related text. Also supports auto-formatting to clean up residual symbols.
 <br>

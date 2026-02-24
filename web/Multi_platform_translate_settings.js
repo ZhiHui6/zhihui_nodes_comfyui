@@ -446,10 +446,10 @@ function getPlatformFields(platform) {
         ],
         zhipu: [
             { name: "api_key", label: "API Key", type: "text", required: true },
-            { name: "model", label: "模型", type: "select", options: ["glm-4-flash", "glm-4.5-flash", "glm-4.6v-flash"], default: "glm-4-flash" }
+            { name: "model", label: "模型", type: "select", options: ["glm-4-flash", "glm-4.5-flash", "glm-4.6v-flash", "glm-4.7-flash"], default: "glm-4.7-flash" }
         ],
         free: [
-            { name: "platform", label: "翻译平台", type: "select", options: ["腾讯翻译君", "Pollinations AI"], default: "腾讯翻译君" }
+            { name: "platform", label: "翻译平台", type: "select", options: ["腾讯翻译君", "谷歌翻译"], default: "腾讯翻译君" }
         ]
     };
     return fields[platform] || [];
@@ -479,7 +479,7 @@ function getPlatformInfo(platform) {
         },
         free: {
             name: "免费翻译",
-            description: "完全免费使用翻译服务，无需API密钥，可在腾讯翻译君和Pollinations AI之间切换。",
+            description: "完全免费使用翻译服务，无需API密钥。",
             website: ""
         }
     };
@@ -628,6 +628,12 @@ async function openSettings(node) {
                     </div>
                 ` : ""}
 
+                ${currentPlatform === 'free' ? `
+                <div id="google-warning" class="platform-warning" style="display: ${platformData.config.platform === '谷歌翻译' ? 'block' : 'none'}; margin-bottom: 15px; padding: 10px; background-color: rgba(245, 158, 11, 0.1); border: 1px solid rgba(245, 158, 11, 0.3); border-radius: 6px;">
+                    <p style="color: #f59e0b; margin: 0; font-size: 14px;">⚠️ 注意：谷歌翻译需要特殊网络环境支持才能正常使用。</p>
+                </div>
+                ` : ''}
+
                 ${fieldsHtml}
 
                 <div class="form-actions">
@@ -669,6 +675,17 @@ async function openSettings(node) {
                 }
             });
         });
+
+        // 监听平台选择变化（针对免费翻译的谷歌翻译警告）
+        const platformSelect = dialog.querySelector('#field-platform');
+        if (platformSelect && currentPlatform === 'free') {
+            platformSelect.addEventListener('change', (e) => {
+                const warningEl = dialog.querySelector('#google-warning');
+                if (warningEl) {
+                    warningEl.style.display = e.target.value === '谷歌翻译' ? 'block' : 'none';
+                }
+            });
+        }
 
         // 翻译指令功能已移除，只允许使用默认专业指令
 

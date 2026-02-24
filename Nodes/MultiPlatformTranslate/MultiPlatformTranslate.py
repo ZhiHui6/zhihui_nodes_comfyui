@@ -6,8 +6,6 @@ import time
 import random
 import hmac
 import base64
-import urllib.parse
-from urllib.parse import quote
 import uuid
 from datetime import datetime
 
@@ -200,19 +198,69 @@ class MultiPlatformTranslate:
             raise Exception(f"Youdao Translate error: {result.get('errorCode', 'Unknown error')}")
 
     def translate_free(self, config, source_language, target_language, text):
-        """免费翻译方法，支持腾讯翻译君和Pollinations AI两种平台"""
+        """免费翻译方法，支持腾讯翻译君和谷歌翻译"""
         if not text.strip():
             return text
             
         platform = config.get("platform", "腾讯翻译君")
         
-        if platform == "腾讯翻译君":
-            return self._translate_with_tencent(source_language, target_language, text)
-        elif platform == "Pollinations AI":
-            return self._translate_with_pollinations(source_language, target_language, text)
+        if platform == "谷歌翻译":
+            return self._translate_with_google(source_language, target_language, text)
         else:
+            # 默认使用腾讯翻译君
             return self._translate_with_tencent(source_language, target_language, text)
     
+    def _translate_with_google(self, source_language, target_language, text):
+        """使用谷歌翻译进行翻译"""
+        lang_map = {
+            "auto": "auto",
+            "zh": "zh-CN", 
+            "en": "en",
+            "ja": "ja",
+            "ko": "ko",
+            "fr": "fr",
+            "de": "de",
+            "es": "es",
+            "ru": "ru",
+            "ar": "ar"
+        }
+        
+        source_lang = lang_map.get(source_language, "auto")
+        target_lang = lang_map.get(target_language, "en")
+        
+        url = "https://translate.googleapis.com/translate_a/single"
+        
+        params = {
+            "client": "gtx",
+            "sl": source_lang,
+            "tl": target_lang,
+            "dt": "t",
+            "q": text
+        }
+        
+        headers = {
+            'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/110.0.0.0 Safari/537.36'
+        }
+        
+        try:
+            response = requests.get(url, params=params, headers=headers, timeout=10)
+            if response.status_code == 200:
+                result = response.json()
+                # 谷歌翻译返回的结构是 [[["翻译结果", "源文本", ...], ...], ...]
+                if result and isinstance(result, list) and len(result) > 0:
+                    translated_parts = []
+                    for part in result[0]:
+                        if part and isinstance(part, list) and len(part) > 0:
+                            translated_parts.append(part[0])
+                    return "".join(translated_parts)
+            
+            error_msg = f"Google translation failed with status code {response.status_code}"
+            print(error_msg)
+            return text
+        except Exception as e:
+            print(f"Google free translation error: {e}")
+            return text
+
     def _translate_with_tencent(self, source_language, target_language, text):
         """使用腾讯翻译君进行翻译"""
         lang_map = {
@@ -273,68 +321,6 @@ class MultiPlatformTranslate:
             return translated_text
         except Exception as e:
             print(f"Tencent free translation error: {e}")
-            return text
-    
-    def _translate_with_pollinations(self, source_language, target_language, text):
-        """使用Pollinations AI进行翻译"""
-        import urllib.parse
-        
-        lang_map = {
-            "auto": "Auto detect",
-            "zh": "zh", 
-            "en": "en",
-            "ja": "en", 
-            "ko": "en",
-            "fr": "en",
-            "de": "en",
-            "es": "en",
-            "ru": "en",
-            "ar": "en",
-            "pt": "en",
-            "it": "en",
-            "th": "en",
-            "vi": "en",
-            "id": "en"
-        }
-        
-        actual_source = lang_map.get(source_language, "Auto detect")
-        actual_target = lang_map.get(target_language, "en")
-        
-        # 使用固定默认的专业翻译指令
-        prompt = f"""Please translate the following text to {actual_target} with requirements:
-1. Accurate, natural, and fluent translation
-2. Maintain the tone and style of the original text
-3. Only output the translation result without any explanation
-
-Text to translate:
-{text}"""
-        
-        try:
-            encoded_prompt = urllib.parse.quote(prompt)
-            api_url = f"https://text.pollinations.ai/deepseek/{encoded_prompt}"
-            
-            response = requests.get(api_url, timeout=30)
-            
-            if response.status_code == 200:
-                result = response.text.strip()
-                if result and len(result) > 1:
-                    return result
-                else:
-                    print("Pollinations AI returned empty result")
-                    return text
-            else:
-                error_msg = f"HTTP error: {response.status_code}"
-                print(f"Pollinations AI translation error: {error_msg}")
-                return text
-                
-        except requests.exceptions.Timeout:
-            print("Pollinations AI translation timeout")
-            return text
-        except requests.exceptions.ConnectionError:
-            print("Pollinations AI connection error")
-            return text
-        except Exception as e:
-            print(f"Pollinations AI translation error: {str(e)}")
             return text
 
     def translate_zhipu(self, config, source_language, target_language, text):

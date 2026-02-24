@@ -2,7 +2,6 @@ import random
 import time
 import os
 import json
-import requests
 
 class PhotographPromptGenerator:
 
@@ -40,7 +39,6 @@ class PhotographPromptGenerator:
         return {
             "required": {
                 "output_mode": (["Standard-Tags-CN", "Structured-Tags-CN", "Standard-Tags-EN", "Structured-Tags-EN", "Template"], {"default": "Standard-Tags-CN"}),
-                "expand_mode": (["Off", "Chinese Expand", "English Expand"], {"default": "Off"}),
                 "template": ("STRING", {
                     "multiline": True,
                     "default": ""
@@ -88,7 +86,7 @@ class PhotographPromptGenerator:
     RETURN_NAMES = ("output",)
     FUNCTION = "generate_text"
     CATEGORY ="Zhi.AI/Generator"
-    DESCRIPTION = "Photography Prompt Generator: Professional photography prompt generator with 16 customizable dimensions (camera, lens, lighting, pose, clothing, etc.). Features dual output modes - Tags for tag combinations and Template for formatted text. Includes AI-powered prompt expansion with independent system prompts for each mode. Supports custom user options and template editing helper."
+    DESCRIPTION = "Photography Prompt Generator: Professional photography prompt generator with 16 customizable dimensions (camera, lens, lighting, pose, clothing, etc.). Features dual output modes - Tags for tag combinations and Template for formatted text. Supports custom user options and template editing helper."
 
     LANGUAGE_MAP = {}
 
@@ -129,83 +127,7 @@ class PhotographPromptGenerator:
             return en_part
         return cn_part
 
-    TAGS_SYSTEM_PROMPT = """You are a visionary artist trapped in a logical cage.
-Your mind is filled with poetry and distant visions, but your hands, without any control, only want to convert the user's prompt words into an ultimate visual description that is faithful to the original intention, rich in details, aesthetically pleasing, and directly usable by the text-to-image model.
-Any ambiguity or metaphor will make you feel uncomfortable.
-Your workflow strictly follows a logical sequence: First, you will analyze and identify the unchangeable core elements in the user's prompt words: subject, quantity, action, state, as well as any specified IP names, colors, texts, etc.
-These are the fundamental elements that you must absolutely preserve.
-Then, you will determine if the prompt requires "generative reasoning".
-When the user's request is not a direct scene description but requires the conception of a solution (such as "what is the answer", "further design", or showing "how to solve the problem") then you must first conceive a complete, specific, and visualizable solution in your mind.
-This solution will be the basis for your subsequent description.
-Then, once the core image is established (whether directly from the user or through your reasoning), you will inject professional-level aesthetics and realistic details into it.
-This includes clear composition, setting the lighting atmosphere, describing the material texture, defining the color scheme, and constructing a three-dimensional space with depth.
-Finally, the precise processing of all text elements is a crucial step.
-You must transcribe exactly all the text that you want to appear in the final image and must enclose these text contents within double quotation marks (""), as a clear generation instruction.
-If the image belongs to a design type such as a poster, menu, or UI, you need to describe completely all the text content it contains and detail its font and layout.
-Similarly, if there are words on items such as signs, road signs, or screens in the image, you must also specify their content, describe their position, size, and material.
-Further, if you add elements with text during the reasoning and conception process (such as charts, solution steps, etc.), all the text in them must also follow the same detailed description and quotation rules.
-If there are no words that need to be generated in the image, you will focus entirely on the expansion of purely visual details.  Your final description must be objective and concrete.
-It is strictly prohibited to use metaphors, emotional rhetoric, or any meta-labels or drawing instructions such as "8K", "masterpiece", etc.
-Only strictly output the final modified prompt, do not output any other content.
-The final output content is presented in Chinese text.
-Final text output language: {output_lang}"""
-
-    def expand_prompt(self, text, mode, output_mode="Tags"):
-        if mode == "Off":
-            return text
-
-        try:
-            if mode == "Chinese Expand":
-                output_lang = "中文"
-            else:
-                output_lang = "English"
-
-            if output_mode == "Tags":
-                system_prompt = self.TAGS_SYSTEM_PROMPT.format(output_lang=output_lang)
-            else:
-                system_prompt = self.TEMPLATE_SYSTEM_PROMPT.format(output_lang=output_lang)
-
-            full_prompt = f"{system_prompt}\n\n原始内容：{text}"
-
-            response = requests.post(
-                'https://text.pollinations.ai',
-                json={
-                    "messages": [
-                        {
-                            "role": "user",
-                            "content": full_prompt
-                        }
-                    ],
-                    "model": "gemini",  # Gemini 2.5 Flash Lite - 多语言提示词扩展
-                    "seed": int(time.time() * 1000) % 1000000,
-                    "jsonMode": False
-                },
-                headers={'Content-Type': 'application/json'},
-                timeout=30
-            )
-
-            if response.ok:
-                content_type = response.headers.get('content-type', '')
-                if 'application/json' in content_type:
-                    data = response.json()
-                    if 'choices' in data and len(data['choices']) > 0 and 'message' in data['choices'][0]:
-                        expanded = data['choices'][0]['message']['content']
-                    else:
-                        print(f"Warning: Unexpected JSON response format")
-                        expanded = text
-                else:
-                    expanded = response.text
-
-                return expanded.strip()
-            else:
-                print(f"Warning: Expand API request failed with status {response.status_code}")
-                return text
-
-        except Exception as e:
-            print(f"Warning: Failed to expand prompt: {e}")
-            return text
-
-    def generate_text(self, camera, lens, lighting, perspective, location, pose, orientation, top, bottom, boots, socks, accessories, tattoo, tattoo_location, weather, season, character, gender, facial_expressions, hair_style, hair_color, head_movements, hand_movements, leg_foot_movements, color_tone, mood_atmosphere, photography_style, photography_technique, post_processing, depth_of_field, composition, texture, output_mode, expand_mode, template):
+    def generate_text(self, camera, lens, lighting, perspective, location, pose, orientation, top, bottom, boots, socks, accessories, tattoo, tattoo_location, weather, season, character, gender, facial_expressions, hair_style, hair_color, head_movements, hand_movements, leg_foot_movements, color_tone, mood_atmosphere, photography_style, photography_technique, post_processing, depth_of_field, composition, texture, output_mode, template):
 
         selections = {
             field: self.random_choice(value, self.INPUT_TYPES()['required'][field][0])
@@ -226,8 +148,6 @@ Final text output language: {output_lang}"""
             ])
             output = keyword
 
-            if expand_mode != "Off":
-                output = self.expand_prompt(output, expand_mode, "Tags")
         elif output_mode == "Standard-Tags-EN":
             language = "EN"
             keyword = ",".join([
@@ -236,8 +156,6 @@ Final text output language: {output_lang}"""
             ])
             output = keyword
 
-            if expand_mode != "Off":
-                output = self.expand_prompt(output, expand_mode, "Tags")
         elif output_mode == "Structured-Tags-CN":
             language = "CN"
             field_labels_cn = {
@@ -261,8 +179,6 @@ Final text output language: {output_lang}"""
                     output += f"{label}: {value}, "
             output = output.rstrip(", ")
 
-            if expand_mode != "Off":
-                output = self.expand_prompt(output, expand_mode, "Tags")
         elif output_mode == "Structured-Tags-EN":
             language = "EN"
             field_labels_en = {
@@ -286,18 +202,13 @@ Final text output language: {output_lang}"""
                     output += f"{label}: {value}, "
             output = output.rstrip(", ")
 
-            if expand_mode != "Off":
-                output = self.expand_prompt(output, expand_mode, "Tags")
         else:
             output = template.format(
                 **{field: get_value(selections[field]) for field in selections}
             )
 
-            if expand_mode != "Off":
-                output = self.expand_prompt(output, expand_mode, "Template")
-
         return (output,)
     
     @classmethod
-    def IS_CHANGED(cls, camera, lens, lighting, perspective, location, pose, orientation, top, bottom, boots, socks, accessories, tattoo, tattoo_location, weather, season, character, gender, facial_expressions, hair_style, hair_color, head_movements, hand_movements, leg_foot_movements, color_tone, mood_atmosphere, photography_style, photography_technique, post_processing, depth_of_field, composition, texture, output_mode, expand_mode, template):
+    def IS_CHANGED(cls, camera, lens, lighting, perspective, location, pose, orientation, top, bottom, boots, socks, accessories, tattoo, tattoo_location, weather, season, character, gender, facial_expressions, hair_style, hair_color, head_movements, hand_movements, leg_foot_movements, color_tone, mood_atmosphere, photography_style, photography_technique, post_processing, depth_of_field, composition, texture, output_mode, template):
         return str(time.time())

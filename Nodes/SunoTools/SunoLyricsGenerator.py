@@ -1,7 +1,5 @@
 import time
 import random
-import requests
-import urllib.parse
 
 
 class SunoLyricsGenerator:
@@ -106,7 +104,6 @@ class SunoLyricsGenerator:
                 "Lyrics Style": (cls.lyrics_style_options, {"default": "Random"}),
                 "Mood": (cls.mood_options, {"default": "Random"}),
                 "Style/Genre": (cls.genre_options, {"default": "Random"}),
-                "Output_original_text": ("BOOLEAN", {"default": False}),
             },
         }
 
@@ -114,7 +111,7 @@ class SunoLyricsGenerator:
     RETURN_NAMES = ("lyrics",)
     FUNCTION = "generate"
     CATEGORY = "Zhi.AI/Generator"
-    DESCRIPTION = "Suno AI Lyrics Generator: Online LLM-powered generator producing structured, singable lyrics with detailed meta-tags and sections ([Intro][Soft Guitar], [Verse 1][Piano], [Chorus][Soaring Vocals], etc.) guided by theme, language, vocal arrangement, style, mood, and genre."
+    DESCRIPTION = "Suno AI Lyrics Generator: Generates structured lyrics prompts based on theme, language, vocal arrangement, style, mood, and genre. (Note: AI generation removed due to defunct platform)"
 
     def _random_choice(self, value, options):
         if value == "Random":
@@ -195,29 +192,7 @@ class SunoLyricsGenerator:
 """
         return system_prompt
 
-    def _call_llm_api(self, prompt_text):
-        encoded_prompt = urllib.parse.quote(prompt_text)
-        api_url = f"https://text.pollinations.ai/openai-reasoning/{encoded_prompt}"
-        try:
-            response = requests.get(api_url, timeout=30)
-            response.raise_for_status()
-            result = response.text.strip()
-            if not result or len(result) < 5:
-                return prompt_text
-            return result
-        except requests.exceptions.Timeout:
-            print("API request timeout for openai-reasoning model. Using original text.")
-            return prompt_text
-        except requests.exceptions.RequestException as e:
-            error_message = f"API request failed for openai-reasoning model: {e}"
-            if 'response' in locals() and response is not None:
-                error_message += f" | Status code: {response.status_code} | Server response: {response.text[:200]}..."
-            print(error_message)
-            return prompt_text
-
     def generate(self, preference, Theme, **kwargs):
-        output_original = kwargs.get("Output_original_text", False)
-
         theme = self._random_choice(Theme, self.theme_options)
         language = self._random_choice(kwargs.get("Lyrics Language"), self.language_options)
         vocal = self._random_choice(kwargs.get("Vocal Arrangement"), self.vocal_arrangement_options)
@@ -232,11 +207,7 @@ class SunoLyricsGenerator:
             base_text, theme, language, vocal, lstyle, mood, genre
         )
 
-        if output_original:
-            return (instruction,)
-
-        lyrics = self._call_llm_api(instruction)
-        return (lyrics,)
+        return (instruction,)
 
     @classmethod
     def IS_CHANGED(cls, **kwargs):

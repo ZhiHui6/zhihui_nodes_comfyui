@@ -45,6 +45,11 @@ app.registerExtension({
                 });
                 manageButton.serialize = false;
 
+                // 强制调整节点大小以适应内容
+                setTimeout(() => {
+                   this.setSize(this.computeSize());
+                }, 50);
+
                 return r;
             };
         }
@@ -4299,6 +4304,11 @@ function applyAllBrowserChanges() {
         console.log(`Applied ${changeCount} changes to node`);
     } else {
         showToast(`ℹ️ 没有需要应用的更改`, 'info');
+    }
+
+    if (currentCategoryBrowserDialog) {
+        currentCategoryBrowserDialog.remove();
+        currentCategoryBrowserDialog = null;
     }
 }
 

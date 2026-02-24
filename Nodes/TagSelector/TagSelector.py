@@ -1,7 +1,5 @@
 import os
 import json
-import requests
-import urllib.parse
 import base64
 import random
 from typing import Dict, Any
@@ -29,18 +27,6 @@ class TagSelector:
                     "label_off": "Off",
                     "tooltip": "启用后将自动生成随机标签。需要先在标签选择器界面中配置随机标签生成设置，包括启用分类、设置权重和数量等参数。"
                 }),
-                "expand_mode": (["Disabled", "Tag Style", "Natural Language"], {
-                    "default": "Disabled",
-                    "tooltip": "选择标签扩写模式：禁用/标签风格/自然语言风格"
-                }),
-                "Expanded_result": (["Chinese", "English"], {
-                    "default": "Chinese",
-                    "tooltip": "选择扩写结果的语言：中文/英文。仅在启用标签扩写模式时生效。"
-                }),
-                "expand_model": (["deepseek", "deepseek-reasoning", "gemini", "mistral", "nova-fast", "openai", "openai-large", "openai-reasoning", "evil", "unity"], {
-                    "default": "openai",
-                    "tooltip": "选择用于标签扩写的AI模型"
-                }),
             },
             "hidden": {
                 "unique_id": "UNIQUE_ID",
@@ -53,7 +39,7 @@ class TagSelector:
     FUNCTION = "process_tags"
     CATEGORY = "Zhi.AI/Generator"
     
-    def process_tags(self, tag_edit, auto_random_tags, expand_mode, Expanded_result, expand_model="openai", unique_id=None, extra_pnginfo=None):
+    def process_tags(self, tag_edit, auto_random_tags, unique_id=None, extra_pnginfo=None):
         if auto_random_tags:
             random_tags = self._generate_random_tags()
             if random_tags:
@@ -62,10 +48,6 @@ class TagSelector:
                 processed_tags = self.clean_tags(tag_edit)
         else:
             processed_tags = self.clean_tags(tag_edit)
-        
-        if expand_mode != "Disabled" and processed_tags.strip():
-            expanded_tags = self._expand_tags_with_llm(processed_tags, expand_mode, Expanded_result, expand_model)
-            return (expanded_tags,)
         
         return (processed_tags,)
     
@@ -212,119 +194,8 @@ class TagSelector:
         
         return ', '.join(unique_tags)
     
-    def _expand_tags_with_llm(self, tags_text: str, expand_mode: str, Expanded_result: str, expand_model: str = "openai") -> str:
-        try:
-            is_chinese = Expanded_result == "Chinese"
-            
-            if expand_mode == "Tag Style":
-                if is_chinese:
-                    system_prompt = """你是一个专业的AI绘画提示词扩写助手。请将用户提供的简单标签扩写成极致详细、更丰富的标签形式。
-
-要求：
-1. 保持标签格式，用逗号分隔
-2. 为每个标签添加更多描述性的修饰词
-3. 增加相关的风格、质量、技术参数标签
-4. 保持原有标签的核心含义不变
-5. 输出应该是可以直接用于AI绘画的提示词标签
-6. 直接给出结果，不要出现说明解释性的句段
-7. 请用中文输出所有标签
-
-示例：
-输入：girl, cat, garden
-输出：美丽女孩, 可爱女孩, 精致面部, 表情丰富的眼睛, 可爱猫咪, 毛茸茸的猫, 猫耳朵, 茂盛花园, 盛开花朵, 自然光线, 高质量, 杰作, 精细, 8k分辨率"""
-                else:
-                    system_prompt = """You are a professional AI art prompt expansion assistant. Please expand the simple tags provided by the user into extremely detailed and more richer tag formats.
-
-Requirements:
-1. Maintain tag format, separated by commas
-2. Add more descriptive modifiers to each tag
-3. Add related style, quality, and technical parameter tags
-4. Keep the core meaning of original tags unchanged
-5. Output should be prompt tags that can be directly used for AI art
-6. Give results directly without explanatory sentences
-7. Please output all tags in English
-
-Example:
-Input: girl, cat, garden
-Output: beautiful girl, cute girl, detailed face, expressive eyes, adorable cat, fluffy cat, cat ears, lush garden, blooming flowers, natural lighting, high quality, masterpiece, detailed, 8k resolution"""
-            
-            elif expand_mode == "Natural Language":
-                if is_chinese:
-                    system_prompt = """你是一个专业的AI绘画提示词扩写助手。请将用户提供的标签转换成自然流畅的句子。
-
-要求：
-1. 将标签组合成完整的、描述性的句子
-2. 添加极致丰富的细节描述
-3. 使用生动的形容词和副词
-4. 保持语言自然流畅
-5. 适合用作AI绘画的提示词
-6. 直接给出结果，不要出现说明解释性的句段
-7. 请用中文输出描述
-
-示例：
-输入：girl, cat, garden
-输出：一个美丽的年轻女孩，有着富有表现力的眼睛和温柔笑容，坐在一个郁郁葱葱的盛开花园里，花园里满是五颜六色的花朵，她怀里抱一只可爱猫，猫咪有着柔软的毛发，周围被透过绿叶的自然阳光包围，营造出一个宁静而迷人的场景，具有高细节和艺术品质"""
-                else:
-                    system_prompt = """You are a professional AI art prompt expansion assistant. Please convert the tags provided by the user into natural and fluent sentences.
-
-Requirements:
-1. Combine tags into complete, descriptive sentences
-2. Add extreme rich detail descriptions
-3. Use vivid adjectives and adverbs
-4. Keep language natural and fluent
-5. Suitable for use as AI art prompts
-6. Give results directly without explanatory sentences
-7. Please output description in English
-
-Example:
-Input: girl, cat, garden
-Output: A beautiful young girl with expressive eyes and a gentle smile, sitting in a lush blooming garden filled with colorful flowers, holding a cute fluffy cat with soft fur, surrounded by natural sunlight filtering through green leaves, creating a peaceful and enchanting scene with high detail and artistic quality"""
-            
-            else:
-                return tags_text
-            
-            full_prompt = f"{system_prompt}\n\n输入标签：{tags_text}\n\n请扩写："
-            encoded_prompt = urllib.parse.quote(full_prompt)
-            model_mapping = {
-                "gemini": "gemini",
-                "mistral": "mistral",
-                "nova-fast": "nova-fast",
-                "openai": "openai",
-                "openai-large": "openai-large",
-                "openai-reasoning": "openai-reasoning",
-                "evil": "evil",
-                "unity": "unity"
-            }
-            
-            model_name = model_mapping.get(expand_model, "openai")
-            api_url = f"https://text.pollinations.ai/{model_name}/{encoded_prompt}"
-            
-            response = requests.get(api_url, timeout=30)
-            response.raise_for_status()
-            
-            expanded_text = response.text.strip()
-            
-            if not expanded_text:
-                print(f"LLM API returned empty response (model: {expand_model}), using original tags")
-                return tags_text
-                
-            return expanded_text
-            
-        except requests.exceptions.Timeout:
-            print(f"LLM expansion timeout (model: {expand_model}), using original tags")
-            return tags_text
-        except requests.exceptions.RequestException as e:
-            error_msg = f"LLM expansion failed (model: {expand_model}): {e}"
-            if 'response' in locals() and response is not None:
-                error_msg += f" | status: {response.status_code} | response: {response.text[:200]}..."
-            print(error_msg)
-            return tags_text
-        except Exception as e:
-            print(f"LLM expansion failed (model: {expand_model}): {e}")
-            return tags_text
-    
     @classmethod
-    def IS_CHANGED(cls, tag_edit, auto_random_tags, expand_mode, Expanded_result, expand_model=None, unique_id=None, extra_pnginfo=None):
+    def IS_CHANGED(cls, tag_edit, auto_random_tags, unique_id=None, extra_pnginfo=None):
         if auto_random_tags:
             import time
             return f"{tag_edit}_{time.time()}"
