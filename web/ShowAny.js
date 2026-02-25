@@ -4,6 +4,7 @@ app.registerExtension({
 	name: "ShowAny",
 	async beforeRegisterNodeDef(nodeType, nodeData, app) {
 		if (nodeData.name === "ShowAny") {
+			let uniqueCounter = 0;
 			const translations = {
 				"Preview Mode:": "Preview Mode / 预览模式：",
 				"Standard": "Standard / 标准模式",
@@ -69,12 +70,15 @@ app.registerExtension({
 				const modeWrap = document.createElement("div");
 				modeWrap.style.cssText = "display:flex;align-items:center;gap:10px;";
 
+				uniqueCounter++;
+				const radioName = `showany-mode-${Date.now()}-${uniqueCounter}`;
+
 				const mkRadio = (value, text) => {
 					const label = document.createElement("label");
 					label.style.cssText = "display:flex;align-items:center;gap:4px;";
 					const input = document.createElement("input");
 					input.type = "radio";
-					input.name = `showany-mode-${node.id || Math.random().toString(36).slice(2)}`;
+					input.name = radioName;
 					input.value = value;
 					const span = document.createElement("span");
 					span.textContent = text;
