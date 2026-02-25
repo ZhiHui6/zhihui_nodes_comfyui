@@ -1,4 +1,9 @@
 # 更新日志
+## 1.0.11 2026-2-25
+- 修复图像切换节点(ImageSwitchDualMode)的选择范围起始值引起的错误
+    <br>
+- Fixed the error caused by the starting value of the selection range in the ImageSwitchDualMode node
+
 ## 1.0.10 2026-2-24
 - 移除一些节点中含Pollinations AI调用的部分（平台失效）
 - 移除 老旧过时的TextExpander节点

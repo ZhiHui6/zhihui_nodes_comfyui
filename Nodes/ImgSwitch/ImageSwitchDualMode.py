@@ -8,7 +8,7 @@ class ImageSwitchDualMode:
         return {
             "required": {
                 "mode": (["manual", "auto"], {"default": "auto"}),
-                "select_image": ([str(i) for i in range(2, 1024)], {"default": "2"}),
+                "select_image": ([str(i) for i in range(1, 1024)], {"default": "1"}),
                 "inputcount": ("INT", {"default": 2, "min": 2, "max": 1000, "step": 1}),
                 "image1_note": ("STRING", {"multiline": False, "default": ""}),
                 "image2_note": ("STRING", {"multiline": False, "default": ""}),
