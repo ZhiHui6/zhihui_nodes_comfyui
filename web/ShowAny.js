@@ -15,37 +15,34 @@ app.registerExtension({
 				return translations[key] || key;
 			}
 
-			function toPlainText(value, isDebugMode = false) {
-				const parts = [];
-				
-				function fixEncoding(str) {
-					if (!isDebugMode || typeof str !== 'string') {
-						return str;
-					}
-					try {
-						if (/[\u0080-\u00FF]/.test(str) && !/[\u4E00-\u9FFF]/.test(str)) {
-							const bytes = new Uint8Array(str.length);
-							for (let i = 0; i < str.length; i++) {
-								bytes[i] = str.charCodeAt(i) & 0xFF;
-							}
-							const decoder = new TextDecoder('utf-8');
-							return decoder.decode(bytes);
-						}
-					} catch (e) {}
+			function fixEncoding(str, isDebugMode = false) {
+				if (!isDebugMode || typeof str !== 'string') {
 					return str;
 				}
-				
-				const pushValue = (v) => {
-					if (Array.isArray(v)) {
-						v.forEach(item => pushValue(item));
-					} else if (v === null || v === undefined) {
-						parts.push("");
-					} else {
-						parts.push(fixEncoding(String(v)));
+				try {
+					if (/[\u0080-\u00FF]/.test(str) && !/[\u4E00-\u9FFF]/.test(str)) {
+						const bytes = new Uint8Array(str.length);
+						for (let i = 0; i < str.length; i++) {
+							bytes[i] = str.charCodeAt(i) & 0xFF;
+						}
+						const decoder = new TextDecoder('utf-8');
+						return decoder.decode(bytes);
 					}
-				};
-				pushValue(value);
-				return parts.join("\n");
+				} catch (e) {}
+				return str;
+			}
+
+			function createItemContainer(text, isDebugMode) {
+				const container = document.createElement("div");
+				container.style.cssText = "display:flex;flex-direction:column;gap:4px;width:100%;box-sizing:border-box;";
+
+				const textarea = document.createElement("textarea");
+				textarea.readOnly = true;
+				textarea.style.cssText = "width:100%;height:80px;resize:none;background:#1f2430;color:#e5e7eb;border:1px solid rgba(255,255,255,0.12);border-radius:8px;padding:10px;font-size:12px;line-height:1.5;box-sizing:border-box;";
+				textarea.value = fixEncoding(text, isDebugMode);
+
+				container.appendChild(textarea);
+				return { container, textarea };
 			}
 
 			function ensurePreviewUI(node) {
@@ -56,12 +53,11 @@ app.registerExtension({
 				const host = document.createElement("div");
 				host.style.cssText = "display:flex;flex-direction:column;gap:8px;width:100%;height:100%;box-sizing:border-box;";
 
-				const textarea = document.createElement("textarea");
-				textarea.readOnly = true;
-				textarea.style.cssText = "width:100%;resize:none;background:#1f2430;color:#e5e7eb;border:1px solid rgba(255,255,255,0.12);border-radius:8px;padding:10px;font-size:12px;line-height:1.5;box-sizing:border-box;";
+				const itemsContainer = document.createElement("div");
+				itemsContainer.style.cssText = "display:flex;flex-direction:column;gap:8px;width:100%;overflow-y:auto;flex:1;";
 
 				const footer = document.createElement("div");
-				footer.style.cssText = "display:flex;align-items:center;gap:8px;font-size:12px;color:#cbd5e1;";
+				footer.style.cssText = "display:flex;align-items:center;gap:8px;font-size:12px;color:#cbd5e1;flex-shrink:0;";
 
 				const modeLabel = document.createElement("span");
 				modeLabel.textContent = t("Preview Mode:");
@@ -96,7 +92,7 @@ app.registerExtension({
 				footer.appendChild(modeLabel);
 				footer.appendChild(modeWrap);
 
-				host.appendChild(textarea);
+				host.appendChild(itemsContainer);
 				host.appendChild(footer);
 
 				const domWidget = node.addDOMWidget("showany_preview", "div", host, {});
@@ -104,7 +100,7 @@ app.registerExtension({
 
 				node.__showAnyPreview = {
 					host,
-					textarea,
+					itemsContainer,
 					radioStandard,
 					radioDebug
 				};
@@ -126,35 +122,39 @@ app.registerExtension({
 				node.__showAnyPreview.radioStandard.input.addEventListener("change", onModeChange);
 				node.__showAnyPreview.radioDebug.input.addEventListener("change", onModeChange);
 
-
-
-				const updateHeight = () => {
-					const available = Math.max(120, node.size[1] - 70);
-					textarea.style.height = `${available}px`;
-				};
-
-				const onResize = node.onResize;
-				node.onResize = function(size) {
-					const r = onResize?.apply(this, arguments);
-					updateHeight();
-					return r;
-				};
-
 				if (!node.size || node.size.length < 2) {
 					node.size = [520, 300];
 				} else {
 					node.size = [Math.max(node.size[0], 520), Math.max(node.size[1], 300)];
 				}
-
-				updateHeight();
 			}
 
 			function updatePreview(node, data) {
 				ensurePreviewUI(node);
 				node.__showAnyRawData = data;
 				const isDebugMode = node.properties.showAnyMode === "Debug";
-				const text = toPlainText(data, isDebugMode);
-				node.__showAnyPreview.textarea.value = text;
+				const itemsContainer = node.__showAnyPreview.itemsContainer;
+
+				itemsContainer.innerHTML = "";
+
+				let items = [];
+				if (Array.isArray(data)) {
+					items = data;
+				} else if (data !== null && data !== undefined) {
+					items = [data];
+				}
+
+				items.forEach(item => {
+					let text = "";
+					if (item === null || item === undefined) {
+						text = "";
+					} else {
+						text = String(item);
+					}
+					const { container } = createItemContainer(text, isDebugMode);
+					itemsContainer.appendChild(container);
+				});
+
 				app.graph.setDirtyCanvas(true, false);
 			}
 

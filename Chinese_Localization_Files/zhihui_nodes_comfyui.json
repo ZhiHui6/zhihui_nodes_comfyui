@@ -10,6 +10,8 @@
     "Gaussian":"高斯",
     "Uniform":"均匀",
     "Long Side":"长边",
+    "extract_by_count":"按数量抽帧",
+    "extract_by_interval":"按间隔抽帧",
     "Short Side":"短边",
     "Scene Teleport":"场景传送",
     "Camera Movement":"相机移动",

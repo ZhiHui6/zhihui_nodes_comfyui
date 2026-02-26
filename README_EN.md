@@ -589,6 +589,40 @@ Intelligent color matching tool that can apply the color tone style of a referen
 </tr>
 </table>
 
+### 🎬 Video Processing Nodes
+
+<table>
+<tr>
+<th width="30%">Node Name</th>
+<th>Function Description</th>
+</tr>
+<tr>
+<td><b>Video Frame Extractor</b><br><code>VideoFrameExtractor</code></td>
+<td>
+Professional video frame extraction tool that supports extracting a specified number of frames or frames at intervals from video files, suitable for video analysis, preview, and subsequent processing.
+
+<b>Features</b>:
+- <b>Dual Extraction Modes</b>: Supports extraction by count (even distribution) and extraction by interval
+- <b>Start Frame Setting</b>: Can specify which frame to start extracting from
+- <b>Flexible Configuration</b>: Supports setting maximum extraction count and interval frames
+- <b>Batch Output</b>: Extracted frames are output as an image list, directly connectable to subsequent image processing nodes
+- <b>Optional Save</b>: Supports saving extracted frames to a specified directory
+
+<b>Use Cases</b>:
+- Video keyframe extraction and preview
+- Preparing video frame input for AI vision models
+- Video content analysis and processing
+
+<br>
+<div align="left">
+<a href="images/Video Frame Extractor.jpg" target="_blank">
+<img src="images/Video Frame Extractor.jpg" alt="Video Frame Extractor" width="45%"/>
+</a>
+</div>
+</td>
+</tr>
+</table>
+
 ### 🎵 Music-Related Nodes
 
 <table>

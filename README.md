@@ -212,7 +212,7 @@
 </tr>
 </table>
 
-### 🎯 提示词处理类节点
+### � 提示词处理类节点
 
 <table>
 <tr>
@@ -584,6 +584,32 @@
 <div align="left">
 <a href="images/颜色匹配.jpg" target="_blank">
 <img src="images/颜色匹配.jpg" alt="色彩匹配" width="45%"/>
+</a>
+</div>
+</td>
+</tr>
+</table>
+
+### 🎬 视频处理类节点
+
+<table>
+<tr>
+<th width="30%">节点名称</th>
+<th>功能描述</th>
+</tr>
+<tr>
+<td><b>视频帧提取器</b><br><code>VideoFrameExtractor</code></td>
+<td>
+专业的视频帧提取工具，支持从视频文件中提取指定数量的帧或按间隔提取帧，适用于视频分析、预览和后续处理。
+
+<b>特点</b>：
+- <b>双提取模式</b>：支持按数量提取（均匀分布）和按间隔提取两种模式
+- <b>可选保存</b>：支持将提取的帧保存到指定目录
+
+<br>
+<div align="left">
+<a href="images/Video Frame Extractor.jpg" target="_blank">
+<img src="images/Video Frame Extractor.jpg" alt="视频帧提取器" width="45%"/>
 </a>
 </div>
 </td>

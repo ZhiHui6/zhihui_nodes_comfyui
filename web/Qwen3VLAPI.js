@@ -8,11 +8,15 @@ class APIConfigManager {
         this.isDialogOpen = false;     
         this.platformModels = {
             "ModelScope": [
+                "Qwen3.5-27B",
+                "Qwen3.5-35B-A3B",
+                "Qwen3.5-122B-A10B",
+                "Qwen3.5-397B-A17B",
                 "Qwen3-VL-8B-Instruct",
                 "Qwen3-VL-8B-Thinking",
-                "Qwen3-VL-235B-A22B-Instruct"
-
+                "Qwen3-VL-235B-A22B-Instruct",
             ],
+
             "SiliconFlow": [
                 "Qwen3-VL-8B-Instruct",
                 "Qwen3-VL-8B-Thinking",
@@ -21,7 +25,14 @@ class APIConfigManager {
                 "Qwen3-VL-30B-A3B-Thinking",
                 "Qwen3-VL-30B-A3B-Instruct"
             ],
+            
             "Aliyun": [
+                "qwen3.5-plus",
+                "qwen3.5-flash",
+                "qwen3.5-27b",
+                "qwen3.5-35b-a3b",
+                "qwen3.5-122b-a10b",
+                "qwen3.5-397b-a17b",
                 "qwen3-vl-plus",
                 "qwen3-vl-flash",
                 "qwen3-vl-235b-a22b-thinking",

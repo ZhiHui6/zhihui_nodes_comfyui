@@ -58,6 +58,7 @@ from .Nodes.TypeDesigner.TypeDesigner import TypeDesigner
 from .Nodes.PromptReplace import PromptReplace
 from .Nodes.PromptDelete import PromptDelete
 from .Nodes.AudioDuration import AudioDuration
+from .Nodes.VideoFrameExtractor import VideoFrameExtractor
 
 import os
 
@@ -119,6 +120,7 @@ NODE_CLASS_MAPPINGS = {
     "PromptReplace": PromptReplace,
     "PromptDelete": PromptDelete,
     "AudioDuration": AudioDuration,
+    "VideoFrameExtractor": VideoFrameExtractor,
 }
 
 NODE_DISPLAY_NAME_MAPPINGS = {
@@ -179,6 +181,7 @@ NODE_DISPLAY_NAME_MAPPINGS = {
     "PromptReplace": "Prompt Replace",
     "PromptDelete": "Prompt Delete",
     "AudioDuration": "Audio Duration",
+    "VideoFrameExtractor": "Video Frame Extractor",
 }
 
 WEB_DIRECTORY = os.path.join(os.path.dirname(os.path.abspath(__file__)), "web")

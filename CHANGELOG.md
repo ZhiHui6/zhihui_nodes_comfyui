@@ -1,4 +1,14 @@
 # 更新日志
+
+## 1.0.12 2026-2-26
+- 新增视频帧提取器节点(VideoFrameExtractor)：支持按数量或间隔提取视频帧
+- 修复ShowAny节点的编码问题和布局
+- 优化Qwen3VLAPI的模型选择和随机种子处理
+    <br>
+- Added VideoFrameExtractor node: extract video frames by count or interval
+- Fixed encoding issues and layout of ShowAny node
+- Optimized model selection and random-seed handling in Qwen3VLAPI
+
 ## 1.0.11 2026-2-25
 - 修复图像切换节点(ImageSwitchDualMode)的选择范围起始值引起的错误
 - 修复显示任何节点(ShowAny)的预览模式标签显示问题

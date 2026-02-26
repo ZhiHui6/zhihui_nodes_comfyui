@@ -183,72 +183,26 @@ class Qwen3VLAPI:
         except:
             return ""
     
-    def get_shared_models(self):
-        return {
-            "Qwen3-VL-8B-Instruct": {
-                "display_name": "Qwen3-VL-8B-Instruct",
-                "api_name": "Qwen/Qwen3-VL-8B-Instruct",
-            },
-            "Qwen3-VL-8B-Thinking": {
-                "display_name": "Qwen3-VL-8B-Thinking",
-                "api_name": "Qwen/Qwen3-VL-8B-Thinking",
-            },
-            "Qwen3-VL-30B-A3B-Instruct": {
-                "display_name": "Qwen3-VL-30B-A3B-Instruct",
-                "api_name": "Qwen/Qwen3-VL-30B-A3B-Instruct",
-            },
-            "Qwen3-VL-30B-A3B-Thinking": {
-                "display_name": "Qwen3-VL-30B-A3B-Thinking",
-                "api_name": "Qwen/Qwen3-VL-30B-A3B-Thinking",
-            },
-            "Qwen3-VL-32B-Instruct": {
-                "display_name": "Qwen3-VL-32B-Instruct",
-                "api_name": "Qwen/Qwen3-VL-32B-Instruct",
-            },
-            "Qwen3-VL-32B-Thinking": {
-                "display_name": "Qwen3-VL-32B-Thinking",
-                "api_name": "Qwen/Qwen3-VL-32B-Thinking",
-            },
-            "Qwen3-VL-235B-A22B-Instruct": {
-                "display_name": "Qwen3-VL-235B-A22B-Instruct",
-                "api_name": "Qwen/Qwen3-VL-235B-A22B-Instruct",
-            },
-            "Qwen3-VL-235B-A22B-Thinking": {
-                "display_name": "Qwen3-VL-235B-A22B-Thinking",
-                "api_name": "Qwen/Qwen3-VL-235B-A22B-Thinking",
-            },
-        }
-
     def get_default_config(self):
-        shared_models = self.get_shared_models()
-        
         return {
             "platforms": {
                 "SiliconFlow": {
                     "name": "SiliconFlow",
-                    "api_base": "https://api.siliconflow.cn/v1/chat/completions",
-                    "models": shared_models
+                    "api_base": "https://api.siliconflow.cn/v1/chat/completions"
                 },
                 "ModelScope": {
                     "name": "ModelScope",
-                    "api_base": "https://api-inference.modelscope.cn/v1",
-                    "models": shared_models
+                    "api_base": "https://api-inference.modelscope.cn/v1"
                 },
                 "Aliyun": {
                     "name": "Aliyun",
-                    "api_base": "https://dashscope.aliyuncs.com/compatible-mode/v1",
-                    "models": shared_models
+                    "api_base": "https://dashscope.aliyuncs.com/compatible-mode/v1"
                 }
-            },
-            
+            }
         }
     
     def get_available_models(self):
-        models = []
-        for platform_key, platform_config in self.config.get("platforms", {}).items():
-            for model_key, model_info in platform_config.get("models", {}).items():
-                models.append(model_info["display_name"])
-        return list(set(models))
+        return []
     
     def tensor_to_base64(self, tensor, size_limitation=None):
         if tensor.max() <= 1.0:
@@ -963,9 +917,6 @@ class Qwen3VLAPI:
     
     @classmethod
     def INPUT_TYPES(cls):
-        instance = cls()
-        available_models = instance.get_available_models()
-        
         return {
             "required": {
                 "user_prompt": ("STRING", {
@@ -1109,16 +1060,8 @@ class Qwen3VLAPI:
         return {}
     
     def get_model_api_name(self, platform_name, display_model_name):
-        config = self.load_config()
-        if config and platform_name in config["platforms"]:
-            platform_config = config["platforms"][platform_name]
-            if "models" in platform_config:
-                for model_key, model_info in platform_config["models"].items():
-                    if model_info.get("display_name") == display_model_name:
-                        return model_info.get("api_name", model_key)
-        
-        if platform_name == "SiliconFlow":
-            return display_model_name
+        if platform_name == "ModelScope":
+            return f"Qwen/{display_model_name}"
         return display_model_name
     
     def get_final_prompt(self, system_prompt, user_prompt):
@@ -1430,15 +1373,18 @@ class Qwen3VLAPI:
 
     def _prepare_sampling(self, llm_mode, creative_mode, temperature, top_k, repetition_penalty, min_p, top_p, seed):
         import random
-        import time
         params = {}
         effective_temperature = temperature
         if llm_mode and creative_mode:
             rnd = random.Random()
-            try:
-                rnd.seed(time.time_ns() ^ os.getpid())
-            except Exception:
-                rnd.seed(time.time() * 1000)
+            if seed != -1:
+                rnd.seed(seed)
+            else:
+                import time
+                try:
+                    rnd.seed(time.time_ns() ^ os.getpid())
+                except Exception:
+                    rnd.seed(time.time() * 1000)
             effective_temperature = max(0.1, min(2.0, rnd.uniform(1.4, 2.0)))
             params["top_p"] = rnd.uniform(0.85, 1.0)
             params["presence_penalty"] = rnd.uniform(0.6, 1.2)
