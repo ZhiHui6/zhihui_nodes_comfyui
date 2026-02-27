@@ -1,11 +1,16 @@
 # 更新日志
 
+## 1.0.13 2026-2-27
+- 新增图片反推和音乐相关的系统提示预设文件
+- 添加IntNode节点用于统一参数控制的整数值输出
+
 ## 1.0.12 2026-2-26
 - 新增视频帧提取器节点(VideoFrameExtractor)：支持按数量或间隔提取视频帧
 - 修复ShowAny节点的编码问题和布局
 - 优化Qwen3VLAPI的模型选择和随机种子处理
     <br>
 - Added VideoFrameExtractor node: extract video frames by count or interval
+- Added StyleStringInjector node: inject style strings into prompts
 - Fixed encoding issues and layout of ShowAny node
 - Optimized model selection and random-seed handling in Qwen3VLAPI
 

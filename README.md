@@ -992,6 +992,18 @@
 </div>
 </td>
 </tr>
+<tr>
+<td><b>整数节点</b><br><code>IntNode</code></td>
+<td>
+
+输出可配置整数值的工具节点，用于统一的参数控制。支持-2147483648到2147483647范围的整数输入，适用于需要精确数值控制的场景。
+
+<br>
+<div align="left">
+<img src="images/IntNode.jpg" alt="整数节点" width="45%"/>
+</div>
+</td>
+</tr>
 </table>
 
 ---

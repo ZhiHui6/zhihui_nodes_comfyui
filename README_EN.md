@@ -998,6 +998,18 @@ Intelligent workflow control node that can pause workflow execution at any posit
 
 </td>
 </tr>
+<tr>
+<td><b>Integer Node</b><br><code>IntNode</code></td>
+<td>
+
+Outputs a configurable integer value for unified parameter control. Supports integer input in the range of -2147483648 to 2147483647, suitable for scenarios requiring precise numerical control.
+
+<br>
+<div align="left">
+<img src="images/IntNode.jpg" alt="Integer Node" width="45%"/>
+</div>
+</td>
+</tr>
 </table>
 
 ---
