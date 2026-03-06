@@ -25,7 +25,7 @@ class MultiPlatformTranslate:
     RETURN_TYPES = ("STRING",)
     RETURN_NAMES = ("translation_result",)
     FUNCTION = "translate"
-    CATEGORY = "Zhi.AI/Translate"
+    CATEGORY = "Zhi.AI/Text"
     DESCRIPTION = "Multi-platform translation node supporting Baidu, Tencent, Aliyun, Youdao and free translation services. Click 'Configuration Management' button below to manage API settings for each platform."
 
     def __init__(self):

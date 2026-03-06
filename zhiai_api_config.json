@@ -1,0 +1,122 @@
+{
+    "platforms": {
+        "openai": {
+            "name": "OpenAI",
+            "enabled": true,
+            "config": {
+                "base_url": "https://api.openai.com/v1",
+                "model": "gpt-4o-mini"
+            },
+            "api_url": "https://api.openai.com/v1/chat/completions"
+        },
+        "claude": {
+            "name": "Anthropic",
+            "enabled": true,
+            "config": {
+                "base_url": "https://api.anthropic.com",
+                "model": "claude-3-5-sonnet-20241022"
+            },
+            "api_url": "https://api.anthropic.com/v1/messages"
+        },
+        "gemini": {
+            "name": "Google",
+            "enabled": true,
+            "config": {
+                "base_url": "https://generativelanguage.googleapis.com",
+                "model": "gemini-1.5-flash"
+            },
+            "api_url": "https://generativelanguage.googleapis.com/v1beta/models"
+        },
+        "zhipu": {
+            "name": "ZhipuAI",
+            "enabled": true,
+            "config": {
+                "base_url": "https://open.bigmodel.cn/api/paas/v4",
+                "model": "glm-4-flash"
+            },
+            "api_url": "https://open.bigmodel.cn/api/paas/v4/chat/completions"
+        },
+        "deepseek": {
+            "name": "DeepSeek",
+            "enabled": true,
+            "config": {
+                "base_url": "https://api.deepseek.com",
+                "model": "deepseek-chat"
+            },
+            "api_url": "https://api.deepseek.com/chat/completions"
+        },
+        "siliconflow": {
+            "name": "SiliconFlow",
+            "enabled": true,
+            "config": {
+                "base_url": "https://api.siliconflow.cn/v1",
+                "model": "Qwen/Qwen2.5-7B-Instruct"
+            },
+            "api_url": "https://api.siliconflow.cn/v1/chat/completions"
+        },
+        "kimi": {
+            "name": "MoonshotAI",
+            "enabled": true,
+            "config": {
+                "base_url": "https://api.moonshot.cn/v1",
+                "model": "moonshot-v1-8k"
+            },
+            "api_url": "https://api.moonshot.cn/v1/chat/completions"
+        },
+        "minimax": {
+            "name": "MiniMax",
+            "enabled": true,
+            "config": {
+                "base_url": "https://api.minimaxi.com/v1",
+                "model": "MiniMax-M2.5"
+            },
+            "api_url": "https://api.minimax.chat/v1/chat/completions"
+        },
+        "qwen": {
+            "name": "Alibaba",
+            "enabled": true,
+            "config": {
+                "base_url": "https://dashscope.aliyuncs.com/compatible-mode/v1",
+                "model": "qwen-turbo"
+            },
+            "api_url": "https://dashscope.aliyuncs.com/compatible-mode/v1/chat/completions"
+        },
+        "openrouter": {
+            "name": "OpenRouter",
+            "enabled": true,
+            "config": {
+                "base_url": "https://openrouter.ai/api/v1",
+                "model": "openai/gpt-4o-mini"
+            },
+            "api_url": "https://openrouter.ai/api/v1/chat/completions"
+        },
+        "tencent": {
+            "name": "Tencent",
+            "enabled": true,
+            "config": {
+                "base_url": "https://hunyuan.tencentcloudapi.com",
+                "model": "hunyuan-lite"
+            },
+            "api_url": "https://hunyuan.tencentcloudapi.com/v1/chat/completions"
+        },
+        "nvidia": {
+            "name": "NVIDIA",
+            "enabled": true,
+            "config": {
+                "base_url": "https://integrate.api.nvidia.com/v1",
+                "model": "nvidia/llama-3.1-nemotron-70b-instruct"
+            },
+            "api_url": "https://integrate.api.nvidia.com/v1/chat/completions"
+        },
+        "custom": {
+            "name": "User-defined",
+            "enabled": true,
+            "config": {
+                "model": "gpt-4-turbo",
+                "api_url": "https://api.chatanywhere.tech/v1"
+            },
+            "api_url": ""
+        }
+    },
+    "default_platform": "auto"
+}

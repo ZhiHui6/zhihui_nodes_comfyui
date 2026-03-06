@@ -60,6 +60,8 @@ from .Nodes.PromptDelete import PromptDelete
 from .Nodes.AudioDuration import AudioDuration
 from .Nodes.VideoFrameExtractor import VideoFrameExtractor
 from .Nodes.IntNode import IntNode
+from .Nodes.PromptExpander.PromptExpander import PromptExpander
+from .Nodes.PromptExpander.PromptExpanderAPI import PromptExpanderAPI
 
 import os
 
@@ -123,6 +125,7 @@ NODE_CLASS_MAPPINGS = {
     "AudioDuration": AudioDuration,
     "VideoFrameExtractor": VideoFrameExtractor,
     "IntNode": IntNode,
+    "PromptExpander": PromptExpander,
 }
 
 NODE_DISPLAY_NAME_MAPPINGS = {
@@ -185,6 +188,7 @@ NODE_DISPLAY_NAME_MAPPINGS = {
     "AudioDuration": "Audio Duration",
     "VideoFrameExtractor": "Video Frame Extractor",
     "IntNode": "Int",
+    "PromptExpander": "Prompt Expander",
 }
 
 WEB_DIRECTORY = os.path.join(os.path.dirname(os.path.abspath(__file__)), "web")

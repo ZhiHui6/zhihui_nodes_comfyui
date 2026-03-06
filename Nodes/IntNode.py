@@ -10,7 +10,7 @@ class IntNode:
     RETURN_TYPES = ("INT",)
     RETURN_NAMES = ("int",)
     FUNCTION = "get_int"
-    CATEGORY = "Zhi/Utils"
+    CATEGORY = "Zhi.AI/Toolkit"
     DESCRIPTION = "Int Node: Output a configurable integer value for unified parameter control."
 
     def get_int(self, value):

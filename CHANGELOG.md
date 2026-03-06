@@ -1,5 +1,14 @@
 # 更新日志
 
+## 1.0.14 2026-3-6
+- 新增ComfyUI设置界面的全新API平台统一设置项
+- 新增PromptExpander节点，支持多种AI平台扩写提示词
+- 优化ShowAny.js的文本显示区域自适应高度
+    <br>
+- Added a unified API-platform settings section in the ComfyUI settings interface
+- Added PromptExpander node, supporting prompt expansion across multiple AI platforms
+- Optimized ShowAny.js text display area with adaptive height
+
 ## 1.0.13 2026-2-27
 - 新增图片反推和音乐相关的系统提示预设文件
 - 添加IntNode节点用于统一参数控制的整数值输出

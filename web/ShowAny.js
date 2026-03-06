@@ -38,7 +38,7 @@ app.registerExtension({
 
 				const textarea = document.createElement("textarea");
 				textarea.readOnly = true;
-				textarea.style.cssText = "width:100%;height:80px;resize:none;background:#1f2430;color:#e5e7eb;border:1px solid rgba(255,255,255,0.12);border-radius:8px;padding:10px;font-size:12px;line-height:1.5;box-sizing:border-box;";
+				textarea.style.cssText = "width:100%;resize:none;background:#1f2430;color:#e5e7eb;border:1px solid rgba(255,255,255,0.12);border-radius:8px;padding:10px;font-size:12px;line-height:1.5;box-sizing:border-box;";
 				textarea.value = fixEncoding(text, isDebugMode);
 
 				container.appendChild(textarea);
@@ -144,15 +144,30 @@ app.registerExtension({
 					items = [data];
 				}
 
-				items.forEach(item => {
+				const isSingleItem = items.length === 1;
+
+				itemsContainer.style.overflowY = "auto";
+				itemsContainer.style.flex = "1";
+
+				items.forEach((item, index) => {
 					let text = "";
 					if (item === null || item === undefined) {
 						text = "";
 					} else {
 						text = String(item);
 					}
-					const { container } = createItemContainer(text, isDebugMode);
+					const { container, textarea } = createItemContainer(text, isDebugMode);
 					itemsContainer.appendChild(container);
+					if (isSingleItem) {
+						container.style.height = "100%";
+						container.style.flex = "1";
+						container.style.minHeight = "0";
+						textarea.style.height = "100%";
+						textarea.style.overflow = "auto";
+					} else {
+						textarea.style.height = "80px";
+						textarea.style.overflow = "auto";
+					}
 				});
 
 				app.graph.setDirtyCanvas(true, false);

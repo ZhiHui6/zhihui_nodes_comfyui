@@ -22,7 +22,7 @@ class TypeDesigner:
     RETURN_TYPES = ("STRING",)
     RETURN_NAMES = ("prompt_text",)
     FUNCTION = "process"
-    CATEGORY = "Type Designer"
+    CATEGORY = "Zhi.AI/Generator"
 
     def process(self, text, prompt=None, extra_pnginfo=None):
         return (text,)

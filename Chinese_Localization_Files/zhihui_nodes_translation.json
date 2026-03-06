@@ -1013,5 +1013,20 @@
         "outputs": {
             "IMAGES": "图像"
         }
+    },
+    "PromptExpander": {
+        "title": "提示词扩写器",
+        "description": "AI驱动的提示词扩写，一键生成高质量提示词",
+        "widgets": {
+            "platform": "平台",
+            "writing_style": "写作风格",
+            "output_language": "输出语言",
+            "max_tokens": "最大令牌数",
+            "prompt": "提示词",
+            "custom_system_prompt": "自定义系统提示词"
+        },
+        "outputs": {
+            "expanded_prompt": "扩写提示词"
+        }
     }
 }
