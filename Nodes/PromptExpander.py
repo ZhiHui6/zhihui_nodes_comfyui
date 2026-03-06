@@ -13,29 +13,38 @@ except ImportError:
     web = None
 
 class PromptExpander:
-    PLATFORMS = ["auto", "OpenAI", "Anthropic", "Google", "ZhipuAI", "DeepSeek", "SiliconFlow", "MoonshotAI", "MiniMax", "Alibaba", "OpenRouter", "Tencent", "User-defined"]
-
-    PLATFORM_MAP = {
-        "auto": "auto",
-        "OpenAI": "openai",
-        "Anthropic": "claude",
-        "Google": "gemini",
-        "ZhipuAI": "zhipu",
-        "DeepSeek": "deepseek",
-        "SiliconFlow": "siliconflow",
-        "MoonshotAI": "kimi",
-        "MiniMax": "minimax",
-        "Alibaba": "qwen",
-        "OpenRouter": "openrouter",
-        "Tencent": "tencent",
-        "User-defined": "custom"
-    }
-
+    @classmethod
+    def get_platforms_list(cls):
+        config = cls().load_config()
+        platforms = ["auto"]
+        for platform_key, platform_info in config.get("platforms", {}).items():
+            if isinstance(platform_info, dict):
+                platform_name = platform_info.get("name", platform_key)
+                if platform_name and platform_name not in platforms:
+                    platforms.append(platform_name)
+        if "User-defined" not in platforms:
+            platforms.append("User-defined")
+        return platforms
+    
+    @classmethod
+    def get_platform_map(cls):
+        config = cls().load_config()
+        platform_map = {"auto": "auto"}
+        for platform_key, platform_info in config.get("platforms", {}).items():
+            if isinstance(platform_info, dict):
+                platform_name = platform_info.get("name", platform_key)
+                if platform_name:
+                    platform_map[platform_name] = platform_key
+        if "User-defined" not in platform_map.values():
+            platform_map["User-defined"] = "custom"
+        return platform_map
+    
     @classmethod
     def INPUT_TYPES(cls):
+        platforms = cls.get_platforms_list()
         return {
             "required": {
-                "platform": (cls.PLATFORMS, {"default": "auto"}),
+                "platform": (platforms, {"default": "auto"}),
                 "writing_style": (["Natural", "Tag", "Custom"], {"default": "Natural"}),
                 "output_language": (["English", "Chinese"], {"default": "English"}),
                 "max_tokens": ("INT", {"default": 2048, "min": 256, "max": 8192, "step": 256}),
@@ -53,8 +62,8 @@ class PromptExpander:
     DESCRIPTION = "AI-powered prompt expansion, one-click to generate high-quality prompts"
 
     def __init__(self):
-        self.config_path = os.path.join(os.path.dirname(os.path.dirname(os.path.dirname(__file__))), "zhiai_api_config.json")
-        self.keys_path = os.path.join(os.path.dirname(os.path.dirname(os.path.dirname(__file__))), "zhiai_api_keys.json")
+        self.config_path = os.path.join(os.path.dirname(os.path.dirname(__file__)), "zhiai_api_config.json")
+        self.keys_path = os.path.join(os.path.dirname(os.path.dirname(__file__)), "zhiai_api_keys.json")
         self.config = self.load_config()
         self.api_keys = self.load_api_keys()
 
@@ -78,86 +87,7 @@ class PromptExpander:
 
     def get_default_config(self):
         return {
-            "platforms": {
-                "openai": {
-                    "name": "OpenAI",
-                    "enabled": True,
-                    "config": {"api_key": "", "base_url": "https://api.openai.com/v1", "model": "gpt-4o-mini"},
-                    "api_url": "https://api.openai.com/v1/chat/completions"
-                },
-                "claude": {
-                    "name": "Anthropic",
-                    "enabled": True,
-                    "config": {"api_key": "", "base_url": "https://api.anthropic.com", "model": "claude-3-5-sonnet-20241022"},
-                    "api_url": "https://api.anthropic.com/v1/messages"
-                },
-                "gemini": {
-                    "name": "Google",
-                    "enabled": True,
-                    "config": {"api_key": "", "base_url": "https://generativelanguage.googleapis.com", "model": "gemini-1.5-flash"},
-                    "api_url": "https://generativelanguage.googleapis.com/v1beta/models"
-                },
-                "zhipu": {
-                    "name": "ZhipuAI",
-                    "enabled": True,
-                    "config": {"api_key": "", "base_url": "https://open.bigmodel.cn/api/paas/v4", "model": "glm-4-flash"},
-                    "api_url": "https://open.bigmodel.cn/api/paas/v4/chat/completions"
-                },
-                "deepseek": {
-                    "name": "DeepSeek",
-                    "enabled": True,
-                    "config": {"api_key": "", "base_url": "https://api.deepseek.com", "model": "deepseek-chat"},
-                    "api_url": "https://api.deepseek.com/chat/completions"
-                },
-                "siliconflow": {
-                    "name": "SiliconFlow",
-                    "enabled": True,
-                    "config": {"api_key": "", "base_url": "https://api.siliconflow.cn/v1", "model": "Qwen/Qwen2.5-7B-Instruct"},
-                    "api_url": "https://api.siliconflow.cn/v1/chat/completions"
-                },
-                "kimi": {
-                    "name": "MoonshotAI",
-                    "enabled": True,
-                    "config": {"api_key": "", "base_url": "https://api.moonshot.cn/v1", "model": "moonshot-v1-8k"},
-                    "api_url": "https://api.moonshot.cn/v1/chat/completions"
-                },
-                "minimax": {
-                    "name": "MiniMax",
-                    "enabled": True,
-                    "config": {"api_key": "", "base_url": "https://api.minimax.chat/v1", "model": "abab6.5s-chat"},
-                    "api_url": "https://api.minimax.chat/v1/chat/completions"
-                },
-                "qwen": {
-                    "name": "Alibaba",
-                    "enabled": True,
-                    "config": {"api_key": "", "base_url": "https://dashscope.aliyuncs.com/compatible-mode/v1", "model": "qwen-turbo"},
-                    "api_url": "https://dashscope.aliyuncs.com/compatible-mode/v1/chat/completions"
-                },
-                "openrouter": {
-                    "name": "OpenRouter",
-                    "enabled": True,
-                    "config": {"api_key": "", "base_url": "https://openrouter.ai/api/v1", "model": "openai/gpt-4o-mini"},
-                    "api_url": "https://openrouter.ai/api/v1/chat/completions"
-                },
-                "tencent": {
-                    "name": "Tencent",
-                    "enabled": True,
-                    "config": {"base_url": "https://hunyuan.tencentcloudapi.com", "model": "hunyuan-lite"},
-                    "api_url": "https://hunyuan.tencentcloudapi.com/v1/chat/completions"
-                },
-                "nvidia": {
-                    "name": "NVIDIA",
-                    "enabled": True,
-                    "config": {"base_url": "https://integrate.api.nvidia.com/v1", "model": "nvidia/llama-3.1-nemotron-70b-instruct"},
-                    "api_url": "https://integrate.api.nvidia.com/v1/chat/completions"
-                },
-                "custom": {
-                    "name": "User-defined",
-                    "enabled": True,
-                    "config": {"base_url": "", "model": "", "api_url": ""},
-                    "api_url": ""
-                }
-            },
+            "platforms": {},
             "default_platform": "auto"
         }
 
@@ -201,7 +131,8 @@ class PromptExpander:
 
     def get_platform(self, selected_platform):
         self.api_keys = self.load_api_keys()
-        platform_id = self.PLATFORM_MAP.get(selected_platform, selected_platform)
+        platform_map = self.get_platform_map()
+        platform_id = platform_map.get(selected_platform, selected_platform)
         
         if platform_id and platform_id != "auto":
             platform_config = self.config["platforms"].get(platform_id)
@@ -225,8 +156,8 @@ class PromptExpander:
             return (prompt,)
 
         self.config = self.load_config()
-        platform, platform_config = self.get_platform(platform)
-        if not platform:
+        platform_id, platform_config = self.get_platform(platform)
+        if not platform_id:
             error_output = "[ZhiAI Prompt Expander] 错误：未配置可用的API平台\n请在ComfyUI设置页面的 ZhiAI > API配置 中配置至少一个平台的API密钥"
             print("\n" + "="*60)
             print("[ZhiAI Prompt Expander] 错误：未配置可用的API平台")
@@ -236,22 +167,13 @@ class PromptExpander:
             return (error_output,)
 
         if platform_config is None:
-            platform_names = {
-                "openai": "OpenAI",
-                "claude": "Anthropic",
-                "gemini": "Google",
-                "zhipu": "ZhipuAI",
-                "deepseek": "DeepSeek",
-                "siliconflow": "SiliconFlow",
-                "kimi": "MoonshotAI",
-                "minimax": "MiniMax",
-                "qwen": "Alibaba",
-                "openrouter": "OpenRouter",
-                "tencent": "Tencent",
-                "nvidia": "NVIDIA",
-                "custom": "User-defined"
-            }
-            platform_name = platform_names.get(platform, platform)
+            platform_names = {}
+            for platform_key, platform_info in self.config.get("platforms", {}).items():
+                if isinstance(platform_info, dict):
+                    platform_names[platform_key] = platform_info.get("name", platform_key)
+            if "User-defined" not in platform_names.values():
+                platform_names["custom"] = "User-defined"
+            platform_name = platform_names.get(platform_id, platform_id)
             error_output = f"[ZhiAI Prompt Expander] 错误：当前选择的平台 '{platform_name}' 未配置API密钥\n请在设置页面配置 {platform_name} 的API密钥，或将默认平台切换为其他已配置的平台"
             print("\n" + "="*60)
             print(f"[ZhiAI Prompt Expander] 错误：当前选择的平台 '{platform_name}' 未配置API密钥")
@@ -260,7 +182,7 @@ class PromptExpander:
             print("="*60 + "\n")
             return (error_output,)
 
-        api_key = self.get_api_key(platform)
+        api_key = self.get_api_key(platform_id)
         if not api_key:
             error_output = f"[ZhiAI Prompt Expander] 错误：{platform_config['name']} 未配置API密钥\n请在设置页面配置 {platform_config['name']} 的API密钥"
             print("\n" + "="*60)
@@ -274,32 +196,25 @@ class PromptExpander:
             system_prompt = self.get_system_prompt(writing_style, output_language, custom_system_prompt)
             temperature = 0.7
             
-            if platform == "openai":
-                result = self.call_openai(platform, platform_config, system_prompt, prompt, max_tokens, temperature)
-            elif platform == "claude":
-                result = self.call_claude(platform, platform_config, system_prompt, prompt, max_tokens, temperature)
-            elif platform == "gemini":
-                result = self.call_gemini(platform, platform_config, system_prompt, prompt, max_tokens, temperature)
-            elif platform == "zhipu":
-                result = self.call_zhipu(platform, platform_config, system_prompt, prompt, max_tokens, temperature)
-            elif platform == "deepseek":
-                result = self.call_deepseek(platform, platform_config, system_prompt, prompt, max_tokens, temperature)
-            elif platform == "siliconflow":
-                result = self.call_siliconflow(platform, platform_config, system_prompt, prompt, max_tokens, temperature)
-            elif platform == "kimi":
-                result = self.call_kimi(platform, platform_config, system_prompt, prompt, max_tokens, temperature)
-            elif platform == "minimax":
-                result = self.call_minimax(platform, platform_config, system_prompt, prompt, max_tokens, temperature)
-            elif platform == "qwen":
-                result = self.call_qwen(platform, platform_config, system_prompt, prompt, max_tokens, temperature)
-            elif platform == "openrouter":
-                result = self.call_openrouter(platform, platform_config, system_prompt, prompt, max_tokens, temperature)
-            elif platform == "tencent":
-                result = self.call_tencent(platform, platform_config, system_prompt, prompt, max_tokens, temperature)
-            elif platform == "nvidia":
-                result = self.call_nvidia(platform, platform_config, system_prompt, prompt, max_tokens, temperature)
-            elif platform == "custom":
-                result = self.call_custom(platform, platform_config, system_prompt, prompt, max_tokens, temperature)
+            platform_call_methods = {
+                "openai": self.call_openai,
+                "claude": self.call_claude,
+                "gemini": self.call_gemini,
+                "zhipu": self.call_zhipu,
+                "deepseek": self.call_deepseek,
+                "siliconflow": self.call_siliconflow,
+                "kimi": self.call_kimi,
+                "minimax": self.call_minimax,
+                "qwen": self.call_qwen,
+                "openrouter": self.call_openrouter,
+                "tencent": self.call_tencent,
+                "nvidia": self.call_nvidia,
+                "custom": self.call_custom
+            }
+            
+            call_method = platform_call_methods.get(platform_id)
+            if call_method:
+                result = call_method(platform_id, platform_config, system_prompt, prompt, max_tokens, temperature)
             else:
                 result = prompt
 
@@ -430,7 +345,7 @@ class PromptExpander:
         if response.status_code == 200 and "choices" in result:
             return result["choices"][0]["message"]["content"].strip()
         else:
-            raise Exception(f"GLM API error: {result.get('error', {}).get('message', 'Unknown error')}")
+            raise Exception(f"Zhipu API error: {result.get('error', {}).get('message', 'Unknown error')}")
 
     def call_deepseek(self, platform_id, config, system_prompt, user_prompt, max_tokens, temperature):
         api_key = self.get_api_key(platform_id)
@@ -582,7 +497,7 @@ class PromptExpander:
             "Authorization": f"Bearer {api_key}",
             "Content-Type": "application/json",
             "HTTP-Referer": "https://github.com",
-            "X-Title": "ComfyUI Prompt Expander"
+            "X-Title": "ComfyUI ZhiAI Nodes"
         }
         data = {
             "model": model,
@@ -607,7 +522,7 @@ class PromptExpander:
         model = config["config"].get("model", "hunyuan-lite")
         base_url = config["config"].get("base_url", "https://hunyuan.tencentcloudapi.com").rstrip('/')
         
-        url = f"{base_url}/v1/chat/completions"
+        url = f"{base_url}/chat/completions"
         headers = {
             "Authorization": f"Bearer {api_key}",
             "Content-Type": "application/json"
@@ -629,41 +544,6 @@ class PromptExpander:
             return result["choices"][0]["message"]["content"].strip()
         else:
             raise Exception(f"Tencent API error: {result.get('error', {}).get('message', 'Unknown error')}")
-
-    def call_custom(self, platform_id, config, system_prompt, user_prompt, max_tokens, temperature):
-        api_key = self.get_api_key(platform_id)
-        model = config["config"].get("model", "")
-        api_url = config["config"].get("api_url", "")
-        
-        if not api_url:
-            raise Exception("Custom API address not configured")
-        
-        headers = {
-            "Authorization": f"Bearer {api_key}",
-            "Content-Type": "application/json"
-        }
-        data = {
-            "model": model,
-            "messages": [
-                {"role": "system", "content": system_prompt},
-                {"role": "user", "content": user_prompt}
-            ],
-            "max_tokens": max_tokens,
-            "temperature": temperature
-        }
-        
-        response = requests.post(api_url, headers=headers, json=data, timeout=60)
-        result = response.json()
-        
-        if response.status_code == 200:
-            if "choices" in result:
-                return result["choices"][0]["message"]["content"].strip()
-            elif "content" in result:
-                return result["content"][0]["text"].strip()
-            else:
-                return str(result)
-        else:
-            raise Exception(f"Custom API error: {result.get('error', {}).get('message', 'Unknown error')}")
 
     def call_nvidia(self, platform_id, config, system_prompt, user_prompt, max_tokens, temperature):
         api_key = self.get_api_key(platform_id)
@@ -692,3 +572,34 @@ class PromptExpander:
             return result["choices"][0]["message"]["content"].strip()
         else:
             raise Exception(f"NVIDIA API error: {result.get('error', {}).get('message', 'Unknown error')}")
+
+    def call_custom(self, platform_id, config, system_prompt, user_prompt, max_tokens, temperature):
+        api_key = self.get_api_key(platform_id)
+        model = config["config"].get("model", "gpt-4-turbo")
+        base_url = config["config"].get("base_url", "").rstrip('/')
+        api_url = config["config"].get("api_url", f"{base_url}/chat/completions")
+        
+        if not api_url:
+            api_url = f"{base_url}/chat/completions"
+        
+        headers = {
+            "Authorization": f"Bearer {api_key}",
+            "Content-Type": "application/json"
+        }
+        data = {
+            "model": model,
+            "messages": [
+                {"role": "system", "content": system_prompt},
+                {"role": "user", "content": user_prompt}
+            ],
+            "max_tokens": max_tokens,
+            "temperature": temperature
+        }
+        
+        response = requests.post(api_url, headers=headers, json=data, timeout=60)
+        result = response.json()
+        
+        if response.status_code == 200 and "choices" in result:
+            return result["choices"][0]["message"]["content"].strip()
+        else:
+            raise Exception(f"Custom API error: {result.get('error', {}).get('message', 'Unknown error')}")

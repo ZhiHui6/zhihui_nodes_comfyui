@@ -109,7 +109,7 @@
     },
     "TagSelector": {
         "title": "标签选择器",
-        "description": "提供可视化标签选择界面，允许用户从预设分类中选择标签。支持层级浏览、搜索功能和自动去重，选中的标签以逗号分隔字符串输出。",
+        "description": "提供可视化标签选择界面，允许用户从预设分类中选择标签。支持层级浏览、搜索功能和自动去重，选中的标签以逗号分隔字符串输出。支持AI扩写功能，可使用多种AI平台对选中的标签进行智能扩写，使其更加详细和丰富。",
         "inputs": {
             "tag_edit": "标签编辑"
         },
@@ -117,7 +117,11 @@
             "tags": "标签"
         },
         "widgets": {
-            "auto_random_tags": "自动随机标签"
+            "auto_random_tags": "自动随机标签",
+            "expand_mode": "扩写模式",
+            "output_language": "输出语言",
+            "platform": "API平台",
+            "max_tokens": "最大令牌数"
         }
     },
     "ImageAspectRatio": {

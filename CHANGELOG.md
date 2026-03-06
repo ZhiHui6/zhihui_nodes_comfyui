@@ -4,10 +4,12 @@
 - 新增ComfyUI设置界面的全新API平台统一设置项
 - 新增PromptExpander节点，支持多种AI平台扩写提示词
 - 优化ShowAny.js的文本显示区域自适应高度
+- 标签选择器节点(TagSelector)：重新添加新版的内置提示词扩写功能。
     <br>
 - Added a unified API-platform settings section in the ComfyUI settings interface
 - Added PromptExpander node, supporting prompt expansion across multiple AI platforms
 - Optimized ShowAny.js text display area with adaptive height
+- TagSelector node: re-added the new built-in prompt expansion feature
 
 ## 1.0.13 2026-2-27
 - 新增图片反推和音乐相关的系统提示预设文件

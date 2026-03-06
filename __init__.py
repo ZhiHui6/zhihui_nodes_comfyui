@@ -60,8 +60,7 @@ from .Nodes.PromptDelete import PromptDelete
 from .Nodes.AudioDuration import AudioDuration
 from .Nodes.VideoFrameExtractor import VideoFrameExtractor
 from .Nodes.IntNode import IntNode
-from .Nodes.PromptExpander.PromptExpander import PromptExpander
-from .Nodes.PromptExpander.PromptExpanderAPI import PromptExpanderAPI
+from .Nodes.PromptExpander import PromptExpander
 
 import os
 

@@ -214,6 +214,43 @@ app.registerExtension({
                 openTagSelector(node);
             });
             button.serialize = false;
+            
+            const applyWidgetVisibility = (widget, show) => {
+                if (!widget) return;
+                widget.hidden = !show;
+                widget.disabled = !show;
+                if (widget.options && typeof widget.options === "object") {
+                    widget.options.hidden = !show;
+                }
+                if (widget.inputEl) {
+                    widget.inputEl.disabled = !show;
+                    widget.inputEl.style.display = show ? '' : 'none';
+                }
+            };
+            
+            const updateExpandWidgets = () => {
+                const expandModeWidget = node.widgets?.find(w => w.name === "expand_mode");
+                const outputLangWidget = node.widgets?.find(w => w.name === "output_language");
+                const platformWidget = node.widgets?.find(w => w.name === "platform");
+                const maxTokensWidget = node.widgets?.find(w => w.name === "max_tokens");
+                
+                const isDisabled = !expandModeWidget || expandModeWidget.value === "Disabled";
+                
+                applyWidgetVisibility(outputLangWidget, !isDisabled);
+                applyWidgetVisibility(platformWidget, !isDisabled);
+                applyWidgetVisibility(maxTokensWidget, !isDisabled);
+            };
+            
+            const expandModeWidget = node.widgets?.find(w => w.name === "expand_mode");
+            if (expandModeWidget) {
+                const originalCallback = expandModeWidget.callback;
+                expandModeWidget.callback = (value) => {
+                    if (originalCallback) originalCallback.call(node, value);
+                    updateExpandWidgets();
+                };
+            }
+            
+            setTimeout(updateExpandWidgets, 100);
         }
     }
 });

@@ -381,12 +381,30 @@
 </tr>
 <tr>
 <td><b>提示词图库</b><br><code>PromptGallery</code></td>
-<td>提示词图库节点：从指定目录加载包含缩略图和文本的图文库，从用户选择的图片输出与图片同名的 <code>.txt</code> 文件内容（提示词文本）。适用于将“图像-提示词”成对管理并在工作流中快速取用。
+<td>提示词图库节点：从指定目录加载包含缩略图和文本的图文库，从用户选择的图片输出与图片同名的 <code>.txt</code> 文件内容（提示词文本）。适用于将"图像-提示词"成对管理并在工作流中快速取用。
 
 <br>
 <div align="left">
 <a href="images/Prompt Gallery.jpg" target="_blank">
 <img src="images/Prompt Gallery.jpg" alt="提示词图库" width="60%"/>
+</a>
+</div>
+</td>
+</tr>
+<tr>
+<td><b>提示词扩写器</b><br><code>PromptExpander</code></td>
+<td>使用AI大模型将简短的提示词扩展为详细、高质量的内容。
+
+<b>特点</b>：
+- <b>双核心风格</b>：支持自然语言式扩写和标签式扩写两种核心风格
+- <b>多平台支持</b>：支持OpenAI、Anthropic、Google、智谱AI、深度求索、硅基流动、月之暗面、稀宇科技、阿里云、OpenRouter、腾讯、英伟达等平台
+- <b>自定义提示词</b>：支持完全自定义系统提示词，满足个性化需求
+- <b>多语言输出</b>：支持中文和英文两种输出语言
+
+<br>
+<div align="left">
+<a href="images/Prompt Expander.jpg" target="_blank">
+<img src="images/Prompt Expander.jpg" alt="提示词扩写器" width="45%"/>
 </a>
 </div>
 </td>
@@ -505,6 +523,26 @@
 <div align="left">
 <a href="images/Image Format Converter.jpg" target="_blank">
 <img src="images/Image Format Converter.jpg" alt="图像格式转换器" width="45%"/>
+</a>
+</div>
+</td>
+</tr>
+<tr>
+<td><b>批量图像加载器</b><br><code>BatchLoadingOfImages</code></td>
+<td>
+
+从指定目录批量加载图像文件，支持多种排序方式和加载控制。
+
+<b>特点</b>：
+- <b>批量加载</b>：从文件夹批量加载图像，支持JPG、PNG、WEBP、JXL等格式
+- <b>多种排序</b>：支持按字母、数字、日期时间等升序/降序排列
+- <b>加载控制</b>：支持设置起始索引和加载数量限制
+- <b>实时刷新</b>：支持始终重新加载模式，实时获取最新文件
+
+<br>
+<div align="left">
+<a href="images/BatchLoadingOfImages.jpg" target="_blank">
+<img src="images/BatchLoadingOfImages.jpg" alt="批量图像加载器" width="45%"/>
 </a>
 </div>
 </td>
@@ -648,6 +686,19 @@
 <img src="images/Song Style Prompt Generator.jpg" alt="Suno歌曲风格提示词生成器" width="45%"/>
 </a>
 </div>
+</td>
+</tr>
+<tr>
+<td><b>音频时长计算器</b><br><code>AudioDuration</code></td>
+<td>
+计算音频文件的时长信息，输出秒数、格式化时间和毫秒数三种格式。
+
+<b>特点</b>：
+- <b>多格式输出</b>：同时输出秒数、格式化时间（HH:MM:SS.mmm）和毫秒数
+- <b>自动适配</b>：自动适配不同维度的音频张量
+- <b>精确计算</b>：基于采样率进行精确时长计算
+
+<br>
 </td>
 </tr>
 </table>

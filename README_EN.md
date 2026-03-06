@@ -390,6 +390,24 @@ A comprehensive prompt generator written based on WanXiang 2.2 official document
 </div>
 </td>
 </tr>
+<tr>
+<td><b>Prompt Expander</b><br><code>PromptExpander</code></td>
+<td>Uses AI large models to expand short prompts into detailed, high-quality content.
+
+<b>Features</b>:
+- <b>Dual Core Styles</b>: Supports natural language expansion and tag-based expansion
+- <b>Multi-Platform Support</b>: Supports OpenAI, Anthropic, Google, Zhipu AI, DeepSeek, SiliconFlow, Moonshot, Minimax, Alibaba Cloud, OpenRouter, Tencent, NVIDIA platforms
+- <b>Custom Prompts</b>: Supports fully customizable system prompts for personalized needs
+- <b>Multi-Language Output</b>: Supports Chinese and English output languages
+
+<br>
+<div align="left">
+<a href="images/Prompt Expander.jpg" target="_blank">
+<img src="images/Prompt Expander.jpg" alt="Prompt Expander" width="45%"/>
+</a>
+</div>
+</td>
+</tr>
 </table>
 
 ### 🖼️ Image Processing Nodes
@@ -504,6 +522,26 @@ Professional image format conversion tool, supporting batch conversion of multip
 <div align="left">
 <a href="images/Image Format Converter.jpg" target="_blank">
 <img src="images/Image Format Converter.jpg" alt="Image Format Converter" width="45%"/>
+</a>
+</div>
+</td>
+</tr>
+<tr>
+<td><b>Batch Image Loader</b><br><code>BatchLoadingOfImages</code></td>
+<td>
+
+Batch loads image files from a specified directory, supporting multiple sorting methods and loading controls.
+
+<b>Features</b>:
+- <b>Batch Loading</b>: Batch loads images from folders, supporting JPG, PNG, WEBP, JXL formats
+- <b>Multiple Sorting</b>: Supports alphabetical, numerical, datetime ascending/descending sorting
+- <b>Loading Control</b>: Supports setting start index and load count limits
+- <b>Real-time Refresh</b>: Supports always reload mode for real-time access to latest files
+
+<br>
+<div align="left">
+<a href="images/BatchLoadingOfImages.jpg" target="_blank">
+<img src="images/BatchLoadingOfImages.jpg" alt="Batch Image Loader" width="45%"/>
 </a>
 </div>
 </td>
@@ -655,6 +693,19 @@ Professional song style prompt generation tool that combines user preferences an
 <img src="images/Song Style Prompt Generator.jpg" alt="Suno Song Style Prompt Generator" width="45%"/>
 </a>
 </div>
+</td>
+</tr>
+<tr>
+<td><b>Audio Duration Calculator</b><br><code>AudioDuration</code></td>
+<td>
+Calculates audio file duration information, outputting seconds, formatted time, and milliseconds.
+
+<b>Features</b>:
+- <b>Multi-Format Output</b>: Simultaneously outputs seconds, formatted time (HH:MM:SS.mmm), and milliseconds
+- <b>Auto-Adaptation</b>: Automatically adapts to audio tensors of different dimensions
+- <b>Precise Calculation</b>: Precise duration calculation based on sample rate
+
+<br>
 </td>
 </tr>
 </table>
