@@ -41,9 +41,9 @@ from .Nodes.Qwen3VL.ImageLoader import ImageLoader
 from .Nodes.Qwen3VL.VideoLoader import VideoLoader
 from .Nodes.Qwen3VL.MultiplePathsInput import MultiplePathsInput
 from .Nodes.Qwen3VL.PathSwitch import PathSwitch
+from .Nodes.Qwen3VL_API.Qwen3VLAPI import Qwen3VLAPI
 from .Nodes.ImageRotateTool import ImageRotateTool
 from .Nodes.ImageFormatConverter import ImageFormatConverter
-from .Nodes.Qwen3VL_API.Qwen3VLAPI import Qwen3VLAPI
 from .Nodes.Sa2VA.Sa2VAAdvanced import Sa2VAAdvanced
 from .Nodes.Sa2VA.Sa2VASegmentationPreset import Sa2VASegmentationPreset
 from .Nodes.Batch_loading_of_images import BatchLoadingOfImages
@@ -61,6 +61,8 @@ from .Nodes.AudioDuration import AudioDuration
 from .Nodes.VideoFrameExtractor import VideoFrameExtractor
 from .Nodes.IntNode import IntNode
 from .Nodes.PromptExpander import PromptExpander
+from .Nodes.LMStudio.lmstudio_node import LMStudioNode
+from .Nodes.LMStudio.lm_studio_unload_node import UnloadLMStudioModels
 
 import os
 
@@ -125,6 +127,8 @@ NODE_CLASS_MAPPINGS = {
     "VideoFrameExtractor": VideoFrameExtractor,
     "IntNode": IntNode,
     "PromptExpander": PromptExpander,
+    "LMStudioNode": LMStudioNode,
+    "UnloadLMStudioModels": UnloadLMStudioModels,
 }
 
 NODE_DISPLAY_NAME_MAPPINGS = {
@@ -188,6 +192,8 @@ NODE_DISPLAY_NAME_MAPPINGS = {
     "VideoFrameExtractor": "Video Frame Extractor",
     "IntNode": "Int",
     "PromptExpander": "Prompt Expander",
+    "LMStudioNode": "LM Studio Node",
+    "UnloadLMStudioModels": "Unload LM Studio Models",
 }
 
 WEB_DIRECTORY = os.path.join(os.path.dirname(os.path.abspath(__file__)), "web")

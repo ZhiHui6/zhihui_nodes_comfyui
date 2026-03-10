@@ -900,6 +900,34 @@ An interactive segmentation preset selection tool node that allows selecting com
 </div>
 </td>
 </tr>
+<tr>
+<td><b>LM Studio Node</b><br><code>LMStudioNode</code></td>
+<td>
+A vision understanding node that connects to a local LM Studio server, supporting image analysis and text generation. Enables private image analysis using locally deployed models without cloud APIs.
+
+<b>Prerequisites</b>:
+- Install <b>LM Studio</b> software, download from: [https://lmstudio.ai](https://lmstudio.ai)
+- Download and load a vision-capable model in LM Studio (e.g., Qwen2-VL, Llama-Vision, etc.)
+- Enable the local server feature in LM Studio (default port 1234)
+
+<b>Core Features</b>:
+- <b>Local Deployment</b>: Connect to local LM Studio server, no cloud API key required
+- <b>Multiple Preset Templates</b>: Supports tag backtracking, detailed description, creative writing, and more
+- <b>Output Language Control</b>: Supports Chinese, English, and bilingual output
+- <b>Auto Model Discovery</b>: Automatically fetches loaded model list from LM Studio
+- <b>Visual Settings</b>: Provides status settings interface for easy parameter configuration
+
+<b>Companion Node</b>:
+- <b>LM Studio Model Unloader</b>: One-click unload of loaded models from LM Studio to free VRAM
+
+<br>
+<div align="left">
+<a href="images/LM Studio Node.jpg" target="_blank">
+<img src="images/LM Studio Node.jpg" alt="LM Studio Node" width="45%"/>
+</a>
+</div>
+</td>
+</tr>
 </table>
 
 ### ⚙️ Logic and Utility Nodes

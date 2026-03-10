@@ -894,6 +894,34 @@
 </div>
 </td>
 </tr>
+<tr>
+<td><b>LM Studio节点</b><br><code>LMStudioNode</code></td>
+<td>
+连接本地LM Studio服务器的视觉理解节点，支持图像分析和文本生成。通过LM Studio本地部署的大模型，实现无需云端API的私有化图像分析。
+
+<b>前置要求</b>：
+- 需要安装 <b>LM Studio</b> 软件，下载地址：[https://lmstudio.ai](https://lmstudio.ai)
+- 在LM Studio中下载并加载支持视觉能力的模型（如Qwen2-VL、Llama-Vision等）
+- 启动LM Studio的本地服务器功能（默认端口1234）
+
+<b>核心功能</b>：
+- <b>本地部署</b>：连接本地LM Studio服务器，无需云端API密钥
+- <b>多种预设模板</b>：支持标签反推、详细描述、创意写作等多种提示词预设
+- <b>输出语言控制</b>：支持中文、英文、中英双语等多种输出语言
+- <b>模型自动发现</b>：自动获取LM Studio中已加载的模型列表
+- <b>可视化设置</b>：提供状态设置界面，方便配置参数
+
+<b>配套节点</b>：
+- <b>LM Studio模型卸载</b>：一键卸载LM Studio中已加载的模型，释放显存
+
+<br>
+<div align="left">
+<a href="images/LM Studio Node.jpg" target="_blank">
+<img src="images/LM Studio Node.jpg" alt="LM Studio节点" width="45%"/>
+</a>
+</div>
+</td>
+</tr>
 </table>
 
 ### ⚙️ 逻辑与工具类节点

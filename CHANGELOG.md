@@ -1,4 +1,8 @@
 # 更新日志
+## 1.0.15 2026-3-10
+- 新增LMStudio节点：支持连接本地LM Studio服务器进行图像分析和文本生成
+    <br>
+- Added LMStudio node: connect to local LM Studio server for image analysis and text generation
 
 ## 1.0.14 2026-3-6
 - 新增ComfyUI设置界面的全新API平台统一设置项
