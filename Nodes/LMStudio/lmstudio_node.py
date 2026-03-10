@@ -127,41 +127,41 @@ class LMStudioNode:
                 "temperature": (
                     "FLOAT",
                     {
-                        "default": 0.3,
+                        "default": 0.4,
                         "min": 0.0,
                         "max": 2.0,
                         "step": 0.05,
-                        "tooltip": "Sampling temperature. 0.3 ensures stable, accurate output for visual understanding",
+                        "tooltip": "Sampling temperature. 0.4 balances accuracy and natural expression for vision tasks",
                     },
                 ),
                 "top_p": (
                     "FLOAT",
                     {
-                        "default": 0.95,
+                        "default": 0.9,
                         "min": 0.0,
                         "max": 1.0,
                         "step": 0.05,
-                        "tooltip": "Nucleus sampling. 0.95 maintains quality while allowing natural variation",
+                        "tooltip": "Nucleus sampling. 0.9 is optimal for filtering low-quality tokens while preserving diversity",
                     },
                 ),
                 "top_k": (
                     "INT",
                     {
-                        "default": 50,
+                        "default": 40,
                         "min": 0,
                         "max": 1000,
                         "step": 1,
-                        "tooltip": "Top-k sampling. 50 balances quality and diversity for optimal outputs",
+                        "tooltip": "Top-k sampling. 40 is the classic value for optimal quality-diversity balance",
                     },
                 ),
                 "repetition_penalty": (
                     "FLOAT",
                     {
-                        "default": 1.05,
+                        "default": 1.1,
                         "min": 0.1,
                         "max": 2.0,
                         "step": 0.05,
-                        "tooltip": "Repetition penalty. 1.05 minimizes redundancy without affecting natural flow",
+                        "tooltip": "Repetition penalty. 1.1 effectively reduces redundancy without over-penalizing",
                     },
                 ),
                 "unload_model": (
