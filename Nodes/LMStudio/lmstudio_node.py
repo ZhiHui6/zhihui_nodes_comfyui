@@ -441,11 +441,14 @@ class LMStudioNode:
 
         full_user_text = self._apply_output_language(full_user_text, output_language)
 
+        # When a preset is selected (not "Ignore"), the system_prompt input should be disabled
+        effective_system_prompt = system_prompt if preset_prompt == "Ignore" else ""
+
         if not batch_mode:
             if image is None:
                 messages = []
-                if system_prompt.strip():
-                    messages.append({"role": "system", "content": system_prompt})
+                if effective_system_prompt.strip():
+                    messages.append({"role": "system", "content": effective_system_prompt})
                 messages.append({"role": "user", "content": full_user_text})
 
                 try:
@@ -466,8 +469,8 @@ class LMStudioNode:
             ]
 
             messages = []
-            if system_prompt.strip():
-                messages.append({"role": "system", "content": system_prompt})
+            if effective_system_prompt.strip():
+                messages.append({"role": "system", "content": effective_system_prompt})
             messages.append({"role": "user", "content": user_content})
 
             try:
@@ -511,8 +514,8 @@ class LMStudioNode:
                             ]
 
                             messages = []
-                            if system_prompt.strip():
-                                messages.append({"role": "system", "content": system_prompt})
+                            if effective_system_prompt.strip():
+                                messages.append({"role": "system", "content": effective_system_prompt})
                             messages.append({"role": "user", "content": user_content})
 
                             result = self._call_api(endpoint, model, messages, max_tokens, temperature, top_p, top_k, repetition_penalty)
@@ -550,8 +553,8 @@ class LMStudioNode:
                         ]
 
                         messages = []
-                        if system_prompt.strip():
-                            messages.append({"role": "system", "content": system_prompt})
+                        if effective_system_prompt.strip():
+                            messages.append({"role": "system", "content": effective_system_prompt})
                         messages.append({"role": "user", "content": user_content})
 
                         result = self._call_api(endpoint, model, messages, max_tokens, temperature, top_p, top_k, repetition_penalty)
