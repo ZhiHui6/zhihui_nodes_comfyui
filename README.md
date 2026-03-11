@@ -435,15 +435,21 @@
 <td>智能图像宽高比设置工具，支持多种预设模式和自定义尺寸配置。
 
 <b>特点</b>：
-- <b>多预设支持</b>：内置Qwen、Flux、Wan、SDXL等主流模型的专用宽高比预设
+- <b>多预设支持</b>：内置Qwen、Flux、Wan、SDXL、LTX2.3等主流模型的专用宽高比预设
 - <b>自定义模式</b>：支持完全自定义的宽度和高度设置
 - <b>宽高比锁定</b>：提供宽高比锁定功能，修改一个维度时自动调整另一个维度
-- <b>智能切换</b>：根据选择的预设模式自动显示对应的宽高比选项
+- <b>尺寸互换</b>：一键互换宽高数值，方便调整横竖屏方向
 
 <br>
 <div align="left">
-<a href="images/Image Aspect Ratio.jpg" target="_blank">
-<img src="images/Image Aspect Ratio.jpg" alt="Image Aspect Ratio" width="80%"/>
+<a href="images/Image Aspect Ratio1.jpg" target="_blank">
+<img src="images/Image Aspect Ratio1.jpg" alt="Image Aspect Ratio" width="80%"/>
+</a>
+</div>
+<br>
+<div align="left">
+<a href="images/Image Aspect Ratio2.jpg" target="_blank">
+<img src="images/Image Aspect Ratio2.jpg" alt="Image Aspect Ratio 2" width="80%"/>
 </a>
 </div>
 </td>

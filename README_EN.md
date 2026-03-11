@@ -434,15 +434,21 @@ A comprehensive prompt generator written based on WanXiang 2.2 official document
 <td>Intelligent image aspect ratio setting tool, supporting multiple preset modes and custom size configurations.
 
 <b>Features</b>:
-- <b>Multiple Preset Support</b>: Built-in dedicated aspect ratio presets for mainstream models such as Qwen, Flux, Wan, and SDXL
+- <b>Multiple Preset Support</b>: Built-in dedicated aspect ratio presets for mainstream models such as Qwen, Flux, Wan, SDXL, and LTX2.3
 - <b>Custom Mode</b>: Supports completely custom width and height settings
 - <b>Aspect Ratio Lock</b>: Provides aspect ratio locking function, automatically adjusting one dimension when modifying the other
-- <b>Intelligent Switching</b>: Automatically displays corresponding aspect ratio options based on the selected preset mode
+- <b>Size Swap</b>: One-click swap width and height values for easy portrait/landscape orientation adjustment
 
 <br>
 <div align="left">
-<a href="images/Image Aspect Ratio.jpg" target="_blank">
-<img src="images/Image Aspect Ratio.jpg" alt="Image Aspect Ratio" width="80%"/>
+<a href="images/Image Aspect Ratio1.jpg" target="_blank">
+<img src="images/Image Aspect Ratio1.jpg" alt="Image Aspect Ratio" width="80%"/>
+</a>
+</div>
+<br>
+<div align="left">
+<a href="images/Image Aspect Ratio2.jpg" target="_blank">
+<img src="images/Image Aspect Ratio2.jpg" alt="Image Aspect Ratio 2" width="80%"/>
 </a>
 </div>
 </td>

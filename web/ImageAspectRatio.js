@@ -13,143 +13,104 @@ app.registerExtension({
                 this.lastCustomSize = { width: 1328, height: 1328 };
                 this.lastPresetSize = null;
 
-                const QWEN_PRESETS = [
-                    "1:1(1328x1328)",
-                    "16:9(1664x928)",
-                    "9:16(928x1664)",
-                    "4:3(1472x1104)",
-                    "3:4(1104x1472)",
-                    "3:2(1584x1056)",
-                    "2:3(1056x1584)",
-                ];
-                const FLUX_PRESETS = [
-                    "1:1(1024x1024)",
-                    "16:9(1344x768)",
-                    "9:16(768x1344)",
-                    "4:3(1152x864)",
-                    "3:4(864x1152)",
-                    "3:2(1216x832)",
-                    "2:3(832x1216)",
-                ];
+                const PRESETS_DATA = {
+                    "Qwen image": {
+                        "1:1": ["1328x1328"],
+                        "16:9": ["1664x928"],
+                        "9:16": ["928x1664"],
+                        "4:3": ["1472x1104"],
+                        "3:4": ["1104x1472"],
+                        "3:2": ["1584x1056"],
+                        "2:3": ["1056x1584"],
+                        "Cinema": ["4K 4032x2128", "2K 2016x1008"],
+                        "Video": ["1080p 1904x1008", "720p 1232x672"],
+                    },
+                    "Flux": {
+                        "1:1": ["1024x1024"],
+                        "16:9": ["1344x768"],
+                        "9:16": ["768x1344"],
+                        "4:3": ["1152x864"],
+                        "3:4": ["864x1152"],
+                        "3:2": ["1216x832"],
+                        "2:3": ["832x1216"],
+                    },
+                    "Flux.2": {
+                        "1:1": ["S 1024x1024", "M 1280x1280", "L 1536x1536"],
+                        "16:9": ["S 1344x768", "M 1728x960", "L 2048x1152"],
+                        "9:16": ["S 768x1344", "M 960x1728", "L 1152x2048"],
+                        "4:3": ["S 1152x864", "M 1408x1056", "L 1728x1296"],
+                        "3:4": ["S 864x1152", "M 1088x1472", "L 1280x1728"],
+                        "3:2": ["S 1216x832", "M 1536x1024", "L 1920x1280"],
+                        "2:3": ["S 832x1216", "M 1024x1536", "L 1280x1920"],
+                    },
+                    "Flux2 klein": {
+                        "1:1": ["S 768x768", "M 896x896", "L 1024x1024"],
+                        "16:9": ["S 1024x576", "M 1152x640", "L 1344x768"],
+                        "9:16": ["S 576x1024", "M 640x1152", "L 768x1344"],
+                        "4:3": ["S 768x576", "M 960x704", "L 1024x768"],
+                        "3:4": ["S 576x768", "M 704x960", "L 768x1024"],
+                        "3:2": ["S 960x640", "M 1152x768", "L 1344x896"],
+                        "2:3": ["S 640x960", "M 768x1152", "L 896x1344"],
+                        "Cinema": ["4K 4096x2160", "2K 2048x1072"],
+                        "Video": ["1080p 1920x1072", "720p 1280x720"],
+                    },
+                    "Wan": {
+                        "16:9": ["1280x720"],
+                        "9:16": ["720x1280"],
+                        "4:3": ["1024x768"],
+                        "3:4": ["768x1024"],
+                        "21:9": ["1344x576"],
+                        "9:21": ["576x1344"],
+                        "Cinema": ["4K 4096x2144", "2K 2048x1056"],
+                        "Video": ["1080p 1920x1056", "720p 1280x704"],
+                    },
+                    "SDXL": {
+                        "1:1": ["1024x1024"],
+                        "9:8": ["1152x896"],
+                        "8:9": ["896x1152"],
+                        "3:2": ["1216x832"],
+                        "2:3": ["832x1216"],
+                        "7:4": ["1344x768"],
+                        "4:7": ["768x1344"],
+                        "12:5": ["1536x640"],
+                        "5:12": ["640x1536"],
+                    },
+                    "LTX2.3": {
+                        "16:9": ["480p 832x480", "720p 1280x704", "1080p 1920x1088", "2K 2048x1152", "4K 3840x2176"],
+                        "10:16": ["480p 480x768", "720p 704x1152", "1080p 1088x1728", "2K 1280x2048", "4K 2368x3840"],
+                        "16:10": ["480p 768x480", "720p 1152x704", "1080p 1728x1088", "2K 2048x1280", "4K 3840x2368"],
+                        "9:16": ["480p 480x832", "720p 704x1280", "1080p 1088x1920", "2K 1152x2048", "4K 2176x3840"],
+                        "21:9": ["480p 1152x480", "720p 1728x704", "1080p 2560x1088", "2K 2688x1152", "4K 5120x2176"],
+                        "9:21": ["480p 480x1152", "720p 704x1728", "1080p 1088x2560", "2K 1152x2688", "4K 2176x5120"],
+                    },
+                    "Z-image": {
+                        "1:1": ["1024x1024", "1280x1280", "1536x1536"],
+                        "9:7": ["1152x896", "1440x1120", "1728x1344"],
+                        "7:9": ["896x1152", "1120x1440", "1344x1728"],
+                        "4:3": ["1152x864", "1472x1104", "1728x1296"],
+                        "3:4": ["864x1152", "1104x1472", "1296x1728"],
+                        "3:2": ["1248x832", "1536x1024", "1872x1248"],
+                        "2:3": ["832x1248", "1024x1536", "1248x1872"],
+                        "16:9": ["1280x720", "1536x864", "2048x1152"],
+                        "9:16": ["720x1280", "864x1536", "1152x2048"],
+                        "21:9": ["1344x576", "1680x720", "2016x864"],
+                        "9:21": ["576x1344", "720x1680", "864x2016"],
+                        "Cinema": ["4K 4096x2112", "2K 2048x1024"],
+                        "Video": ["1080p 1920x1024", "720p 1280x704"],
+                    },
+                    "Custom Size": {},
+                };
 
-                const FLUX2_PRESETS = [
-                    "1:1·S(1024x1024)",
-                    "1:1·M(1280x1280)",
-                    "1:1·L(1536x1536)",
-
-                    "16:9·S(1344x768)",
-                    "16:9·M(1728x960)",
-                    "16:9·L(2048x1152)",
-
-                    "9:16·S(768x1344)",
-                    "9:16·M(960x1728)",
-                    "9:16·L(1152x2048)",
-
-                    "4:3·S(1152x864)",
-                    "4:3·M(1408x1056)",
-                    "4:3·L(1728x1296)",
-
-                    "3:4·S(864x1152)",
-                    "3:4·M(1088x1472)",
-                    "3:4·L(1280x1728)",
-
-                    "3:2·S(1216x832)",
-                    "3:2·M(1536x1024)",
-                    "3:2·L(1920x1280)",
-
-                    "2:3·S(832x1216)",
-                    "2:3·M(1024x1536)",
-                    "2:3·L(1280x1920)",
-                ];
-
-                const FLUX2_KLEIN_PRESETS = [
-                    "1:1·S(768x768)",
-                    "1:1·M(896x896)",
-                    "1:1·L(1024x1024)",
-
-                    "16:9·S(1024x576)",
-                    "16:9·M(1152x640)",
-                    "16:9·L(1344x768)",
-
-                    "9:16·S(576x1024)",
-                    "9:16·M(640x1152)",
-                    "9:16·L(768x1344)",
-
-                    "4:3·S(768x576)",
-                    "4:3·M(960x704)",
-                    "4:3·L(1024x768)",
-
-                    "3:4·S(576x768)",
-                    "3:4·M(704x960)",
-                    "3:4·L(768x1024)",
-
-                    "3:2·S(960x640)",
-                    "3:2·M(1152x768)",
-                    "3:2·L(1344x896)",
-
-                    "2:3·S(640x960)",
-                    "2:3·M(768x1152)",
-                    "2:3·L(896x1344)",
-                ];
-
-                const WAN_PRESETS = [
-                    "1:1(1024x1024)",
-                    "16:9(1280x720)",
-                    "9:16(720x1280)",
-                    "4:3(1024x768)",
-                    "3:4(768x1024)",
-                    "21:9(1344x576)",
-                    "9:21(576x1344)",
-                ];
-                const SD_PRESETS = [
-                    "1:1(1024x1024)",
-                    "9:8(1152x896)",
-                    "8:9(896x1152)",
-                    "3:2(1216x832)",
-                    "2:3(832x1216)",
-                    "7:4(1344x768)",
-                    "4:7(768x1344)",
-                    "12:5(1536x640)",
-                    "5:12(640x1536)",
-                    "9:16(768x1344)",
-                    "16:9(1344x768)",
-                ];
-                const ZIMAGE_PRESETS = [
-                    "1:1(1024x1024)",
-                    "1:1(1280x1280)",
-                    "1:1(1536x1536)",
-                    "9:7(1152x896)",
-                    "9:7(1440x1120)",
-                    "9:7(1728x1344)",
-                    "7:9(896x1152)",
-                    "7:9(1120x1440)",
-                    "7:9(1344x1728)",
-                    "4:3(1152x864)",
-                    "4:3(1472x1104)",
-                    "4:3(1728x1296)",
-                    "3:4(864x1152)",
-                    "3:4(1104x1472)",
-                    "3:4(1296x1728)",
-                    "3:2(1248x832)",
-                    "3:2(1536x1024)",
-                    "3:2(1872x1248)",
-                    "2:3(832x1248)",
-                    "2:3(1024x1536)",
-                    "2:3(1248x1872)",
-                    "16:9(1280x720)",
-                    "16:9(1536x864)",
-                    "16:9(2048x1152)",
-                    "9:16(720x1280)",
-                    "9:16(864x1536)",
-                    "9:16(1152x2048)",
-                    "21:9(1344x576)",
-                    "21:9(1680x720)",
-                    "21:9(2016x864)",
-                    "9:21(576x1344)",
-                    "9:21(720x1680)",
-                    "9:21(864x2016)",
-                ];
-
+                const ALL_CATEGORIES = [...new Set([
+                    ...Object.keys(PRESETS_DATA["Qwen image"]),
+                    ...Object.keys(PRESETS_DATA["Flux"]),
+                    ...Object.keys(PRESETS_DATA["Flux.2"]),
+                    ...Object.keys(PRESETS_DATA["Flux2 klein"]),
+                    ...Object.keys(PRESETS_DATA["Wan"]),
+                    ...Object.keys(PRESETS_DATA["SDXL"]),
+                    ...Object.keys(PRESETS_DATA["LTX2.3"]),
+                    ...Object.keys(PRESETS_DATA["Z-image"]),
+                ])].sort();
 
                 const setComboOptions = (widget, values) => {
                     if (!widget) return;
@@ -162,67 +123,107 @@ app.registerExtension({
                     }
                 };
 
-
-                const applyAspectOptionsByMode = (mode, aspectRatioWidget) => {
-                    let presets;
-                    switch (mode) {
-                        case "Flux":
-                            presets = FLUX_PRESETS;
-                            break;
-                        case "Flux.2":
-                            presets = FLUX2_PRESETS;
-                            break;
-                        case "Flux2 klein":
-                            presets = FLUX2_KLEIN_PRESETS;
-                            break;
-                        case "Wan":
-                            presets = WAN_PRESETS;
-                            break;
-                        case "SDXL":
-                            presets = SD_PRESETS;
-                            break;
-                        case "Z-image":
-                            presets = ZIMAGE_PRESETS;
-                            break;
-                        case "Custom Size":
-                            presets = [];
-                            break;
-                        case "Qwen image":
-                        default:
-                            presets = QWEN_PRESETS;
-                            break;
-                    }
-                    const opts = [...presets];
-                    setComboOptions(aspectRatioWidget, opts);
-                    if (opts.length > 0 && !opts.includes(aspectRatioWidget.value)) {
-                        aspectRatioWidget.value = opts[0];
-                    }
+                const getCategoriesByMode = (mode) => {
+                    const data = PRESETS_DATA[mode];
+                    if (!data) return [];
+                    return Object.keys(data).sort();
                 };
 
-                this.swapWidthHeight = function() {
+                const getSizesByCategory = (mode, category) => {
+                    const data = PRESETS_DATA[mode];
+                    if (!data || !data[category]) return [];
+                    return data[category];
+                };
+
+                const applyCategoryOptionsByMode = (mode, categoryWidget) => {
+                    const categories = getCategoriesByMode(mode);
+                    setComboOptions(categoryWidget, categories);
+                    if (categories.length > 0 && !categories.includes(categoryWidget.value)) {
+                        categoryWidget.value = categories[0];
+                    }
+                    return categories;
+                };
+
+                const applySizeOptionsByCategory = (mode, category, sizeWidget) => {
+                    const sizes = getSizesByCategory(mode, category);
+                    setComboOptions(sizeWidget, sizes);
+                    if (sizes.length > 0 && !sizes.includes(sizeWidget.value)) {
+                        sizeWidget.value = sizes[0];
+                    }
+                    return sizes;
+                };
+
+                this.swapAll = function() {
+                    const modeWidget = this.widgets.find(w => w.name === "preset_mode");
+                    const categoryWidget = this.widgets.find(w => w.name === "aspect_category");
+                    const sizeWidget = this.widgets.find(w => w.name === "aspect_size");
                     const widthWidget = this.widgets.find(w => w.name === "custom_width");
                     const heightWidget = this.widgets.find(w => w.name === "custom_height");
                     
-                    if (widthWidget && heightWidget) {
-                        const currentWidth = parseInt(widthWidget.value) || 1328;
-                        const currentHeight = parseInt(heightWidget.value) || 1328;
-                        
-                        widthWidget.value = currentHeight;
-                        heightWidget.value = currentWidth;
-                        
-                        this.lastCustomSize = {
-                            width: currentHeight,
-                            height: currentWidth
-                        };
-                        
-                        if (this.aspectRatio && this.aspectRatio > 0) {
-                            this.aspectRatio = currentHeight / currentWidth;
-                            this.lastWidth = currentHeight;
-                            this.lastHeight = currentWidth;
+                    if (!modeWidget) return;
+                    
+                    const isCustom = modeWidget.value === "Custom Size";
+                    
+                    if (isCustom) {
+                        if (widthWidget && heightWidget) {
+                            const currentWidth = parseInt(widthWidget.value) || 1328;
+                            const currentHeight = parseInt(heightWidget.value) || 1328;
+                            
+                            widthWidget.value = currentHeight;
+                            heightWidget.value = currentWidth;
+                            
+                            this.lastCustomSize = {
+                                width: currentHeight,
+                                height: currentWidth
+                            };
+                            
+                            if (this.aspectRatio && this.aspectRatio > 0) {
+                                this.aspectRatio = currentHeight / currentWidth;
+                                this.lastWidth = currentHeight;
+                                this.lastHeight = currentWidth;
+                            }
                         }
-                        
-                        app.graph.setDirtyCanvas(true, true);
+                    } else {
+                        if (categoryWidget && sizeWidget) {
+                            const currentCategory = categoryWidget.value;
+                            const swappedCategory = this.getSwappedRatio(currentCategory);
+                            
+                            if (swappedCategory && swappedCategory !== currentCategory) {
+                                const categories = getCategoriesByMode(modeWidget.value);
+                                if (categories.includes(swappedCategory)) {
+                                    categoryWidget.value = swappedCategory;
+                                    applySizeOptionsByCategory(modeWidget.value, swappedCategory, sizeWidget);
+                                }
+                            }
+                        }
                     }
+                    
+                    this.callback();
+                    app.graph.setDirtyCanvas(true, true);
+                };
+
+                this.getSwappedRatio = function(ratio) {
+                    const swapMap = {
+                        "16:9": "9:16",
+                        "9:16": "16:9",
+                        "16:10": "10:16",
+                        "10:16": "16:10",
+                        "4:3": "3:4",
+                        "3:4": "4:3",
+                        "3:2": "2:3",
+                        "2:3": "3:2",
+                        "21:9": "9:21",
+                        "9:21": "21:9",
+                        "9:8": "8:9",
+                        "8:9": "9:8",
+                        "9:7": "7:9",
+                        "7:9": "9:7",
+                        "7:4": "4:7",
+                        "4:7": "7:4",
+                        "12:5": "5:12",
+                        "5:12": "12:5",
+                    };
+                    return swapMap[ratio] || ratio;
                 };
 
                 this.repositionCustomControls = function(isCustom) {
@@ -230,15 +231,17 @@ app.registerExtension({
                     
                     const widgets = this.widgets || [];
                     const modeIdx = widgets.findIndex(w => w && w.name === "preset_mode");
-                    const aspectIdx = widgets.findIndex(w => w && w.name === "aspect_ratio");
+                    const categoryIdx = widgets.findIndex(w => w && w.name === "aspect_category");
+                    const sizeIdx = widgets.findIndex(w => w && w.name === "aspect_size");
                     const widthIdx = widgets.findIndex(w => w && w.name === "custom_width");
                     const heightIdx = widgets.findIndex(w => w && w.name === "custom_height");
                     const lockIdx = widgets.findIndex(w => w && w.name === "aspect_lock");
-                    const swapIdx = widgets.findIndex(w => w && w.name === "🔁互换宽高·Swap_W&H");
+                    const swapIdx = widgets.findIndex(w => w && w.name === "🔃尺寸互换·Swap_Size");
                     
-                    if (modeIdx < 0 || aspectIdx < 0 || widthIdx < 0 || heightIdx < 0 || lockIdx < 0) return;
+                    if (modeIdx < 0 || categoryIdx < 0 || sizeIdx < 0 || widthIdx < 0 || heightIdx < 0 || lockIdx < 0) return;
                     
-                    const aspectWidget = widgets[aspectIdx];
+                    const categoryWidget = widgets[categoryIdx];
+                    const sizeWidget = widgets[sizeIdx];
                     const widthWidget = widgets[widthIdx];
                     const heightWidget = widgets[heightIdx];
                     const lockWidget = widgets[lockIdx];
@@ -251,25 +254,26 @@ app.registerExtension({
                         };
                     }
                     
-                    const indicesToRemove = [aspectIdx, widthIdx, heightIdx, lockIdx, swapIdx].filter(idx => idx >= 0).sort((a, b) => b - a);
+                    const indicesToRemove = [categoryIdx, sizeIdx, widthIdx, heightIdx, lockIdx, swapIdx].filter(idx => idx >= 0).sort((a, b) => b - a);
                     for (const idx of indicesToRemove) {
                         widgets.splice(idx, 1);
                     }
                     
                     if (isCustom) {
-                        widgets.splice(modeIdx + 1, 0, widthWidget, heightWidget);
+                        widgets.splice(modeIdx + 1, 0, widthWidget, heightWidget, lockWidget);
                         
                         if (!swapWidget) {
-                            swapWidget = this.addWidget("button", "🔁互换宽高·Swap_W&H", null, () => {
-                                this.swapWidthHeight();
+                            swapWidget = this.addWidget("button", "🔃尺寸互换·Swap_Size", null, () => {
+                                this.swapAll();
                             });
                             const curIdx = widgets.indexOf(swapWidget);
                             if (curIdx >= 0) widgets.splice(curIdx, 1);
                         }
 
-                        widgets.splice(modeIdx + 3, 0, swapWidget, lockWidget);
+                        widgets.push(swapWidget);
                         
-                        aspectWidget.hidden = true;
+                        categoryWidget.hidden = true;
+                        sizeWidget.hidden = true;
                         widthWidget.hidden = false;
                         heightWidget.hidden = false;
                         lockWidget.hidden = false;
@@ -278,17 +282,28 @@ app.registerExtension({
                         }
                         widthWidget.value = this.lastCustomSize.width;
                         heightWidget.value = this.lastCustomSize.height;
-                        widgets.push(aspectWidget);
+                        widgets.push(categoryWidget, sizeWidget);
                     } else {
-                        widgets.splice(modeIdx + 1, 0, aspectWidget);
-                        aspectWidget.hidden = false;
+                        widgets.splice(modeIdx + 1, 0, categoryWidget, sizeWidget);
+                        
+                        if (!swapWidget) {
+                            swapWidget = this.addWidget("button", "🔃尺寸互换·Swap_Size", null, () => {
+                                this.swapAll();
+                            });
+                            const curIdx = widgets.indexOf(swapWidget);
+                            if (curIdx >= 0) widgets.splice(curIdx, 1);
+                        }
+                        
+                        widgets.splice(modeIdx + 3, 0, swapWidget);
+                        
+                        categoryWidget.hidden = false;
+                        sizeWidget.hidden = false;
                         widthWidget.hidden = true;
                         heightWidget.hidden = true;
                         lockWidget.hidden = true;
                         widgets.push(widthWidget, heightWidget, lockWidget);
                         if (swapWidget) {
-                            swapWidget.hidden = true;
-                            widgets.push(swapWidget);
+                            swapWidget.hidden = false;
                         }
                     }
                     
@@ -302,17 +317,16 @@ app.registerExtension({
                         originalCallback.apply(this, arguments);
                     }
                     
-                    const aspectRatioWidget = this.widgets.find(w => w.name === "aspect_ratio");
+                    const categoryWidget = this.widgets.find(w => w.name === "aspect_category");
+                    const sizeWidget = this.widgets.find(w => w.name === "aspect_size");
                     const widthWidget = this.widgets.find(w => w.name === "custom_width");
                     const heightWidget = this.widgets.find(w => w.name === "custom_height");
                     const lockWidget = this.widgets.find(w => w.name === "aspect_lock");
                     const modeWidget = this.widgets.find(w => w.name === "preset_mode");
                     
-                    if (!aspectRatioWidget || !widthWidget || !heightWidget || !lockWidget || !modeWidget) {
+                    if (!categoryWidget || !sizeWidget || !widthWidget || !heightWidget || !lockWidget || !modeWidget) {
                         return;
                     }
-                    
-                    applyAspectOptionsByMode(modeWidget.value, aspectRatioWidget);
 
                     const isCustom = modeWidget.value === "Custom Size";
                     
@@ -338,11 +352,12 @@ app.registerExtension({
                 setTimeout(() => {
                     const widthWidget = this.widgets.find(w => w.name === "custom_width");
                     const heightWidget = this.widgets.find(w => w.name === "custom_height");
-                    const aspectRatioWidget = this.widgets.find(w => w.name === "aspect_ratio");
+                    const categoryWidget = this.widgets.find(w => w.name === "aspect_category");
+                    const sizeWidget = this.widgets.find(w => w.name === "aspect_size");
                     const lockWidget = this.widgets.find(w => w.name === "aspect_lock");
                     const modeWidget = this.widgets.find(w => w.name === "preset_mode");
                     
-                    if (widthWidget && heightWidget && aspectRatioWidget && lockWidget && modeWidget) {
+                    if (widthWidget && heightWidget && categoryWidget && sizeWidget && lockWidget && modeWidget) {
                         if (widthWidget.value === '' || widthWidget.value === null || widthWidget.value === undefined) {
                             widthWidget.value = 1328;
                         }
@@ -355,12 +370,19 @@ app.registerExtension({
                         this.aspectRatio = this.lastHeight > 0 ? this.lastWidth / this.lastHeight : 1;
                         this.isUpdating = false;
                         
-                        const originalAspectCallback = aspectRatioWidget.callback;
+                        const originalCategoryCallback = categoryWidget.callback;
+                        const originalSizeCallback = sizeWidget.callback;
                         const originalLockCallback = lockWidget.callback;
                         const originalModeCallback = modeWidget.callback;
                         
-                        aspectRatioWidget.callback = () => {
-                            if (originalAspectCallback) originalAspectCallback.apply(aspectRatioWidget, arguments);
+                        categoryWidget.callback = () => {
+                            if (originalCategoryCallback) originalCategoryCallback.apply(categoryWidget, arguments);
+                            applySizeOptionsByCategory(modeWidget.value, categoryWidget.value, sizeWidget);
+                            this.callback();
+                        };
+                        
+                        sizeWidget.callback = () => {
+                            if (originalSizeCallback) originalSizeCallback.apply(sizeWidget, arguments);
                             this.callback();
                         };
                         
@@ -388,9 +410,14 @@ app.registerExtension({
 
                         modeWidget.callback = () => {
                             if (originalModeCallback) originalModeCallback.apply(modeWidget, arguments);
-                            applyAspectOptionsByMode(modeWidget.value, aspectRatioWidget);
                             
                             const isCustom = modeWidget.value === "Custom Size";
+                            
+                            if (!isCustom) {
+                                applyCategoryOptionsByMode(modeWidget.value, categoryWidget);
+                                applySizeOptionsByCategory(modeWidget.value, categoryWidget.value, sizeWidget);
+                            }
+                            
                             this.repositionCustomControls(isCustom);
                             
                             this.callback();
@@ -438,7 +465,8 @@ app.registerExtension({
                             }
                         }, 100);
                         
-                        applyAspectOptionsByMode(modeWidget.value, aspectRatioWidget);
+                        applyCategoryOptionsByMode(modeWidget.value, categoryWidget);
+                        applySizeOptionsByCategory(modeWidget.value, categoryWidget.value, sizeWidget);
                         
                         const isCustom = modeWidget.value === "Custom Size";
                         this.repositionCustomControls(isCustom);

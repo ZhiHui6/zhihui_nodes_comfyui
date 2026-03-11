@@ -1,4 +1,9 @@
 # 更新日志
+## 1.0.15 2026-3-11
+- 图像宽高比(mageAspectRatio)节点：优化预设尺寸结构并新增LTX2.3视频分辨率预设
+    <br>
+- ImageAspectRatio node: optimized preset size structure and added LTX2.3 video resolution presets
+
 ## 1.0.15 2026-3-10
 - 新增LMStudio节点：支持连接本地LM Studio服务器进行图像分析和文本生成
     <br>
