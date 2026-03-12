@@ -923,9 +923,6 @@ A vision understanding node that connects to a local LM Studio server, supportin
 - <b>Auto Model Discovery</b>: Automatically fetches loaded model list from LM Studio
 - <b>Visual Settings</b>: Provides status settings interface for easy parameter configuration
 
-<b>Companion Node</b>:
-- <b>LM Studio Model Unloader</b>: One-click unload of loaded models from LM Studio to free VRAM
-
 <br>
 <div align="left">
 <a href="images/LM Studio Node.jpg" target="_blank">

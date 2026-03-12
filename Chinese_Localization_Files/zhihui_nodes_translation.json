@@ -46,6 +46,30 @@
             "merged_text": "合并文本"
         }
     },
+    "PromptDelete": {
+        "title": "提示词删除",
+        "description": "提示词删除：搜索并删除文本中匹配的内容，支持最多10个搜索字符串。可选择启用自动格式化功能，自动清理标点符号和空格。",
+        "inputs": {
+            "text_input": "文本输入"
+        },
+        "widgets": {
+            "inputcount": "输入数量",
+            "auto_format": "自动格式化",
+            "find_1": "查找1",
+            "find_2": "查找2",
+            "find_3": "查找3",
+            "find_4": "查找4",
+            "find_5": "查找5",
+            "find_6": "查找6",
+            "find_7": "查找7",
+            "find_8": "查找8",
+            "find_9": "查找9",
+            "find_10": "查找10"
+        },
+        "outputs": {
+            "text_output": "文本输出"
+        }
+    },
     "TextModifier": {
         "title": "文本修改器",
         "description": "文本修改器：提取指定起始文本和结束文本之间的文本内容。可以删除指定字符串及其前后的所有文本，实现精确的文本提取功能。",

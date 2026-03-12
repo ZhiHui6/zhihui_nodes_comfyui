@@ -62,7 +62,6 @@ from .Nodes.VideoFrameExtractor import VideoFrameExtractor
 from .Nodes.IntNode import IntNode
 from .Nodes.PromptExpander import PromptExpander
 from .Nodes.LMStudio.lmstudio_node import LMStudioNode
-from .Nodes.LMStudio.lm_studio_unload_node import UnloadLMStudioModels
 
 import os
 
@@ -128,7 +127,6 @@ NODE_CLASS_MAPPINGS = {
     "IntNode": IntNode,
     "PromptExpander": PromptExpander,
     "LMStudioNode": LMStudioNode,
-    "UnloadLMStudioModels": UnloadLMStudioModels,
 }
 
 NODE_DISPLAY_NAME_MAPPINGS = {
@@ -193,7 +191,6 @@ NODE_DISPLAY_NAME_MAPPINGS = {
     "IntNode": "Int",
     "PromptExpander": "Prompt Expander",
     "LMStudioNode": "LM Studio Node",
-    "UnloadLMStudioModels": "Unload LM Studio Models",
 }
 
 WEB_DIRECTORY = os.path.join(os.path.dirname(os.path.abspath(__file__)), "web")
