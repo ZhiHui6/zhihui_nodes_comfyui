@@ -1,5 +1,10 @@
 # 更新日志
 
+## 1.0.16 2026-3-12
+- 在VideoFrameExtractor节点中添加end_frame参数，支持设置提取的结束帧
+    <br>
+- Added `end_frame` parameter to VideoFrameExtractor node to allow specifying the last frame to extract
+
 ## 1.0.15 2026-3-11
 - 图像宽高比(mageAspectRatio)节点：优化预设尺寸结构并新增LTX2.3视频分辨率预设
 - 修正LM工作室(LMStudio)节点: 当选择预设时禁用系统提示输入

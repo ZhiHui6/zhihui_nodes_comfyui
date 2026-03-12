@@ -1034,6 +1034,7 @@
             "interval": "间隔",
             "preview_cols": "预览列数",
             "start_frame": "起始帧",
+            "end_frame": "结束帧",
             "enable_output": "启用输出",
             "output_path": "输出路径",
             "filename_prefix": "文件名前缀"

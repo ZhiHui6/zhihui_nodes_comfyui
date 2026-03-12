@@ -18,6 +18,7 @@ class VideoFrameExtractor(ComfyNodeABC):
             },
             "optional": {
                 "start_frame": ("INT", {"default": 0, "min": 0, "max": 99999, "step": 1}),
+                "end_frame": ("INT", {"default": -1, "min": -1, "max": 99999, "step": 1}),
                 "enable_output": ("BOOLEAN", {"default": False}),
                 "output_path": ("STRING", {"default": "", "multiline": False}),
                 "filename_prefix": ("STRING", {"default": "", "multiline": False}),
@@ -30,7 +31,7 @@ class VideoFrameExtractor(ComfyNodeABC):
     OUTPUT_IS_LIST = (True,)
     FUNCTION = "extract_frames"
 
-    def extract_frames(self, video, mode, max_frames, interval, start_frame=0, enable_output=False, output_path="", filename_prefix="frame"):
+    def extract_frames(self, video, mode, max_frames, interval, start_frame=0, end_frame=-1, enable_output=False, output_path="", filename_prefix="frame"):
         if enable_output and (not output_path or not output_path.strip()):
             raise ValueError("Output path must be specified when output is enabled / 当启用输出时，必须指定输出路径")
         
@@ -55,26 +56,32 @@ class VideoFrameExtractor(ComfyNodeABC):
         if frame_count == 0:
             raise ValueError("No frames found in video")
 
+        effective_end = end_frame if end_frame >= 0 else frame_count - 1
+        effective_end = min(effective_end, frame_count - 1)
+
+        if start_frame > effective_end:
+            raise ValueError("Start frame exceeds end frame")
+
         selected_indices = []
 
         if mode == "extract_by_count":
-            total_available = frame_count - start_frame
+            total_available = effective_end - start_frame + 1
             if total_available <= 0:
-                raise ValueError("Start frame exceeds video length")
-            
+                raise ValueError("No frames available in the specified range")
+
             step = max(1, total_available // max_frames)
             for i in range(max_frames):
                 idx = start_frame + i * step
-                if idx < frame_count:
+                if idx <= effective_end:
                     selected_indices.append(idx)
         else:
             idx = start_frame
-            while idx < frame_count:
+            while idx <= effective_end:
                 selected_indices.append(idx)
                 idx += interval
 
         if len(selected_indices) == 0:
-            selected_indices = [0]
+            selected_indices = [start_frame]
 
         selected_indices = selected_indices[:max_frames]
 
