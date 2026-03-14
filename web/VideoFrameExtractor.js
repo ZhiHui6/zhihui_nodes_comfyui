@@ -7,7 +7,57 @@ app.registerExtension({
             const onNodeCreated = nodeType.prototype.onNodeCreated;
             nodeType.prototype.onNodeCreated = function () {
                 const r = onNodeCreated?.apply(this, arguments);
-                
+
+                const rangeModeWidget = this.widgets.find(w => w.name === "range_mode");
+                const startFrameWidget = this.widgets.find(w => w.name === "start_frame");
+                const endFrameWidget = this.widgets.find(w => w.name === "end_frame");
+                const startTimeWidget = this.widgets.find(w => w.name === "start_time");
+                const endTimeWidget = this.widgets.find(w => w.name === "end_time");
+                const timeUnitWidget = this.widgets.find(w => w.name === "time_unit");
+
+                if (rangeModeWidget && startFrameWidget && endFrameWidget && startTimeWidget && endTimeWidget) {
+                    const updateRangeModeVisibility = () => {
+                        const rangeMode = rangeModeWidget.value;
+                        if (rangeMode === "by_frame") {
+                            startFrameWidget.type = "number";
+                            startFrameWidget.hidden = false;
+                            endFrameWidget.type = "number";
+                            endFrameWidget.hidden = false;
+                            startTimeWidget.type = "hidden";
+                            startTimeWidget.hidden = true;
+                            endTimeWidget.type = "hidden";
+                            endTimeWidget.hidden = true;
+                            if (timeUnitWidget) {
+                                timeUnitWidget.type = "hidden";
+                                timeUnitWidget.hidden = true;
+                            }
+                        } else {
+                            startFrameWidget.type = "hidden";
+                            startFrameWidget.hidden = true;
+                            endFrameWidget.type = "hidden";
+                            endFrameWidget.hidden = true;
+                            startTimeWidget.type = "number";
+                            startTimeWidget.hidden = false;
+                            endTimeWidget.type = "number";
+                            endTimeWidget.hidden = false;
+                            if (timeUnitWidget) {
+                                timeUnitWidget.type = "combo";
+                                timeUnitWidget.hidden = false;
+                            }
+                        }
+                        updateSize(this);
+                    };
+
+                    const originalCallback = rangeModeWidget.callback;
+                    rangeModeWidget.callback = function(value) {
+                        const result = originalCallback?.apply(this, arguments);
+                        updateRangeModeVisibility();
+                        return result;
+                    };
+
+                    updateRangeModeVisibility();
+                }
+
                 const modeWidget = this.widgets.find(w => w.name === "mode");
                 const maxFramesWidget = this.widgets.find(w => w.name === "max_frames");
                 const intervalWidget = this.widgets.find(w => w.name === "interval");

@@ -12,6 +12,7 @@ class VideoFrameExtractor(ComfyNodeABC):
         return {
             "required": {
                 "video": ("VIDEO",),
+                "range_mode": (["by_frame", "by_time"],),
                 "mode": (["extract_by_count", "extract_by_interval"],),
                 "max_frames": ("INT", {"default": 16, "min": 1, "max": 100, "step": 1}),
                 "interval": ("INT", {"default": 10, "min": 1, "max": 500, "step": 1}),
@@ -19,6 +20,9 @@ class VideoFrameExtractor(ComfyNodeABC):
             "optional": {
                 "start_frame": ("INT", {"default": 0, "min": 0, "max": 99999, "step": 1}),
                 "end_frame": ("INT", {"default": -1, "min": -1, "max": 99999, "step": 1}),
+                "start_time": ("FLOAT", {"default": 0.0, "min": 0.0, "max": 99999.0, "step": 0.1}),
+                "end_time": ("FLOAT", {"default": -1.0, "min": -1.0, "max": 99999.0, "step": 0.1}),
+                "time_unit": (["seconds", "minutes"],),
                 "enable_output": ("BOOLEAN", {"default": False}),
                 "output_path": ("STRING", {"default": "", "multiline": False}),
                 "filename_prefix": ("STRING", {"default": "", "multiline": False}),
@@ -31,7 +35,7 @@ class VideoFrameExtractor(ComfyNodeABC):
     OUTPUT_IS_LIST = (True,)
     FUNCTION = "extract_frames"
 
-    def extract_frames(self, video, mode, max_frames, interval, start_frame=0, end_frame=-1, enable_output=False, output_path="", filename_prefix="frame"):
+    def extract_frames(self, video, range_mode, mode, max_frames, interval, start_frame=0, end_frame=-1, start_time=0.0, end_time=-1.0, time_unit="seconds", enable_output=False, output_path="", filename_prefix="frame"):
         if enable_output and (not output_path or not output_path.strip()):
             raise ValueError("Output path must be specified when output is enabled / 当启用输出时，必须指定输出路径")
         
@@ -55,6 +59,17 @@ class VideoFrameExtractor(ComfyNodeABC):
 
         if frame_count == 0:
             raise ValueError("No frames found in video")
+
+        components = video.get_components()
+        fps = components.frame_rate if hasattr(components, 'frame_rate') else 30.0
+
+        if range_mode == "by_time":
+            time_multiplier = 60.0 if time_unit == "minutes" else 1.0
+            start_frame = int(start_time * fps * time_multiplier)
+            if end_time < 0:
+                end_frame = frame_count - 1
+            else:
+                end_frame = int(end_time * fps * time_multiplier)
 
         effective_end = end_frame if end_frame >= 0 else frame_count - 1
         effective_end = min(effective_end, frame_count - 1)

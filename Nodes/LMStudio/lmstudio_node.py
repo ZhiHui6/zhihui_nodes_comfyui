@@ -490,6 +490,7 @@ class LMStudioNode:
                     total_images = len(image_paths)
                     processed_count = 0
                     error_count = 0
+                    error_details = []
 
                     for i, image_path in enumerate(image_paths):
                         try:
@@ -523,12 +524,16 @@ class LMStudioNode:
 
                         except Exception as e:
                             error_count += 1
+                            error_msg = str(e)
+                            error_details.append(f"[{os.path.basename(image_path)}] {error_msg}")
 
-                    log_message = f"批量处理完成！\n总计：{total_images} 张图片\n成功：{processed_count}\n失败：{error_count}"
+                    log_message = f"Batch processing completed!\nTotal: {total_images} images\nSuccess: {processed_count}\nFailed: {error_count}"
+                    if error_details:
+                        log_message += "\n\nFailure details:\n" + "\n".join(error_details)
                     return self._prepare_return(log_message, endpoint, unload_model)
 
                 except Exception as e:
-                    return self._prepare_return("", endpoint, unload_model)
+                    return self._prepare_return(f"Batch processing failed: {str(e)}", endpoint, unload_model)
 
             else:
                 if image is None:
@@ -537,6 +542,7 @@ class LMStudioNode:
                 total_images = image.shape[0] if len(image.shape) == 4 else 1
                 processed_count = 0
                 error_count = 0
+                error_details = []
 
                 for i in range(total_images):
                     try:
@@ -557,11 +563,17 @@ class LMStudioNode:
                         messages.append({"role": "user", "content": user_content})
 
                         result = self._call_api(endpoint, model, messages, max_tokens, temperature, top_p, top_k, repetition_penalty)
-                        results.append(f"图片 {i+1}/{total_images}:\n{result}")
+                        results.append(f"Image {i+1}/{total_images}:\n{result}")
                         processed_count += 1
 
                     except Exception as e:
                         error_count += 1
+                        error_msg = str(e)
+                        error_details.append(f"[Image {i+1}] {error_msg}")
 
                 combined_result = "\n\n" + "="*50 + "\n\n".join(results)
+                summary = f"Batch processing completed!\nTotal: {total_images} images\nSuccess: {processed_count}\nFailed: {error_count}"
+                if error_details:
+                    summary += "\n\nFailure details:\n" + "\n".join(error_details)
+                combined_result = summary + "\n\n" + "="*50 + "\n" + combined_result
                 return self._prepare_return(combined_result, endpoint, unload_model)

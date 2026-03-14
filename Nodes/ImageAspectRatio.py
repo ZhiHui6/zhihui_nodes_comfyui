@@ -322,11 +322,17 @@ class ImageAspectRatio:
             list(s.PRESETS_ZIMAGE.keys())
         ))
 
+        all_sizes = []
+        for preset in [s.PRESETS_QWEN, s.PRESETS_FLUX, s.PRESETS_FLUX2, s.PRESETS_FLUX2_KLEIN, s.PRESETS_WAN, s.PRESETS_SD, s.PRESETS_LTX2, s.PRESETS_ZIMAGE]:
+            for category_sizes in preset.values():
+                all_sizes.extend(category_sizes.keys())
+        all_sizes = list(set(all_sizes))
+
         return {
             "required": {
                 "preset_mode": (["Qwen image", "Flux", "Flux.2", "Flux2 klein", "Wan", "SDXL", "LTX2.3", "Z-image", "Custom Size"], {"default": "Z-image"}),
                 "aspect_category": (all_categories, {"default": "1:1"}),
-                "aspect_size": (["default"], {"default": "default"}),
+                "aspect_size": (all_sizes, {"default": all_sizes[0] if all_sizes else "default"}),
             },
             "optional": {
                 "custom_width": ("INT", {"default": 1328, "min": 1, "max": 8192, "step": 1}),

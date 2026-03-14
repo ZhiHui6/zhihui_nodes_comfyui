@@ -1024,17 +1024,21 @@
     },
     "VideoFrameExtractor": {
         "title": "视频抽帧",
-        "description": "视频抽帧节点：从视频中提取帧并生成预览网格图。支持两种抽帧模式：按指定数量均匀抽帧或按固定间隔抽帧。可设置起始帧位置，预览图支持自定义列数，方便查看视频内容。",
+        "description": "视频抽帧节点：从视频中提取帧。支持按帧或按时间设定区间，支持两种抽帧模式：按指定数量均匀抽帧或按固定间隔抽帧。",
         "inputs": {
             "video": "视频"
         },
         "widgets": {
-            "mode": "模式",
+            "range_mode": "区间模式",
+            "mode": "抽帧模式",
             "max_frames": "最大帧数",
             "interval": "间隔",
             "preview_cols": "预览列数",
             "start_frame": "起始帧",
             "end_frame": "结束帧",
+            "start_time": "起始时间",
+            "end_time": "结束时间",
+            "time_unit": "时间单位",
             "enable_output": "启用输出",
             "output_path": "输出路径",
             "filename_prefix": "文件名前缀"

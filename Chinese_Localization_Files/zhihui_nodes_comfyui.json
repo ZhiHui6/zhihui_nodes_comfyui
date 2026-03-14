@@ -215,5 +215,11 @@
     "Template":"模板",
     "User-defined":"用户自定义",
     "Natural":"自然语言",
-    "Tag":"标签式"
+    "Tag":"标签式",
+    "by_frame":"按帧",
+    "by_time":"按时间",
+    "extract_by_count":"按数量抽取",
+    "extract_by_interval":"按间隔抽取",
+    "seconds":"秒",
+    "minutes":"分钟"
 }

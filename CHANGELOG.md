@@ -1,4 +1,12 @@
 # 更新日志
+## 1.0.17 2026-3-13
+- 视频抽帧节点(VideoFrameExtractor)：新增按时间区间抽帧功能选项，支持秒和分钟单位
+- LM工作室(LMStudio)节点: 同时改进批量处理时的错误信息展示，包含详细错误原因。
+- 图片比例节点(ImageAspectRatio): 重构图片比例节点的尺寸选择逻辑，修复尺寸输出报错问题。
+    <br>
+- VideoFrameExtractor node: added time-range frame extraction options, supporting both seconds and minutes
+- LMStudio node: improved error-message display during batch processing, now includes detailed causes
+- ImageAspectRatio node: refactored size-selection logic and fixed output errors
 
 ## 1.0.16 2026-3-12
 - 在VideoFrameExtractor节点中添加end_frame参数，支持设置提取的结束帧
