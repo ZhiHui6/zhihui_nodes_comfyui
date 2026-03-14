@@ -44,5 +44,5 @@ Documentation = "https://github.com/zhihui6/zhihui_nodes_comfyui#readme"
 [tool.comfy]
 PublisherId = "zhihui6"
 DisplayName = "Zhihui Nodes"
-Icon = "👩🏻‍🎨"
+Icon = ""
 includes = []
