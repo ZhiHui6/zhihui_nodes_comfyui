@@ -1,4 +1,20 @@
 # 更新日志
+## 1.0.18 2026-3-25
+- LM工作室(LMStudio)节点: 
+  - 新增参数预设配置和超时设置功能
+  - 添加参数预设功能，支持图像分析、文本生成和创意写作三种预设
+  - 实现超时设置配置，可自定义API调用和模型操作超时时间
+  - 新增配置保存和恢复默认设置功能
+  - 添加种子参数和移除思考标签选项
+    <br>
+- LMStudio node: 
+  - Added parameter preset configuration and timeout settings
+  - Added parameter preset feature, supporting three presets: image analysis, text generation, and creative writing
+  - Implemented timeout configuration, allowing customization of API call and model operation timeout durations
+  - Added configuration save and restore default settings functionality
+  - Added seed parameter and remove thinking tags option
+
+
 ## 1.0.17 2026-3-13
 - 视频抽帧节点(VideoFrameExtractor)：新增按时间区间抽帧功能选项，支持秒和分钟单位
 - LM工作室(LMStudio)节点: 同时改进批量处理时的错误信息展示，包含详细错误原因。

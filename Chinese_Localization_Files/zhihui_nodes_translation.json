@@ -1083,8 +1083,10 @@
             "top_p": "Top P",
             "top_k": "Top K",
             "repetition_penalty": "重复惩罚",
+            "seed": "种子",
             "batch_folder_path": "批量文件夹路径",
-            "unload_model": "卸载模型"
+            "unload_model": "卸载模型",
+            "remove_think_tags": "移除思考标签"
         },
         "outputs": {
             "result": "结果"

@@ -11,11 +11,61 @@ import numpy as np
 from PIL import Image
 import requests
 
+CONFIG_DIR = os.path.dirname(__file__)
+CONFIG_FILE = os.path.join(CONFIG_DIR, "lmstudio_config.json")
+
+def _load_config():
+    if os.path.exists(CONFIG_FILE):
+        try:
+            with open(CONFIG_FILE, 'r', encoding='utf-8') as f:
+                return json.load(f)
+        except Exception:
+            pass
+    return {}
+
+def _save_config(config):
+    try:
+        os.makedirs(CONFIG_DIR, exist_ok=True)
+        with open(CONFIG_FILE, 'w', encoding='utf-8') as f:
+            json.dump(config, f, indent=2, ensure_ascii=False)
+        return True
+    except Exception:
+        return False
+
+def _get_timeout(key, default):
+    config = _load_config()
+    return config.get("timeouts", {}).get(key, default)
+
 LMSTUDIO_PROMPT_PRESETS = {
     "Ignore": "",
     "Tags": "Your task is to generate a clean list of comma-separated tags for a text-to-image AI, based *only* on the visual information in the image. Limit the output to a maximum of 50 unique tags. Strictly describe visual elements like subject, clothing, environment, colors, lighting, and composition. Do not include abstract concepts, interpretations, marketing terms, or technical jargon (e.g., no 'SEO', 'brand-aligned', 'viral potential'). The goal is a concise list of visual descriptors. Avoid repeating tags.",
     "Extreme Detailed": "Generate an extremely detailed and descriptive text-to-image prompt from the image. Create a rich paragraph that elaborates on the subject's appearance, textures of clothing, specific background elements, the quality and color of light, shadows, and the overall atmosphere. Aim for a highly descriptive and immersive prompt.",
     "Short Story": "Write a short, imaginative story inspired by this image or video.",
+}
+
+LMSTUDIO_PARAM_PRESETS = {
+    "Ignore": {},
+    "Image Analysis": {
+        "max_tokens": 4096,
+        "temperature": 0.4,
+        "top_p": 0.9,
+        "top_k": 40,
+        "repetition_penalty": 1.1,
+    },
+    "Text Generation": {
+        "max_tokens": 2048,
+        "temperature": 0.7,
+        "top_p": 0.95,
+        "top_k": 50,
+        "repetition_penalty": 1.0,
+    },
+    "Creative Writing": {
+        "max_tokens": 4096,
+        "temperature": 0.9,
+        "top_p": 0.95,
+        "top_k": 60,
+        "repetition_penalty": 1.05,
+    },
 }
 
 def _normalise_base(endpoint: str) -> str:
@@ -26,9 +76,10 @@ def _normalise_base(endpoint: str) -> str:
 
 def _fetch_models(endpoint: str) -> list:
     url = _normalise_base(endpoint) + "/v1/models"
+    timeout = _get_timeout("fetch_models", 5)
     try:
         req = urllib.request.Request(url, headers={"Accept": "application/json"})
-        with urllib.request.urlopen(req, timeout=5) as resp:
+        with urllib.request.urlopen(req, timeout=timeout) as resp:
             data = json.loads(resp.read())
             ids = [m["id"] for m in data.get("data", [])]
             return ids if ids else ["(no models found)"]
@@ -75,7 +126,7 @@ class LMStudioNode:
                 "user_prompt": (
                     "STRING",
                     {
-                        "default": "Describe this image.",
+                        "default": "",
                         "multiline": True,
                         "tooltip": "User message sent to the model. Any wired text_input is appended here.",
                     },
@@ -83,7 +134,7 @@ class LMStudioNode:
                 "system_prompt": (
                     "STRING",
                     {
-                        "default": "You are a helpful assistant.",
+                        "default": "",
                         "multiline": True,
                         "tooltip": "System prompt / persona to guide the model",
                     },
@@ -163,6 +214,22 @@ class LMStudioNode:
                         "tooltip": "Repetition penalty. 1.1 effectively reduces redundancy without over-penalizing",
                     },
                 ),
+                "seed": (
+                    "INT",
+                    {
+                        "default": 0,
+                        "min": 0,
+                        "max": 0xffffffffffffffff,
+                        "tooltip": "Random seed for reproducible outputs. 0 means random seed",
+                    },
+                ),
+                "remove_think_tags": (
+                    "BOOLEAN",
+                    {
+                        "default": False,
+                        "tooltip": "When enabled, removes the </think> tag and all content before it from the output text, keeping only the clean description.",
+                    },
+                ),
                 "unload_model": (
                     "BOOLEAN",
                     {
@@ -217,6 +284,15 @@ class LMStudioNode:
         elif output_language == "Chinese&English":
             return prompt + " Please respond in both Chinese and English, first describe in Chinese, then describe in English."
         return prompt
+
+    @staticmethod
+    def _remove_think_content(text: str) -> str:
+        if not isinstance(text, str):
+            return text
+        think_end_pos = text.find('</think>')
+        if think_end_pos != -1:
+            return text[think_end_pos + len('</think>'):].strip()
+        return text
 
     @staticmethod
     def _tensor_to_base64(image_tensor, size_limitation=None) -> str:
@@ -312,7 +388,7 @@ class LMStudioNode:
         with open(txt_file, 'w', encoding='utf-8') as f:
             f.write(description)
 
-    def _call_api(self, endpoint, model, messages, max_tokens, temperature, top_p, top_k, repetition_penalty):
+    def _call_api(self, endpoint, model, messages, max_tokens, temperature, top_p, top_k, repetition_penalty, seed=None):
         payload = {
             "messages": messages,
             "max_tokens": max_tokens,
@@ -324,6 +400,8 @@ class LMStudioNode:
         }
         if model.strip() and not model.startswith("("):
             payload["model"] = model.strip()
+        if seed is not None and seed > 0:
+            payload["seed"] = seed
 
         url = _normalise_base(endpoint) + "/v1/chat/completions"
         body = json.dumps(payload).encode("utf-8")
@@ -334,8 +412,9 @@ class LMStudioNode:
             method="POST",
         )
 
+        timeout = _get_timeout("api_call", 120)
         try:
-            with urllib.request.urlopen(req, timeout=120) as resp:
+            with urllib.request.urlopen(req, timeout=timeout) as resp:
                 result = json.loads(resp.read())
         except urllib.error.HTTPError as e:
             error_body = e.read().decode("utf-8", errors="replace")
@@ -353,11 +432,13 @@ class LMStudioNode:
 
     def _unload_model(self, endpoint: str) -> str:
         base_url = _normalise_base(endpoint)
+        timeout_list = _get_timeout("unload_model_list", 10)
+        timeout_unload = _get_timeout("unload_model", 30)
         try:
             response = requests.get(
                 f"{base_url}/api/v1/models",
                 headers={"Content-Type": "application/json"},
-                timeout=10
+                timeout=timeout_list
             )
             response.raise_for_status()
             models_data = response.json()
@@ -382,7 +463,7 @@ class LMStudioNode:
                     f"{base_url}/api/v1/models/unload",
                     headers={"Content-Type": "application/json"},
                     json={"instance_id": instance_id},
-                    timeout=30
+                    timeout=timeout_unload
                 )
 
                 if unload_response.status_code == 200:
@@ -404,7 +485,9 @@ class LMStudioNode:
         except Exception as e:
             return f"Error: {str(e)}"
 
-    def _prepare_return(self, result: str, endpoint: str, unload_model: bool):
+    def _prepare_return(self, result: str, endpoint: str, unload_model: bool, remove_think_tags: bool = False):
+        if remove_think_tags:
+            result = self._remove_think_content(result)
         if unload_model:
             self._unload_model(endpoint)
         return (result,)
@@ -423,13 +506,19 @@ class LMStudioNode:
         top_p: float,
         top_k: int,
         repetition_penalty: float,
+        seed: int,
         unload_model: bool,
         batch_mode: bool,
         batch_folder_path: str,
         skip_exists: bool,
+        remove_think_tags: bool = False,
         image=None,
     ):
         _maybe_refresh(endpoint)
+
+        if seed == 0:
+            import random
+            seed = random.randint(1, 0xffffffffffffffff)
 
         preset_text = LMSTUDIO_PROMPT_PRESETS.get(preset_prompt, "")
 
@@ -440,7 +529,6 @@ class LMStudioNode:
 
         full_user_text = self._apply_output_language(full_user_text, output_language)
 
-        # When a preset is selected (not "Ignore"), the system_prompt input should be disabled
         effective_system_prompt = system_prompt if preset_prompt == "Ignore" else ""
 
         if not batch_mode:
@@ -451,10 +539,10 @@ class LMStudioNode:
                 messages.append({"role": "user", "content": full_user_text})
 
                 try:
-                    result = self._call_api(endpoint, model, messages, max_tokens, temperature, top_p, top_k, repetition_penalty)
-                    return self._prepare_return(result, endpoint, unload_model)
+                    result = self._call_api(endpoint, model, messages, max_tokens, temperature, top_p, top_k, repetition_penalty, seed)
+                    return self._prepare_return(result, endpoint, unload_model, remove_think_tags)
                 except Exception as e:
-                    return self._prepare_return("", endpoint, unload_model)
+                    return self._prepare_return("", endpoint, unload_model, remove_think_tags)
 
             if len(image.shape) == 4 and image.shape[0] > 0:
                 image_tensor = image[0:1]
@@ -473,10 +561,10 @@ class LMStudioNode:
             messages.append({"role": "user", "content": user_content})
 
             try:
-                result = self._call_api(endpoint, model, messages, max_tokens, temperature, top_p, top_k, repetition_penalty)
-                return self._prepare_return(result, endpoint, unload_model)
+                result = self._call_api(endpoint, model, messages, max_tokens, temperature, top_p, top_k, repetition_penalty, seed)
+                return self._prepare_return(result, endpoint, unload_model, remove_think_tags)
             except Exception as e:
-                return self._prepare_return("", endpoint, unload_model)
+                return self._prepare_return("", endpoint, unload_model, remove_think_tags)
 
         else:
             results = []
@@ -485,7 +573,7 @@ class LMStudioNode:
                 try:
                     image_paths = self._traverse_folder_for_images(batch_folder_path.strip())
                     if not image_paths:
-                        return self._prepare_return("", endpoint, unload_model)
+                        return self._prepare_return("", endpoint, unload_model, remove_think_tags)
 
                     total_images = len(image_paths)
                     processed_count = 0
@@ -518,7 +606,7 @@ class LMStudioNode:
                                 messages.append({"role": "system", "content": effective_system_prompt})
                             messages.append({"role": "user", "content": user_content})
 
-                            result = self._call_api(endpoint, model, messages, max_tokens, temperature, top_p, top_k, repetition_penalty)
+                            result = self._call_api(endpoint, model, messages, max_tokens, temperature, top_p, top_k, repetition_penalty, seed)
                             self._save_description(image_path, result)
                             processed_count += 1
 
@@ -530,14 +618,14 @@ class LMStudioNode:
                     log_message = f"Batch processing completed!\nTotal: {total_images} images\nSuccess: {processed_count}\nFailed: {error_count}"
                     if error_details:
                         log_message += "\n\nFailure details:\n" + "\n".join(error_details)
-                    return self._prepare_return(log_message, endpoint, unload_model)
+                    return self._prepare_return(log_message, endpoint, unload_model, remove_think_tags)
 
                 except Exception as e:
-                    return self._prepare_return(f"Batch processing failed: {str(e)}", endpoint, unload_model)
+                    return self._prepare_return(f"Batch processing failed: {str(e)}", endpoint, unload_model, remove_think_tags)
 
             else:
                 if image is None:
-                    return self._prepare_return("", endpoint, unload_model)
+                    return self._prepare_return("", endpoint, unload_model, remove_think_tags)
 
                 total_images = image.shape[0] if len(image.shape) == 4 else 1
                 processed_count = 0
@@ -562,7 +650,7 @@ class LMStudioNode:
                             messages.append({"role": "system", "content": effective_system_prompt})
                         messages.append({"role": "user", "content": user_content})
 
-                        result = self._call_api(endpoint, model, messages, max_tokens, temperature, top_p, top_k, repetition_penalty)
+                        result = self._call_api(endpoint, model, messages, max_tokens, temperature, top_p, top_k, repetition_penalty, seed)
                         results.append(f"Image {i+1}/{total_images}:\n{result}")
                         processed_count += 1
 
@@ -576,4 +664,4 @@ class LMStudioNode:
                 if error_details:
                     summary += "\n\nFailure details:\n" + "\n".join(error_details)
                 combined_result = summary + "\n\n" + "="*50 + "\n" + combined_result
-                return self._prepare_return(combined_result, endpoint, unload_model)
+                return self._prepare_return(combined_result, endpoint, unload_model, remove_think_tags)

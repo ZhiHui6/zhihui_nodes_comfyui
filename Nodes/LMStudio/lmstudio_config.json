@@ -1,0 +1,9 @@
+{
+  "timeouts": {
+    "fetch_models": 5,
+    "api_call": 120,
+    "unload_model_list": 10,
+    "unload_model": 30
+  },
+  "preset": "Ignore"
+}

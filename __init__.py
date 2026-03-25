@@ -62,6 +62,7 @@ from .Nodes.VideoFrameExtractor import VideoFrameExtractor
 from .Nodes.IntNode import IntNode
 from .Nodes.PromptExpander import PromptExpander
 from .Nodes.LMStudio.lmstudio_node import LMStudioNode
+from .Nodes.LMStudio import lmstudio_api
 
 import os
 
