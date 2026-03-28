@@ -2,6 +2,141 @@ import { app } from "../../scripts/app.js";
 
 const LMSTUDIO_EXT_ID = "ZhihuiNodes.LMStudio";
 
+const i18n = {
+    zh: {
+        title: "🤖 LM Studio 状态设置",
+        statusMonitoring: "服务状态监控",
+        serverStatus: "服务器状态",
+        connected: "已连接",
+        disconnected: "未连接",
+        corsNotice: "⚠️ CORS 配置提示",
+        corsWarning: "检测到跨域问题，请确保 LM Studio 服务器已启用 CORS 支持",
+        howToEnable: "如何启用 CORS",
+        availableModels: "可用模型列表",
+        refresh: "🔄 刷新",
+        refreshStatus: "刷新状态",
+        serviceStatus: "服务状态",
+        serviceAddress: "服务地址",
+        loadedModels: "已加载模型",
+        none: "无",
+        checking: "检查中...",
+        paramPreset: "参数组预设",
+        presetDescription: "选择合适的参数预设以优化模型输出效果",
+        timeoutSettings: "超时设置",
+        promptPresetVersion: "反推预设版本",
+        newVersion: "新版预设",
+        oldVersion: "旧版预设",
+        newVersionHintPrefix: "新版预设包含更多选项：",
+        newVersionHintOptions: "标签、简洁、详细、极详细、电影感、详细分析、视频总结、短篇故事、优化扩展提示词",
+        oldVersionHintPrefix: "旧版预设包含：",
+        oldVersionHintOptions: "标签、极详细、短篇故事",
+        fetchModelsTimeout: "获取模型列表超时",
+        fetchModelsTimeoutDesc: "从LM Studio服务器获取可用模型列表的最大等待时间",
+        apiCallTimeout: "API 调用超时",
+        apiCallTimeoutDesc: "与模型进行对话请求的最大等待时间",
+        unloadModelListTimeout: "模型列表卸载超时",
+        unloadModelListTimeoutDesc: "获取已加载模型列表用于卸载操作的最大等待时间",
+        unloadModelTimeout: "模型卸载超时",
+        unloadModelTimeoutDesc: "执行模型卸载操作的最大等待时间",
+        seconds: "秒",
+        saveAll: "💾 保存所有设置",
+        resetDefault: "🔄 恢复默认",
+        confirmReset: "确定要恢复默认设置吗？这将重置所有配置为默认值。",
+        saveSuccess: "所有设置已保存到配置文件",
+        saveSuccessRefresh: "设置已保存，请刷新页面以更新主节点的预设选项",
+        saveFailed: "保存设置失败",
+        resetSuccess: "已恢复默认设置并保存",
+        resetFailed: "保存默认设置失败",
+        ignore: "默认预设",
+        ignoreDesc: "使用当前节点设置的参数值，不进行预设参数替换。",
+        custom: "用户自设",
+        customDesc: "维持用户当前在节点中的参数不做任何修改。",
+        precise: "精确模式",
+        balanced: "平衡模式",
+        creative: "创意模式",
+        preciseDesc: "适合需要精确回答的场景：较低的temperature减少随机性，适合代码、数学、逻辑推理等任务。",
+        balancedDesc: "适合大多数日常对话场景：平衡的参数设置，在准确性和创造性之间取得良好平衡。",
+        creativeDesc: "适合创意写作：较高的temperature增加创造性输出，适合故事、诗歌等创作。",
+        maxTokens: "Max Tokens",
+        temperature: "Temperature",
+        topP: "Top P",
+        topK: "Top K",
+        repetition: "Repetition",
+        seed: "Seed"
+    },
+    en: {
+        title: "🤖 LM Studio Status Settings",
+        statusMonitoring: "Service Status Monitoring",
+        serverStatus: "Server Status",
+        connected: "Connected",
+        disconnected: "Disconnected",
+        corsNotice: "⚠️ CORS Configuration Notice",
+        corsWarning: "Cross-origin issue detected. Please ensure LM Studio server has CORS support enabled",
+        howToEnable: "How to Enable CORS",
+        availableModels: "Available Models",
+        refresh: "🔄 Refresh",
+        refreshStatus: "Refresh Status",
+        serviceStatus: "Status",
+        serviceAddress: "Service Address",
+        loadedModels: "Loaded Models",
+        none: "None",
+        checking: "Checking...",
+        paramPreset: "Parameter Preset",
+        presetDescription: "Select appropriate parameter preset to optimize model output",
+        timeoutSettings: "Timeout Settings",
+        promptPresetVersion: "Prompt Preset Version",
+        newVersion: "New Version",
+        oldVersion: "Old Version",
+        newVersionHintPrefix: "New presets include: ",
+        newVersionHintOptions: "Tags, Simple, Detailed, Extreme Detailed, Cinematic, Detailed Analysis, Summarize Video, Short Story ...",
+        oldVersionHintPrefix: "Old presets include: ",
+        oldVersionHintOptions: "Tags, Extreme Detailed, Short Story",
+        fetchModelsTimeout: "Fetch Models Timeout",
+        fetchModelsTimeoutDesc: "Maximum wait time to retrieve available models from LM Studio server",
+        apiCallTimeout: "API Call Timeout",
+        apiCallTimeoutDesc: "Maximum wait time for chat completion requests",
+        unloadModelListTimeout: "Unload Model List Timeout",
+        unloadModelListTimeoutDesc: "Maximum wait time to get loaded models list for unload operations",
+        unloadModelTimeout: "Unload Model Timeout",
+        unloadModelTimeoutDesc: "Maximum wait time for model unload operations",
+        seconds: "S",
+        saveAll: "💾 Save All Settings",
+        resetDefault: "🔄 Reset Default",
+        confirmReset: "Are you sure you want to reset to default settings? This will reset all configurations.",
+        saveSuccess: "All settings saved to configuration file",
+        saveSuccessRefresh: "Settings saved, please refresh page to update main node preset options",
+        saveFailed: "Failed to save settings",
+        resetSuccess: "Reset to default and saved",
+        resetFailed: "Failed to save default settings",
+        ignore: "Default Preset",
+        ignoreDesc: "Uses the current node's parameter values without preset replacement.",
+        custom: "Custom",
+        customDesc: "Maintains user's current node parameters without any modification.",
+        precise: "Precise Mode",
+        balanced: "Balanced Mode",
+        creative: "Creative Mode",
+        preciseDesc: "For scenarios requiring precise answers: lower temperature reduces randomness, suitable for code, math, logic reasoning tasks.",
+        balancedDesc: "For most daily conversation scenarios: balanced parameters for good accuracy and creativity balance.",
+        creativeDesc: "For creative writing: higher temperature increases creative output, suitable for stories, poetry, etc.",
+        maxTokens: "Max Tokens",
+        temperature: "Temperature",
+        topP: "Top P",
+        topK: "Top K",
+        repetition: "Repetition",
+        seed: "Seed"
+    }
+};
+
+function getLocale() {
+    const comfyLocale = app?.ui?.settings?.getSettingValue?.('Comfy.Locale');
+    return comfyLocale === 'zh-CN' || comfyLocale === 'zh' ? 'zh' : 'en';
+}
+
+function $t(key) {
+    const locale = getLocale();
+    return i18n[locale][key] || i18n['en'][key] || key;
+}
+
 function showToast(message, type = "info") {
     const toast = document.createElement("div");
     const bgColor = type === "success" ? "#22c55e" : type === "error" ? "#ef4444" : "#667eea";
@@ -193,8 +328,9 @@ function showLMStudioSettings(node) {
     const dialog = document.createElement("div");
     dialog.className = "comfy-modal";
     dialog.style.cssText = `
-        max-width: 1050px; /* 最大宽度限制，防止在大屏幕上过宽影响阅读 */
-        width: 100%;       /* 响应式宽度，在较小屏幕上自适应并保持两侧边距 */
+        max-width: 1188px;
+        width: 100%;
+        min-height: 680px;
         background: #111827;
         border: 1px solid rgba(255, 255, 255, 0.12);
         border-radius: 10px;
@@ -218,10 +354,9 @@ function showLMStudioSettings(node) {
                 justify-content: space-between;
                 margin-bottom: 8px;
                 padding-bottom: 4px;
-                border-bottom: 1px solid rgba(255, 255, 255, 0.1);
             }
             #${uniqueId} .ui-title {
-                font-size: 14px;
+                font-size: 18px;
                 font-weight: 600;
                 color: #f0f0f0;
                 margin: 0;
@@ -255,6 +390,11 @@ function showLMStudioSettings(node) {
                 background: linear-gradient(145deg, #1a202c, #2d3748);
                 border: 1px solid rgba(255, 255, 255, 0.1);
                 border-radius: 8px;
+                height: 245px;
+                min-height: 245px;
+                max-height: 245px;
+                overflow: hidden;
+                width: 1150px;
             }
             #${uniqueId} .dashboard-title {
                 margin: 0 0 10px 0;
@@ -270,7 +410,7 @@ function showLMStudioSettings(node) {
                 align-items: flex-start;
                 gap: 10px;
                 margin-bottom: 10px;
-                flex-wrap: wrap;
+                flex-wrap: nowrap;
             }
             #${uniqueId} .dashboard-row:last-child {
                 margin-bottom: 0;
@@ -283,19 +423,23 @@ function showLMStudioSettings(node) {
                 flex-shrink: 0;
             }
             #${uniqueId} .dashboard-item.status {
-                min-width: 80px;
+                width: 100px;
+                flex: 0 0 100px;
             }
             #${uniqueId} .dashboard-item.endpoint {
-                min-width: 160px;
-                max-width: 220px;
+                width: 200px;
+                flex: 0 0 200px;
             }
             #${uniqueId} .dashboard-item.loaded {
-                min-width: 80px;
+                width: 350px;
             }
             #${uniqueId} .dashboard-item.models {
-                min-width: 350px;
-                max-width: none;
-                flex: 1;
+                width: 432px;
+                flex: 0 0 432px;
+            }
+            #${uniqueId} #lmstudio-models-list {
+                height: 60px;
+                overflow-y: auto;
             }
             #${uniqueId} .dashboard-item-label {
                 font-size: 12px;
@@ -311,6 +455,8 @@ function showLMStudioSettings(node) {
                 font-weight: 500;
                 word-break: break-all;
                 line-height: 1.4;
+                height: 60px;
+                overflow-y: auto;
             }
             #${uniqueId} .dashboard-item-value.connected {
                 color: #4ade80;
@@ -427,12 +573,15 @@ function showLMStudioSettings(node) {
                 margin-top: 16px;
             }
             #${uniqueId} .preset-section {
-                /* 固定宽度 600px，不伸缩，用于容纳参数预设选择器和说明文字 */
-                flex: 0 0 613px;
+                flex: 0 0 650px;
+                height: 230px;
+                min-height: 230px;
+                max-height: 230px;
                 padding: 16px;
                 background: linear-gradient(145deg, #1a202c, #2d3748);
                 border: 1px solid rgba(255, 255, 255, 0.1);
                 border-radius: 8px;
+                overflow: hidden;
             }
             #${uniqueId} .preset-title {
                 margin: 0 0 12px 0;
@@ -451,8 +600,8 @@ function showLMStudioSettings(node) {
             }
             #${uniqueId} .preset-select {
                 width: auto;
-                min-width: 200px;
-                max-width: 280px;
+                min-width: 100px;
+                max-width: 130px;
                 padding: 8px 12px;
                 background: #1f2937;
                 border: 1px solid rgba(255, 255, 255, 0.15);
@@ -485,15 +634,14 @@ function showLMStudioSettings(node) {
                 background: #16a34a;
             }
             #${uniqueId} .timeout-section {
-                /* 固定宽度 380px，不伸缩，用于容纳超时设置参数 */
-                flex: 0 0 380px;
-                padding: 16px;
+                flex: 0 0 485px;
+                padding: 12px 16px;
                 background: linear-gradient(145deg, #1a202c, #2d3748);
                 border: 1px solid rgba(255, 255, 255, 0.1);
                 border-radius: 8px;
             }
             #${uniqueId} .timeout-title {
-                margin: 0 0 12px 0;
+                margin: 0 0 8px 0;
                 font-size: 14px;
                 font-weight: 600;
                 color: #ffffff;
@@ -504,8 +652,7 @@ function showLMStudioSettings(node) {
             #${uniqueId} .timeout-grid {
                 display: grid;
                 grid-template-columns: repeat(2, 1fr);
-                gap: 12px;
-                margin-bottom: 12px;
+                gap: 8px;
             }
             #${uniqueId} .timeout-item {
                 display: flex;
@@ -520,11 +667,11 @@ function showLMStudioSettings(node) {
                 font-size: 12px;
                 color: #9ca3af;
                 flex-shrink: 0;
-                min-width: 80px;
+                min-width: 140px;
             }
             #${uniqueId} .timeout-input {
-                width: 45px;
-                padding: 6px 8px;
+                width: 35px;
+                padding: 6px 4px;
                 background: #1f2937;
                 border: 1px solid rgba(255, 255, 255, 0.15);
                 border-radius: 4px;
@@ -546,6 +693,55 @@ function showLMStudioSettings(node) {
             #${uniqueId} .timeout-unit {
                 font-size: 12px;
                 color: #667eea;
+            }
+            #${uniqueId} .prompt-version-section {
+                margin-top: 16px;
+                padding: 12px 16px;
+                background: linear-gradient(145deg, #1a202c, #2d3748);
+                border: 1px solid rgba(255, 255, 255, 0.1);
+                border-radius: 8px;
+            }
+            #${uniqueId} .prompt-version-title {
+                margin: 0 0 8px 0;
+                font-size: 14px;
+                font-weight: 600;
+                color: #ffffff;
+                display: flex;
+                align-items: center;
+                gap: 6px;
+            }
+            #${uniqueId} .prompt-version-row {
+                display: flex;
+                align-items: center;
+                gap: 12px;
+            }
+            #${uniqueId} .prompt-version-select {
+                width: 140px;
+                padding: 8px 12px;
+                background: #1f2937;
+                border: 1px solid rgba(255, 255, 255, 0.15);
+                border-radius: 6px;
+                color: #e8e8e8;
+                font-size: 13px;
+                cursor: pointer;
+            }
+            #${uniqueId} .prompt-version-select:focus {
+                outline: none;
+                border-color: #667eea;
+            }
+            #${uniqueId} .prompt-version-hint {
+                font-size: 12px;
+                color: #e2e8f0;
+                flex: 1;
+                padding: 8px 12px;
+                background: linear-gradient(135deg, rgba(102, 126, 234, 0.15), rgba(118, 75, 162, 0.15));
+                border: 1px solid rgba(102, 126, 234, 0.4);
+                border-radius: 6px;
+                line-height: 1.5;
+            }
+            #${uniqueId} .hint-options {
+                color: #fbbf24;
+                font-weight: 600;
             }
             #${uniqueId} .timeout-apply-btn {
                 width: 100%;
@@ -621,7 +817,7 @@ function showLMStudioSettings(node) {
             }
             #${uniqueId} .preset-params {
                 display: grid;
-                grid-template-columns: repeat(5, 1fr);
+                grid-template-columns: 1.2fr 1fr 0.7fr 0.7fr 1.2fr;
                 gap: 8px;
                 margin-top: 10px;
             }
@@ -638,10 +834,12 @@ function showLMStudioSettings(node) {
             #${uniqueId} .preset-param-item.narrow {
                 padding: 8px 4px;
                 min-width: 0;
+                max-width: 80px;
             }
             #${uniqueId} .preset-param-item.wide {
-                padding: 8px 4px;
+                padding: 8px 16px;
                 min-width: 0;
+                max-width: 220px;
             }
             #${uniqueId} .preset-param-label {
                 color: #667eea;
@@ -680,40 +878,39 @@ function showLMStudioSettings(node) {
         </style>
         <div id="${uniqueId}">
             <div class="ui-header">
-                <h3 class="ui-title">LM Studio状态设置</h3>
+                <h3 class="ui-title">${$t('title')}</h3>
                 <button class="circle-close" type="button"></button>
             </div>
             <div class="dashboard">
                 <h4 class="dashboard-title" style="margin: 0 0 10px 0;">
                     <span>📊</span>
-                    <span>服务状态监控</span>
-                    <button class="dashboard-refresh" type="button">刷新状态</button>
+                    <span>${$t('statusMonitoring')}</span>
+                    <button class="dashboard-refresh" type="button">${$t('refreshStatus')}</button>
                 </h4>
                 <div class="dashboard-row">
                     <div class="dashboard-item status">
-                        <div class="dashboard-item-label">服务状态</div>
-                        <div class="dashboard-item-value" id="lmstudio-status">检查中...</div>
+                        <div class="dashboard-item-label">${$t('serviceStatus')}</div>
+                        <div class="dashboard-item-value" id="lmstudio-status">${$t('disconnected')}</div>
                     </div>
                     <div class="dashboard-item endpoint">
-                        <div class="dashboard-item-label">服务地址</div>
+                        <div class="dashboard-item-label">${$t('serviceAddress')}</div>
                         <div class="dashboard-item-value" id="lmstudio-endpoint">-</div>
                     </div>
                     <div class="dashboard-item loaded">
-                        <div class="dashboard-item-label">已加载模型</div>
+                        <div class="dashboard-item-label">${$t('loadedModels')}</div>
                         <div class="dashboard-item-value" id="lmstudio-loaded">-</div>
                     </div>
                     <div class="dashboard-item models">
-                        <div class="dashboard-item-label">可用模型列表</div>
-                        <div class="dashboard-item-value" id="lmstudio-models-list" style="max-height: 80px; overflow-y: auto; margin-top: 2px;">-</div>
+                        <div class="dashboard-item-label">${$t('availableModels')}</div>
+                        <div class="dashboard-item-value" id="lmstudio-models-list">-</div>
                     </div>
                 </div>
                 <div class="cors-notice">
                     <h5 class="cors-notice-title">
-                        <span>ℹ️ CORS 配置提示</span>
+                        <span>${$t('corsNotice')}</span>
                     </h5>
                     <p class="cors-notice-content">
-                        如果连接失败，请确保在 <strong>LM Studio 软件设置</strong>中启用了 <strong>CORS（跨源资源共享）</strong>功能。<br>
-                        启用 CORS 允许 ComfyUI 向 LM Studio 服务器发起请求。在 LM Studio 的 Server 设置中找到 "Enable CORS" 选项并勾选。
+                        ${$t('corsWarning')}
                     </p>
                 </div>
             </div>
@@ -721,53 +918,70 @@ function showLMStudioSettings(node) {
                 <div class="preset-section">
                     <h4 class="preset-title">
                         <span>⚙️</span>
-                        <span>参数组预设</span>
+                        <span>${$t('paramPreset')}</span>
                     </h4>
                     <div class="preset-row">
                         <select class="preset-select" id="lmstudio-preset-select">
-                            <option value="Ignore">Ignore - 不应用预设</option>
-                            <option value="Image Analysis">Image Analysis - 图像分析</option>
-                            <option value="Text Generation">Text Generation - 文本生成</option>
-                            <option value="Creative Writing">Creative Writing - 创意写作</option>
+                            <option value="Ignore">${$t('ignore')}</option>
+                            <option value="Precise">${$t('precise')}</option>
+                            <option value="Balanced">${$t('balanced')}</option>
+                            <option value="Creative">${$t('creative')}</option>
+                            <option value="Custom">${$t('custom')}</option>
                         </select>
                     </div>
                     <div class="preset-info" id="lmstudio-preset-info">
-                        选择一个预设以自动配置适合该场景的参数。
+                        ${$t('presetDescription')}
                     </div>
                     <div class="preset-params" id="lmstudio-preset-params" style="display: none;"></div>
                 </div>
                 <div class="timeout-section">
                     <h4 class="timeout-title">
                         <span>⏱️</span>
-                        <span>超时设置</span>
+                        <span>${$t('timeoutSettings')}</span>
                     </h4>
                     <div class="timeout-grid">
                         <div class="timeout-item">
-                            <label class="timeout-label">获取模型列表</label>
+                            <label class="timeout-label">${$t('fetchModelsTimeout')}</label>
                             <input type="number" class="timeout-input" id="lmstudio-timeout-fetch" min="1" max="60" step="1" value="5">
-                            <span class="timeout-unit">秒</span>
+                            <span class="timeout-unit">${$t('seconds')}</span>
                         </div>
                         <div class="timeout-item">
-                            <label class="timeout-label">API推理调用</label>
+                            <label class="timeout-label">${$t('apiCallTimeout')}</label>
                             <input type="number" class="timeout-input" id="lmstudio-timeout-api" min="10" max="600" step="10" value="120">
-                            <span class="timeout-unit">秒</span>
+                            <span class="timeout-unit">${$t('seconds')}</span>
                         </div>
                         <div class="timeout-item">
-                            <label class="timeout-label">获取已加载模型</label>
+                            <label class="timeout-label">${$t('unloadModelListTimeout')}</label>
                             <input type="number" class="timeout-input" id="lmstudio-timeout-list" min="1" max="60" step="1" value="10">
-                            <span class="timeout-unit">秒</span>
+                            <span class="timeout-unit">${$t('seconds')}</span>
                         </div>
                         <div class="timeout-item">
-                            <label class="timeout-label">卸载模型</label>
+                            <label class="timeout-label">${$t('unloadModelTimeout')}</label>
                             <input type="number" class="timeout-input" id="lmstudio-timeout-unload" min="5" max="120" step="5" value="30">
-                            <span class="timeout-unit">秒</span>
+                            <span class="timeout-unit">${$t('seconds')}</span>
                         </div>
                     </div>
                 </div>
             </div>
+            <div class="prompt-version-section">
+                <h4 class="prompt-version-title">
+                    <span>📋</span>
+                    <span>${$t('promptPresetVersion')}</span>
+                </h4>
+                <div class="prompt-version-row">
+                    <select class="prompt-version-select" id="lmstudio-prompt-version">
+                        <option value="new">${$t('newVersion')}</option>
+                        <option value="old">${$t('oldVersion')}</option>
+                    </select>
+                    <span class="prompt-version-hint">
+                        <span class="hint-prefix">${$t('newVersionHintPrefix')}</span>
+                        <span class="hint-options">${$t('newVersionHintOptions')}</span>
+                    </span>
+                </div>
+            </div>
             <div class="save-section">
-                <button class="reset-default-btn" type="button" id="lmstudio-reset-default">🔄 恢复默认</button>
-                <button class="save-all-btn" type="button" id="lmstudio-save-all">💾 保存所有设置</button>
+                <button class="reset-default-btn" type="button" id="lmstudio-reset-default">${$t('resetDefault')}</button>
+                <button class="save-all-btn" type="button" id="lmstudio-save-all">${$t('saveAll')}</button>
             </div>
         </div>
     `;
@@ -805,12 +1019,11 @@ function showLMStudioSettings(node) {
         const statusEl = dialog.querySelector("#lmstudio-status");
         const endpointEl = dialog.querySelector("#lmstudio-endpoint");
         const modelsListEl = dialog.querySelector("#lmstudio-models-list");
-        const loadedEl = dialog.querySelector("#lmstudio-loaded");
-        
+        const loadedEl = dialog.querySelector("#lmstudio-loaded");  
         const currentEndpoint = node.widgets?.find(w => w.name === "endpoint")?.value || "http://localhost:1234";
         
         endpointEl.textContent = currentEndpoint;
-        statusEl.textContent = "检查中...";
+        statusEl.textContent = $t('checking');
         statusEl.className = "dashboard-item-value loading";
         modelsListEl.textContent = "-";
         loadedEl.textContent = "-";
@@ -853,27 +1066,25 @@ function showLMStudioSettings(node) {
                 loadedModels = [];
             }
             
-            statusEl.textContent = availableModels.length > 0 ? "已连接" : "无可用模型";
+            statusEl.textContent = availableModels.length > 0 ? $t('connected') : $t('disconnected');
             statusEl.className = "dashboard-item-value " + (availableModels.length > 0 ? "connected" : "disconnected");
-            
+
             if (availableModels.length > 0) {
-                modelsListEl.innerHTML = "<ul class='models-list'>" + 
-                    availableModels.map(m => `<li>${m}</li>`).join("") + 
+                modelsListEl.innerHTML = "<ul class='models-list'>" +
+                    availableModels.map(m => `<li>${m}</li>`).join("") +
                     "</ul>";
             } else {
-                modelsListEl.textContent = "无可用模型";
+                modelsListEl.textContent = $t('disconnected');
             }
             
             if (loadedModels.length > 0) {
-                loadedEl.innerHTML = "<ul class='models-list'>" + 
-                    loadedModels.map(m => `<li>${m}</li>`).join("") + 
-                    "</ul>";
+                loadedEl.innerHTML = loadedModels.map(m => `<div>${m}</div>`).join("");
             } else {
-                loadedEl.textContent = "无";
+                loadedEl.textContent = $t('none');
             }
             
         } catch (e) {
-            statusEl.textContent = "连接失败";
+            statusEl.textContent = $t('disconnected');
             statusEl.className = "dashboard-item-value disconnected";
         }
         
@@ -884,10 +1095,20 @@ function showLMStudioSettings(node) {
     
     const paramPresets = {
         "Ignore": {
-            params: {},
-            description: "不应用任何预设，保持当前参数不变。"
+            params: {
+                max_tokens: 2048,
+                temperature: 0.7,
+                top_p: 0.9,
+                top_k: 40,
+                repetition_penalty: 1.0
+            },
+            description: $t('ignoreDesc')
         },
-        "Image Analysis": {
+        "Custom": {
+            params: {},
+            description: $t('customDesc')
+        },
+        "Precise": {
             params: {
                 max_tokens: 4096,
                 temperature: 0.4,
@@ -895,19 +1116,19 @@ function showLMStudioSettings(node) {
                 top_k: 40,
                 repetition_penalty: 1.1
             },
-            description: "适合图像分析：较低的temperature确保描述准确性，适中的repetition_penalty避免重复。"
+            description: $t('preciseDesc')
         },
-        "Text Generation": {
+        "Balanced": {
             params: {
                 max_tokens: 2048,
-                temperature: 0.7,
-                top_p: 0.95,
-                top_k: 50,
+                temperature: 0.75,
+                top_p: 0.92,
+                top_k: 45,
                 repetition_penalty: 1.0
             },
-            description: "适合通用文本生成：平衡的temperature兼顾创造性和连贯性。"
+            description: $t('balancedDesc')
         },
-        "Creative Writing": {
+        "Creative": {
             params: {
                 max_tokens: 4096,
                 temperature: 0.9,
@@ -915,7 +1136,7 @@ function showLMStudioSettings(node) {
                 top_k: 60,
                 repetition_penalty: 1.05
             },
-            description: "适合创意写作：较高的temperature增加创造性输出，适合故事、诗歌等创作。"
+            description: $t('creativeDesc')
         }
     };
     
@@ -928,6 +1149,8 @@ function showLMStudioSettings(node) {
     const timeoutApiInput = dialog.querySelector("#lmstudio-timeout-api");
     const timeoutListInput = dialog.querySelector("#lmstudio-timeout-list");
     const timeoutUnloadInput = dialog.querySelector("#lmstudio-timeout-unload");
+    const promptVersionSelect = dialog.querySelector("#lmstudio-prompt-version");
+    let originalPromptVersion = "new";
     
     const loadConfig = async () => {
         try {
@@ -944,6 +1167,11 @@ function showLMStudioSettings(node) {
                 timeoutListInput.value = timeouts.unload_model_list || 10;
                 timeoutUnloadInput.value = timeouts.unload_model || 30;
                 
+                const promptVersion = config.prompt_version || "new";
+                promptVersionSelect.value = promptVersion;
+                originalPromptVersion = promptVersion;
+                updatePromptVersionHint();
+                
                 updatePresetDisplay();
             }
         } catch (e) {
@@ -952,41 +1180,59 @@ function showLMStudioSettings(node) {
             timeoutApiInput.value = 120;
             timeoutListInput.value = 10;
             timeoutUnloadInput.value = 30;
+            promptVersionSelect.value = "new";
+            updatePromptVersionHint();
             updatePresetDisplay();
         }
     };
+    
+    const updatePromptVersionHint = () => {
+        const hintEl = dialog.querySelector(".prompt-version-hint");
+        if (hintEl) {
+            const isNew = promptVersionSelect.value === "new";
+            hintEl.innerHTML = `
+                <span class="hint-prefix">${isNew ? $t('newVersionHintPrefix') : $t('oldVersionHintPrefix')}</span>
+                <span class="hint-options">${isNew ? $t('newVersionHintOptions') : $t('oldVersionHintOptions')}</span>
+            `;
+        }
+    };
+    
+    promptVersionSelect.addEventListener("change", updatePromptVersionHint);
     
     const updatePresetDisplay = () => {
         const selectedPreset = presetSelect.value;
         const preset = paramPresets[selectedPreset];
         
-        if (selectedPreset === "Ignore") {
-            presetInfo.textContent = preset.description;
+        presetInfo.textContent = preset.description;
+        
+        if (selectedPreset === "Custom") {
             presetParams.style.display = "none";
-        } else {
-            presetInfo.textContent = preset.description;
-            presetParams.style.display = "grid";
-            presetParams.innerHTML = Object.entries(preset.params).map(([key, value]) => {
-                const labelMap = {
-                    max_tokens: "Max Tokens",
-                    temperature: "Temperature",
-                    top_p: "Top P",
-                    top_k: "Top K",
-                    repetition_penalty: "Repetition",
-                    seed: "Seed"
-                };
-                let widthClass = 'preset-param-item';
-                if (key === 'top_p' || key === 'top_k') {
-                    widthClass = 'preset-param-item narrow';
-                } else if (key === 'max_tokens') {
-                    widthClass = 'preset-param-item wide';
-                }
-                return `<div class="${widthClass}">
-                    <span class="preset-param-label">${labelMap[key] || key}:</span>
-                    <span class="preset-param-value">${value}</span>
-                </div>`;
-            }).join("");
+            return;
         }
+        
+        presetParams.style.display = "grid";
+        const paramsToShow = preset.params;
+        
+        presetParams.innerHTML = Object.entries(paramsToShow).map(([key, value]) => {
+            const labelMap = {
+                max_tokens: $t('maxTokens'),
+                temperature: $t('temperature'),
+                top_p: $t('topP'),
+                top_k: $t('topK'),
+                repetition_penalty: $t('repetition'),
+                seed: $t('seed')
+            };
+            let widthClass = 'preset-param-item';
+            if (key === 'top_p' || key === 'top_k') {
+                widthClass = 'preset-param-item narrow';
+            } else if (key === 'max_tokens') {
+                widthClass = 'preset-param-item wide';
+            }
+            return `<div class="${widthClass}">
+                <span class="preset-param-label">${labelMap[key] || key}:</span>
+                <span class="preset-param-value">${value}</span>
+            </div>`;
+        }).join("");
     };
     
     presetSelect.addEventListener("change", () => {
@@ -996,7 +1242,7 @@ function showLMStudioSettings(node) {
     
     const applyPresetToNode = (presetName) => {
         const preset = paramPresets[presetName];
-        if (!preset || presetName === "Ignore") return 0;
+        if (!preset || presetName === "Custom") return 0;
         
         const widgetMap = {
             max_tokens: "max_tokens",
@@ -1030,6 +1276,7 @@ function showLMStudioSettings(node) {
 
         const config = {
             preset: selectedPreset,
+            prompt_version: promptVersionSelect.value,
             timeouts: {
                 fetch_models: parseInt(timeoutFetchInput.value),
                 api_call: parseInt(timeoutApiInput.value),
@@ -1054,19 +1301,27 @@ function showLMStudioSettings(node) {
                     }
                 }
 
-                showToast("所有设置已保存到配置文件", "success");
+                const newPromptVersion = promptVersionSelect.value;
+                if (newPromptVersion !== originalPromptVersion) {
+                    originalPromptVersion = newPromptVersion;
+                    showToast($t('saveSuccessRefresh'), "success");
+                } else {
+                    showToast($t('saveSuccess'), "success");
+                }
             } else {
-                showToast("保存设置失败", "error");
+                showToast($t('saveFailed'), "error");
             }
         } catch (e) {
-            showToast("保存设置失败: " + e.message, "error");
+            showToast($t('saveFailed') + ": " + e.message, "error");
         }
     };
 
     resetDefaultBtn.onclick = () => {
         showConfirm(
-            "确定要恢复默认设置吗？这将重置所有配置为默认值。",
+            $t('confirmReset'),
             async () => {
+                const needRefresh = originalPromptVersion !== "new";
+                
                 presetSelect.value = "Ignore";
                 node.lmstudioState.lastParamPreset = "Ignore";
 
@@ -1074,11 +1329,14 @@ function showLMStudioSettings(node) {
                 timeoutApiInput.value = 120;
                 timeoutListInput.value = 10;
                 timeoutUnloadInput.value = 30;
+                promptVersionSelect.value = "new";
+                originalPromptVersion = "new";
 
                 updatePresetDisplay();
 
                 const config = {
                     preset: "Ignore",
+                    prompt_version: "new",
                     timeouts: {
                         fetch_models: 5,
                         api_call: 120,
@@ -1095,12 +1353,16 @@ function showLMStudioSettings(node) {
                     });
 
                     if (response.ok) {
-                        showToast("已恢复默认设置并保存", "success");
+                        if (needRefresh) {
+                            showToast($t('saveSuccessRefresh'), "success");
+                        } else {
+                            showToast($t('resetSuccess'), "success");
+                        }
                     } else {
-                        showToast("保存默认设置失败", "error");
+                        showToast($t('resetFailed'), "error");
                     }
                 } catch (e) {
-                    showToast("保存默认设置失败: " + e.message, "error");
+                    showToast($t('resetFailed') + ": " + e.message, "error");
                 }
             }
         );

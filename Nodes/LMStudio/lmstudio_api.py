@@ -38,6 +38,8 @@ async def save_lmstudio_config(request):
             config["timeouts"] = data["timeouts"]
         if "preset" in data:
             config["preset"] = data["preset"]
+        if "prompt_version" in data:
+            config["prompt_version"] = data["prompt_version"]
         if _save_config(config):
             return web.json_response({"status": "success"})
         else:

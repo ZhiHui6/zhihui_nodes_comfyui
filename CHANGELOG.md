@@ -1,6 +1,22 @@
 # 更新日志
+
+## 1.0.19 2026-3-28
+- LM工作室节点(LMStudio): 
+  - 新增多语言支持并添加视频处理功能（测试）
+  - 优化预设模板格式和内容（支持图像/视频自动识别）
+  - 新增提示词版本选择功能（新/旧）
+- 系统提示词加载器(SystemPrompt)：删除过时的系统提示模板文件，新增三个模板文件
+- 视频抽帧节点(VideoFrameExtractor): 重构视频帧提取逻辑，提高内存效率
+    <br>
+- LMStudio node: 
+  - Added multilingual support and video processing features (beta)
+  - Optimized preset template format and content (supporting automatic image/video recognition)
+  - Added prompt version selection feature (new/old)
+- SystemPrompt loader: removed outdated system prompt template files, added three new templates
+- VideoFrameExtractor node: refactored video frame extraction logic to improve memory efficiency
+
 ## 1.0.18 2026-3-25
-- LM工作室(LMStudio)节点: 
+- LM工作室节点(LMStudio): 
   - 新增参数预设配置和超时设置功能
   - 添加参数预设功能，支持图像分析、文本生成和创意写作三种预设
   - 实现超时设置配置，可自定义API调用和模型操作超时时间
