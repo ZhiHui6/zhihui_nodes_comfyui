@@ -8,30 +8,25 @@ app.registerExtension({
             nodeType.prototype.onNodeCreated = function () {
                 const r = onNodeCreated?.apply(this, arguments);
 
-                const rangeModeWidget = this.widgets.find(w => w.name === "range_mode");
+                const extractModeWidget = this.widgets.find(w => w.name === "extract_mode");
+                
+                const numFramesWidget = this.widgets.find(w => w.name === "num_frames");
+                const frameIntervalValueWidget = this.widgets.find(w => w.name === "frame_interval_value");
+                const timeIntervalValueWidget = this.widgets.find(w => w.name === "time_interval_value");
+                const timeUnitWidget = this.widgets.find(w => w.name === "time_unit");
                 const startFrameWidget = this.widgets.find(w => w.name === "start_frame");
                 const endFrameWidget = this.widgets.find(w => w.name === "end_frame");
                 const startTimeWidget = this.widgets.find(w => w.name === "start_time");
                 const endTimeWidget = this.widgets.find(w => w.name === "end_time");
-                const timeUnitWidget = this.widgets.find(w => w.name === "time_unit");
+                const maxOutputFramesWidget = this.widgets.find(w => w.name === "max_output_frames");
 
-                if (rangeModeWidget && startFrameWidget && endFrameWidget && startTimeWidget && endTimeWidget) {
-                    const updateRangeModeVisibility = () => {
-                        const rangeMode = rangeModeWidget.value;
-                        if (rangeMode === "by_frame") {
-                            startFrameWidget.type = "number";
-                            startFrameWidget.hidden = false;
-                            endFrameWidget.type = "number";
-                            endFrameWidget.hidden = false;
-                            startTimeWidget.type = "hidden";
-                            startTimeWidget.hidden = true;
-                            endTimeWidget.type = "hidden";
-                            endTimeWidget.hidden = true;
-                            if (timeUnitWidget) {
-                                timeUnitWidget.type = "hidden";
-                                timeUnitWidget.hidden = true;
-                            }
-                        } else {
+                if (extractModeWidget) {
+                    const updateVisibility = () => {
+                        const mode = extractModeWidget.value;
+                        const isTimeMode = mode === "time_count" || mode === "time_interval";
+                        const isCountMode = mode === "frame_count" || mode === "time_count";
+
+                        if (isTimeMode) {
                             startFrameWidget.type = "hidden";
                             startFrameWidget.hidden = true;
                             endFrameWidget.type = "hidden";
@@ -40,86 +35,92 @@ app.registerExtension({
                             startTimeWidget.hidden = false;
                             endTimeWidget.type = "number";
                             endTimeWidget.hidden = false;
-                            if (timeUnitWidget) {
-                                timeUnitWidget.type = "combo";
-                                timeUnitWidget.hidden = false;
-                            }
-                        }
-                        updateSize(this);
-                    };
-
-                    const originalCallback = rangeModeWidget.callback;
-                    rangeModeWidget.callback = function(value) {
-                        const result = originalCallback?.apply(this, arguments);
-                        updateRangeModeVisibility();
-                        return result;
-                    };
-
-                    updateRangeModeVisibility();
-                }
-
-                const modeWidget = this.widgets.find(w => w.name === "mode");
-                const maxFramesWidget = this.widgets.find(w => w.name === "max_frames");
-                const intervalWidget = this.widgets.find(w => w.name === "interval");
-                
-                if (modeWidget && maxFramesWidget && intervalWidget) {
-                    const updateModeVisibility = () => {
-                        const mode = modeWidget.value;
-                        if (mode === "extract_by_count") {
-                            maxFramesWidget.type = "number";
-                            maxFramesWidget.hidden = false;
-                            intervalWidget.type = "hidden";
-                            intervalWidget.hidden = true;
+                            timeUnitWidget.type = "combo";
+                            timeUnitWidget.hidden = false;
                         } else {
-                            maxFramesWidget.type = "hidden";
-                            maxFramesWidget.hidden = true;
-                            intervalWidget.type = "number";
-                            intervalWidget.hidden = false;
+                            startFrameWidget.type = "number";
+                            startFrameWidget.hidden = false;
+                            endFrameWidget.type = "number";
+                            endFrameWidget.hidden = false;
+                            startTimeWidget.type = "hidden";
+                            startTimeWidget.hidden = true;
+                            endTimeWidget.type = "hidden";
+                            endTimeWidget.hidden = true;
+                            timeUnitWidget.type = "hidden";
+                            timeUnitWidget.hidden = true;
                         }
+
+                        if (isCountMode) {
+                            numFramesWidget.type = "number";
+                            numFramesWidget.hidden = false;
+                            frameIntervalValueWidget.type = "hidden";
+                            frameIntervalValueWidget.hidden = true;
+                            timeIntervalValueWidget.type = "hidden";
+                            timeIntervalValueWidget.hidden = true;
+                            maxOutputFramesWidget.type = "hidden";
+                            maxOutputFramesWidget.hidden = true;
+                        } else {
+                            numFramesWidget.type = "hidden";
+                            numFramesWidget.hidden = true;
+                            if (isTimeMode) {
+                                frameIntervalValueWidget.type = "hidden";
+                                frameIntervalValueWidget.hidden = true;
+                                timeIntervalValueWidget.type = "number";
+                                timeIntervalValueWidget.hidden = false;
+                            } else {
+                                frameIntervalValueWidget.type = "number";
+                                frameIntervalValueWidget.hidden = false;
+                                timeIntervalValueWidget.type = "hidden";
+                                timeIntervalValueWidget.hidden = true;
+                            }
+                            maxOutputFramesWidget.type = "number";
+                            maxOutputFramesWidget.hidden = false;
+                        }
+
                         updateSize(this);
                     };
-                    
-                    const originalCallback = modeWidget.callback;
-                    modeWidget.callback = function(value) {
+
+                    const originalCallback = extractModeWidget.callback;
+                    extractModeWidget.callback = function(value) {
                         const result = originalCallback?.apply(this, arguments);
-                        updateModeVisibility();
+                        updateVisibility();
                         return result;
                     };
-                    
-                    updateModeVisibility();
+
+                    updateVisibility();
                 }
-                
-                const enableOutputWidget = this.widgets.find(w => w.name === "enable_output");
-                const outputPathWidget = this.widgets.find(w => w.name === "output_path");
+
+                const customPathWidget = this.widgets.find(w => w.name === "custom_path");
+                const outputDirectoryWidget = this.widgets.find(w => w.name === "output_directory");
                 const filenamePrefixWidget = this.widgets.find(w => w.name === "filename_prefix");
-                
-                if (enableOutputWidget && outputPathWidget && filenamePrefixWidget) {
+
+                if (customPathWidget && outputDirectoryWidget && filenamePrefixWidget) {
                     const updateOutputVisibility = () => {
-                        const enabled = enableOutputWidget.value;
+                        const enabled = customPathWidget.value;
                         if (enabled) {
-                            outputPathWidget.type = "string";
-                            outputPathWidget.hidden = false;
+                            outputDirectoryWidget.type = "string";
+                            outputDirectoryWidget.hidden = false;
                             filenamePrefixWidget.type = "string";
                             filenamePrefixWidget.hidden = false;
                         } else {
-                            outputPathWidget.type = "hidden";
-                            outputPathWidget.hidden = true;
+                            outputDirectoryWidget.type = "hidden";
+                            outputDirectoryWidget.hidden = true;
                             filenamePrefixWidget.type = "hidden";
                             filenamePrefixWidget.hidden = true;
                         }
                         updateSize(this);
                     };
-                    
-                    const originalCallback = enableOutputWidget.callback;
-                    enableOutputWidget.callback = function(value) {
+
+                    const originalCallback = customPathWidget.callback;
+                    customPathWidget.callback = function(value) {
                         const result = originalCallback?.apply(this, arguments);
                         updateOutputVisibility();
                         return result;
                     };
-                    
+
                     updateOutputVisibility();
                 }
-                
+
                 return r;
             };
         }

@@ -25,8 +25,7 @@ app.registerExtension({
 
                 for (const widget of this.widgets) {
                     if (photographFieldsToHide.includes(widget.name)) {
-                        widget.type = "hidden";
-                        widget.computeSize = () => [0, -4];
+                        widget.hidden = true;
                     }
                 }
 
@@ -45,10 +44,16 @@ app.registerExtension({
                 });
                 manageButton.serialize = false;
 
-                // 强制调整节点大小以适应内容
+                const self = this;
                 setTimeout(() => {
-                   this.setSize(this.computeSize());
-                }, 50);
+                    self.setSize(self.computeSize());
+                }, 10);
+                setTimeout(() => {
+                    self.setSize(self.computeSize());
+                }, 100);
+                setTimeout(() => {
+                    self.setSize(self.computeSize());
+                }, 300);
 
                 return r;
             };

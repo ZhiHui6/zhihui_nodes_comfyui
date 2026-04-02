@@ -1024,27 +1024,39 @@
     },
     "VideoFrameExtractor": {
         "title": "视频抽帧",
-        "description": "视频抽帧节点：从视频中提取帧。支持按帧或按时间设定区间，支持两种抽帧模式：按指定数量均匀抽帧或按固定间隔抽帧。使用video_path输入实现内存高效提取。",
+        "description": "视频抽帧节点：从视频中提取帧。支持四种抽取模式：按帧数均匀抽取、按帧间隔跳帧、按时间均匀抽取、按时间间隔抽取。支持设置起始和结束范围，可自定义输出目录和文件名前缀保存帧图像。",
         "inputs": {
             "video_path": "视频路径"
         },
         "widgets": {
-            "range_mode": "区间模式",
-            "mode": "抽帧模式",
-            "max_frames": "最大帧数",
-            "interval": "间隔",
-            "preview_cols": "预览列数",
+            "extract_mode": "抽取模式",
+            "num_frames": "抽取帧数",
+            "frame_interval_value": "帧间隔",
+            "time_interval_value": "时间间隔",
+            "time_unit": "时间单位",
             "start_frame": "起始帧",
             "end_frame": "结束帧",
             "start_time": "起始时间",
             "end_time": "结束时间",
-            "time_unit": "时间单位",
-            "enable_output": "启用输出",
-            "output_path": "输出路径",
+            "max_output_frames": "最大输出帧数",
+            "custom_path": "自定义路径",
+            "output_directory": "输出目录",
             "filename_prefix": "文件名前缀"
         },
+        "options": {
+            "extract_mode": {
+                "frame_count": "按帧（逐帧）",
+                "frame_interval": "按帧（跳帧）",
+                "time_count": "按时间（逐个时间）",
+                "time_interval": "按时间（间隔时间）"
+            },
+            "time_unit": {
+                "seconds": "秒",
+                "minutes": "分钟"
+            }
+        },
         "outputs": {
-            "IMAGES": "图像"
+            "IMAGES": "图像列表"
         }
     },
     "PromptExpander": {

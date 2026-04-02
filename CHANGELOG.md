@@ -1,5 +1,14 @@
 # 更新日志
 
+## 1.0.20 2026-4-1
+- 视频抽帧节点(VideoFrameExtractor): 重构节点并优化功能逻辑。
+- 系统提示词加载器节点(SystemPrompt)： 新增系统提示词模板文件
+- 摄影提示词生成器节点(PhotographPrompt)：修复因兼容性问题而导致的界面显示异常。
+    <br>
+- VideoFrameExtractor node: refactored node and optimized functional logic.
+- SystemPrompt node: added new system prompt template files.
+- PhotographPrompt node: fixed UI display abnormalities caused by compatibility issues.
+
 ## 1.0.19 2026-3-28
 - LM工作室节点(LMStudio): 
   - 新增多语言支持并添加视频处理功能（测试）
