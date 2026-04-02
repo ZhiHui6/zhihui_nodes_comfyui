@@ -264,7 +264,6 @@ class Sa2VAAdvanced:
                     "--upgrade",
                 ],
                 capture_output=True,
-                text=True,
             )
 
             if result.returncode == 0:
@@ -272,7 +271,8 @@ class Sa2VAAdvanced:
                 print("🔄 Please restart ComfyUI to use the upgraded version")
                 return True
             else:
-                print(f"❌ Failed to upgrade transformers: {result.stderr}")
+                stderr_text = result.stderr.decode('utf-8', errors='replace')
+                print(f"❌ Failed to upgrade transformers: {stderr_text}")
                 return False
 
         except Exception as e:
