@@ -37,21 +37,21 @@
 </tr>
 
 <tr>
-<td><b>TagSelector</b><br><b>标签选择器</b><br><code>TagSelector</code></td>
+<td><b>标签选择器</b><br><code>TagSelector</code></td>
 <td>提示词处理</td>
 <td>新一代智能标签管理系统，提供可视化标签选择界面，支持自定义标签管理和智能搜索功能。分类丰富，涵盖画质、摄影、艺术风格等众多专业标签。</td>
-</tr>
-
-<tr>
-<td><b>Qwen3-VL高级版</b><br><code>Qwen3VLAdv</code></td>
-<td>AI视觉理解</td>
-<td>通过Qwen3-VL视觉识别大模型，提供专业级内容描述、场景理解等核心功能，实现图像/视频智能分析。支持NSFW破限分析，具备4bit/8bit量化加速和批量处理能力。</td>
 </tr>
 
 <tr>
 <td><b>摄影提示词生成器</b><br><code>PhotographPromptGenerator</code></td>
 <td>提示词处理</td>
 <td>专业摄影风格提示词生成器，涵盖人物、场景、镜头、光线、服装等16个维度。支持输出模式切换（标签组合/模板文本），集成AI扩写功能。配有用户自定义选项扩展和模板编辑助手界面。</td>
+</tr>
+
+<tr>
+<td><b>LM工作室节点</b><br><code>LMStudioNode</code></td>
+<td>AI视觉理解</td>
+<td>连接本地LM Studio服务器的视觉理解节点，支持图像分析和文本生成。通过LM Studio本地部署的大模型，实现无需云端API的私有化图像分析。支持多种预设模板和输出语言控制。</td>
 </tr>
 </table>
 

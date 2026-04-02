@@ -43,15 +43,15 @@ Provides dedicated Chinese localization files, which can be used with the ComfyU
 </tr>
 
 <tr>
-<td><b>Qwen3-VL Advanced</b><br><code>Qwen3VLAdv</code></td>
-<td>AI Vision Understanding</td>
-<td>Through the Qwen3-VL visual recognition large model, it provides professional-level content description, scene understanding, and other core functions, achieving intelligent image/video analysis. Supports NSFW limit-breaking analysis, with 4bit/8bit quantization acceleration and batch processing capabilities.</td>
-</tr>
-
-<tr>
 <td><b>Photography Prompt Generator</b><br><code>PhotographPromptGenerator</code></td>
 <td>Prompt Processing</td>
 <td>Professional photography-style prompt generator, covering 16 dimensions including characters, scenes, lenses, lighting, and clothing. Supports output mode switching (tag combination/template text), integrated AI expansion function. Equipped with user-defined option extension and template editing assistant interface.</td>
+</tr>
+
+<tr>
+<td><b>LM Studio Node</b><br><code>LMStudioNode</code></td>
+<td>AI Vision Understanding</td>
+<td>A vision understanding node that connects to a local LM Studio server, supporting image analysis and text generation. Enables private image analysis using locally deployed models without cloud APIs. Supports multiple preset templates and output language control.</td>
 </tr>
 </table>
 
