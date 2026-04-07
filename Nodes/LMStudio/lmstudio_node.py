@@ -14,47 +14,50 @@ import requests
 CONFIG_DIR = os.path.dirname(__file__)
 CONFIG_FILE = os.path.join(CONFIG_DIR, "lmstudio_config.json")
 
+
 def _load_config():
     if os.path.exists(CONFIG_FILE):
         try:
-            with open(CONFIG_FILE, 'r', encoding='utf-8') as f:
+            with open(CONFIG_FILE, "r", encoding="utf-8") as f:
                 return json.load(f)
         except Exception:
             pass
     return {}
 
+
 def _save_config(config):
     try:
         os.makedirs(CONFIG_DIR, exist_ok=True)
-        with open(CONFIG_FILE, 'w', encoding='utf-8') as f:
+        with open(CONFIG_FILE, "w", encoding="utf-8") as f:
             json.dump(config, f, indent=2, ensure_ascii=False)
         return True
     except Exception:
         return False
 
+
 def _get_timeout(key, default):
     config = _load_config()
     return config.get("timeouts", {}).get(key, default)
 
+
 LMSTUDIO_PROMPT_PRESETS = {
     "Ignore": "",
-    "Normal - Describe": "Describe this @.",
-    "Prompt Style - Tags": "Your task is to generate a clean list of comma-separated tags for a text-to-@ AI, based *only* on the visual information in the @. Limit the output to a maximum of 50 unique tags. Strictly describe visual elements like subject, clothing, environment, colors, lighting, and composition. Do not include abstract concepts, interpretations, marketing terms, or technical jargon (e.g., no 'SEO', 'brand-aligned', 'viral potential'). The goal is a concise list of visual descriptors. Avoid repeating tags.",
-    "Prompt Style - Simple": "Analyze the @ and generate a simple, single-sentence text-to-@ prompt. Describe the main subject and the setting concisely.",
-    "Prompt Style - Detailed": "Generate a detailed, artistic text-to-@ prompt based on the @. Combine the subject, their actions, the environment, lighting, and overall mood into a single, cohesive paragraph of about 2-3 sentences. Focus on key visual details.",
-    "Prompt Style - Extreme Detailed": "Generate an extremely detailed and descriptive text-to-@ prompt from the @. Create a rich paragraph that elaborates on the subject's appearance, textures of clothing, specific background elements, the quality and color of light, shadows, and the overall atmosphere. Aim for a highly descriptive and immersive prompt.",
-    "Prompt Style - Cinematic": "Act as a master prompt engineer. Create a highly detailed and evocative prompt for an @ generation AI. Describe the subject, their pose, the environment, the lighting, the mood, and the artistic style (e.g., photorealistic, cinematic, painterly). Weave all elements into a single, natural language paragraph, focusing on visual impact.",
-    "Creative - Detailed Analysis": "Describe this @ in detail, breaking down the subject, attire, accessories, background, and composition into separate sections.",
-    "Creative - Summarize Video": "Summarize the key events and narrative points in this video.",
-    "Creative - Short Story": "Write a short, imaginative story inspired by this @ or video.",
-    "Creative - Refine & Expand Prompt": "Refine and enhance the following user prompt for creative text-to-@ generation. Keep the meaning and keywords, make it more expressive and visually rich. Output **only the improved prompt text itself**, without any reasoning steps, thinking process, or additional commentary.",
+    "Normal - Describe": "Describe this 图像.",
+    "Prompt Style - Tags": "Your task is to generate a clean list of comma-separated tags for a text-to-图像 AI, based *only* on the visual information in the 图像. Limit the output to a maximum of 50 unique tags. Strictly describe visual elements like subject, clothing, environment, colors, lighting, and composition. Do not include abstract concepts, interpretations, marketing terms, or technical jargon (e.g., no 'SEO', 'brand-aligned', 'viral potential'). The goal is a concise list of visual descriptors. Avoid repeating tags.",
+    "Prompt Style - Simple": "Analyze the 图像 and generate a simple, single-sentence text-to-图像 prompt. Describe the main subject and the setting concisely.",
+    "Prompt Style - Detailed": "Generate a detailed, artistic text-to-图像 prompt based on the 图像. Combine the subject, their actions, the environment, lighting, and overall mood into a single, cohesive paragraph of about 2-3 sentences. Focus on key visual details.",
+    "Prompt Style - Extreme Detailed": "Generate an extremely detailed and descriptive text-to-图像 prompt from the 图像. Create a rich paragraph that elaborates on the subject's appearance, textures of clothing, specific background elements, the quality and color of light, shadows, and the overall atmosphere. Aim for a highly descriptive and immersive prompt.",
+    "Prompt Style - Cinematic": "Act as a master prompt engineer. Create a highly detailed and evocative prompt for an 图像 generation AI. Describe the subject, their pose, the environment, the lighting, the mood, and the artistic style (e.g., photorealistic, cinematic, painterly). Weave all elements into a single, natural language paragraph, focusing on visual impact.",
+    "Creative - Detailed Analysis": "Describe this 图像 in detail, breaking down the subject, attire, accessories, background, and composition into separate sections.",
+    "Creative - Short Story": "Write a short, imaginative story inspired by this 图像.",
+    "Creative - Refine & Expand Prompt": "Refine and enhance the following user prompt for creative text-to-图像 generation. Keep the meaning and keywords, make it more expressive and visually rich. Output **only the improved prompt text itself**, without any reasoning steps, thinking process, or additional commentary.",
 }
 
 LMSTUDIO_PROMPT_PRESETS_OLD = {
     "Ignore": "",
     "Tags": "Your task is to generate a clean list of comma-separated tags for a text-to-image AI, based *only* on the visual information in the image. Limit the output to a maximum of 50 unique tags. Strictly describe visual elements like subject, clothing, environment, colors, lighting, and composition. Do not include abstract concepts, interpretations, marketing terms, or technical jargon (e.g., no 'SEO', 'brand-aligned', 'viral potential'). The goal is a concise list of visual descriptors. Avoid repeating tags.",
     "Extreme Detailed": "Generate an extremely detailed and descriptive text-to-image prompt from the image. Create a rich paragraph that elaborates on the subject's appearance, textures of clothing, specific background elements, the quality and color of light, shadows, and the overall atmosphere. Aim for a highly descriptive and immersive prompt.",
-    "Short Story": "Write a short, imaginative story inspired by this image or video.",
+    "Short Story": "Write a short, imaginative story inspired by this image.",
 }
 
 LMSTUDIO_PARAM_PRESETS = {
@@ -82,26 +85,52 @@ LMSTUDIO_PARAM_PRESETS = {
     },
 }
 
+
 def _normalise_base(endpoint: str) -> str:
     base = endpoint.rstrip("/")
     if base.endswith("/v1"):
         base = base[:-3]
     return base
 
+
 def _fetch_models(endpoint: str) -> list:
-    url = _normalise_base(endpoint) + "/v1/models"
+    base = _normalise_base(endpoint)
     timeout = _get_timeout("fetch_models", 5)
+
     try:
-        req = urllib.request.Request(url, headers={"Accept": "application/json"})
+        req = urllib.request.Request(
+            f"{base}/v1/models", headers={"Accept": "application/json"}
+        )
         with urllib.request.urlopen(req, timeout=timeout) as resp:
             data = json.loads(resp.read())
-            ids = [m["id"] for m in data.get("data", [])]
-            return ids if ids else ["(no models found)"]
-    except Exception as exc:
-        return [f"(error: {exc})"]
+            if "data" in data:
+                ids = [m.get("id", "") for m in data.get("data", []) if m.get("id")]
+                if ids:
+                    return ids
+    except Exception:
+        pass
+
+    try:
+        req = urllib.request.Request(
+            f"{base}/api/v1/models", headers={"Accept": "application/json"}
+        )
+        with urllib.request.urlopen(req, timeout=timeout) as resp:
+            data = json.loads(resp.read())
+            if "models" in data:
+                keys = [
+                    m.get("key", "") for m in data.get("models", []) if m.get("key")
+                ]
+                if keys:
+                    return keys
+    except Exception:
+        pass
+
+    return ["(no models found)"]
+
 
 _cached_endpoint: str = "http://localhost:1234"
 _cached_models: list = _fetch_models("http://localhost:1234")
+
 
 def _maybe_refresh(endpoint: str) -> list:
     global _cached_endpoint, _cached_models
@@ -110,12 +139,13 @@ def _maybe_refresh(endpoint: str) -> list:
         _cached_models = _fetch_models(endpoint)
     return _cached_models
 
-class LMStudioNode:
 
+class LMStudioNode:
     CATEGORY = "Zhi.AI/LM Studio"
     FUNCTION = "run"
     RETURN_TYPES = ("STRING",)
     RETURN_NAMES = ("result",)
+    OUTPUT_NODE = True
     DESCRIPTION = "Connect to local LM Studio server for image analysis and text generation. Supports multiple preset templates, output language control, and auto model discovery. Requires LM Studio software running with a vision-capable model loaded."
 
     @classmethod
@@ -239,7 +269,7 @@ class LMStudioNode:
                     {
                         "default": 0,
                         "min": 0,
-                        "max": 0xffffffffffffffff,
+                        "max": 0xFFFFFFFFFFFFFFFF,
                         "tooltip": "Random seed for reproducible outputs. 0 means random seed",
                     },
                 ),
@@ -302,23 +332,26 @@ class LMStudioNode:
         elif output_language == "English":
             return prompt + " Please respond in English."
         elif output_language == "Chinese&English":
-            return prompt + " Please respond in both Chinese and English, first describe in Chinese, then describe in English."
+            return (
+                prompt
+                + " Please respond in both Chinese and English, first describe in Chinese, then describe in English."
+            )
         return prompt
 
     @staticmethod
     def _remove_think_content(text: str) -> str:
         if not isinstance(text, str):
             return text
-        think_end_pos = text.find('</think>')
+        think_end_pos = text.find("</think>")
         if think_end_pos != -1:
-            return text[think_end_pos + len('</think>'):].strip()
+            return text[think_end_pos + len("</think>") :].strip()
         return text
 
     @staticmethod
     def _tensor_to_base64(image_tensor, size_limitation=None) -> str:
         img_np = (image_tensor[0].cpu().numpy() * 255).clip(0, 255).astype(np.uint8)
         pil_img = Image.fromarray(img_np, mode="RGB")
-        
+
         if size_limitation is not None and size_limitation > 0:
             target = min(size_limitation, 2500)
             w, h = pil_img.size
@@ -328,7 +361,7 @@ class LMStudioNode:
                 new_w = max(1, int(round(w * scale)))
                 new_h = max(1, int(round(h * scale)))
                 pil_img = pil_img.resize((new_w, new_h), Image.LANCZOS)
-        
+
         buf = BytesIO()
         pil_img.save(buf, format="PNG")
         return base64.b64encode(buf.getvalue()).decode("utf-8")
@@ -337,16 +370,16 @@ class LMStudioNode:
     def _load_image_from_path(image_path):
         if not os.path.exists(image_path):
             raise FileNotFoundError(f"图片文件未找到: {image_path}")
-        
-        valid_extensions = {'.jpg', '.jpeg', '.png', '.bmp', '.webp'}
+
+        valid_extensions = {".jpg", ".jpeg", ".png", ".bmp", ".webp"}
         file_ext = os.path.splitext(image_path.lower())[1]
         if file_ext not in valid_extensions:
             raise ValueError(f"不支持的图片格式: {file_ext}")
-        
+
         image = Image.open(image_path)
-        if image.mode != 'RGB':
-            image = image.convert('RGB')
-        
+        if image.mode != "RGB":
+            image = image.convert("RGB")
+
         image_array = np.array(image).astype(np.float32) / 255.0
         return image_array
 
@@ -354,16 +387,16 @@ class LMStudioNode:
     def _resize_image_array(image_array, size_limitation):
         if size_limitation is None or size_limitation <= 0:
             return image_array
-        
+
         h, w = image_array.shape[:2]
         long_edge = max(w, h)
         if long_edge <= size_limitation:
             return image_array
-        
+
         scale = size_limitation / float(long_edge)
         new_w = max(1, int(round(w * scale)))
         new_h = max(1, int(round(h * scale)))
-        
+
         pil_img = Image.fromarray((image_array * 255).astype(np.uint8))
         pil_img = pil_img.resize((new_w, new_h), Image.LANCZOS)
         return np.array(pil_img).astype(np.float32) / 255.0
@@ -372,16 +405,16 @@ class LMStudioNode:
     def _traverse_folder_for_images(folder_path, recursive=True):
         if not folder_path or not folder_path.strip():
             return []
-        
+
         folder_path = folder_path.strip()
         if not os.path.exists(folder_path):
             raise FileNotFoundError(f"文件夹未找到: {folder_path}")
         if not os.path.isdir(folder_path):
             raise ValueError(f"路径不是文件夹: {folder_path}")
-        
-        valid_extensions = {'.jpg', '.jpeg', '.png', '.bmp', '.webp'}
+
+        valid_extensions = {".jpg", ".jpeg", ".png", ".bmp", ".webp"}
         image_files = []
-        
+
         if recursive:
             for root, dirs, files in os.walk(folder_path):
                 for file in files:
@@ -398,17 +431,28 @@ class LMStudioNode:
                     if file_ext in valid_extensions:
                         if os.access(file_path, os.R_OK):
                             image_files.append(file_path)
-        
+
         image_files.sort(key=lambda x: os.path.basename(x).lower())
         return image_files
 
     @staticmethod
     def _save_description(image_file, description):
         txt_file = os.path.splitext(image_file)[0] + ".txt"
-        with open(txt_file, 'w', encoding='utf-8') as f:
+        with open(txt_file, "w", encoding="utf-8") as f:
             f.write(description)
 
-    def _call_api(self, endpoint, model, messages, max_tokens, temperature, top_p, top_k, repetition_penalty, seed=None):
+    def _call_api(
+        self,
+        endpoint,
+        model,
+        messages,
+        max_tokens,
+        temperature,
+        top_p,
+        top_k,
+        repetition_penalty,
+        seed=None,
+    ):
         payload = {
             "messages": messages,
             "max_tokens": max_tokens,
@@ -432,7 +476,7 @@ class LMStudioNode:
             method="POST",
         )
 
-        timeout = _get_timeout("api_call", 120)
+        timeout = _get_timeout("api_call", 450)
         try:
             with urllib.request.urlopen(req, timeout=timeout) as resp:
                 result = json.loads(resp.read())
@@ -458,7 +502,7 @@ class LMStudioNode:
             response = requests.get(
                 f"{base_url}/api/v1/models",
                 headers={"Content-Type": "application/json"},
-                timeout=timeout_list
+                timeout=timeout_list,
             )
             response.raise_for_status()
             models_data = response.json()
@@ -483,7 +527,7 @@ class LMStudioNode:
                     f"{base_url}/api/v1/models/unload",
                     headers={"Content-Type": "application/json"},
                     json={"instance_id": instance_id},
-                    timeout=timeout_unload
+                    timeout=timeout_unload,
                 )
 
                 if unload_response.status_code == 200:
@@ -505,12 +549,80 @@ class LMStudioNode:
         except Exception as e:
             return f"Error: {str(e)}"
 
-    def _prepare_return(self, result: str, endpoint: str, unload_model: bool, remove_think_tags: bool = False):
+    def _generate_log_info(
+        self,
+        model: str,
+        endpoint: str,
+        preset_prompt: str,
+        output_language: str,
+        max_tokens: int,
+        temperature: float,
+        top_p: float,
+        top_k: int,
+        repetition_penalty: float,
+        seed: int,
+        size_limitation: int,
+        batch_mode: bool,
+        image_count: int = 0,
+        success: bool = True,
+        error_msg: str = "",
+        processed_count: int = 0,
+        error_count: int = 0,
+        duration: float = 0.0,
+    ):
+        config = _load_config()
+        show_log = config.get("show_log_panel", True)
+        if not show_log:
+            return ""
+
+        log_lines = []
+        log_lines.append(f"🤖 模型: {model}")
+        log_lines.append(f"🌐 端点: {endpoint}")
+        log_lines.append(f"📝 预设提示词: {preset_prompt}")
+        log_lines.append(f"🌍 输出语言: {output_language}")
+        log_lines.append(f"📊 Max Tokens: {max_tokens}")
+        log_lines.append(f"🌡️ Temperature: {temperature}")
+        log_lines.append(f"🎯 Top P: {top_p}")
+        log_lines.append(f"🔢 Top K: {top_k}")
+        log_lines.append(f"🔄 Repetition Penalty: {repetition_penalty}")
+        log_lines.append(f"🎲 Seed: {seed}")
+        log_lines.append(f"📐 尺寸限制: {size_limitation if size_limitation > 0 else '无限制'}")
+        
+        if batch_mode:
+            log_lines.append(f"📦 批处理模式: 启用")
+            if image_count > 0:
+                log_lines.append(f"🖼️ 图片数量: {image_count}")
+            if processed_count > 0 or error_count > 0:
+                log_lines.append(f"✅ 成功处理: {processed_count}")
+                log_lines.append(f"❌ 失败数量: {error_count}")
+        elif image_count > 0:
+            log_lines.append(f"🖼️ 图片数量: {image_count}")
+        
+        if duration > 0:
+            log_lines.append(f"⏱️ 耗时: {duration:.2f}秒")
+        
+        if success:
+            log_lines.append(f"✨ 状态: 推理完成")
+        else:
+            log_lines.append(f"⚠️ 状态: 推理失败")
+            if error_msg:
+                log_lines.append(f"❗ 错误信息: {error_msg}")
+        
+        return "\n".join(log_lines)
+
+    def _prepare_return(
+        self,
+        result: str,
+        endpoint: str,
+        unload_model: bool,
+        remove_think_tags: bool = False,
+        log_info: str = "",
+    ):
         if remove_think_tags:
             result = self._remove_think_content(result)
         if unload_model:
             self._unload_model(endpoint)
-        return (result,)
+        return {"ui": {"log_info": [log_info]}, "result": (result,)}
 
     def run(
         self,
@@ -535,10 +647,11 @@ class LMStudioNode:
         image=None,
     ):
         _maybe_refresh(endpoint)
+        start_time = time.time()
 
         if seed == 0:
             import random
-            seed = random.randint(1, 0xffffffffffffffff)
+            seed = random.randint(1, 0xFFFFFFFFFFFFFFFF)
 
         config = _load_config()
         prompt_version = config.get("prompt_version", "new")
@@ -546,11 +659,6 @@ class LMStudioNode:
             preset_text = LMSTUDIO_PROMPT_PRESETS_OLD.get(preset_prompt, "")
         else:
             preset_text = LMSTUDIO_PROMPT_PRESETS.get(preset_prompt, "")
-
-        if preset_text and "@" in preset_text:
-            is_video = image is not None and len(image.shape) == 4 and image.shape[0] > 1
-            input_type = "video" if is_video else "image"
-            preset_text = preset_text.replace("@", input_type)
 
         if preset_prompt == "Ignore":
             full_user_text = user_prompt.strip() if user_prompt.strip() else ""
@@ -562,26 +670,91 @@ class LMStudioNode:
         effective_system_prompt = system_prompt if preset_prompt == "Ignore" else ""
 
         if not batch_mode:
+            image_count = 0
+            if image is not None:
+                if len(image.shape) == 4:
+                    image_count = image.shape[0]
+                else:
+                    image_count = 1
+
             if image is None:
                 messages = []
                 if effective_system_prompt.strip():
-                    messages.append({"role": "system", "content": effective_system_prompt})
+                    messages.append(
+                        {"role": "system", "content": effective_system_prompt}
+                    )
                 messages.append({"role": "user", "content": full_user_text})
 
                 try:
-                    result = self._call_api(endpoint, model, messages, max_tokens, temperature, top_p, top_k, repetition_penalty, seed)
-                    return self._prepare_return(result, endpoint, unload_model, remove_think_tags)
+                    result = self._call_api(
+                        endpoint,
+                        model,
+                        messages,
+                        max_tokens,
+                        temperature,
+                        top_p,
+                        top_k,
+                        repetition_penalty,
+                        seed,
+                    )
+                    duration = time.time() - start_time
+                    log_info = self._generate_log_info(
+                        model=model,
+                        endpoint=endpoint,
+                        preset_prompt=preset_prompt,
+                        output_language=output_language,
+                        max_tokens=max_tokens,
+                        temperature=temperature,
+                        top_p=top_p,
+                        top_k=top_k,
+                        repetition_penalty=repetition_penalty,
+                        seed=seed,
+                        size_limitation=size_limitation,
+                        batch_mode=batch_mode,
+                        image_count=image_count,
+                        success=True,
+                        duration=duration,
+                    )
+                    return self._prepare_return(
+                        result, endpoint, unload_model, remove_think_tags, log_info
+                    )
                 except Exception as e:
-                    return self._prepare_return("", endpoint, unload_model, remove_think_tags)
+                    duration = time.time() - start_time
+                    log_info = self._generate_log_info(
+                        model=model,
+                        endpoint=endpoint,
+                        preset_prompt=preset_prompt,
+                        output_language=output_language,
+                        max_tokens=max_tokens,
+                        temperature=temperature,
+                        top_p=top_p,
+                        top_k=top_k,
+                        repetition_penalty=repetition_penalty,
+                        seed=seed,
+                        size_limitation=size_limitation,
+                        batch_mode=batch_mode,
+                        image_count=image_count,
+                        success=False,
+                        error_msg=str(e),
+                        duration=duration,
+                    )
+                    return self._prepare_return(
+                        "", endpoint, unload_model, remove_think_tags, log_info
+                    )
 
             if len(image.shape) == 4 and image.shape[0] > 0:
                 image_tensor = image[0:1]
             else:
                 image_tensor = image
 
-            b64 = self._tensor_to_base64(image_tensor, size_limitation if size_limitation > 0 else None)
+            b64 = self._tensor_to_base64(
+                image_tensor, size_limitation if size_limitation > 0 else None
+            )
             user_content = [
-                {"type": "image_url", "image_url": {"url": f"data:image/png;base64,{b64}"}},
+                {
+                    "type": "image_url",
+                    "image_url": {"url": f"data:image/png;base64,{b64}"},
+                },
                 {"type": "text", "text": full_user_text},
             ]
 
@@ -591,19 +764,91 @@ class LMStudioNode:
             messages.append({"role": "user", "content": user_content})
 
             try:
-                result = self._call_api(endpoint, model, messages, max_tokens, temperature, top_p, top_k, repetition_penalty, seed)
-                return self._prepare_return(result, endpoint, unload_model, remove_think_tags)
+                result = self._call_api(
+                    endpoint,
+                    model,
+                    messages,
+                    max_tokens,
+                    temperature,
+                    top_p,
+                    top_k,
+                    repetition_penalty,
+                    seed,
+                )
+                duration = time.time() - start_time
+                log_info = self._generate_log_info(
+                    model=model,
+                    endpoint=endpoint,
+                    preset_prompt=preset_prompt,
+                    output_language=output_language,
+                    max_tokens=max_tokens,
+                    temperature=temperature,
+                    top_p=top_p,
+                    top_k=top_k,
+                    repetition_penalty=repetition_penalty,
+                    seed=seed,
+                    size_limitation=size_limitation,
+                    batch_mode=batch_mode,
+                    image_count=image_count,
+                    success=True,
+                    duration=duration,
+                )
+                return self._prepare_return(
+                    result, endpoint, unload_model, remove_think_tags, log_info
+                )
             except Exception as e:
-                return self._prepare_return("", endpoint, unload_model, remove_think_tags)
+                duration = time.time() - start_time
+                log_info = self._generate_log_info(
+                    model=model,
+                    endpoint=endpoint,
+                    preset_prompt=preset_prompt,
+                    output_language=output_language,
+                    max_tokens=max_tokens,
+                    temperature=temperature,
+                    top_p=top_p,
+                    top_k=top_k,
+                    repetition_penalty=repetition_penalty,
+                    seed=seed,
+                    size_limitation=size_limitation,
+                    batch_mode=batch_mode,
+                    image_count=image_count,
+                    success=False,
+                    error_msg=str(e),
+                    duration=duration,
+                )
+                return self._prepare_return(
+                    "", endpoint, unload_model, remove_think_tags, log_info
+                )
 
         else:
             results = []
 
             if batch_folder_path and batch_folder_path.strip():
                 try:
-                    image_paths = self._traverse_folder_for_images(batch_folder_path.strip())
+                    image_paths = self._traverse_folder_for_images(
+                        batch_folder_path.strip()
+                    )
                     if not image_paths:
-                        return self._prepare_return("", endpoint, unload_model, remove_think_tags)
+                        log_info = self._generate_log_info(
+                            model=model,
+                            endpoint=endpoint,
+                            preset_prompt=preset_prompt,
+                            output_language=output_language,
+                            max_tokens=max_tokens,
+                            temperature=temperature,
+                            top_p=top_p,
+                            top_k=top_k,
+                            repetition_penalty=repetition_penalty,
+                            seed=seed,
+                            size_limitation=size_limitation,
+                            batch_mode=batch_mode,
+                            image_count=0,
+                            success=False,
+                            error_msg="未找到图片文件",
+                        )
+                        return self._prepare_return(
+                            "", endpoint, unload_model, remove_think_tags, log_info
+                        )
 
                     total_images = len(image_paths)
                     processed_count = 0
@@ -619,43 +864,135 @@ class LMStudioNode:
 
                             image_array = self._load_image_from_path(image_path)
                             if size_limitation > 0:
-                                image_array = self._resize_image_array(image_array, size_limitation)
+                                image_array = self._resize_image_array(
+                                    image_array, size_limitation
+                                )
 
-                            pil_img = Image.fromarray((image_array * 255).astype(np.uint8))
+                            pil_img = Image.fromarray(
+                                (image_array * 255).astype(np.uint8)
+                            )
                             buf = BytesIO()
                             pil_img.save(buf, format="PNG")
                             b64 = base64.b64encode(buf.getvalue()).decode("utf-8")
 
                             user_content = [
-                                {"type": "image_url", "image_url": {"url": f"data:image/png;base64,{b64}"}},
+                                {
+                                    "type": "image_url",
+                                    "image_url": {
+                                        "url": f"data:image/png;base64,{b64}"
+                                    },
+                                },
                                 {"type": "text", "text": full_user_text},
                             ]
 
                             messages = []
                             if effective_system_prompt.strip():
-                                messages.append({"role": "system", "content": effective_system_prompt})
+                                messages.append(
+                                    {
+                                        "role": "system",
+                                        "content": effective_system_prompt,
+                                    }
+                                )
                             messages.append({"role": "user", "content": user_content})
 
-                            result = self._call_api(endpoint, model, messages, max_tokens, temperature, top_p, top_k, repetition_penalty, seed)
+                            result = self._call_api(
+                                endpoint,
+                                model,
+                                messages,
+                                max_tokens,
+                                temperature,
+                                top_p,
+                                top_k,
+                                repetition_penalty,
+                                seed,
+                            )
                             self._save_description(image_path, result)
                             processed_count += 1
 
                         except Exception as e:
                             error_count += 1
                             error_msg = str(e)
-                            error_details.append(f"[{os.path.basename(image_path)}] {error_msg}")
+                            error_details.append(
+                                f"[{os.path.basename(image_path)}] {error_msg}"
+                            )
 
+                    duration = time.time() - start_time
                     log_message = f"Batch processing completed!\nTotal: {total_images} images\nSuccess: {processed_count}\nFailed: {error_count}"
                     if error_details:
-                        log_message += "\n\nFailure details:\n" + "\n".join(error_details)
-                    return self._prepare_return(log_message, endpoint, unload_model, remove_think_tags)
+                        log_message += "\n\nFailure details:\n" + "\n".join(
+                            error_details
+                        )
+                    log_info = self._generate_log_info(
+                        model=model,
+                        endpoint=endpoint,
+                        preset_prompt=preset_prompt,
+                        output_language=output_language,
+                        max_tokens=max_tokens,
+                        temperature=temperature,
+                        top_p=top_p,
+                        top_k=top_k,
+                        repetition_penalty=repetition_penalty,
+                        seed=seed,
+                        size_limitation=size_limitation,
+                        batch_mode=batch_mode,
+                        image_count=total_images,
+                        success=True,
+                        processed_count=processed_count,
+                        error_count=error_count,
+                        duration=duration,
+                    )
+                    return self._prepare_return(
+                        log_message, endpoint, unload_model, remove_think_tags, log_info
+                    )
 
                 except Exception as e:
-                    return self._prepare_return(f"Batch processing failed: {str(e)}", endpoint, unload_model, remove_think_tags)
+                    duration = time.time() - start_time
+                    log_info = self._generate_log_info(
+                        model=model,
+                        endpoint=endpoint,
+                        preset_prompt=preset_prompt,
+                        output_language=output_language,
+                        max_tokens=max_tokens,
+                        temperature=temperature,
+                        top_p=top_p,
+                        top_k=top_k,
+                        repetition_penalty=repetition_penalty,
+                        seed=seed,
+                        size_limitation=size_limitation,
+                        batch_mode=batch_mode,
+                        success=False,
+                        error_msg=str(e),
+                        duration=duration,
+                    )
+                    return self._prepare_return(
+                        f"Batch processing failed: {str(e)}",
+                        endpoint,
+                        unload_model,
+                        remove_think_tags,
+                        log_info,
+                    )
 
             else:
                 if image is None:
-                    return self._prepare_return("", endpoint, unload_model, remove_think_tags)
+                    log_info = self._generate_log_info(
+                        model=model,
+                        endpoint=endpoint,
+                        preset_prompt=preset_prompt,
+                        output_language=output_language,
+                        max_tokens=max_tokens,
+                        temperature=temperature,
+                        top_p=top_p,
+                        top_k=top_k,
+                        repetition_penalty=repetition_penalty,
+                        seed=seed,
+                        size_limitation=size_limitation,
+                        batch_mode=batch_mode,
+                        success=False,
+                        error_msg="批处理模式下未提供图片",
+                    )
+                    return self._prepare_return(
+                        "", endpoint, unload_model, remove_think_tags, log_info
+                    )
 
                 total_images = image.shape[0] if len(image.shape) == 4 else 1
                 processed_count = 0
@@ -665,33 +1002,73 @@ class LMStudioNode:
                 for i in range(total_images):
                     try:
                         if len(image.shape) == 4:
-                            image_tensor = image[i:i+1]
+                            image_tensor = image[i : i + 1]
                         else:
                             image_tensor = image
 
-                        b64 = self._tensor_to_base64(image_tensor, size_limitation if size_limitation > 0 else None)
+                        b64 = self._tensor_to_base64(
+                            image_tensor,
+                            size_limitation if size_limitation > 0 else None,
+                        )
                         user_content = [
-                            {"type": "image_url", "image_url": {"url": f"data:image/png;base64,{b64}"}},
+                            {
+                                "type": "image_url",
+                                "image_url": {"url": f"data:image/png;base64,{b64}"},
+                            },
                             {"type": "text", "text": full_user_text},
                         ]
 
                         messages = []
                         if effective_system_prompt.strip():
-                            messages.append({"role": "system", "content": effective_system_prompt})
+                            messages.append(
+                                {"role": "system", "content": effective_system_prompt}
+                            )
                         messages.append({"role": "user", "content": user_content})
 
-                        result = self._call_api(endpoint, model, messages, max_tokens, temperature, top_p, top_k, repetition_penalty, seed)
-                        results.append(f"Image {i+1}/{total_images}:\n{result}")
+                        result = self._call_api(
+                            endpoint,
+                            model,
+                            messages,
+                            max_tokens,
+                            temperature,
+                            top_p,
+                            top_k,
+                            repetition_penalty,
+                            seed,
+                        )
+                        results.append(f"Image {i + 1}/{total_images}:\n{result}")
                         processed_count += 1
 
                     except Exception as e:
                         error_count += 1
                         error_msg = str(e)
-                        error_details.append(f"[Image {i+1}] {error_msg}")
+                        error_details.append(f"[Image {i + 1}] {error_msg}")
 
-                combined_result = "\n\n" + "="*50 + "\n\n".join(results)
+                duration = time.time() - start_time
+                combined_result = "\n\n" + "=" * 50 + "\n\n".join(results)
                 summary = f"Batch processing completed!\nTotal: {total_images} images\nSuccess: {processed_count}\nFailed: {error_count}"
                 if error_details:
                     summary += "\n\nFailure details:\n" + "\n".join(error_details)
-                combined_result = summary + "\n\n" + "="*50 + "\n" + combined_result
-                return self._prepare_return(combined_result, endpoint, unload_model, remove_think_tags)
+                combined_result = summary + "\n\n" + "=" * 50 + "\n" + combined_result
+                log_info = self._generate_log_info(
+                    model=model,
+                    endpoint=endpoint,
+                    preset_prompt=preset_prompt,
+                    output_language=output_language,
+                    max_tokens=max_tokens,
+                    temperature=temperature,
+                    top_p=top_p,
+                    top_k=top_k,
+                    repetition_penalty=repetition_penalty,
+                    seed=seed,
+                    size_limitation=size_limitation,
+                    batch_mode=batch_mode,
+                    image_count=total_images,
+                    success=True,
+                    processed_count=processed_count,
+                    error_count=error_count,
+                    duration=duration,
+                )
+                return self._prepare_return(
+                    combined_result, endpoint, unload_model, remove_think_tags, log_info
+                )

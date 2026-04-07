@@ -1,5 +1,22 @@
 # 更新日志
 
+## 1.0.22 2026-4-7
+- LM工作室节点(LMStudio): 
+  - 删除视频处理功能（LM Studio客户端不支持视频处理）
+  - 新增日志面板显示推理日志信息
+  - 增加API调用超时时间至450秒
+    <br>
+- LMStudio node: 
+  - Removed video processing features as LM Studio does not support video processing.
+  - Added log panel to display inference log information
+  - Increased API call timeout to 450 seconds
+
+
+## 1.0.21 2026-4-3
+- Sa2VA高级版节点(Sa2VAAdvanced): 修复字节流解码的问题。
+    <br>
+- Sa2VAAdvanced node: Fixed byte stream decoding issue.
+
 ## 1.0.20 2026-4-1
 - 视频抽帧节点(VideoFrameExtractor): 重构节点并优化功能逻辑。
 - 系统提示词加载器节点(SystemPrompt)： 新增系统提示词模板文件

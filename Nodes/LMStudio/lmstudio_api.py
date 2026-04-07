@@ -40,6 +40,8 @@ async def save_lmstudio_config(request):
             config["preset"] = data["preset"]
         if "prompt_version" in data:
             config["prompt_version"] = data["prompt_version"]
+        if "show_log_panel" in data:
+            config["show_log_panel"] = data["show_log_panel"]
         if _save_config(config):
             return web.json_response({"status": "success"})
         else:

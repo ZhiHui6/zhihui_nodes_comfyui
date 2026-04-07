@@ -27,7 +27,7 @@ const i18n = {
         newVersion: "新版预设",
         oldVersion: "旧版预设",
         newVersionHintPrefix: "新版预设包含更多选项：",
-        newVersionHintOptions: "标签、简洁、详细、极详细、电影感、详细分析、视频总结、短篇故事、优化扩展提示词",
+        newVersionHintOptions: "标签、简洁、详细、极详细、电影感、详细分析、短篇故事、优化扩展提示词",
         oldVersionHintPrefix: "旧版预设包含：",
         oldVersionHintOptions: "标签、极详细、短篇故事",
         fetchModelsTimeout: "获取模型列表超时",
@@ -62,7 +62,11 @@ const i18n = {
         topP: "Top P",
         topK: "Top K",
         repetition: "Repetition",
-        seed: "Seed"
+        seed: "Seed",
+        showLogPanel: "显示日志信息栏",
+        showLogPanelDesc: "在节点底部显示推理日志信息，包含模型、参数、耗时等详细信息",
+        logPanelTitle: "📋 推理日志",
+        clearLog: "清屏"
     },
     en: {
         title: "🤖 LM Studio Status Settings",
@@ -88,7 +92,7 @@ const i18n = {
         newVersion: "New Version",
         oldVersion: "Old Version",
         newVersionHintPrefix: "New presets include: ",
-        newVersionHintOptions: "Tags, Simple, Detailed, Extreme Detailed, Cinematic, Detailed Analysis, Summarize Video, Short Story ...",
+        newVersionHintOptions: "Tags, Simple, Detailed, Extreme Detailed, Cinematic, Detailed Analysis, Short Story ...",
         oldVersionHintPrefix: "Old presets include: ",
         oldVersionHintOptions: "Tags, Extreme Detailed, Short Story",
         fetchModelsTimeout: "Fetch Models Timeout",
@@ -123,7 +127,11 @@ const i18n = {
         topP: "Top P",
         topK: "Top K",
         repetition: "Repetition",
-        seed: "Seed"
+        seed: "Seed",
+        showLogPanel: "Show Log Panel",
+        showLogPanelDesc: "Display inference log information at the bottom of the node, including model, parameters, duration, etc.",
+        logPanelTitle: "📋 Inference Log",
+        clearLog: "Clear"
     }
 };
 
@@ -165,6 +173,10 @@ function showToast(message, type = "info") {
             from { transform: translate(-50%, -50%) scale(0.9); opacity: 0; }
             to { transform: translate(-50%, -50%) scale(1); opacity: 1; }
         }
+        @keyframes fadeScaleDialog {
+            from { transform: scale(0.9); opacity: 0; }
+            to { transform: scale(1); opacity: 1; }
+        }
     `;
     document.head.appendChild(style);
 
@@ -199,7 +211,7 @@ function showConfirm(message, onConfirm, onCancel) {
         max-width: 400px;
         text-align: center;
         box-shadow: 0 20px 60px rgba(0, 0, 0, 0.5);
-        animation: fadeScale 0.2s ease;
+        animation: fadeScaleDialog 0.2s ease;
     `;
 
     const messageEl = document.createElement("p");
@@ -285,6 +297,140 @@ app.registerExtension({
     
     async beforeRegisterNodeDef(nodeType, nodeData, app) {
         if (nodeData.name === "LMStudioNode") {
+            nodeType.prototype._createLogPanel = function() {
+                const host = document.createElement("div");
+                host.style.cssText = `
+                    display: flex;
+                    flex-direction: column;
+                    width: 100%;
+                    min-height: 120px;
+                    max-height: 300px;
+                    background: linear-gradient(145deg, #1a1a2e, #2d1b4e);
+                    border: 2px solid #9333ea;
+                    border-radius: 8px;
+                    overflow: hidden;
+                    margin-top: 8px;
+                `;
+                
+                const header = document.createElement("div");
+                header.style.cssText = `
+                    display: flex;
+                    align-items: center;
+                    justify-content: space-between;
+                    padding: 8px 12px;
+                    background: linear-gradient(90deg, #9333ea, #a855f7);
+                    color: white;
+                    font-weight: 600;
+                    font-size: 13px;
+                `;
+                
+                const titleSpan = document.createElement("span");
+                titleSpan.textContent = $t('logPanelTitle');
+                
+                const clearBtn = document.createElement("button");
+                clearBtn.textContent = $t('clearLog');
+                clearBtn.style.cssText = `
+                    padding: 4px 12px;
+                    background: rgba(255, 255, 255, 0.2);
+                    border: 1px solid rgba(255, 255, 255, 0.3);
+                    border-radius: 4px;
+                    color: white;
+                    font-size: 11px;
+                    cursor: pointer;
+                    transition: all 0.2s ease;
+                `;
+                clearBtn.onmouseover = () => {
+                    clearBtn.style.background = "rgba(255, 255, 255, 0.3)";
+                };
+                clearBtn.onmouseout = () => {
+                    clearBtn.style.background = "rgba(255, 255, 255, 0.2)";
+                };
+                clearBtn.onclick = () => {
+                    if (this._logPanelContent) {
+                        this._logPanelContent.innerHTML = "";
+                        this._logPanelContent.style.display = "none";
+                    }
+                };
+                
+                header.appendChild(titleSpan);
+                header.appendChild(clearBtn);
+                
+                const content = document.createElement("div");
+                content.style.cssText = `
+                    flex: 1;
+                    padding: 10px 12px;
+                    overflow-y: auto;
+                    font-size: 12px;
+                    line-height: 1.6;
+                    color: #e8e8e8;
+                    white-space: pre-wrap;
+                    word-break: break-word;
+                    display: none;
+                `;
+                
+                host.appendChild(header);
+                host.appendChild(content);
+                
+                const domWidget = this.addDOMWidget("lmstudio_log_panel", "div", host, {});
+                domWidget.serialize = false;
+                
+                this._logPanelHost = host;
+                this._logPanelContent = content;
+                this._logPanelHeader = header;
+                
+                this._loadLogPanelConfig();
+            };
+            
+            nodeType.prototype._loadLogPanelConfig = async function() {
+                try {
+                    const response = await fetch("/zhihui/lmstudio/config");
+                    if (response.ok) {
+                        const config = await response.json();
+                        const showLog = config.show_log_panel !== false;
+                        this.lmstudioState.showLogPanel = showLog;
+                        if (this._logPanelHost) {
+                            this._logPanelHost.style.display = showLog ? "flex" : "none";
+                        }
+                    }
+                } catch (e) {
+                    this.lmstudioState.showLogPanel = true;
+                }
+            };
+            
+            nodeType.prototype._updateLogPanel = function(logText) {
+                if (!this.lmstudioState?.showLogPanel || !this._logPanelContent) {
+                    return;
+                }
+                
+                this._logPanelContent.style.display = "block";
+                
+                const timestamp = new Date().toLocaleTimeString();
+                const logLine = document.createElement("div");
+                logLine.style.cssText = `
+                    margin-bottom: 6px;
+                    padding-bottom: 6px;
+                    border-bottom: 1px solid rgba(147, 51, 234, 0.3);
+                `;
+                
+                const timeSpan = document.createElement("span");
+                timeSpan.style.cssText = `
+                    color: #c084fc;
+                    font-weight: 600;
+                    margin-right: 8px;
+                `;
+                timeSpan.textContent = `[${timestamp}]`;
+                
+                const textSpan = document.createElement("span");
+                textSpan.style.cssText = `color: #e8e8e8;`;
+                textSpan.textContent = logText;
+                
+                logLine.appendChild(timeSpan);
+                logLine.appendChild(textSpan);
+                
+                this._logPanelContent.appendChild(logLine);
+                this._logPanelContent.scrollTop = this._logPanelContent.scrollHeight;
+            };
+            
             const onNodeCreated = nodeType.prototype.onNodeCreated;
             
             nodeType.prototype.onNodeCreated = function() {
@@ -292,7 +438,8 @@ app.registerExtension({
                 
                 if (!this.lmstudioState) {
                     this.lmstudioState = {
-                        lastParamPreset: "Ignore"
+                        lastParamPreset: "Ignore",
+                        showLogPanel: true
                     };
                 }
                 
@@ -301,7 +448,21 @@ app.registerExtension({
                 });
                 settingsBtn.serialize = false;
                 
+                this._createLogPanel();
+                
                 return result;
+            };
+            
+            const onExecuted = nodeType.prototype.onExecuted;
+            nodeType.prototype.onExecuted = function(message) {
+                onExecuted?.apply(this, arguments);
+                
+                if (message?.log_info && this._logPanelContent) {
+                    const logText = message.log_info[0];
+                    if (logText && logText.trim()) {
+                        this._updateLogPanel(logText);
+                    }
+                }
             };
         }
     }
@@ -743,6 +904,48 @@ function showLMStudioSettings(node) {
                 color: #fbbf24;
                 font-weight: 600;
             }
+            #${uniqueId} .log-panel-section {
+                margin-top: 16px;
+                padding: 12px 16px;
+                background: linear-gradient(145deg, #1a202c, #2d3748);
+                border: 1px solid rgba(255, 255, 255, 0.1);
+                border-radius: 8px;
+            }
+            #${uniqueId} .log-panel-title {
+                margin: 0 0 8px 0;
+                font-size: 14px;
+                font-weight: 600;
+                color: #ffffff;
+                display: flex;
+                align-items: center;
+                gap: 6px;
+            }
+            #${uniqueId} .log-panel-row {
+                display: flex;
+                align-items: center;
+                gap: 12px;
+            }
+            #${uniqueId} .log-panel-checkbox {
+                display: flex;
+                align-items: center;
+                gap: 8px;
+                cursor: pointer;
+            }
+            #${uniqueId} .log-panel-checkbox input[type="checkbox"] {
+                width: 18px;
+                height: 18px;
+                cursor: pointer;
+                accent-color: #e94560;
+            }
+            #${uniqueId} .log-panel-checkbox-label {
+                font-size: 13px;
+                color: #e8e8e8;
+            }
+            #${uniqueId} .log-panel-hint {
+                font-size: 12px;
+                color: #9ca3af;
+                flex: 1;
+            }
             #${uniqueId} .timeout-apply-btn {
                 width: 100%;
                 padding: 10px 16px;
@@ -947,7 +1150,7 @@ function showLMStudioSettings(node) {
                         </div>
                         <div class="timeout-item">
                             <label class="timeout-label">${$t('apiCallTimeout')}</label>
-                            <input type="number" class="timeout-input" id="lmstudio-timeout-api" min="10" max="600" step="10" value="120">
+                            <input type="number" class="timeout-input" id="lmstudio-timeout-api" min="10" max="600" step="10" value="450">
                             <span class="timeout-unit">${$t('seconds')}</span>
                         </div>
                         <div class="timeout-item">
@@ -977,6 +1180,19 @@ function showLMStudioSettings(node) {
                         <span class="hint-prefix">${$t('newVersionHintPrefix')}</span>
                         <span class="hint-options">${$t('newVersionHintOptions')}</span>
                     </span>
+                </div>
+            </div>
+            <div class="log-panel-section">
+                <h4 class="log-panel-title">
+                    <span>📝</span>
+                    <span>${$t('showLogPanel')}</span>
+                </h4>
+                <div class="log-panel-row">
+                    <label class="log-panel-checkbox">
+                        <input type="checkbox" id="lmstudio-show-log-panel" checked>
+                        <span class="log-panel-checkbox-label">${$t('showLogPanel')}</span>
+                    </label>
+                    <span class="log-panel-hint">${$t('showLogPanelDesc')}</span>
                 </div>
             </div>
             <div class="save-section">
@@ -1151,6 +1367,7 @@ function showLMStudioSettings(node) {
     const timeoutUnloadInput = dialog.querySelector("#lmstudio-timeout-unload");
     const promptVersionSelect = dialog.querySelector("#lmstudio-prompt-version");
     let originalPromptVersion = "new";
+    const showLogPanelCheckbox = dialog.querySelector("#lmstudio-show-log-panel");
     
     const loadConfig = async () => {
         try {
@@ -1163,7 +1380,7 @@ function showLMStudioSettings(node) {
                 
                 const timeouts = config.timeouts || {};
                 timeoutFetchInput.value = timeouts.fetch_models || 5;
-                timeoutApiInput.value = timeouts.api_call || 120;
+                timeoutApiInput.value = timeouts.api_call || 450;
                 timeoutListInput.value = timeouts.unload_model_list || 10;
                 timeoutUnloadInput.value = timeouts.unload_model || 30;
                 
@@ -1172,15 +1389,21 @@ function showLMStudioSettings(node) {
                 originalPromptVersion = promptVersion;
                 updatePromptVersionHint();
                 
+                const showLogPanel = config.show_log_panel !== false;
+                showLogPanelCheckbox.checked = showLogPanel;
+                node.lmstudioState.showLogPanel = showLogPanel;
+                
                 updatePresetDisplay();
             }
         } catch (e) {
             presetSelect.value = "Ignore";
             timeoutFetchInput.value = 5;
-            timeoutApiInput.value = 120;
+            timeoutApiInput.value = 450;
             timeoutListInput.value = 10;
             timeoutUnloadInput.value = 30;
             promptVersionSelect.value = "new";
+            showLogPanelCheckbox.checked = true;
+            node.lmstudioState.showLogPanel = true;
             updatePromptVersionHint();
             updatePresetDisplay();
         }
@@ -1273,10 +1496,12 @@ function showLMStudioSettings(node) {
     
     saveAllBtn.onclick = async () => {
         const selectedPreset = presetSelect.value;
+        const showLogPanel = showLogPanelCheckbox.checked;
 
         const config = {
             preset: selectedPreset,
             prompt_version: promptVersionSelect.value,
+            show_log_panel: showLogPanel,
             timeouts: {
                 fetch_models: parseInt(timeoutFetchInput.value),
                 api_call: parseInt(timeoutApiInput.value),
@@ -1293,6 +1518,11 @@ function showLMStudioSettings(node) {
             });
 
             if (response.ok) {
+                node.lmstudioState.showLogPanel = showLogPanel;
+                if (node._logPanelHost) {
+                    node._logPanelHost.style.display = showLogPanel ? "flex" : "none";
+                }
+                
                 let appliedCount = 0;
                 if (selectedPreset !== "Ignore") {
                     appliedCount = applyPresetToNode(selectedPreset);
@@ -1326,20 +1556,26 @@ function showLMStudioSettings(node) {
                 node.lmstudioState.lastParamPreset = "Ignore";
 
                 timeoutFetchInput.value = 5;
-                timeoutApiInput.value = 120;
+                timeoutApiInput.value = 450;
                 timeoutListInput.value = 10;
                 timeoutUnloadInput.value = 30;
                 promptVersionSelect.value = "new";
                 originalPromptVersion = "new";
+                showLogPanelCheckbox.checked = true;
+                node.lmstudioState.showLogPanel = true;
+                if (node._logPanelHost) {
+                    node._logPanelHost.style.display = "flex";
+                }
 
                 updatePresetDisplay();
 
                 const config = {
                     preset: "Ignore",
                     prompt_version: "new",
+                    show_log_panel: true,
                     timeouts: {
                         fetch_models: 5,
-                        api_call: 120,
+                        api_call: 450,
                         unload_model_list: 10,
                         unload_model: 30
                     }
