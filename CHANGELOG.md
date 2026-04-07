@@ -2,11 +2,13 @@
 
 ## 1.0.22 2026-4-7
 - LM工作室节点(LMStudio): 
+  - 新增提示词风格（结构化JSON）
   - 删除视频处理功能（LM Studio客户端不支持视频处理）
   - 新增日志面板显示推理日志信息
   - 增加API调用超时时间至450秒
     <br>
 - LMStudio node: 
+  - Added prompt style (Structured JSON)
   - Removed video processing features as LM Studio does not support video processing.
   - Added log panel to display inference log information
   - Increased API call timeout to 450 seconds
