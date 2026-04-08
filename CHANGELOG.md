@@ -1,5 +1,10 @@
 # 更新日志
 
+## 1.0.23 2026-4-8
+- LM工作室节点(LMStudio):优化界面UI
+    <br>
+- LMStudio node: Optimized UI design.
+
 ## 1.0.22 2026-4-7
 - LM工作室节点(LMStudio): 
   - 新增提示词风格（结构化JSON）

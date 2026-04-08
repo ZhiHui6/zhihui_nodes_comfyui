@@ -10,7 +10,7 @@ const i18n = {
         connected: "已连接",
         disconnected: "未连接",
         corsNotice: "⚠️ CORS 配置提示",
-        corsWarning: "检测到跨域问题，请确保 LM Studio 服务器已启用 CORS 支持",
+        corsWarning: "如检测到跨域问题，请确保 LM Studio 服务器已启用 CORS 支持。解决方法：打开 LM Studio → 进入 Developer → 选择 Local Server → 找到 Server Settings 选项卡 → 启用 \"Enable CORS\" 选项，然后重启服务器。",
         howToEnable: "如何启用 CORS",
         availableModels: "可用模型列表",
         refresh: "🔄 刷新",
@@ -63,7 +63,8 @@ const i18n = {
         topK: "Top K",
         repetition: "Repetition",
         seed: "Seed",
-        showLogPanel: "显示日志信息栏",
+        showLogPanel: "日志信息栏管理",
+        enableLogPanel: "开启日志信息栏",
         showLogPanelDesc: "在节点底部显示推理日志信息，包含模型、参数、耗时等详细信息",
         logPanelTitle: "📋 推理日志",
         clearLog: "清屏"
@@ -75,7 +76,7 @@ const i18n = {
         connected: "Connected",
         disconnected: "Disconnected",
         corsNotice: "⚠️ CORS Configuration Notice",
-        corsWarning: "Cross-origin issue detected. Please ensure LM Studio server has CORS support enabled",
+        corsWarning: "If cross-origin issue detected, please ensure LM Studio server has CORS support enabled. Solution: Open LM Studio → Go to Developer → Select Local Server → Find Server Settings tab → Enable \"Enable CORS\" option, then restart the server.",
         howToEnable: "How to Enable CORS",
         availableModels: "Available Models",
         refresh: "🔄 Refresh",
@@ -128,7 +129,8 @@ const i18n = {
         topK: "Top K",
         repetition: "Repetition",
         seed: "Seed",
-        showLogPanel: "Show Log Panel",
+        showLogPanel: "Log Panel Management",
+        enableLogPanel: "Enable Log Panel",
         showLogPanelDesc: "Display inference log information at the bottom of the node, including model, parameters, duration, etc.",
         logPanelTitle: "📋 Inference Log",
         clearLog: "Clear"
@@ -305,8 +307,7 @@ app.registerExtension({
                     width: 100%;
                     min-height: 120px;
                     max-height: 300px;
-                    background: linear-gradient(145deg, #1a1a2e, #2d1b4e);
-                    border: 2px solid #9333ea;
+                    background: linear-gradient(145deg, #1a1a2e, #1e2a3e);
                     border-radius: 8px;
                     overflow: hidden;
                     margin-top: 8px;
@@ -317,11 +318,11 @@ app.registerExtension({
                     display: flex;
                     align-items: center;
                     justify-content: space-between;
-                    padding: 8px 12px;
-                    background: linear-gradient(90deg, #9333ea, #a855f7);
+                    padding: 2px 12px;
+                    background: linear-gradient(90deg, #4a6fa5, #5a8fc5);
                     color: white;
-                    font-weight: 600;
-                    font-size: 13px;
+                    font-weight: 400;
+                    font-size: 11px;
                 `;
                 
                 const titleSpan = document.createElement("span");
@@ -330,12 +331,13 @@ app.registerExtension({
                 const clearBtn = document.createElement("button");
                 clearBtn.textContent = $t('clearLog');
                 clearBtn.style.cssText = `
-                    padding: 4px 12px;
+                    padding: 1px 6px;
                     background: rgba(255, 255, 255, 0.2);
                     border: 1px solid rgba(255, 255, 255, 0.3);
-                    border-radius: 4px;
+                    border-radius: 3px;
                     color: white;
-                    font-size: 11px;
+                    font-size: 9px;
+                    font-weight: 400;
                     cursor: pointer;
                     transition: all 0.2s ease;
                 `;
@@ -935,7 +937,7 @@ function showLMStudioSettings(node) {
                 width: 18px;
                 height: 18px;
                 cursor: pointer;
-                accent-color: #e94560;
+                accent-color: #4a6fa5;
             }
             #${uniqueId} .log-panel-checkbox-label {
                 font-size: 13px;
@@ -1055,24 +1057,30 @@ function showLMStudioSettings(node) {
             }
             #${uniqueId} .cors-notice {
                 margin-top: 12px;
-                padding: 12px 16px;
+                padding: 6px 16px;
                 background: linear-gradient(145deg, #1e3a5f, #2d4a6f);
                 border: 1px solid rgba(102, 126, 234, 0.3);
                 border-radius: 8px;
             }
+            #${uniqueId} .cors-notice h5 {
+                margin: 0;
+            }
+            #${uniqueId} .cors-notice p {
+                margin: 0;
+            }
             #${uniqueId} .cors-notice-title {
-                font-size: 14px;
+                font-size: 13px;
                 font-weight: 600;
                 color: #60a5fa;
-                margin: 0 0 4px 0;
+                margin: 0 0 1px 0;
                 display: flex;
                 align-items: center;
-                gap: 6px;
+                gap: 4px;
             }
             #${uniqueId} .cors-notice-content {
                 font-size: 12px;
                 color: #cbd5e1;
-                line-height: 1.1;
+                line-height: 1.2;
                 margin: 0;
             }
             #${uniqueId} .cors-notice-content strong {
@@ -1190,7 +1198,7 @@ function showLMStudioSettings(node) {
                 <div class="log-panel-row">
                     <label class="log-panel-checkbox">
                         <input type="checkbox" id="lmstudio-show-log-panel" checked>
-                        <span class="log-panel-checkbox-label">${$t('showLogPanel')}</span>
+                        <span class="log-panel-checkbox-label">${$t('enableLogPanel')}</span>
                     </label>
                     <span class="log-panel-hint">${$t('showLogPanelDesc')}</span>
                 </div>
