@@ -319,6 +319,24 @@ class LMStudioNode:
                         "tooltip": "Optional image (B,H,W,C float32). Requires a vision-capable model.",
                     },
                 ),
+                "image_2": (
+                    "IMAGE",
+                    {
+                        "tooltip": "Optional second image for multi-image inference.",
+                    },
+                ),
+                "image_3": (
+                    "IMAGE",
+                    {
+                        "tooltip": "Optional third image for multi-image inference.",
+                    },
+                ),
+                "image_4": (
+                    "IMAGE",
+                    {
+                        "tooltip": "Optional fourth image for multi-image inference.",
+                    },
+                ),
             },
         }
 
@@ -637,6 +655,9 @@ class LMStudioNode:
         skip_exists: bool,
         remove_think_tags: bool = False,
         image=None,
+        image_2=None,
+        image_3=None,
+        image_4=None,
     ):
         _maybe_refresh(endpoint)
         start_time = time.time()
@@ -662,14 +683,14 @@ class LMStudioNode:
         effective_system_prompt = system_prompt if preset_prompt == "Ignore" else ""
 
         if not batch_mode:
-            image_count = 0
-            if image is not None:
-                if len(image.shape) == 4:
-                    image_count = image.shape[0]
-                else:
-                    image_count = 1
+            all_images = []
+            for img in [image, image_2, image_3, image_4]:
+                if img is not None:
+                    all_images.append(img)
+            
+            image_count = len(all_images)
 
-            if image is None:
+            if image_count == 0:
                 messages = []
                 if effective_system_prompt.strip():
                     messages.append(
@@ -734,21 +755,23 @@ class LMStudioNode:
                         "", endpoint, unload_model, remove_think_tags, log_info
                     )
 
-            if len(image.shape) == 4 and image.shape[0] > 0:
-                image_tensor = image[0:1]
-            else:
-                image_tensor = image
-
-            b64 = self._tensor_to_base64(
-                image_tensor, size_limitation if size_limitation > 0 else None
-            )
-            user_content = [
-                {
+            user_content = []
+            
+            for img in all_images:
+                if len(img.shape) == 4 and img.shape[0] > 0:
+                    image_tensor = img[0:1]
+                else:
+                    image_tensor = img
+                
+                b64 = self._tensor_to_base64(
+                    image_tensor, size_limitation if size_limitation > 0 else None
+                )
+                user_content.append({
                     "type": "image_url",
                     "image_url": {"url": f"data:image/png;base64,{b64}"},
-                },
-                {"type": "text", "text": full_user_text},
-            ]
+                })
+            
+            user_content.append({"type": "text", "text": full_user_text})
 
             messages = []
             if effective_system_prompt.strip():
