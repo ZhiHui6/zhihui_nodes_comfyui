@@ -2,8 +2,10 @@
 
 ## 1.0.23 2026-4-8
 - LM工作室节点(LMStudio):优化界面UI
+- 增加模型刷新功能并优化日志面板显示
     <br>
 - LMStudio node: Optimized UI design.
+- Added model refresh button and optimized log panel display.
 
 ## 1.0.22 2026-4-7
 - LM工作室节点(LMStudio): 

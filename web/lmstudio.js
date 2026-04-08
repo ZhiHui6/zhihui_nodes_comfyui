@@ -67,7 +67,11 @@ const i18n = {
         enableLogPanel: "开启日志信息栏",
         showLogPanelDesc: "在节点底部显示推理日志信息，包含模型、参数、耗时等详细信息",
         logPanelTitle: "📋 推理日志",
-        clearLog: "清屏"
+        clearLog: "清屏",
+        refreshModels: "🔄 刷新模型",
+        refreshModelsSuccess: "模型列表已刷新",
+        refreshModelsFailed: "获取模型列表失败",
+        noModelsFound: "未找到模型"
     },
     en: {
         title: "🤖 LM Studio Status Settings",
@@ -133,7 +137,11 @@ const i18n = {
         enableLogPanel: "Enable Log Panel",
         showLogPanelDesc: "Display inference log information at the bottom of the node, including model, parameters, duration, etc.",
         logPanelTitle: "📋 Inference Log",
-        clearLog: "Clear"
+        clearLog: "Clear",
+        refreshModels: "🔄 Refresh Models",
+        refreshModelsSuccess: "Model list refreshed",
+        refreshModelsFailed: "Failed to fetch model list",
+        noModelsFound: "No models found"
     }
 };
 
@@ -405,32 +413,28 @@ app.registerExtension({
                 }
                 
                 this._logPanelContent.style.display = "block";
+                this._logPanelContent.innerHTML = "";
                 
                 const timestamp = new Date().toLocaleTimeString();
-                const logLine = document.createElement("div");
-                logLine.style.cssText = `
-                    margin-bottom: 6px;
-                    padding-bottom: 6px;
-                    border-bottom: 1px solid rgba(147, 51, 234, 0.3);
-                `;
                 
-                const timeSpan = document.createElement("span");
-                timeSpan.style.cssText = `
-                    color: #c084fc;
+                const timeLine = document.createElement("div");
+                timeLine.style.cssText = `
+                    color: #60a5fa;
                     font-weight: 600;
-                    margin-right: 8px;
+                    margin-bottom: 4px;
                 `;
-                timeSpan.textContent = `[${timestamp}]`;
+                timeLine.textContent = `[${timestamp}]`;
                 
-                const textSpan = document.createElement("span");
-                textSpan.style.cssText = `color: #e8e8e8;`;
-                textSpan.textContent = logText;
+                const textLine = document.createElement("div");
+                textLine.style.cssText = `
+                    color: #e8e8e8;
+                    white-space: pre-wrap;
+                    word-break: break-word;
+                `;
+                textLine.textContent = logText;
                 
-                logLine.appendChild(timeSpan);
-                logLine.appendChild(textSpan);
-                
-                this._logPanelContent.appendChild(logLine);
-                this._logPanelContent.scrollTop = this._logPanelContent.scrollHeight;
+                this._logPanelContent.appendChild(timeLine);
+                this._logPanelContent.appendChild(textLine);
             };
             
             const onNodeCreated = nodeType.prototype.onNodeCreated;
@@ -445,6 +449,11 @@ app.registerExtension({
                     };
                 }
                 
+                const refreshModelsBtn = this.addWidget("button", "🔄 刷新模型 / Refresh Models", null, async () => {
+                    await this._refreshModelsList();
+                });
+                refreshModelsBtn.serialize = false;
+                
                 const settingsBtn = this.addWidget("button", "⚙️状态设置 / Status", null, () => {
                     showLMStudioSettings(this);
                 });
@@ -453,6 +462,49 @@ app.registerExtension({
                 this._createLogPanel();
                 
                 return result;
+            };
+            
+            nodeType.prototype._refreshModelsList = async function() {
+                const endpointWidget = this.widgets?.find(w => w.name === "endpoint");
+                const modelWidget = this.widgets?.find(w => w.name === "model");
+                
+                if (!endpointWidget || !modelWidget) {
+                    showToast($t('refreshModelsFailed'), "error");
+                    return;
+                }
+                
+                const endpoint = endpointWidget.value || "http://localhost:1234";
+                const base = endpoint.replace(/\/+$/, "").replace(/\/v1$/, "");
+                
+                let models = [];
+                
+                try {
+                    const response = await fetch(base + "/v1/models");
+                    if (response.ok) {
+                        const data = await response.json();
+                        models = data.data?.map(m => m.id) || [];
+                    }
+                } catch (e) {
+                    try {
+                        const response = await fetch(base + "/api/v1/models");
+                        if (response.ok) {
+                            const data = await response.json();
+                            models = data.models?.map(m => m.key) || [];
+                        }
+                    } catch (e2) {
+                        models = [];
+                    }
+                }
+                
+                if (models.length > 0) {
+                    modelWidget.options.values = models;
+                    modelWidget.value = models[0];
+                    showToast($t('refreshModelsSuccess'), "success");
+                } else {
+                    modelWidget.options.values = [$t('noModelsFound')];
+                    modelWidget.value = $t('noModelsFound');
+                    showToast($t('refreshModelsFailed'), "error");
+                }
             };
             
             const onExecuted = nodeType.prototype.onExecuted;

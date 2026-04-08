@@ -579,16 +579,6 @@ class LMStudioNode:
 
         log_lines = []
         log_lines.append(f"🤖 模型: {model}")
-        log_lines.append(f"🌐 端点: {endpoint}")
-        log_lines.append(f"📝 预设提示词: {preset_prompt}")
-        log_lines.append(f"🌍 输出语言: {output_language}")
-        log_lines.append(f"📊 Max Tokens: {max_tokens}")
-        log_lines.append(f"🌡️ Temperature: {temperature}")
-        log_lines.append(f"🎯 Top P: {top_p}")
-        log_lines.append(f"🔢 Top K: {top_k}")
-        log_lines.append(f"🔄 Repetition Penalty: {repetition_penalty}")
-        log_lines.append(f"🎲 Seed: {seed}")
-        log_lines.append(f"📐 尺寸限制: {size_limitation if size_limitation > 0 else '无限制'}")
         
         if batch_mode:
             log_lines.append(f"📦 批处理模式: 启用")

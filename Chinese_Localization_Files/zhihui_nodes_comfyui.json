@@ -231,5 +231,6 @@
     "time_count": "按时间（逐个时间）",
     "time_interval": "按时间（间隔时间）",
     "seconds":"秒",
-    "minutes":"分钟"
+    "minutes":"分钟",
+    "Prompt Style - Structured JSON":"结构化JSON提示"
 }
