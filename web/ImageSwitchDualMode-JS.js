@@ -11,12 +11,6 @@ app.registerExtension({
 
             this._type = "IMAGE";
             this.properties = this.properties || {};
-            const nodeName = nodeData?.name || "ImageSwitchDualMode";
-            const today = new Date().toISOString().slice(0, 10);
-            this._noticeStorageKey = `zhihui_nodes_unconnected_notice_disabled_${nodeName}_${today}`;
-            this._unconnectedNoticeDisabled = !!window.localStorage.getItem(this._noticeStorageKey);
-            this._noticeOpen = false;
-            this._noticeDismissMs = 12000;
 
             this._noteStorageKey = () => {
                 try { return `zh_imageswitch_notes_${this.id || 'unknown'}`; } catch(_) { return 'zh_imageswitch_notes_unknown'; }
@@ -50,28 +44,8 @@ app.registerExtension({
                 } catch(_){}
             };
             const inputcountWidget = this.widgets?.find(w => w.name === "inputcount");
-            if (inputcountWidget) {
-                const saved = this.properties?.zh_imageswitch;
-                if (saved && typeof saved.count !== "undefined") {
-                    inputcountWidget.value = String(saved.count);
-                }
-                const originalCallback = inputcountWidget.callback;
-                inputcountWidget.callback = (value) => {
-                    if (originalCallback) originalCallback.call(this, value);
-                    this.updateInputs(value);
-                    this.updateSelectOptions(value);
-                    this.syncCommentWidgets(value);
-                    this.saveNoteValues();
-                };
-            }
 
-            this.addWidget("button", "Update inputs", null, () => {
-                const n = this.widgets.find(w => w.name === "inputcount").value;
-                this.updateInputs(n);
-                this.updateSelectOptions(n);
-                this.syncCommentWidgets(n);
-                this.saveNoteValues();
-            });
+
 
             this.updateInputs = function (n) {
                 if (!this.inputs) this.inputs = [];
@@ -99,44 +73,42 @@ app.registerExtension({
                 }
                 this.size = this.computeSize(this.size);
                 app.graph.setDirtyCanvas(true, true);
+            };
 
-                // 检查所有未连接端口（而非仅新增端口）
-                const allUnconnected = (this.inputs || [])
-                    .filter(i => isImage(i.name) && (i.link == null || i.link === undefined))
-                    .map(i => i.name);
-                if (allUnconnected.length) this.showUnconnectedNotice(allUnconnected, "图像端口");
+            this.getConnectedImageInputs = function () {
+                const connected = [];
+                if (!this.inputs) return connected;
+                for (const input of this.inputs) {
+                    if (/^image\d+$/.test(input.name) && input.link != null && input.link !== undefined) {
+                        const num = parseInt(input.name.replace("image", ""));
+                        connected.push(num);
+                    }
+                }
+                return connected.sort((a, b) => a - b);
             };
 
             this.updateSelectOptions = function (n) {
                 const w = this.widgets?.find(w => w.name === "select_image");
                 if (!w) return;
-                const opts = Array.from({ length: Math.max(1, parseInt(n) || 1) }, (_, i) => String(i + 1));
+                const modeWidget = this.widgets?.find(w => w.name === "mode");
+                const isManual = modeWidget?.value === "manual";
+                let opts;
+                if (isManual) {
+                    const connected = this.getConnectedImageInputs();
+                    opts = connected.length > 0 ? connected.map(String) : ["1"];
+                } else {
+                    opts = Array.from({ length: Math.max(1, parseInt(n) || 1) }, (_, i) => String(i + 1));
+                }
                 if (Array.isArray(w.options)) w.options = opts; else if (w.options && typeof w.options === "object") w.options.values = opts; else w.options = opts;
                 const v = parseInt(w.value);
-                w.value = !v || v < 1 || v > opts.length ? "1" : String(v);
-                this.size = this.computeSize(this.size);
-                app.graph.setDirtyCanvas(true, true);
-            };
-
-            this.repositionSelectImage = function(currentMode) {
-                const widgets = this.widgets || [];
-                const selIdx = widgets.findIndex(w => w && w.name === "select_image");
-                const modeIdx = widgets.findIndex(w => w && w.name === "mode");
-                if (selIdx < 0 || modeIdx < 0) return;
-                const sel = widgets[selIdx];
-                const hide = currentMode === "auto";
-                sel.hidden = hide;
-                if (hide) {
-                    widgets.splice(selIdx, 1);
-                    widgets.push(sel);
-                } else {
-                    widgets.splice(selIdx, 1);
-                    const insertPos = widgets.findIndex(w => w && w.name === "mode");
-                    widgets.splice(insertPos + 1, 0, sel);
+                if (!v || !opts.includes(String(v))) {
+                    w.value = opts[0] || "1";
                 }
                 this.size = this.computeSize(this.size);
                 app.graph.setDirtyCanvas(true, true);
             };
+
+
 
             this.syncCommentWidgets = function (n) {
                 const target = Math.max(1, parseInt(n) || 1);
@@ -181,80 +153,68 @@ app.registerExtension({
             };
 
             if (inputcountWidget) {
-                const v = inputcountWidget.value;
+                const self = this;
+                const handleInputChange = () => {
+                    const n = parseInt(inputcountWidget.value) || 1;
+                    self.updateInputs(n);
+                    self.updateSelectOptions(n);
+                    self.syncCommentWidgets(n);
+                    self.saveNoteValues();
+                };
+                const originalCallback = inputcountWidget.callback;
+                inputcountWidget.callback = function(value) {
+                    if (originalCallback) originalCallback.call(this, value);
+                    handleInputChange();
+                };
+                const originalMouseUp = inputcountWidget.mouseUp;
+                inputcountWidget.mouseUp = function(e, pos, node) {
+                    const result = originalMouseUp ? originalMouseUp.call(this, e, pos, node) : undefined;
+                    handleInputChange();
+                    return result;
+                };
+                const originalOnKeyDown = inputcountWidget.onKeyDown;
+                inputcountWidget.onKeyDown = function(e) {
+                    const result = originalOnKeyDown ? originalOnKeyDown.call(this, e) : undefined;
+                    if (e.keyCode === 13) {
+                        handleInputChange();
+                    }
+                    return result;
+                };
+                let saved = null;
+                try { const raw = window.localStorage.getItem(this._noteStorageKey()); if (raw) saved = JSON.parse(raw); } catch(_){}
+                if (!saved) saved = this.properties?.zh_imageswitch;
+                if (saved && typeof saved.count !== "undefined") {
+                    inputcountWidget.value = saved.count;
+                }
+                const v = parseInt(inputcountWidget.value) || 1;
                 this.updateInputs(v);
                 this.updateSelectOptions(v);
                 this.syncCommentWidgets(v);
                 this.restoreNoteValues();
             }
 
-            this.showUnconnectedNotice = function(names, label) {
-                try {
-                    if (this._unconnectedNoticeDisabled || this._noticeOpen) return;
-                    this._noticeOpen = true;
-                    const overlay = document.createElement("div");
-                    overlay.style.cssText = `position: fixed;left:0;top:0;width:100%;height:100%;background: rgba(0,0,0,0.45);z-index: 9999;`;
-                    const dialog = document.createElement("div");
-                    dialog.style.cssText = `position: fixed;left:50%;top:50%;transform: translate(-50%,-50%);width: 520px;background: var(--comfy-menu-bg);border: 2px solid #4488ff;border-radius:8px;padding:16px;color: var(--input-text);z-index:10000;box-shadow:0 4px 20px rgba(0,0,0,0.3);`;
-                    dialog.innerHTML = `
-                        <h3 style="margin:0 0 10px 0;text-align:center;color:var(--input-text);">未连接端口</h3>
-                        <div style="font-size:13px;color:var(--descrip-text);margin-bottom:12px;">以下${label}当前未连接：</div>
-                        <div style="display:flex;flex-wrap:wrap;gap:6px;margin-bottom:12px;">
-                            ${names.map(n => `<span style=\"padding:4px 8px;border:1px solid var(--border-color);border-radius:4px;background:var(--comfy-input-bg);color:var(--input-text);\">${n}</span>`).join("")}
-                        </div>
-                        <div style="display:flex;justify-content:center;gap:8px;align-items:center;">
-                            <button id="notice-ok" style="background: #4488ff;border: 1px solid #4488ff;color: #ffffff;padding: 4px 10px;border-radius: 4px;cursor: pointer;font-size: 12px;">知道了</button>
-                            <label style="display:flex;align-items:center;gap:6px;font-size:12px;color:var(--input-text);">
-                                <input id="notice-disable" type="checkbox" style="accent-color:#22c55e;">本日内不再提示
-                            </label>
-                        </div>
-                        <div style="text-align:center;margin-top:8px;font-size:12px;">此窗口将自动在 <span id=\"countdown-val\" style=\"font-weight:600;color:#22c55e;\">${(this._noticeDismissMs/1000)|0}</span> 秒后关闭</div>`;
-                    document.body.appendChild(overlay);
-                    document.body.appendChild(dialog);
-                    const close = () => { 
-                        try { document.body.removeChild(dialog); document.body.removeChild(overlay);} catch(e){}
-                        this._noticeOpen = false;
-                        if (intervalId) { clearInterval(intervalId); intervalId = null; }
-                    };
-                    dialog.querySelector('#notice-ok')?.addEventListener('click', close);
-                    overlay.addEventListener('click', close);
-                    const disableEl = dialog.querySelector('#notice-disable');
-                    disableEl?.addEventListener('change', (e) => {
-                        if (e.target.checked) {
-                            try { window.localStorage.setItem(this._noticeStorageKey, '1'); } catch(err){}
-                            this._unconnectedNoticeDisabled = true;
-                        }
-                    });
-                    const countdownEl = dialog.querySelector('#countdown-val');
-                    let remaining = this._noticeDismissMs;
-                    const colorFor = (ms) => {
-                        const s = Math.ceil(ms/1000);
-                        if (s > 4) return '#22c55e';
-                        if (s > 2) return '#f59e0b';
-                        return '#ef4444';
-                    };
-                    let intervalId = setInterval(() => {
-                        remaining -= 1000;
-                        if (countdownEl) {
-                            countdownEl.textContent = String(Math.max(0, Math.ceil(remaining/1000)));
-                            countdownEl.style.color = colorFor(remaining);
-                        }
-                        if (remaining <= 0) close();
-                    }, 1000);
-                    setTimeout(close, this._noticeDismissMs);
-                } catch(e) { console.warn('showUnconnectedNotice failed', e); }
-            };
-
             const modeWidget = this.widgets?.find(w => w.name === "mode");
-            const selectWidget = this.widgets?.find(w => w.name === "select_image");
-            if (modeWidget && selectWidget) {
+            if (modeWidget) {
+                const self = this;
                 const originalModeCallback = modeWidget.callback;
-                modeWidget.callback = (value) => {
+                modeWidget.callback = function(value) {
                     if (originalModeCallback) originalModeCallback.call(this, value);
-                    this.repositionSelectImage(modeWidget.value);
+                    const inputcountW = self.widgets?.find(w => w.name === "inputcount");
+                    const n = parseInt(inputcountW?.value) || 1;
+                    self.updateSelectOptions(n);
                 };
-                this.repositionSelectImage(modeWidget.value);
             }
+
+            const onConnectionsChange = this.onConnectionsChange;
+            this.onConnectionsChange = function (type, slot, connected, link_info) {
+                const result = onConnectionsChange ? onConnectionsChange.apply(this, arguments) : undefined;
+                if (type === 1) {
+                    const inputcountW = this.widgets?.find(w => w.name === "inputcount");
+                    const n = parseInt(inputcountW?.value) || 1;
+                    this.updateSelectOptions(n);
+                }
+                return result;
+            };
 
             const configure = nodeType.prototype.configure;
             nodeType.prototype.configure = function () {
@@ -272,14 +232,14 @@ app.registerExtension({
                     if (!saved) saved = this.properties?.zh_imageswitch;
                     if (saved && typeof saved.count !== "undefined") {
                         const inputcountWidget = this.widgets?.find(w => w.name === "inputcount");
-                        if (inputcountWidget) inputcountWidget.value = String(saved.count);
+                        if (inputcountWidget) inputcountWidget.value = saved.count;
                         const n = parseInt(saved.count) || 1;
                         this.updateInputs(n);
                         this.updateSelectOptions(n);
                         this.syncCommentWidgets(n);
                         this.restoreNoteValues();
                     }
-                } catch(_){}
+                } catch (_) {}
                 return r3;
             };
 

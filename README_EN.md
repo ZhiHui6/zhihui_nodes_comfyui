@@ -17,9 +17,9 @@ Provides dedicated Chinese localization files, which can be used with the ComfyU
 
 ### **Core Functionality Features**
 
-- 🔄 **Multi-Engine Translation Nodes**: Integrates 5 major translation engines including Baidu, Tencent, Youdao, Google, and free online services, supporting mutual translation between Chinese, English, Japanese, Korean, and other languages, with automatic input language detection and one-click optimal engine switching.
+- 🔄 **Multi-Engine Translation Nodes**: Integrates 5 major translation platforms including Baidu, Tencent, Youdao, Google, and free online services, supporting Chinese-English mutual translation with automatic input language detection and flexible platform switching.
 
-- 📝 **Comprehensive Text Processing**: Provides 5 types of text operation nodes including multi-line text editing, text merging and separation, content extraction and modification, and language filtering.
+- 📝 **Comprehensive Text Processing**: Provides text operation nodes including multi-line text editing, text merging and separation, content extraction and modification, and language filtering.
 
 - 🎯 **Intelligent Prompt System**: Professional prompt generation tools such as Tag Selector, Kontext Presets Plus, Photography Prompt Generator, and WanXiang Video Prompt Generator.
 
@@ -51,7 +51,7 @@ Provides dedicated Chinese localization files, which can be used with the ComfyU
 <tr>
 <td><b>LM Studio Node</b><br><code>LMStudioNode</code></td>
 <td>AI Vision Understanding</td>
-<td>A vision understanding node that connects to a local LM Studio server, supporting image analysis and text generation. Enables private image analysis using locally deployed models without cloud APIs. Supports multiple preset templates and output language control.</td>
+<td>A vision understanding node that connects to a local LM Studio server, supporting image analysis and text generation. Enables private image analysis using locally deployed models without cloud APIs. Supports multiple preset templates, output language control, and multi-image input.</td>
 </tr>
 </table>
 
@@ -921,6 +921,9 @@ A vision understanding node that connects to a local LM Studio server, supportin
 - <b>Multiple Preset Templates</b>: Supports tag backtracking, detailed description, creative writing, and more
 - <b>Output Language Control</b>: Supports Chinese, English, and bilingual output
 - <b>Auto Model Discovery</b>: Automatically fetches loaded model list from LM Studio
+- <b>Model Refresh</b>: One-click refresh button to reload model list when display issues occur
+- <b>Multi-Image Input</b>: Supports up to 4 images for single-round inference
+- <b>Inference Log Panel</b>: Displays real-time inference logs with current run information only
 - <b>Visual Settings</b>: Provides status settings interface for easy parameter configuration
 
 <br>

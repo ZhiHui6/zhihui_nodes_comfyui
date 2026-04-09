@@ -1,5 +1,4 @@
 class LatentSwitchDualMode:
-
     def __init__(self):
         pass
 
@@ -8,15 +7,15 @@ class LatentSwitchDualMode:
         return {
             "required": {
                 "mode": (["manual", "auto"], {"default": "auto"}),
-                "select_channel": ([str(i) for i in range(2, 1024)], {"default": "2"}),
-                "inputcount": ("INT", {"default": 2, "min": 2, "max": 1000, "step": 1}),
-                "Latent_1_comment": ("STRING", {"multiline": False, "default": ""}),
-                "Latent_2_comment": ("STRING", {"multiline": False, "default": ""}),
+                "select_latent": ([str(i) for i in range(1, 1024)], {"default": "1"}),
+                "inputcount": ("INT", {"default": 2, "min": 2, "max": 12, "step": 1}),
+                "latent1_note": ("STRING", {"multiline": False, "default": ""}),
+                "latent2_note": ("STRING", {"multiline": False, "default": ""}),
             },
             "optional": {
-                "Latent_1": ("LATENT", {}),
-                "Latent_2": ("LATENT", {}),
-            }
+                "latent1": ("LATENT", {}),
+                "latent2": ("LATENT", {}),
+            },
         }
 
     RETURN_TYPES = ("LATENT",)
@@ -25,37 +24,46 @@ class LatentSwitchDualMode:
     CATEGORY = "Zhi.AI/Latent"
     DESCRIPTION = "Dynamic Latent Switcher: Switches among a dynamic number of latent inputs. Supports manual mode (select by index) and auto mode (outputs the single non-empty input, errors if multiple). Input count is controlled via 'inputcount', and the UI can update ports accordingly. Newly added inputs are optional."
 
-    def execute(self, mode, select_channel, inputcount, Latent_1=None, Latent_2=None, Latent_1_comment="", Latent_2_comment="", **kwargs):
-        
+    def execute(
+        self,
+        mode,
+        select_latent,
+        inputcount,
+        latent1=None,
+        latent2=None,
+        latent1_note="",
+        latent2_note="",
+        **kwargs,
+    ):
         count = int(inputcount) if inputcount is not None else 2
         count = max(1, count)
         latents = []
         for i in range(1, count + 1):
-            key = f"Latent_{i}"
+            key = f"latent{i}"
             latents.append(kwargs.get(key, locals().get(key, None)))
-        
+
         if mode == "manual":
-            idx = int(select_channel) - 1
+            idx = int(select_latent) - 1
             if idx < 0 or idx >= len(latents):
                 idx = 0
             selected = latents[idx]
-            if selected is None:
-                for lt in latents:
-                    if lt is not None:
-                        return (lt,)
-                return (None,)
-            return (selected,)
+            if selected is not None:
+                return (selected,)
+            for lt in latents:
+                if lt is not None:
+                    return (lt,)
+            return (None,)
 
         valid = [(i + 1, lt) for i, lt in enumerate(latents) if lt is not None]
         if len(valid) == 0:
             return (None,)
         if len(valid) >= 2:
             if len(valid) == 2:
-                ports = f"Latent_{valid[0][0]} and Latent_{valid[1][0]}"
+                ports = f"latent{valid[0][0]} and latent{valid[1][0]}"
             elif len(valid) == 3:
-                ports = f"Latent_{valid[0][0]}, Latent_{valid[1][0]}, Latent_{valid[2][0]}"
+                ports = f"latent{valid[0][0]}, latent{valid[1][0]}, latent{valid[2][0]}"
             else:
-                ports = ", ".join([f"Latent_{n}" for n, _ in valid])
+                ports = ", ".join([f"latent{n}" for n, _ in valid])
             raise ValueError(
                 f"Auto mode error: Detected {ports} with simultaneous inputs.\n"
                 f"Solutions:\n"

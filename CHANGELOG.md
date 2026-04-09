@@ -1,4 +1,15 @@
 # 更新日志
+## 1.0.24 2026-4-9 
+- 优化图像切换器（ImageSwitcherDualMode）、文本切换器（TextSwitchDualMode）、潜在空间切换器（LatentSwitchDualMode）节点：
+  - 输入端口最大数量限制为12个
+  - 删除更新按钮，改为滑块值变化时自动同步端口
+  - 移除所有提示性信息
+    <br>
+- Optimized ImageSwitchDualMode, TextSwitchDualMode, and LatentSwitchDualMode nodes:
+  - Limited maximum input ports to 12
+  - Removed Update button, ports auto-sync on slider value change
+  - Removed all notification messages
+    <br>
 
 ## 1.0.23 2026-4-8
 - LM工作室节点(LMStudio):优化界面UI

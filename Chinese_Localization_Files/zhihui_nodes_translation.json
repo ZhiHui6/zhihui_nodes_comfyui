@@ -119,11 +119,15 @@
     },
     "TextSwitchDualMode": {
         "title": "文本切换器",
-        "description": "动态文本切换器：支持可变数量的文本输入。提供手动模式（按索引选择）与自动模式（仅当唯一非空输入时输出；检测到多个非空将报错）。通过滑块 inputcount 控制端口数量，并通过按钮 Update inputs 根据设定值同步增删端口。select_text 选项与 textN_comment 注释与 inputcount 同步变化，新增的文本输入端口均为非必连。",
+        "description": "动态文本切换器：支持可变数量的文本输入。提供手动模式（按索引选择）与自动模式（仅当唯一非空输入时输出；检测到多个非空将报错）。通过滑块 inputcount 控制端口数量，端口会自动同步变化。手动模式下选择菜单只显示已连接的端口序号。",
+        "inputs": {
+            "text1": "文本1",
+            "text2": "文本2"
+        },
         "widgets": {
-            "inputcount": "输入数量",
             "mode": "模式",
             "select_text": "选择文本",
+            "inputcount": "输入数量",
             "text1_comment": "文本1注释",
             "text2_comment": "文本2注释"
         },
@@ -192,22 +196,17 @@
     },
     "ImageSwitchDualMode": {
         "title": "图像切换器",
-        "description": "动态图像切换器：支持可变数量的图像输入。提供手动模式（按索引选择）与自动模式（仅当唯一非空输入时输出；检测到多个非空将报错）。通过滑块 inputcount 控制端口数量，并通过按钮 Update inputs 根据设定值同步增删端口。select_image 选项与 imageN_note 注释与 inputcount 同步变化，新增的图像输入端口均为非必连。",
+        "description": "动态图像切换器：支持可变数量的图像输入。提供手动模式（按索引选择）与自动模式（仅当唯一非空输入时输出；检测到多个非空将报错）。通过滑块 inputcount 控制端口数量，端口会自动同步变化。手动模式下选择菜单只显示已连接的端口序号。",
         "inputs": {
-            "select_image": "选择图像",
             "image1": "图像1",
-            "image2": "图像2",
-            "image3": "图像3",
-            "image4": "图像4"
+            "image2": "图像2"
         },
         "widgets": {
             "mode": "模式",
             "select_image": "选择图像",
             "inputcount": "输入数量",
             "image1_note": "图像1备注",
-            "image2_note": "图像2备注",
-            "image3_note": "图像3备注",
-            "image4_note": "图像4备注"
+            "image2_note": "图像2备注"
         },
         "outputs": {
             "output_image": "输出图像"
@@ -246,24 +245,20 @@
     },
     "LatentSwitchDualMode": {
         "title": "潜在空间切换器",
-        "description": "动态潜在空间切换器：支持可变数量的潜变量输入。提供手动模式（按索引选择）与自动模式（仅当唯一非空输入时输出；检测到多个非空将报错）。通过滑块 inputcount 控制端口数量，并通过按钮 Update inputs 根据设定值同步增删端口。select_channel 选项与 Latent_N_comment 注释与 inputcount 同步变化，新增的潜变量输入端口均为非必连。",
+        "description": "动态潜在空间切换器：支持可变数量的潜变量输入。提供手动模式（按索引选择）与自动模式（仅当唯一非空输入时输出；检测到多个非空将报错）。通过滑块 inputcount 控制端口数量，端口会自动同步变化。手动模式下选择菜单只显示已连接的端口序号。",
         "inputs": {
-            "mode": "模式",
-            "select_channel": "选择通道",
-            "Latent_1": "潜在空间1",
-            "Latent_2": "潜在空间2",
-            "Latent_3": "潜在空间3"
-        },
-        "outputs": {
-            "output_latent": "输出潜在空间"
+            "latent1": "潜在空间1",
+            "latent2": "潜在空间2"
         },
         "widgets": {
             "mode": "模式",
-            "select_channel": "选择通道",
+            "select_latent": "选择潜在空间",
             "inputcount": "输入数量",
-            "Latent_1_comment": "潜在空间1注释",
-            "Latent_2_comment": "潜在空间2注释",
-            "Latent_3_comment": "潜在空间3注释"
+            "latent1_note": "潜在空间1备注",
+            "latent2_note": "潜在空间2备注"
+        },
+        "outputs": {
+            "output_latent": "输出潜在空间"
         }
     },
     "ColorRemoval": {
