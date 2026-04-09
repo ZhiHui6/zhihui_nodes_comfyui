@@ -2,6 +2,27 @@ import { app } from "../../../scripts/app.js";
 import { ComfyWidgets } from "../../../scripts/widgets.js";
 import { api } from "../../../scripts/api.js";
 
+const i18n = {
+    zh: {
+        syncText: "🔄 同步文本",
+        continueRun: "▶️ 继续运行"
+    },
+    en: {
+        syncText: "🔄 Sync Text",
+        continueRun: "▶️ Continue"
+    }
+};
+
+function getLocale() {
+    const comfyLocale = app?.ui?.settings?.getSettingValue?.('Comfy.Locale');
+    return comfyLocale === 'zh-CN' || comfyLocale === 'zh' ? 'zh' : 'en';
+}
+
+function $t(key) {
+    const locale = getLocale();
+    return i18n[locale][key] || i18n['en'][key] || key;
+}
+
 const postContinue = (nodeId, editedText) => {
     return fetch("/text_editor_continue/continue/" + nodeId, {
         method: "POST",
@@ -165,7 +186,7 @@ app.registerExtension({
                     }
                 }
 
-                this.syncButton = this.addWidget("button", "🔄 同步文本 / Sync Text", "SYNC", async () => {
+                this.syncButton = this.addWidget("button", $t('syncText'), "SYNC", async () => {
                     const data = await fetchState(this.id);
                     if (data && (data.edited_text !== undefined)) {
                         setupEditableWidget.call(this);
@@ -180,7 +201,7 @@ app.registerExtension({
                 });
                 this.syncButton.serialize = false;
 
-                this.continueButton = this.addWidget("button", "▶️ 继续运行 / Continue", "CONTINUE", () => {
+                this.continueButton = this.addWidget("button", $t('continueRun'), "CONTINUE", () => {
                     const editedText = this.editableWidget ? this.editableWidget.value : "";
                     postContinue(this.id, editedText);
                 });

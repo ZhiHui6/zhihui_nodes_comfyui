@@ -1,6 +1,25 @@
 import { app } from "/scripts/app.js";
 import { api } from "/scripts/api.js";
 
+const i18n = {
+    zh: {
+        settings: "⚙️ 设置"
+    },
+    en: {
+        settings: "⚙️ Settings"
+    }
+};
+
+function getLocale() {
+    const comfyLocale = app?.ui?.settings?.getSettingValue?.('Comfy.Locale');
+    return comfyLocale === 'zh-CN' || comfyLocale === 'zh' ? 'zh' : 'en';
+}
+
+function $t(key) {
+    const locale = getLocale();
+    return i18n[locale][key] || i18n['en'][key] || key;
+}
+
 const Utils = {
     formatSpeed(bps) {
         if (!bps || bps <= 0) return "0 MB/s";
@@ -369,9 +388,9 @@ app.registerExtension({
             const onNodeCreated = nodeType.prototype.onNodeCreated;
             nodeType.prototype.onNodeCreated = function() {
                 const r = onNodeCreated ? onNodeCreated.apply(this, arguments) : undefined;
-                const btn = this.addWidget("button", "⚙️设置·Settings", "open_settings", () => { 
+                const btn = this.addWidget("button", $t('settings'), "open_settings", () => { 
                     setTimeout(() => openSettings(this), 0); 
-                }, { label: "⚙️设置·Settings" });
+                }, { label: $t('settings') });
                 btn.serialize = false;
                 
                 const modelWidget = this.widgets?.find((w) => w.name === "model_name");

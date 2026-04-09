@@ -1,6 +1,69 @@
 import { app } from "../../scripts/app.js";
 import { api } from "../../scripts/api.js";
 
+const i18n = {
+    zh: {
+        modelManager: "模型管理",
+        modelsManager: "Florence2 模型管理",
+        downloadSource: "下载源",
+        modelScope: "魔搭社区",
+        huggingFace: "抱抱脸",
+        useChinaMirror: "使用中国镜像站",
+        loading: "加载中...",
+        errorLoadingModels: "加载模型失败",
+        noModelsFound: "未找到模型",
+        installed: "已安装",
+        notInstalled: "未安装",
+        currentSelected: "当前选择",
+        delete: "删除",
+        download: "下载",
+        confirmDelete: "确定要删除",
+        deleteFailed: "删除失败",
+        deleteError: "删除错误",
+        downloadRequestFailed: "下载请求失败",
+        startingDownload: "开始下载...",
+        downloading: "正在下载",
+        downloadCompleted: "下载完成！",
+        error: "错误",
+        configButton: "⚙️ 模型管理"
+    },
+    en: {
+        modelManager: "Model Manager",
+        modelsManager: "Florence2 Model Manager",
+        downloadSource: "Download Source",
+        modelScope: "ModelScope",
+        huggingFace: "Hugging Face",
+        useChinaMirror: "Use China Mirror",
+        loading: "Loading...",
+        errorLoadingModels: "Error loading models",
+        noModelsFound: "No models found",
+        installed: "Installed",
+        notInstalled: "Not Installed",
+        currentSelected: "Selected",
+        delete: "Delete",
+        download: "Download",
+        confirmDelete: "Are you sure you want to delete",
+        deleteFailed: "Delete failed",
+        deleteError: "Delete error",
+        downloadRequestFailed: "Download request failed",
+        startingDownload: "Starting download...",
+        downloading: "Downloading",
+        downloadCompleted: "Download completed!",
+        error: "Error",
+        configButton: "⚙️ Model Manager"
+    }
+};
+
+function getLocale() {
+    const comfyLocale = app?.ui?.settings?.getSettingValue?.('Comfy.Locale');
+    return comfyLocale === 'zh-CN' || comfyLocale === 'zh' ? 'zh' : 'en';
+}
+
+function $t(key) {
+    const locale = getLocale();
+    return i18n[locale][key] || i18n['en'][key] || key;
+}
+
 const style = `
 .zhihui-florence-modal {
     position: fixed;
@@ -158,7 +221,7 @@ app.registerExtension({
             nodeType.prototype.onNodeCreated = function () {
                 const r = onNodeCreated ? onNodeCreated.apply(this, arguments) : undefined;
                 
-                this.addWidget("button", "⚙️模型管理(Model Manager)", "manage_models", () => {
+                this.addWidget("button", $t('configButton'), "manage_models", () => {
                     showManagerModal(this);
                 });
                 
@@ -189,16 +252,16 @@ async function showManagerModal(nodeInstance) {
     
     const header = document.createElement("div");
     header.className = "zhihui-florence-header";
-    header.innerHTML = `<h3>Florence2 模型管理(Models Manager)</h3><button id="close-btn">×</button>`;
+    header.innerHTML = `<h3>${$t('modelsManager')}</h3><button id="close-btn">×</button>`;
     modal.appendChild(header);
     header.querySelector("#close-btn").onclick = close;
     
     const platformDiv = document.createElement("div");
     platformDiv.className = "zhihui-florence-platform-selector";
     platformDiv.innerHTML = `
-        <div style="margin-bottom: 10px; font-weight: bold; color: #ffffffff;">下载源(Download Source):</div>
-        <label><input type="radio" name="platform" value="ModelScope" checked> 魔搭社区(ModelScope)</label>
-        <span class="zhihui-hf-group"><label><input type="radio" name="platform" value="Hugging Face"> 抱抱脸(Hugging Face)</label><span id="hf-options" class="zhihui-hf-options"><label><input type="checkbox" id="use-mirror"> 使用中国镜像站(Use China Mirror)</label></span></span>
+        <div style="margin-bottom: 10px; font-weight: bold; color: #ffffffff;">${$t('downloadSource')}:</div>
+        <label><input type="radio" name="platform" value="ModelScope" checked> ${$t('modelScope')}</label>
+        <span class="zhihui-hf-group"><label><input type="radio" name="platform" value="Hugging Face"> ${$t('huggingFace')}</label><span id="hf-options" class="zhihui-hf-options"><label><input type="checkbox" id="use-mirror"> ${$t('useChinaMirror')}</label></span></span>
     `;
     modal.appendChild(platformDiv);
     
@@ -220,7 +283,7 @@ async function showManagerModal(nodeInstance) {
     
     const content = document.createElement("div");
     content.className = "zhihui-florence-list";
-    content.innerHTML = '<div style="padding:20px; text-align:center;">加载中...(Loading...)</div>';
+    content.innerHTML = `<div style="padding:20px; text-align:center;">${$t('loading')}</div>`;
     modal.appendChild(content);
     
     const statusDiv = document.createElement("div");
@@ -234,20 +297,20 @@ async function showManagerModal(nodeInstance) {
     let pollInterval;
 
     const refresh = async () => {
-        content.innerHTML = '<div style="padding:20px; text-align:center;">加载中...(Loading...)</div>';
+        content.innerHTML = `<div style="padding:20px; text-align:center;">${$t('loading')}</div>`;
         try {
             const res = await api.fetchApi("/zhihui/florence2/models");
             const models = await res.json();
             renderList(models);
         } catch (e) {
-            content.textContent = "加载模型失败(Error loading models): " + e;
+            content.textContent = $t('errorLoadingModels') + ": " + e;
         }
     };
     
     const renderList = (models) => {
         content.innerHTML = "";
         if (models.length === 0) {
-            content.textContent = "未找到模型(No models found).";
+            content.textContent = $t('noModelsFound') + ".";
             return;
         }
         
@@ -258,15 +321,14 @@ async function showManagerModal(nodeInstance) {
             const info = document.createElement("div");
             const statusColor = m.installed ? "#40c057" : "#868e96";
             
-            // Check if this model is currently selected in the node widget
             const modelWidget = nodeInstance.widgets.find(w => w.name === "model_name");
             const isSelected = modelWidget && modelWidget.value === m.name;
             
             info.innerHTML = `
                 <div style="font-size:1.1em; font-weight:bold; margin-bottom:4px;">${m.name}</div>
                 <div style="font-size:0.85em; display:flex; gap:10px;">
-                    <span style="color: ${statusColor}">● ${m.installed ? "已安装(Installed)" : "未安装(Not Installed)"}</span>
-                    ${isSelected ? '<span style="color: #ffd43b; font-weight:bold;">★ 当前选择(Selected)</span>' : ''}
+                    <span style="color: ${statusColor}">● ${m.installed ? $t('installed') : $t('notInstalled')}</span>
+                    ${isSelected ? `<span style="color: #ffd43b; font-weight:bold;">★ ${$t('currentSelected')}</span>` : ''}
                 </div>
             `;
             item.appendChild(info);
@@ -276,26 +338,26 @@ async function showManagerModal(nodeInstance) {
             
             if (m.installed) {
                 const delBtn = document.createElement("button");
-                delBtn.textContent = "删除(Delete)";
+                delBtn.textContent = $t('delete');
                 delBtn.className = "btn-danger";
                 delBtn.onclick = async () => {
-                    if (confirm(`确定要删除 ${m.name} 吗？ / Are you sure you want to delete ${m.name}?`)) {
+                    if (confirm(`${$t('confirmDelete')} ${m.name}?`)) {
                         try {
                             const res = await api.fetchApi("/zhihui/florence2/models", {
                                 method: "DELETE",
                                 body: JSON.stringify({ model_name: m.name })
                             });
                             if (res.ok) refresh();
-                            else alert("删除失败(Delete failed)");
+                            else alert($t('deleteFailed'));
                         } catch (e) {
-                            alert("删除错误(Delete error): " + e);
+                            alert($t('deleteError') + ": " + e);
                         }
                     }
                 };
                 actions.appendChild(delBtn);
             } else {
                 const downloadBtn = document.createElement("button");
-                downloadBtn.textContent = "下载(Download)";
+                downloadBtn.textContent = $t('download');
                 downloadBtn.className = "btn-primary";
                 downloadBtn.onclick = async () => {
                     const platform = platformDiv.querySelector('input[name="platform"]:checked').value;
@@ -317,7 +379,7 @@ async function showManagerModal(nodeInstance) {
                             startPolling();
                         }
                     } catch (e) {
-                            alert("下载请求失败(Download request failed): " + e);
+                            alert($t('downloadRequestFailed') + ": " + e);
                     }
                 };
                 actions.appendChild(downloadBtn);
@@ -329,22 +391,21 @@ async function showManagerModal(nodeInstance) {
     
     const startPolling = () => {
         if (pollInterval) clearInterval(pollInterval);
-        statusDiv.textContent = "开始下载...(Starting download...)";
+        statusDiv.textContent = $t('startingDownload');
         pollInterval = setInterval(async () => {
             try {
                 const res = await api.fetchApi("/zhihui/florence2/download_status");
                 const status = await res.json();
                 
                 if (status.status === "downloading") {
-                    statusDiv.textContent = `正在下载 ${status.model_name}: ${status.message}(Downloading...)`;
+                    statusDiv.textContent = `${$t('downloading')} ${status.model_name}: ${status.message}`;
                 } else if (status.status === "success") {
-                    statusDiv.textContent = "下载完成！(Download completed!)";
+                    statusDiv.textContent = $t('downloadCompleted');
                     clearInterval(pollInterval);
                     refresh();
                 } else if (status.status === "error") {
-                    statusDiv.textContent = "错误(Error): " + status.message;
+                    statusDiv.textContent = $t('error') + ": " + status.message;
                     clearInterval(pollInterval);
-                } else {
                 }
             } catch (e) {
                 console.error(e);

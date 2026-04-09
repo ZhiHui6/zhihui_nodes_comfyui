@@ -1,6 +1,107 @@
 import { app } from "/scripts/app.js";
 import { api } from "/scripts/api.js";
 
+const i18n = {
+    zh: {
+        title: "⚙️ 翻译平台配置管理",
+        platformInfo: "平台信息",
+        officialWebsite: "官网",
+        clearAllConfig: "清除所有配置",
+        backupPlatformInfo: "备份平台信息",
+        importPlatformInfo: "导入平台信息",
+        saveConfig: "保存配置",
+        showPassword: "显示密码",
+        hidePassword: "隐藏密码",
+        inputPlaceholder: "请输入",
+        configTitle: "配置",
+        googleWarning: "⚠️ 注意：谷歌翻译需要特殊网络环境支持才能正常使用。",
+        loadConfigFailed: "无法加载配置文件",
+        confirmClear: "确定要清除所有配置信息吗？此操作不可恢复！",
+        clearSuccess: "✅ 所有配置信息已清除！",
+        clearFailed: "❌ 配置清除失败，请重试。",
+        noBackupData: "❌ 没有可备份的配置信息。",
+        backupSuccess: "✅ 平台信息备份成功！",
+        backupFailed: "❌ 备份失败，请重试。",
+        confirmImport: "确定要导入配置吗？这将覆盖当前所有平台配置！",
+        importSuccess: "✅ 平台信息导入成功！",
+        importFailed: "❌ 配置导入失败，请重试。",
+        invalidFormat: "❌ 导入的文件格式不正确。",
+        importError: "❌ 导入失败，文件格式错误或文件损坏。",
+        saveSuccess: "配置保存成功！",
+        saveFailed: "配置保存失败，请重试。",
+        configButton: "⚙️ 配置管理",
+        baidu: "百度翻译",
+        aliyun: "阿里云翻译",
+        youdao: "有道翻译",
+        zhipu: "智谱AI翻译",
+        free: "免费翻译",
+        tencent: "腾讯翻译",
+        baiduDesc: "百度翻译API，支持多种语言互译，需要注册百度翻译开放平台获取API密钥。免费额度：标准版5万字符/月，高级版100万字符/月（需个人认证）",
+        aliyunDesc: "阿里云翻译API，企业级翻译服务，支持多种语言和领域。免费额度：100万字符/月。",
+        youdaoDesc: "有道翻译API，基于神经网络翻译技术，提供高质量翻译。免费额度：赠送50元的体验金。",
+        zhipuDesc: "智谱AI翻译API，基于大语言模型技术，提供高质量翻译服务，需要智谱AI开放平台API密钥。免费额度：新用户默认获得每月一定数量的免费额度。",
+        freeDesc: "完全免费使用翻译服务，无需API密钥。",
+        model: "模型",
+        translatePlatform: "翻译平台",
+        tencentTranslator: "腾讯翻译君",
+        googleTranslate: "谷歌翻译"
+    },
+    en: {
+        title: "⚙️ Translation Platform Configuration",
+        platformInfo: "Platform Info",
+        officialWebsite: "Website",
+        clearAllConfig: "Clear All Config",
+        backupPlatformInfo: "Backup Config",
+        importPlatformInfo: "Import Config",
+        saveConfig: "Save Config",
+        showPassword: "Show Password",
+        hidePassword: "Hide Password",
+        inputPlaceholder: "Enter",
+        configTitle: "Configuration",
+        googleWarning: "⚠️ Note: Google Translate requires special network environment to work properly.",
+        loadConfigFailed: "Failed to load configuration file",
+        confirmClear: "Are you sure you want to clear all configuration? This action cannot be undone!",
+        clearSuccess: "✅ All configuration cleared!",
+        clearFailed: "❌ Failed to clear configuration, please try again.",
+        noBackupData: "❌ No configuration data to backup.",
+        backupSuccess: "✅ Configuration backup successful!",
+        backupFailed: "❌ Backup failed, please try again.",
+        confirmImport: "Are you sure you want to import configuration? This will overwrite all current platform settings!",
+        importSuccess: "✅ Configuration imported successfully!",
+        importFailed: "❌ Failed to import configuration, please try again.",
+        invalidFormat: "❌ Invalid file format.",
+        importError: "❌ Import failed, file format error or file corrupted.",
+        saveSuccess: "Configuration saved successfully!",
+        saveFailed: "Failed to save configuration, please try again.",
+        configButton: "⚙️ Config Management",
+        baidu: "Baidu Translate",
+        aliyun: "Aliyun Translate",
+        youdao: "Youdao Translate",
+        zhipu: "Zhipu AI Translate",
+        free: "Free Translate",
+        tencent: "Tencent Translate",
+        baiduDesc: "Baidu Translate API supports multiple languages. Requires API key from Baidu Translate Open Platform. Free tier: 50K chars/month (Standard), 1M chars/month (Advanced with verification).",
+        aliyunDesc: "Aliyun Translation API provides enterprise-level translation service supporting multiple languages and domains. Free tier: 1M chars/month.",
+        youdaoDesc: "Youdao Translation API uses neural network technology for high-quality translation. Free tier: 50 CNY trial credit.",
+        zhipuDesc: "Zhipu AI Translation API uses large language model technology for high-quality translation. Requires API key from Zhipu AI Open Platform. Free tier available for new users.",
+        freeDesc: "Completely free translation service, no API key required.",
+        model: "Model",
+        translatePlatform: "Translate Platform",
+        tencentTranslator: "Tencent Translator",
+        googleTranslate: "Google Translate"
+    }
+};
+
+function getLocale() {
+    const comfyLocale = app?.ui?.settings?.getSettingValue?.('Comfy.Locale');
+    return comfyLocale === 'zh-CN' || comfyLocale === 'zh' ? 'zh' : 'en';
+}
+
+function $t(key) {
+    const locale = getLocale();
+    return i18n[locale][key] || i18n['en'][key] || key;
+}
+
 const Utils = {
     async apiCall(url, options = {}) {
         try {
@@ -431,6 +532,12 @@ async function clearConfig() {
 
 
 function getPlatformFields(platform) {
+    const locale = getLocale();
+    const tencentTranslator = locale === 'zh' ? "腾讯翻译君" : "Tencent Translator";
+    const googleTranslate = locale === 'zh' ? "谷歌翻译" : "Google Translate";
+    const modelLabel = locale === 'zh' ? "模型" : "Model";
+    const platformLabel = locale === 'zh' ? "翻译平台" : "Translate Platform";
+    
     const fields = {
         baidu: [
             { name: "app_id", label: "APP ID", type: "text", required: true },
@@ -446,10 +553,10 @@ function getPlatformFields(platform) {
         ],
         zhipu: [
             { name: "api_key", label: "API Key", type: "text", required: true },
-            { name: "model", label: "模型", type: "select", options: ["glm-4-flash", "glm-4.5-flash", "glm-4.6v-flash", "glm-4.7-flash"], default: "glm-4.7-flash" }
+            { name: "model", label: modelLabel, type: "select", options: ["glm-4-flash", "glm-4.5-flash", "glm-4.6v-flash", "glm-4.7-flash"], default: "glm-4.7-flash" }
         ],
         free: [
-            { name: "platform", label: "翻译平台", type: "select", options: ["腾讯翻译君", "谷歌翻译"], default: "腾讯翻译君" }
+            { name: "platform", label: platformLabel, type: "select", options: [tencentTranslator, googleTranslate], default: tencentTranslator }
         ]
     };
     return fields[platform] || [];
@@ -458,28 +565,28 @@ function getPlatformFields(platform) {
 function getPlatformInfo(platform) {
     const info = {
         baidu: {
-            name: "百度翻译",
-            description: "百度翻译API，支持多种语言互译，需要注册百度翻译开放平台获取API密钥。免费额度：标准版5万字符/月，高级版100万字符/月（需个人认证）",
+            name: $t('baidu'),
+            description: $t('baiduDesc'),
             website: "https://api.fanyi.baidu.com/"
         },
         aliyun: {
-            name: "阿里云翻译",
-            description: "阿里云翻译API，企业级翻译服务，支持多种语言和领域。免费额度：100万字符/月。",
+            name: $t('aliyun'),
+            description: $t('aliyunDesc'),
             website: "https://www.aliyun.com/product/ai/alimt"
         },
         youdao: {
-            name: "有道翻译",
-            description: "有道翻译API，基于神经网络翻译技术，提供高质量翻译。免费额度：赠送50元的体验金。",
+            name: $t('youdao'),
+            description: $t('youdaoDesc'),
             website: "https://ai.youdao.com/"
         },
         zhipu: {
-            name: "智谱AI翻译",
-            description: "智谱AI翻译API，基于大语言模型技术，提供高质量翻译服务，需要智谱AI开放平台API密钥。免费额度：新用户默认获得每月一定数量的免费额度。",
+            name: $t('zhipu'),
+            description: $t('zhipuDesc'),
             website: "https://open.bigmodel.cn/"
         },
         free: {
-            name: "免费翻译",
-            description: "完全免费使用翻译服务，无需API密钥。",
+            name: $t('free'),
+            description: $t('freeDesc'),
             website: ""
         }
     };
@@ -489,7 +596,7 @@ function getPlatformInfo(platform) {
 async function openSettings(node) {
     const config = await loadConfig();
     if (!config) {
-        alert("无法加载配置文件");
+        alert($t('loadConfigFailed'));
         return;
     }
 
@@ -503,17 +610,17 @@ async function openSettings(node) {
     function renderPlatformTabs() {
         const platforms = Object.keys(currentConfig.platforms);
         const platformNames = {
-            baidu: "百度翻译",
-            aliyun: "阿里云翻译",
-            youdao: "有道翻译",
-            zhipu: "智谱AI翻译",
-            free: "免费翻译"
+            baidu: $t('baidu'),
+            aliyun: $t('aliyun'),
+            youdao: $t('youdao'),
+            zhipu: $t('zhipu'),
+            free: $t('free')
         };
         
         return `
             <div class="platform-tabs">
                 ${platforms.map(platform => {
-                    const displayName = currentConfig.platforms[platform].name || platformNames[platform] || platform;
+                    const displayName = platformNames[platform] || currentConfig.platforms[platform].name || platform;
                     return `
                         <div class="tab-item ${platform === currentPlatform ? 'active' : ''}" data-platform="${platform}">
                             ${displayName}
@@ -528,6 +635,9 @@ async function openSettings(node) {
         const platformData = currentConfig.platforms[currentPlatform];
         const fields = getPlatformFields(currentPlatform);
         const info = getPlatformInfo(currentPlatform);
+        const locale = getLocale();
+        const googleTranslate = locale === 'zh' ? "谷歌翻译" : "Google Translate";
+        const inputPlaceholder = $t('inputPlaceholder');
         
         let fieldsHtml = "";
         if (fields.length > 0) {
@@ -566,7 +676,7 @@ async function openSettings(node) {
                                 <div class="form-group" id="field-group-${field.name}">
                                     <label>${field.label}${field.required ? " *" : ""}:</label>
                                     <textarea id="field-${field.name}" 
-                                              placeholder="${field.placeholder || '请输入' + field.label}" 
+                                              placeholder="${field.placeholder || inputPlaceholder + field.label}" 
                                               rows="8" 
                                               style="width: 100%; resize: none;">${value}</textarea>
                                 </div>
@@ -576,7 +686,7 @@ async function openSettings(node) {
                                 <div class="form-group-inline">
                                     <label style="text-align: right; min-width: 120px; flex-shrink: 0;">${field.label}${field.required ? " *" : ""}:</label>
                                     <div style="position: relative; display: flex; align-items: center; flex: 1; max-width: 450px;">
-                                        <input type="password" id="field-${field.name}" value="${value}" placeholder="请输入${field.label}" 
+                                        <input type="password" id="field-${field.name}" value="${value}" placeholder="${inputPlaceholder}${field.label}" 
                                                style="width: 100%; padding-right: 35px; background:#1e293b; color:#f8fafc; border:1px solid #334155; border-radius:6px; padding:8px 12px; font-size:14px; transition:all .2s ease; height:36px;">
                                         <button type="button" 
                                                 class="password-toggle-btn" 
@@ -595,7 +705,7 @@ async function openSettings(node) {
                                                 "
                                                 onmouseover="this.style.opacity='1'"
                                                 onmouseout="this.style.opacity='0.7'"
-                                                title="显示/隐藏密码">
+                                                title="${$t('showPassword')}">
                                             🙈
                                         </button>
                                     </div>
@@ -605,7 +715,7 @@ async function openSettings(node) {
                             return `
                                 <div class="form-group">
                                     <label>${field.label}${field.required ? " *" : ""}:</label>
-                                    <input type="${field.type}" id="field-${field.name}" value="${value}" placeholder="请输入${field.label}">
+                                    <input type="${field.type}" id="field-${field.name}" value="${value}" placeholder="${inputPlaceholder}${field.label}">
                                 </div>
                             `;
                         }
@@ -617,30 +727,30 @@ async function openSettings(node) {
         return `
             <div class="platform-config">
                 <div class="config-header">
-                    <h2 class="config-title">${info.name} 配置</h2>
+                    <h2 class="config-title">${info.name} ${$t('configTitle')}</h2>
                 </div>
                 
                 ${info.description ? `
                     <div class="platform-info">
-                        <h4>平台信息</h4>
+                        <h4>${$t('platformInfo')}</h4>
                         <p>${info.description}</p>
-                        ${info.website ? `<p><strong>官网:</strong> <a href="${info.website}" target="_blank">${info.website}</a></p>` : ""}
+                        ${info.website ? `<p><strong>${$t('officialWebsite')}:</strong> <a href="${info.website}" target="_blank">${info.website}</a></p>` : ""}
                     </div>
                 ` : ""}
 
                 ${currentPlatform === 'free' ? `
-                <div id="google-warning" class="platform-warning" style="display: ${platformData.config.platform === '谷歌翻译' ? 'block' : 'none'}; margin-bottom: 15px; padding: 10px; background-color: rgba(245, 158, 11, 0.1); border: 1px solid rgba(245, 158, 11, 0.3); border-radius: 6px;">
-                    <p style="color: #f59e0b; margin: 0; font-size: 14px;">⚠️ 注意：谷歌翻译需要特殊网络环境支持才能正常使用。</p>
+                <div id="google-warning" class="platform-warning" style="display: ${platformData.config.platform === googleTranslate ? 'block' : 'none'}; margin-bottom: 15px; padding: 10px; background-color: rgba(245, 158, 11, 0.1); border: 1px solid rgba(245, 158, 11, 0.3); border-radius: 6px;">
+                    <p style="color: #f59e0b; margin: 0; font-size: 14px;">${$t('googleWarning')}</p>
                 </div>
                 ` : ''}
 
                 ${fieldsHtml}
 
                 <div class="form-actions">
-                    <button id="btn-clear" class="btn-clear" style="background: linear-gradient(135deg, #dc2626 0%, #b91c1c 100%); color: #fff; border: none; border-radius: 6px; padding: 6px 12px; font-size: 13px; font-weight: 600; cursor: pointer; box-shadow: 0 2px 8px rgba(220, 38, 38, 0.3); margin-right: auto;">清除所有配置</button>
-                    <button id="btn-backup" class="btn-backup" style="background: linear-gradient(135deg, #6366f1 0%, #4f46e5 100%); color: #fff; border: none; border-radius: 6px; padding: 6px 12px; font-size: 13px; font-weight: 600; cursor: pointer; box-shadow: 0 2px 8px rgba(99, 102, 241, 0.3); margin-right: 8px;">备份平台信息</button>
-                    <button id="btn-import" class="btn-import" style="background: linear-gradient(135deg, #8b5cf6 0%, #7c3aed 100%); color: #fff; border: none; border-radius: 6px; padding: 6px 12px; font-size: 13px; font-weight: 600; cursor: pointer; box-shadow: 0 2px 8px rgba(139, 92, 246, 0.3); margin-right: 8px;">导入平台信息</button>
-                    <button id="btn-save" class="btn-save">保存配置</button>
+                    <button id="btn-clear" class="btn-clear" style="background: linear-gradient(135deg, #dc2626 0%, #b91c1c 100%); color: #fff; border: none; border-radius: 6px; padding: 6px 12px; font-size: 13px; font-weight: 600; cursor: pointer; box-shadow: 0 2px 8px rgba(220, 38, 38, 0.3); margin-right: auto;">${$t('clearAllConfig')}</button>
+                    <button id="btn-backup" class="btn-backup" style="background: linear-gradient(135deg, #6366f1 0%, #4f46e5 100%); color: #fff; border: none; border-radius: 6px; padding: 6px 12px; font-size: 13px; font-weight: 600; cursor: pointer; box-shadow: 0 2px 8px rgba(99, 102, 241, 0.3); margin-right: 8px;">${$t('backupPlatformInfo')}</button>
+                    <button id="btn-import" class="btn-import" style="background: linear-gradient(135deg, #8b5cf6 0%, #7c3aed 100%); color: #fff; border: none; border-radius: 6px; padding: 6px 12px; font-size: 13px; font-weight: 600; cursor: pointer; box-shadow: 0 2px 8px rgba(139, 92, 246, 0.3); margin-right: 8px;">${$t('importPlatformInfo')}</button>
+                    <button id="btn-save" class="btn-save">${$t('saveConfig')}</button>
                 </div>
             </div>
         `;
@@ -651,7 +761,7 @@ async function openSettings(node) {
             ${StyleManager.getUniqueStyles(uniqueId)}
             <div id="${uniqueId}">
                 <div class="ui-header">
-                    <h1 class="ui-title">⚙️ 翻译平台配置管理</h1>
+                    <h1 class="ui-title">${$t('title')}</h1>
                     <button id="close-button" class="close-button" type="button"></button>
                 </div>
                 <div class="ui-content">
@@ -665,6 +775,9 @@ async function openSettings(node) {
     }
 
     function attachEvents() {
+        const locale = getLocale();
+        const googleTranslate = locale === 'zh' ? "谷歌翻译" : "Google Translate";
+        
         dialog.querySelectorAll(".tab-item").forEach(item => {
             item.addEventListener("click", (e) => {
                 const platform = e.currentTarget.dataset.platform;
@@ -682,7 +795,7 @@ async function openSettings(node) {
             platformSelect.addEventListener('change', (e) => {
                 const warningEl = dialog.querySelector('#google-warning');
                 if (warningEl) {
-                    warningEl.style.display = e.target.value === '谷歌翻译' ? 'block' : 'none';
+                    warningEl.style.display = e.target.value === googleTranslate ? 'block' : 'none';
                 }
             });
         }
@@ -699,11 +812,11 @@ async function openSettings(node) {
                     if (input.type === "password") {
                         input.type = "text";
                         this.textContent = "👁️";
-                        this.title = "隐藏密码";
+                        this.title = $t('hidePassword');
                     } else {
                         input.type = "password";
                         this.textContent = "🙈";
-                        this.title = "显示密码";
+                        this.title = $t('showPassword');
                     }
                 }
             });
@@ -721,34 +834,31 @@ async function openSettings(node) {
             });
 
             const success = await saveConfig(currentConfig);
-            // 获取当前平台的显示名称
             const platformNames = {
-                baidu: "百度翻译",
-                tencent: "腾讯翻译",
-                aliyun: "阿里云翻译",
-                youdao: "有道翻译",
-                zhipu: "智谱AI翻译",
-                free: "免费翻译"
+                baidu: $t('baidu'),
+                tencent: $t('tencent'),
+                aliyun: $t('aliyun'),
+                youdao: $t('youdao'),
+                zhipu: $t('zhipu'),
+                free: $t('free')
             };
             const platformDisplayName = platformNames[currentPlatform] || currentPlatform;
             
             if (success) {
-                showPopupNotification(`✅ ${platformDisplayName}配置保存成功！`, "success");
+                showPopupNotification(`✅ ${platformDisplayName}${$t('saveSuccess')}`, "success");
             } else {
-                showPopupNotification(`❌ ${platformDisplayName}配置保存失败，请重试。`, "error");
+                showPopupNotification(`❌ ${platformDisplayName}${$t('saveFailed')}`, "error");
             }
         });
 
         dialog.querySelector("#btn-clear").addEventListener("click", async () => {
-            // 显示确认对话框
-            if (!confirm("确定要清除所有配置信息吗？此操作不可恢复！")) {
+            if (!confirm($t('confirmClear'))) {
                 return;
             }
 
             const success = await clearConfig();
             
             if (success) {
-                // 清空所有输入框
                 dialog.querySelectorAll("input, select, textarea").forEach(element => {
                     if (element.type === "select-one") {
                         element.selectedIndex = 0;
@@ -757,15 +867,14 @@ async function openSettings(node) {
                     }
                 });
                 
-                // 重新加载配置
                 const config = await loadConfig();
                 if (config) {
                     currentConfig = config;
                 }
                 
-                showPopupNotification("✅ 所有配置信息已清除！", "success");
+                showPopupNotification($t('clearSuccess'), "success");
             } else {
-                showPopupNotification("❌ 配置清除失败，请重试。", "error");
+                showPopupNotification($t('clearFailed'), "error");
             }
         });
 
@@ -783,13 +892,13 @@ async function openSettings(node) {
                     a.click();
                     document.body.removeChild(a);
                     URL.revokeObjectURL(url);
-                    showPopupNotification("✅ 平台信息备份成功！", "success");
+                    showPopupNotification($t('backupSuccess'), "success");
                 } else {
-                    showPopupNotification("❌ 没有可备份的配置信息。", "error");
+                    showPopupNotification($t('noBackupData'), "error");
                 }
             } catch (error) {
                 console.error('备份失败:', error);
-                showPopupNotification("❌ 备份失败，请重试。", "error");
+                showPopupNotification($t('backupFailed'), "error");
             }
         });
 
@@ -806,7 +915,6 @@ async function openSettings(node) {
                     const importedConfig = JSON.parse(text);
                     
                     if (importedConfig && importedConfig.platforms) {
-                        // 验证配置格式
                         const validPlatforms = ['baidu', 'tencent', 'aliyun', 'youdao', 'zhipu', 'free'];
                         let hasValidConfig = false;
                         
@@ -818,26 +926,26 @@ async function openSettings(node) {
                         }
                         
                         if (hasValidConfig) {
-                            if (confirm("确定要导入配置吗？这将覆盖当前所有平台配置！")) {
+                            if (confirm($t('confirmImport'))) {
                                 const success = await saveConfig(importedConfig);
                                 if (success) {
                                     currentConfig = importedConfig;
                                     render();
                                     attachEvents();
-                                    showPopupNotification("✅ 平台信息导入成功！", "success");
+                                    showPopupNotification($t('importSuccess'), "success");
                                 } else {
-                                    showPopupNotification("❌ 配置导入失败，请重试。", "error");
+                                    showPopupNotification($t('importFailed'), "error");
                                 }
                             }
                         } else {
-                            showPopupNotification("❌ 导入的文件格式不正确。", "error");
+                            showPopupNotification($t('invalidFormat'), "error");
                         }
                     } else {
-                        showPopupNotification("❌ 导入的文件格式不正确。", "error");
+                        showPopupNotification($t('invalidFormat'), "error");
                     }
                 } catch (error) {
                     console.error('导入失败:', error);
-                    showPopupNotification("❌ 导入失败，文件格式错误或文件损坏。", "error");
+                    showPopupNotification($t('importError'), "error");
                 }
             };
             input.click();
@@ -911,7 +1019,7 @@ app.registerExtension({
             const onNodeCreated = nodeType.prototype.onNodeCreated;
             nodeType.prototype.onNodeCreated = function () {
                 const r = onNodeCreated ? onNodeCreated.apply(this, arguments) : undefined;
-                const configButton = this.addWidget("button", "⚙️配置管理·Configuration Management", null, () => {
+                const configButton = this.addWidget("button", $t('configButton'), null, () => {
                     openSettings(this);
                 });
                 

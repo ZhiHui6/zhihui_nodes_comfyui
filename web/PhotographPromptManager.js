@@ -1,6 +1,29 @@
 import { app } from "../../../scripts/app.js";
 import { api } from "../../../scripts/api.js";
 
+const i18n = {
+    zh: {
+        selectTags: "🏷️ 标签选择",
+        templateEditing: "📝 模版编辑",
+        customTags: "⚙️ 自定标签"
+    },
+    en: {
+        selectTags: "🏷️ Select Tags",
+        templateEditing: "📝 Template Editing",
+        customTags: "⚙️ Custom Tags"
+    }
+};
+
+function getLocale() {
+    const comfyLocale = app?.ui?.settings?.getSettingValue?.('Comfy.Locale');
+    return comfyLocale === 'zh-CN' || comfyLocale === 'zh' ? 'zh' : 'en';
+}
+
+function $t(key) {
+    const locale = getLocale();
+    return i18n[locale][key] || i18n['en'][key] || key;
+}
+
 app.registerExtension({
     name: "zhihui.PhotographPromptManager",
     async beforeRegisterNodeDef(nodeType, nodeData, app) {
@@ -29,17 +52,17 @@ app.registerExtension({
                     }
                 }
 
-                const categoryBrowserButton = this.addWidget("button", "🏷️标签选择·Select Tags", "category_browser", () => {
+                const categoryBrowserButton = this.addWidget("button", $t('selectTags'), "category_browser", () => {
                     openCategoryBrowser(this);
                 });
                 categoryBrowserButton.serialize = false;
 
-                const templateHelperButton = this.addWidget("button", "📝模版编辑·Template Editing", "template_helper", () => {
+                const templateHelperButton = this.addWidget("button", $t('templateEditing'), "template_helper", () => {
                     openTemplateEditorHelper(this);
                 });
                 templateHelperButton.serialize = false;
 
-                const manageButton = this.addWidget("button", "⚙️自定标签·Custom Tags", "user_option_editing", () => {
+                const manageButton = this.addWidget("button", $t('customTags'), "user_option_editing", () => {
                     openPhotographPromptManager(this);
                 });
                 manageButton.serialize = false;
@@ -4228,12 +4251,14 @@ function createBrowserFieldItem(categoryInfo, widget) {
         const option = document.createElement('option');
         option.value = value;
 
-        // 统一显示格式为 "中文 (English)"
         let displayText = value;
         if (value.includes(' | ')) {
-            // 将 "中文 | English" 转换为 "中文 (English)"
             const parts = value.split(' | ');
             displayText = `${parts[0]} (${parts[1]})`;
+        } else if (value === 'Ignore') {
+            displayText = '忽略 (Ignore)';
+        } else if (value === 'Random') {
+            displayText = '随机值 (Random)';
         }
 
         option.textContent = displayText;

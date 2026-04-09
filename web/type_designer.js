@@ -1,5 +1,93 @@
 import { app } from "../../scripts/app.js";
 import { api } from "../../scripts/api.js";
+
+const i18n = {
+    zh: {
+        selectFontStyle: "🎨 选择字体风格",
+        dialogTitle: "选择字体风格",
+        searchPlaceholder: "搜索风格...",
+        close: "关闭",
+        inputText: "输入文本",
+        inputPlaceholder: "在此输入文字...",
+        promptPreview: "提示词预览",
+        selectStylePrompt: "请选择一种风格并输入文本...",
+        apply: "✨应用",
+        totalItems: "总条目: {count}个",
+        currentCategory: "当前分类: {count}个",
+        noStyleFound: "未找到相关风格",
+        selectStyle: "请选择一种风格",
+        loadStylesError: "无法加载风格数据 (styles.json)",
+        loadError: "加载风格出错: ",
+        all: "全部",
+        styleDescription: "风格描述",
+        actualPrompt: "实际提示词 (中文)",
+        categories: {
+            "全部": "全部",
+            "3D立体字": "3D立体字",
+            "logo标志": "logo标志",
+            "书法字": "书法字",
+            "像素字": "像素字",
+            "卡通字": "卡通字",
+            "哥特体": "哥特体",
+            "复古风": "复古风",
+            "宋体字": "宋体字",
+            "手写字": "手写字",
+            "机甲风": "机甲风",
+            "海报字": "海报字",
+            "科技感": "科技感",
+            "花体字": "花体字",
+            "黑体字": "黑体字"
+        }
+    },
+    en: {
+        selectFontStyle: "🎨 Select Font Style",
+        dialogTitle: "Select Font Style",
+        searchPlaceholder: "Search styles...",
+        close: "Close",
+        inputText: "Input Text",
+        inputPlaceholder: "Enter text here...",
+        promptPreview: "Prompt Preview",
+        selectStylePrompt: "Please select a style and enter text...",
+        apply: "✨Apply",
+        totalItems: "Total items: {count} items",
+        currentCategory: "Current category: {count} items",
+        noStyleFound: "No matching styles found",
+        selectStyle: "Please select a style",
+        loadStylesError: "Failed to load style data (styles.json)",
+        loadError: "Error loading styles: ",
+        all: "All Styles",
+        styleDescription: "Style Description",
+        actualPrompt: "Actual Prompt (Chinese)",
+        categories: {
+            "全部": "All Styles",
+            "3D立体字": "3D Text",
+            "logo标志": "Logo",
+            "书法字": "Brush Script",
+            "像素字": "Pixel",
+            "卡通字": "Cartoon",
+            "哥特体": "Gothic",
+            "复古风": "Vintage",
+            "宋体字": "Song Typeface",
+            "手写字": "Handwriting",
+            "机甲风": "Mecha",
+            "海报字": "Poster",
+            "科技感": "Tech",
+            "花体字": "Flourish",
+            "黑体字": "Hei Typeface"
+        }
+    }
+};
+
+function getLocale() {
+    const comfyLocale = app?.ui?.settings?.getSettingValue?.('Comfy.Locale');
+    return comfyLocale === 'zh-CN' || comfyLocale === 'zh' ? 'zh' : 'en';
+}
+
+function $t(key) {
+    const locale = getLocale();
+    return i18n[locale][key] || i18n['en'][key] || key;
+}
+
 app.registerExtension({
     name: "zhihui.TypeDesigner",
     async beforeRegisterNodeDef(nodeType, nodeData, app) {
@@ -8,7 +96,7 @@ app.registerExtension({
             nodeType.prototype.onNodeCreated = function () {
                 const r = onNodeCreated ? onNodeCreated.apply(this, arguments) : undefined;
                 const node = this;
-                this.addWidget("button", "🎨选择字体风格·Select font style", null, () => {
+                this.addWidget("button", $t('selectFontStyle'), null, () => {
                     openTypeDesignerDialog(node);
                 });
                 return r;
@@ -23,11 +111,11 @@ async function openTypeDesignerDialog(node) {
         if (response.ok) {
             stylesData = await response.json();
         } else {
-            alert("无法加载风格数据 (styles.json)");
+            alert($t('loadStylesError'));
             return;
         }
     } catch (e) {
-        alert("加载风格出错: " + e);
+        alert($t('loadError') + e);
         return;
     }
     const dialog = document.createElement("div");
@@ -386,12 +474,12 @@ async function openTypeDesignerDialog(node) {
     const header = document.createElement("div");
     header.className = "td-header";
     header.innerHTML = `
-        <div class="td-title">选择字体风格</div>
+        <div class="td-title">${$t('dialogTitle')}</div>
         <div class="td-search-wrapper">
             <span class="td-search-icon">🔍</span>
-            <input type="text" class="td-search" placeholder="搜索风格...">
+            <input type="text" class="td-search" placeholder="${$t('searchPlaceholder')}">
         </div>
-        <div class="td-close" title="Close">✕</div>
+        <div class="td-close" title="${$t('close')}">✕</div>
     `;
     container.appendChild(header);
     const body = document.createElement("div");
@@ -415,16 +503,16 @@ async function openTypeDesignerDialog(node) {
     const sidebar = document.createElement("div");
     sidebar.className = "td-sidebar";
     sidebar.innerHTML = `
-        <div class="td-section-title">输入文本</div>
-        <textarea class="td-textarea" id="td-input-text" placeholder="在此输入文字..."></textarea>
-        <div class="td-section-title">提示词预览</div>
+        <div class="td-section-title">${$t('inputText')}</div>
+        <textarea class="td-textarea" id="td-input-text" placeholder="${$t('inputPlaceholder')}"></textarea>
+        <div class="td-section-title">${$t('promptPreview')}</div>
         <div class="td-result-area" id="td-generated-prompt">
             <div style="color: #757575;">
-                请选择一种风格并输入文本...
+                ${$t('selectStylePrompt')}
             </div>
         </div>
         <div style="margin-top:auto">
-            <button class="td-btn" id="td-apply-btn">✨应用</button>
+            <button class="td-btn" id="td-apply-btn">${$t('apply')}</button>
         </div>
     `;
     body.appendChild(sidebar);
@@ -455,7 +543,7 @@ async function openTypeDesignerDialog(node) {
         Object.keys(categories).forEach(cat => {
             const tab = document.createElement("div");
             tab.className = `td-tab ${cat === currentCategory ? "active" : ""}`;
-            tab.textContent = cat;
+            tab.textContent = $t('categories')[cat] || cat;
             tab.onclick = () => {
                 currentCategory = cat;
                 currentSearch = ""; 
@@ -477,14 +565,14 @@ async function openTypeDesignerDialog(node) {
             stylesToShow = categories[currentCategory] || [];
         }
         const totalCount = (categories["全部"] || []).length;
-        let footerText = `总条目: ${totalCount}个`;
+        let footerText = $t('totalItems').replace('{count}', totalCount);
         if (currentCategory !== "全部") {
              const currentCount = (categories[currentCategory] || []).length;
-             footerText += `  ， 当前分类: ${currentCount}个`;
+             footerText += `  ， ${$t('currentCategory').replace('{count}', currentCount)}`;
         }
         footer.textContent = footerText;
         if (stylesToShow.length === 0) {
-            grid.innerHTML = `<div style="width:100%; text-align:center; padding:40px; color:#999;">未找到相关风格</div>`;
+            grid.innerHTML = `<div style="width:100%; text-align:center; padding:40px; color:#999;">${$t('noStyleFound')}</div>`;
             return;
         }
         stylesToShow.forEach((styleName, index) => {
@@ -522,16 +610,50 @@ async function openTypeDesignerDialog(node) {
         const text = document.getElementById("td-input-text").value;
         const resultArea = document.getElementById("td-generated-prompt");
         if (!selectedStyle) {
-            resultArea.innerHTML = `<div style="color: #757575;">请选择一种风格</div>`;
+            resultArea.innerHTML = `<div style="color: #757575;">${$t('selectStyle')}</div>`;
             return;
         }
-        const promptTemplate = prompts[selectedStyle];
-        if (promptTemplate) {
-            let prompt = promptTemplate.replace("{text}", text || "");
-            if (text) {
-                prompt = `"${text}" ${prompt}`;
+        const promptData = prompts[selectedStyle];
+        const locale = getLocale();
+        
+        if (promptData) {
+            if (typeof promptData === 'string') {
+                let prompt = promptData.replace("{text}", text || "");
+                if (text) {
+                    prompt = `"${text}" ${prompt}`;
+                }
+                resultArea.textContent = prompt;
+            } else {
+                const actualPrompt = promptData.prompt || "";
+                const descriptionEn = promptData.description_en || "";
+                
+                if (locale === 'zh') {
+                    let prompt = actualPrompt.replace("{text}", text || "");
+                    if (text) {
+                        prompt = `"${text}" ${prompt}`;
+                    }
+                    resultArea.textContent = prompt;
+                } else {
+                    let displayText = descriptionEn;
+                    if (text) {
+                        displayText = `"${text}" - ${descriptionEn}`;
+                    }
+                    let prompt = actualPrompt.replace("{text}", text || "");
+                    if (text) {
+                        prompt = `"${text}" ${prompt}`;
+                    }
+                    resultArea.innerHTML = `
+                        <div style="margin-bottom: 12px;">
+                            <div style="color: #4fc3f7; font-weight: 600; margin-bottom: 6px; font-size: 13px;">${$t('styleDescription')}:</div>
+                            <div style="color: #e0e0e0; line-height: 1.6;">${displayText}</div>
+                        </div>
+                        <details open style="margin-top: 8px;">
+                            <summary style="color: #ff9800; cursor: pointer; font-size: 13px; font-weight: 600;">${$t('actualPrompt')}</summary>
+                            <div style="margin-top: 8px; padding: 10px; background: #2a2a2a; border-radius: 6px; color: #b0b0b0; font-size: 13px; line-height: 1.5;">${prompt}</div>
+                        </details>
+                    `;
+                }
             }
-            resultArea.textContent = prompt;
         } else {
             resultArea.textContent = "";
         }
@@ -556,7 +678,23 @@ async function openTypeDesignerDialog(node) {
         if (textWidget) {
             if (selectedStyle || inputText.value) {
                 if (selectedStyle) {
-                    textWidget.value = generatedPrompt.textContent;
+                    const promptData = prompts[selectedStyle];
+                    const text = inputText.value;
+                    if (promptData) {
+                        let actualPrompt;
+                        if (typeof promptData === 'string') {
+                            actualPrompt = promptData;
+                        } else {
+                            actualPrompt = promptData.prompt || "";
+                        }
+                        let finalPrompt = actualPrompt.replace("{text}", text || "");
+                        if (text) {
+                            finalPrompt = `"${text}" ${finalPrompt}`;
+                        }
+                        textWidget.value = finalPrompt;
+                    } else {
+                        textWidget.value = generatedPrompt.textContent;
+                    }
                 } else {
                     textWidget.value = inputText.value;
                 }

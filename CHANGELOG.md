@@ -1,11 +1,13 @@
 # 更新日志
-## 1.0.24 2026-4-9 
+
+## 1.0.25 2026-4-10
 - 优化图像切换器（ImageSwitcherDualMode）、文本切换器（TextSwitchDualMode）、潜在空间切换器（LatentSwitchDualMode）节点：
   - 输入端口最大数量限制为12个
   - 删除更新按钮，改为滑块值变化时自动同步端口
   - 移除所有提示性信息
 - Qwen3-VL多路径输入节点（Qwen3-VL Multiple Paths Input）：
   - 优化节点输入数量动态更新逻辑，移除手动更新按钮
+- 对多个节点进行语言显示优化，支持中英文自动切换。
     <br>
 - Optimized ImageSwitchDualMode, TextSwitchDualMode, and LatentSwitchDualMode nodes:
   - Limited maximum input ports to 12
@@ -13,6 +15,7 @@
   - Removed all notification messages
 - Qwen3-VL Multiple Paths Input node:
   - Optimized dynamic input count update logic, removed manual update button
+- Added language switch support for multiple nodes.
 
 ## 1.0.23 2026-4-8
 - LM工作室节点(LMStudio):优化界面UI

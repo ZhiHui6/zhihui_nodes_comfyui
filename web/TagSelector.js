@@ -1,6 +1,25 @@
 import { app } from "/scripts/app.js";
 import { api } from "/scripts/api.js";
 
+const i18n = {
+    zh: {
+        openTagSelector: "🔖 打开标签选择器"
+    },
+    en: {
+        openTagSelector: "🔖 Open Tag Selector"
+    }
+};
+
+function getLocale() {
+    const comfyLocale = app?.ui?.settings?.getSettingValue?.('Comfy.Locale');
+    return comfyLocale === 'zh-CN' || comfyLocale === 'zh' ? 'zh' : 'en';
+}
+
+function $t(key) {
+    const locale = getLocale();
+    return i18n[locale][key] || i18n['en'][key] || key;
+}
+
 const script = document.createElement('script');
 script.src = '/extensions/zhihui_nodes_comfyui/TagSelectorRandomGenerator.js';
 document.head.appendChild(script);
@@ -210,7 +229,7 @@ app.registerExtension({
     name: "zhihui.TagSelector",
     nodeCreated(node) {
         if (node.comfyClass === "TagSelector") {
-            const button = node.addWidget("button", "🔖打开标签选择器·Open Tag Selector", "open_selector", () => {
+            const button = node.addWidget("button", $t('openTagSelector'), "open_selector", () => {
                 openTagSelector(node);
             });
             button.serialize = false;

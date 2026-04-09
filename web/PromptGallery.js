@@ -1,6 +1,65 @@
 import { app } from "../../../scripts/app.js";
 import { api } from "../../../scripts/api.js";
 
+const i18n = {
+    zh: {
+        enterDirectoryPath: "输入目录路径...",
+        browse: "浏览",
+        load: "加载",
+        settings: "设置",
+        close: "关闭",
+        rememberPath: "记住路径",
+        useSystemFolderPicker: "使用系统文件夹选择器",
+        totalImages: "总图片数",
+        matched: "图文匹配",
+        unmatched: "图文未匹配",
+        selected: "选中",
+        pleaseEnterDirectory: "请输入目录路径",
+        loading: "加载中...",
+        error: "错误",
+        noImagesFound: "未找到图片",
+        noText: "无文本",
+        noDirectorySelected: "未选择目录",
+        invalidDirectory: "无效的目录"
+    },
+    en: {
+        enterDirectoryPath: "Enter directory path...",
+        browse: "Browse",
+        load: "Load",
+        settings: "Settings",
+        close: "Close",
+        rememberPath: "Remember path",
+        useSystemFolderPicker: "Use system folder picker",
+        totalImages: "Total images",
+        matched: "Matched",
+        unmatched: "Unmatched",
+        selected: "Selected",
+        pleaseEnterDirectory: "Please enter a directory path",
+        loading: "Loading...",
+        error: "Error",
+        noImagesFound: "No images found",
+        noText: "No Text",
+        noDirectorySelected: "No directory selected",
+        invalidDirectory: "Invalid directory"
+    }
+};
+
+function translateError(message) {
+    if (message === "No directory selected") return $t('noDirectorySelected');
+    if (message === "Invalid directory selected") return $t('invalidDirectory');
+    return message;
+}
+
+function getLocale() {
+    const comfyLocale = app?.ui?.settings?.getSettingValue?.('Comfy.Locale');
+    return comfyLocale === 'zh-CN' || comfyLocale === 'zh' ? 'zh' : 'en';
+}
+
+function $t(key) {
+    const locale = getLocale();
+    return i18n[locale][key] || i18n['en'][key] || key;
+}
+
 const link = document.createElement("link");
 link.rel = "stylesheet";
 link.type = "text/css";
@@ -53,8 +112,7 @@ app.registerExtension({
                 const ensureHiddenInputs = () => {
                     dirWidget = node.widgets ? node.widgets.find(w => w.name === "directory") : null;
                     if (!dirWidget) {
-                        const initDir = (settings.rememberPath && typeof settings.lastDir === "string") ? settings.lastDir : "";
-                        dirWidget = createHiddenWidget("directory", initDir);
+                        dirWidget = createHiddenWidget("directory", "");
                     } else {
                         dirWidget.computeSize = () => [0, -4];
                         dirWidget.draw = () => {};
@@ -94,7 +152,7 @@ app.registerExtension({
                 const pathInput = document.createElement("input");
                 pathInput.className = "zhihui-gallery-path-input";
                 pathInput.type = "text";
-                pathInput.placeholder = "输入目录路径 · Enter directory path...";
+                pathInput.placeholder = $t('enterDirectoryPath');
                 pathInput.value = dirWidget.value || "";            
                 pathInput.onchange = (e) => {
                     applyDirectory(e.target.value, true);
@@ -102,25 +160,25 @@ app.registerExtension({
 
                 const browseBtn = document.createElement("button");
                 browseBtn.className = "zhihui-gallery-btn";
-                browseBtn.innerText = "浏览 · Browse";
+                browseBtn.innerText = $t('browse');
                 browseBtn.onclick = async () => {
                     try {
                         const response = await api.fetchApi(`/zhihui/gallery/select_directory`);
                         const data = await response.json();
                         if (!response.ok) {
-                            throw new Error(data?.error || `HTTP ${response.status}`);
+                            throw new Error(translateError(data?.error) || `HTTP ${response.status}`);
                         }
                         if (data?.path) {
                             applyDirectory(data.path, true);
                         }
                     } catch (e) {
-                        setStatus(`错误 · Error: ${e.message}`);
+                        setStatus(`${$t('error')}: ${e.message}`);
                     }
                 };
 
                 const goBtn = document.createElement("button");
                 goBtn.className = "zhihui-gallery-btn";
-                goBtn.innerText = "加载 · Load";
+                goBtn.innerText = $t('load');
                 goBtn.onclick = () => {
                     applyDirectory(pathInput.value, true);
                 };
@@ -168,11 +226,11 @@ app.registerExtension({
                 const settingsTitle = document.createElement("div");
                 settingsTitle.className = "zhihui-gallery-settings-title";
                 const settingsTitleText = document.createElement("div");
-                settingsTitleText.innerText = "⚙️ 设置 · Settings";
+                settingsTitleText.innerText = `⚙️ ${$t('settings')}`;
                 const settingsClose = document.createElement("button");
                 settingsClose.className = "zhihui-gallery-settings-close";
                 settingsClose.type = "button";
-                settingsClose.innerText = "关闭 · Close";
+                settingsClose.innerHTML = "&times;";
                 settingsClose.onclick = () => {
                     settingsOverlay.style.display = "none";
                 };
@@ -186,7 +244,7 @@ app.registerExtension({
                 rememberCheckbox.type = "checkbox";
                 rememberCheckbox.checked = !!settings.rememberPath;
                 const rememberText = document.createElement("span");
-                rememberText.innerText = "记住路径 · Remember path";
+                rememberText.innerText = $t('rememberPath');
                 rememberRow.appendChild(rememberCheckbox);
                 rememberRow.appendChild(rememberText);
                 settingsDialog.appendChild(rememberRow);
@@ -197,7 +255,7 @@ app.registerExtension({
                 windowsPickerCheckbox.type = "checkbox";
                 windowsPickerCheckbox.checked = !!settings.useWindowsPicker;
                 const windowsPickerText = document.createElement("span");
-                windowsPickerText.innerText = "使用系统文件夹选择器 · Use system folder picker";
+                windowsPickerText.innerText = $t('useSystemFolderPicker');
                 windowsPickerRow.appendChild(windowsPickerCheckbox);
                 windowsPickerRow.appendChild(windowsPickerText);
                 settingsDialog.appendChild(windowsPickerRow);
@@ -246,7 +304,7 @@ app.registerExtension({
                                 body: JSON.stringify(node.properties.zhihuiGallerySettings)
                             });
                         } catch (e) {
-                            setStatus(`错误 · Error: ${e.message}`);
+                            setStatus(`${$t('error')}: ${e.message}`);
                         }
                     }, 150);
                 };
@@ -264,13 +322,9 @@ app.registerExtension({
                             rememberCheckbox.checked = !!settings.rememberPath;
                             windowsPickerCheckbox.checked = !!settings.useWindowsPicker;
                             updateBrowseBtnVisibility();
-                            const currentPath = (pathInput?.value || "").trim();
-                            if (!currentPath && settings.rememberPath && settings.lastDir) {
-                                applyDirectory(settings.lastDir, true);
-                            }
                         }
                     } catch (e) {
-                        setStatus(`错误 · Error: ${e.message}`);
+                        setStatus(`${$t('error')}: ${e.message}`);
                     }
                 };
 
@@ -319,8 +373,8 @@ app.registerExtension({
                     const matched = Array.isArray(lastFiles) ? lastFiles.filter(f => !!f?.has_text).length : 0;
                     const mismatched = total - matched;
                     const selected = imgWidget?.value ? imgWidget.value : "—";
-                    footerStats.innerText = `总图片数 · Total images: ${total} | 图文匹配 · Matched: ${matched} | 图文未匹配 · Unmatched: ${mismatched}`;
-                    footerSelected.innerText = `选中 · Selected: ${selected}`;
+                    footerStats.innerText = `${$t('totalImages')}: ${total} | ${$t('matched')}: ${matched} | ${$t('unmatched')}: ${mismatched}`;
+                    footerSelected.innerText = `${$t('selected')}: ${selected}`;
                 };
 
                 const applyDirectory = (dir, autoFetch) => {
@@ -421,13 +475,13 @@ app.registerExtension({
                 const fetchImages = async (dir) => {
                     const trimmed = (dir || "").trim();
                     if (!trimmed) {
-                        setStatus("请输入目录路径 · Please enter a directory path");
+                        setStatus($t('pleaseEnterDirectory'));
                         return;
                     }
 
                     const seq = ++fetchSeq;
                     grid.classList.add("loading");
-                    setStatus("加载中... · Loading...");
+                    setStatus($t('loading'));
                     
                     try {
                         const response = await api.fetchApi(`/zhihui/gallery/list_files?path=${encodeURIComponent(trimmed)}`);
@@ -437,8 +491,8 @@ app.registerExtension({
                     } catch (e) {
                         console.error("Error fetching gallery:", e);
                         if (seq !== fetchSeq) return;
-                        grid.innerHTML = `<div style='color:red; padding:10px;'>错误 · Error: ${e.message}</div>`;
-                        setStatus(`错误 · Error: ${e.message}`);
+                        grid.innerHTML = `<div style='color:red; padding:10px;'>${$t('error')}: ${e.message}</div>`;
+                        setStatus(`${$t('error')}: ${e.message}`);
                     } finally {
                         if (seq === fetchSeq) {
                             grid.classList.remove("loading");
@@ -450,7 +504,7 @@ app.registerExtension({
                     grid.innerHTML = "";
                     lastFiles = Array.isArray(files) ? files : [];
                     if (!files || files.length === 0) {
-                        grid.innerHTML = "<div style='color:#666; padding:10px;'>未找到图片 · No images found</div>";
+                        grid.innerHTML = `<div style='color:#666; padding:10px;'>${$t('noImagesFound')}</div>`;
                         updateStats();
                         setStatus("");
                         return;
@@ -480,7 +534,7 @@ app.registerExtension({
                         if (!file.has_text) {
                             const badge = document.createElement("div");
                             badge.className = "no-text-indicator";
-                            badge.innerText = "无文本 · No Text";
+                            badge.innerText = $t('noText');
                             item.appendChild(badge);
                         }
 
@@ -504,8 +558,6 @@ app.registerExtension({
 
                 if (dirWidget.value) {
                     applyDirectory(dirWidget.value, true);
-                } else if (settings.rememberPath && settings.lastDir) {
-                    applyDirectory(settings.lastDir, true);
                 } else {
                     updateStats();
                 }

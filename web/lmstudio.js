@@ -69,6 +69,7 @@ const i18n = {
         logPanelTitle: "📋 推理日志",
         clearLog: "清屏",
         refreshModels: "🔄 刷新模型",
+        settings: "⚙️ 状态设置",
         refreshModelsSuccess: "模型列表已刷新",
         refreshModelsFailed: "获取模型列表失败",
         noModelsFound: "未找到模型"
@@ -139,6 +140,7 @@ const i18n = {
         logPanelTitle: "📋 Inference Log",
         clearLog: "Clear",
         refreshModels: "🔄 Refresh Models",
+        settings: "⚙️ Settings",
         refreshModelsSuccess: "Model list refreshed",
         refreshModelsFailed: "Failed to fetch model list",
         noModelsFound: "No models found"
@@ -449,12 +451,12 @@ app.registerExtension({
                     };
                 }
                 
-                const refreshModelsBtn = this.addWidget("button", "🔄 刷新模型 / Refresh Models", null, async () => {
+                const refreshModelsBtn = this.addWidget("button", $t('refreshModels'), null, async () => {
                     await this._refreshModelsList();
                 });
                 refreshModelsBtn.serialize = false;
                 
-                const settingsBtn = this.addWidget("button", "⚙️状态设置 / Status", null, () => {
+                const settingsBtn = this.addWidget("button", $t('settings'), null, () => {
                     showLMStudioSettings(this);
                 });
                 settingsBtn.serialize = false;

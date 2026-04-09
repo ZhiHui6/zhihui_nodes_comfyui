@@ -1,6 +1,156 @@
 import { app } from "/scripts/app.js";
 import { api } from "/scripts/api.js";
 
+const i18n = {
+    zh: {
+        nodeSettings: "⚙️ 节点设置",
+        settings: "设置",
+        configApiKeys: "配置各个平台的API密钥。配置后，节点将自动使用这些密钥，无需每次手动输入。",
+        advancedParams: "高级参数设置",
+        enableAdvancedParams: "高级参数",
+        advancedParamsDesc: "勾选后显示Top K采样、重复惩罚、最小P采样、Top P采样参数",
+        platformConfigs: "平台服务配置",
+        restoreDefault: "恢复默认",
+        exportConfig: "导出配置",
+        importConfig: "导入配置",
+        apply: "应用",
+        cancel: "取消",
+        platform: "平台",
+        apiKey: "API密钥",
+        apiKeyDesc: "请输入平台的API密钥",
+        customModel: "自定义模型",
+        customModelDesc: "自定义模型名称（可选）",
+        customBaseUrl: "自定义Base URL",
+        customBaseUrlDesc: "自定义API请求地址（可选）",
+        addPlatform: "添加平台",
+        delete: "删除",
+        addCustomPlatform: "添加自定义平台",
+        editPlatform: "编辑平台",
+        confirmDelete: "确定要删除这个平台配置吗？",
+        deleteFailed: "删除失败",
+        saveFailed: "保存失败",
+        saveSuccess: "保存成功",
+        invalidJson: "无效的JSON格式",
+        importSuccess: "导入成功",
+        importFailed: "导入失败",
+        activate: "激活",
+        modelSelection: "模型选择:",
+        apiKeyLabel: "API密钥:",
+        apiKeyPlaceholder: "输入{platform}的API密钥",
+        website: "官网",
+        documentation: "文档",
+        savePlatformConfig: "保存该平台配置",
+        cancelPlatformConfig: "取消",
+        customConfig: "自定义配置{num}",
+        configName: "配置名称:",
+        configNamePlaceholder: "配置名称",
+        apiAddress: "API地址:",
+        apiAddressPlaceholder: "https://api.example.com/v1/chat/completions",
+        modelName: "模型名称:",
+        modelNamePlaceholder: "custom-model-name",
+        apiKeyPlaceholderCustom: "your-api-key-here",
+        showHidePassword: "显示/隐藏密码",
+        saveFailedAdvanced: "高级参数状态保存失败，请重试。",
+        configSaved: "配置已保存",
+        configSaveFailed: "配置保存失败，请重试。",
+        noConfig: "无配置可导出",
+        importSuccessMsg: "配置导入成功，已更新为新配置",
+        importFailedMsg: "配置导入失败，JSON格式无效。",
+        deleteConfirm: "确定要删除此自定义配置吗？",
+        deleteSuccess: "删除成功",
+        deleteError: "删除失败，请重试",
+        inputApiKey: "请输入API密钥",
+        selectModel: "请选择模型",
+        selectPlatform: "请选择平台",
+        confirmRestoreDefault: "确定要恢复默认配置吗？这将清空所有当前设置。",
+        restoreDefaultSuccess: "已恢复默认配置并已自动保存！",
+        restoreDefaultFailed: "已恢复默认配置，但保存失败，请稍后重试或手动保存。",
+        exportSuccess: "配置导出成功！",
+        exportFailed: "导出配置失败，请重试。",
+        confirmImportConfig: "确定要导入配置文件吗？这将覆盖当前的所有设置。",
+        importError: "导入失败：{error}"
+    },
+    en: {
+        nodeSettings: "⚙️ Node Settings",
+        settings: "Settings",
+        configApiKeys: "Configure API keys for each platform. After configuration, nodes will automatically use these keys without manual input each time.",
+        advancedParams: "Advanced Parameters",
+        enableAdvancedParams: "Advanced Parameters",
+        advancedParamsDesc: "Check to display Top K sampling, repetition penalty, min P sampling, Top P sampling parameters",
+        platformConfigs: "Platform Service Configuration",
+        restoreDefault: "Restore Default",
+        exportConfig: "Export Config",
+        importConfig: "Import Config",
+        apply: "Apply",
+        cancel: "Cancel",
+        platform: "Platform",
+        apiKey: "API Key",
+        apiKeyDesc: "Please enter the platform's API key",
+        customModel: "Custom Model",
+        customModelDesc: "Custom model name (optional)",
+        customBaseUrl: "Custom Base URL",
+        customBaseUrlDesc: "Custom API request address (optional)",
+        addPlatform: "Add Platform",
+        delete: "Delete",
+        addCustomPlatform: "Add Custom Platform",
+        editPlatform: "Edit Platform",
+        confirmDelete: "Are you sure you want to delete this platform configuration?",
+        deleteFailed: "Delete failed",
+        saveFailed: "Save failed",
+        saveSuccess: "Save successful",
+        invalidJson: "Invalid JSON format",
+        importSuccess: "Import successful",
+        importFailed: "Import failed",
+        activate: "Activate",
+        modelSelection: "Model Selection:",
+        apiKeyLabel: "API Key:",
+        apiKeyPlaceholder: "Enter {platform} API key",
+        website: "Website",
+        documentation: "Documentation",
+        savePlatformConfig: "Save Platform Config",
+        cancelPlatformConfig: "Cancel",
+        customConfig: "Custom Config {num}",
+        configName: "Config Name:",
+        configNamePlaceholder: "Config name",
+        apiAddress: "API Address:",
+        apiAddressPlaceholder: "https://api.example.com/v1/chat/completions",
+        modelName: "Model Name:",
+        modelNamePlaceholder: "custom-model-name",
+        apiKeyPlaceholderCustom: "your-api-key-here",
+        showHidePassword: "Show/Hide Password",
+        saveFailedAdvanced: "Failed to save advanced parameter status, please try again.",
+        configSaved: "Configuration saved",
+        configSaveFailed: "Failed to save configuration, please try again.",
+        noConfig: "No configuration to export",
+        importSuccessMsg: "Configuration imported successfully, updated to new configuration",
+        importFailedMsg: "Failed to import configuration, invalid JSON format.",
+        deleteConfirm: "Are you sure you want to delete this custom configuration?",
+        deleteSuccess: "Delete successful",
+        deleteError: "Delete failed, please try again",
+        inputApiKey: "Please enter API key",
+        selectModel: "Please select model",
+        selectPlatform: "Please select platform",
+        confirmRestoreDefault: "Are you sure you want to restore default configuration? This will clear all current settings.",
+        restoreDefaultSuccess: "Default configuration has been restored and automatically saved!",
+        restoreDefaultFailed: "Default configuration has been restored, but saving failed. Please try again later or save manually.",
+        exportSuccess: "Configuration exported successfully!",
+        exportFailed: "Failed to export configuration, please try again.",
+        confirmImportConfig: "Are you sure you want to import the configuration file? This will overwrite all current settings.",
+        importError: "Import failed: {error}"
+    }
+};
+
+
+function getLocale() {
+    const comfyLocale = app?.ui?.settings?.getSettingValue?.('Comfy.Locale');
+    return comfyLocale === 'zh-CN' || comfyLocale === 'zh' ? 'zh' : 'en';
+}
+
+function $t(key) {
+    const locale = getLocale();
+    return i18n[locale][key] || i18n['en'][key] || key;
+}
+
 class APIConfigManager {
     constructor() {
         this.configPath = "custom_nodes/zhihui_nodes_comfyui/Nodes/Qwen3VL/api_config.json";
@@ -213,11 +363,11 @@ class APIConfigManager {
                 border-radius: 8px 8px 0 0;
                 text-align: center;
                 font-size: 16px;
-            ">设置</h2>
+            ">${$t('settings')}</h2>
             <div id="api-config-content">
                 <div style="margin-bottom: 15px;">
                     <p style="color: var(--descrip-text); font-size: 13px; margin: 0;">
-                        配置各个平台的API密钥。配置后，节点将自动使用这些密钥，无需每次手动输入。
+                        ${$t('configApiKeys')}
                     </p>
                 </div>
                 
@@ -232,11 +382,11 @@ class APIConfigManager {
                             font-weight: bold;
                             border-bottom: 1px solid var(--border-color);
                             padding-bottom: 5px;
-                        ">高级参数设置</h3>
+                        ">${$t('advancedParams')}</h3>
                         <label style="display: flex; align-items: center; gap: 8px; cursor: pointer; padding: 10px; background: var(--comfy-input-bg); border: 1px solid var(--border-color); border-radius: 6px;">
                             <input type="checkbox" id="advanced-params-checkbox" style="margin: 0; accent-color: #22c55e; width: 18px; height: 18px;">
-                            <span style="color: var(--input-text); font-size: 14px; font-weight: bold;">高级参数</span>
-                            <span style="color: var(--descrip-text); font-size: 12px; margin-left: auto;">勾选后显示Top K采样、重复惩罚、最小P采样、Top P采样参数</span>
+                            <span style="color: var(--input-text); font-size: 14px; font-weight: bold;">${$t('enableAdvancedParams')}</span>
+                            <span style="color: var(--descrip-text); font-size: 12px; margin-left: auto;">${$t('advancedParamsDesc')}</span>
                         </label>
                     </div>
                     
@@ -249,7 +399,7 @@ class APIConfigManager {
                             font-weight: bold;
                             border-bottom: 1px solid var(--border-color);
                             padding-bottom: 5px;
-                        ">平台服务配置</h3>
+                        ">${$t('platformConfigs')}</h3>
                         <div id="platform-configs"></div>
                     </div>
                 </div>
@@ -268,10 +418,10 @@ class APIConfigManager {
                             transition: all 0.2s ease;
                             box-shadow: 0 2px 4px rgba(217, 119, 6, 0.2);
                         " onmouseover="this.style.background='#b45309'; this.style.borderColor='#b45309'; this.style.boxShadow='0 2px 12px rgba(217, 119, 6, 0.6)'; this.style.transform='translateY(-1px)';" 
-                          onmouseout="this.style.background='#d97706'; this.style.borderColor='#d97706'; this.style.boxShadow='0 2px 4px rgba(217, 119, 6, 0.2)'; this.style.transform='translateY(0)';">恢复默认</button>
+                          onmouseout="this.style.background='#d97706'; this.style.borderColor='#d97706'; this.style.boxShadow='0 2px 4px rgba(217, 119, 6, 0.2)'; this.style.transform='translateY(0)';">${$t('restoreDefault')}</button>
                     </div>
                     
-                    <div style="display: flex; gap: 8px; padding: 4px 8px; background: var(--comfy-panel-bg, #2a2a2a); border-radius: 6px; border: 1px solid var(--border-color, #404040); margin-left: -350px;">
+                    <div style="display: flex; gap: 8px; padding: 4px 8px; background: var(--comfy-panel-bg, #2a2a2a); border-radius: 6px; border: 1px solid var(--border-color, #404040); margin-left: -280px;">
                         <button id="export-config" style="
                             background: #3b82f6;
                             border: 1px solid #3b82f6;
@@ -283,7 +433,7 @@ class APIConfigManager {
                             transition: all 0.2s ease;
                             font-weight: 500;
                         " onmouseover="this.style.background='#2563eb'; this.style.borderColor='#2563eb'; this.style.boxShadow='0 4px 16px rgba(59, 130, 246, 0.6)'; this.style.transform='translateY(-2px)';" 
-                          onmouseout="this.style.background='#3b82f6'; this.style.borderColor='#3b82f6'; this.style.boxShadow='none'; this.style.transform='translateY(0)';">导出配置</button>
+                          onmouseout="this.style.background='#3b82f6'; this.style.borderColor='#3b82f6'; this.style.boxShadow='none'; this.style.transform='translateY(0)';">${$t('exportConfig')}</button>
                         <button id="import-config" style="
                             background: #3b82f6;
                             border: 1px solid #3b82f6;
@@ -295,7 +445,7 @@ class APIConfigManager {
                             transition: all 0.2s ease;
                             font-weight: 500;
                         " onmouseover="this.style.background='#2563eb'; this.style.borderColor='#2563eb'; this.style.boxShadow='0 4px 16px rgba(59, 130, 246, 0.6)'; this.style.transform='translateY(-2px)';" 
-                          onmouseout="this.style.background='#3b82f6'; this.style.borderColor='#3b82f6'; this.style.boxShadow='none'; this.style.transform='translateY(0)';">导入配置</button>
+                          onmouseout="this.style.background='#3b82f6'; this.style.borderColor='#3b82f6'; this.style.boxShadow='none'; this.style.transform='translateY(0)';">${$t('importConfig')}</button>
                     </div>
                     
                     <div>
@@ -303,13 +453,15 @@ class APIConfigManager {
                             background: #ff0000;
                             border: 1px solid #ff0000;
                             color: white;
-                            padding: 6px 12px;
+                            padding: 6px 14px;
                             border-radius: 4px;
                             cursor: pointer;
-                            font-size: 13px;
+                            font-size: 16px;
+                            font-weight: bold;
                             transition: all 0.2s ease;
+                            line-height: 1;
                         " onmouseover="this.style.background='#e60000'; this.style.borderColor='#e60000'; this.style.boxShadow='0 4px 16px rgba(255, 0, 0, 0.6)'; this.style.transform='translateY(-2px)';" 
-                          onmouseout="this.style.background='#ff0000'; this.style.borderColor='#ff0000'; this.style.boxShadow='none'; this.style.transform='translateY(0)';">退出</button>
+                          onmouseout="this.style.background='#ff0000'; this.style.borderColor='#ff0000'; this.style.boxShadow='none'; this.style.transform='translateY(0)';" title="${$t('cancel')}">&times;</button>
                     </div>
                 </div>
             </div>
@@ -336,7 +488,7 @@ class APIConfigManager {
                     config.advanced_params_enabled = previousValue;
                     advancedParamsCheckbox.checked = previousValue;
                     this.updateAdvancedParamsVisibility(previousValue);
-                    alert("高级参数状态保存失败，请重试。");
+                    alert($t('saveFailedAdvanced'));
                 }
             };
             this.updateAdvancedParamsVisibility(advancedParamsCheckbox.checked);
@@ -437,11 +589,11 @@ class APIConfigManager {
                                value="${platform}"
                                ${isActive ? 'checked' : ''}
                                style="margin: 0; accent-color: #22c55e;">
-                        <span style="font-size: 12px; color: ${isActive ? '#22c55e' : 'var(--input-text)'}; font-weight: ${isActive ? 'bold' : 'normal'};">激活</span>
+                        <span style="font-size: 12px; color: ${isActive ? '#22c55e' : 'var(--input-text)'}; font-weight: ${isActive ? 'bold' : 'normal'};">${$t('activate')}</span>
                     </label>
                 </div>
                 <div style="margin-bottom: 8px; flex: 1;">
-                    <label style="display: block; margin-bottom: 4px; color: var(--input-text); font-size: 12px;">模型选择:</label>
+                    <label style="display: block; margin-bottom: 4px; color: var(--input-text); font-size: 12px;">${$t('modelSelection')}</label>
                     <select data-platform-model="${platform}" 
                             style="
                                 width: 100%;
@@ -456,12 +608,12 @@ class APIConfigManager {
                     </select>
                 </div>
                 <div style="margin-bottom: 8px; flex: 1;">
-                    <label style="display: block; margin-bottom: 4px; color: var(--input-text); font-size: 12px;">API密钥:</label>
+                    <label style="display: block; margin-bottom: 4px; color: var(--input-text); font-size: 12px;">${$t('apiKeyLabel')}</label>
                     <div style="position: relative; display: flex; align-items: center;">
                         <input type="password" 
                                data-platform="${platform}" 
                                value="${platformConfig.api_key || ""}"
-                               placeholder="输入${platform}的API密钥"
+                               placeholder="${$t('apiKeyPlaceholder').replace('{platform}', platform)}"
                                style="
                                    width: 100%;
                                    padding: 6px 35px 6px 6px;
@@ -489,7 +641,7 @@ class APIConfigManager {
                                 "
                                 onmouseover="this.style.opacity='1'"
                                 onmouseout="this.style.opacity='0.7'"
-                                title="显示/隐藏密码">
+                                title="${$t('showHidePassword')}">
                             🙈
                         </button>
                     </div>
@@ -497,11 +649,11 @@ class APIConfigManager {
                 <div style="display: flex; gap: 8px; font-size: 11px; justify-content: center; margin-top: auto;">
                     <a href="${platformConfig.website || "#"}" target="_blank" 
                        style="color: var(--comfy-link-text); text-decoration: none;">
-                       官网
+                       ${$t('website')}
                     </a>
                     <a href="${platformConfig.docs || "#"}" target="_blank" 
                        style="color: var(--comfy-link-text); text-decoration: none;">
-                       文档
+                       ${$t('documentation')}
                     </a>
                 </div>
                 <div class="per-card-save" style="visibility: hidden; margin-top: auto; text-align: right; display: flex; gap: 8px; justify-content: flex-end; min-height: 32px; height: 32px; align-items: center;">
@@ -515,7 +667,7 @@ class APIConfigManager {
                         font-size: 12px;
                         transition: all 0.2s ease;
                     " onmouseover="this.style.background='#4488ff'; this.style.borderColor='#4488ff'; this.style.color='white';" 
-                      onmouseout="this.style.background='var(--comfy-input-bg)'; this.style.borderColor='var(--border-color)'; this.style.color='var(--input-text)';">保存该平台配置</button>
+                      onmouseout="this.style.background='var(--comfy-input-bg)'; this.style.borderColor='var(--border-color)'; this.style.color='var(--input-text)';">${$t('savePlatformConfig')}</button>
                     <button type="button" class="cancel-card-btn" data-card="${platform}" style="
                         background: var(--comfy-input-bg);
                         border: 1px solid var(--border-color);
@@ -526,7 +678,7 @@ class APIConfigManager {
                         font-size: 12px;
                         transition: all 0.2s ease;
                     " onmouseover="this.style.background='#ff4444'; this.style.borderColor='#ff4444'; this.style.color='white';" 
-                      onmouseout="this.style.background='var(--comfy-input-bg)'; this.style.borderColor='var(--border-color)'; this.style.color='var(--input-text)';">取消</button>
+                      onmouseout="this.style.background='var(--comfy-input-bg)'; this.style.borderColor='var(--border-color)'; this.style.color='var(--input-text)';">${$t('cancelPlatformConfig')}</button>
                 </div>
             `;
 
@@ -557,23 +709,23 @@ class APIConfigManager {
 
             customDiv.innerHTML = `
                 <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 8px;">
-                    <h3 style="margin: 0; color: var(--input-text); font-size: 14px;">${customConfig.name || `自定义配置${customKey.slice(-1)}`}</h3>
+                    <h3 style="margin: 0; color: var(--input-text); font-size: 14px;">${customConfig.name || $t('customConfig').replace('{num}', customKey.slice(-1))}</h3>
                     <label style="display: flex; align-items: center; gap: 4px; cursor: pointer;">
                         <input type="radio" 
                                name="active_target" 
                                value="${customKey}"
                                ${isActive ? 'checked' : ''}
                                style="margin: 0; accent-color: #22c55e;">
-                        <span style="font-size: 12px; color: ${isActive ? '#22c55e' : 'var(--input-text)'}; font-weight: ${isActive ? 'bold' : 'normal'};">激活</span>
+                        <span style="font-size: 12px; color: ${isActive ? '#22c55e' : 'var(--input-text)'}; font-weight: ${isActive ? 'bold' : 'normal'};">${$t('activate')}</span>
                     </label>
                 </div>
                 
                 <div style="margin-bottom: 8px; flex: 1;">
-                    <label style="display: block; margin-bottom: 4px; color: var(--input-text); font-size: 12px;">配置名称:</label>
+                    <label style="display: block; margin-bottom: 4px; color: var(--input-text); font-size: 12px;">${$t('configName')}</label>
                     <input type="text" 
                            data-custom="${customKey}_name" 
-                           value="${customConfig.name || `自定义配置${customKey.slice(-1)}`}"
-                           placeholder="配置名称"
+                           value="${customConfig.name || $t('customConfig').replace('{num}', customKey.slice(-1))}"
+                           placeholder="${$t('configNamePlaceholder')}"
                            style="
                                width: 100%;
                                padding: 6px;
@@ -587,11 +739,11 @@ class APIConfigManager {
                 </div>
                 
                 <div style="margin-bottom: 8px; flex: 1;">
-                    <label style="display: block; margin-bottom: 4px; color: var(--input-text); font-size: 12px;">API地址:</label>
+                    <label style="display: block; margin-bottom: 4px; color: var(--input-text); font-size: 12px;">${$t('apiAddress')}</label>
                     <input type="text" 
                            data-custom="${customKey}_api_base" 
                            value="${customConfig.api_base || ""}"
-                           placeholder="https://api.example.com/v1/chat/completions"
+                           placeholder="${$t('apiAddressPlaceholder')}"
                            style="
                                width: 100%;
                                padding: 6px;
@@ -605,11 +757,11 @@ class APIConfigManager {
                 </div>
                 
                 <div style="margin-bottom: 8px; flex: 1;">
-                    <label style="display: block; margin-bottom: 4px; color: var(--input-text); font-size: 12px;">模型名称:</label>
+                    <label style="display: block; margin-bottom: 4px; color: var(--input-text); font-size: 12px;">${$t('modelName')}</label>
                     <input type="text" 
                            data-custom="${customKey}_model_name" 
                            value="${customConfig.model_name || ""}"
-                           placeholder="custom-model-name"
+                           placeholder="${$t('modelNamePlaceholder')}"
                            style="
                                width: 100%;
                                padding: 6px;
@@ -623,12 +775,12 @@ class APIConfigManager {
                 </div>
                 
                 <div style="margin-bottom: 8px; position: relative;">
-                    <label style="display: block; margin-bottom: 4px; color: var(--input-text); font-size: 12px;">API密钥:</label>
+                    <label style="display: block; margin-bottom: 4px; color: var(--input-text); font-size: 12px;">${$t('apiKeyLabel')}</label>
                     <div style="position: relative; display: flex; align-items: center;">
                         <input type="password" 
                                data-custom="${customKey}_api_key" 
                                value="${customConfig.api_key || ""}"
-                               placeholder="your-api-key-here"
+                               placeholder="${$t('apiKeyPlaceholderCustom')}"
                                style="
                                    width: 100%;
                                    padding: 6px 35px 6px 6px;
@@ -656,7 +808,7 @@ class APIConfigManager {
                                 "
                                 onmouseover="this.style.opacity='1'"
                                 onmouseout="this.style.opacity='0.7'"
-                                title="显示/隐藏密码">
+                                title="${$t('showHidePassword')}">
                             🙈
                         </button>
                     </div>
@@ -672,7 +824,7 @@ class APIConfigManager {
                         font-size: 12px;
                         transition: all 0.2s ease;
                     " onmouseover="this.style.background='#4488ff'; this.style.borderColor='#4488ff'; this.style.color='white';" 
-                      onmouseout="this.style.background='var(--comfy-input-bg)'; this.style.borderColor='var(--border-color)'; this.style.color='var(--input-text)';">保存该平台配置</button>
+                      onmouseout="this.style.background='var(--comfy-input-bg)'; this.style.borderColor='var(--border-color)'; this.style.color='var(--input-text)';">${$t('savePlatformConfig')}</button>
                     <button type="button" class="cancel-card-btn" data-card="${customKey}" style="
                         background: var(--comfy-input-bg);
                         border: 1px solid var(--border-color);
@@ -683,13 +835,13 @@ class APIConfigManager {
                         font-size: 12px;
                         transition: all 0.2s ease;
                     " onmouseover="this.style.background='#ff4444'; this.style.borderColor='#ff4444'; this.style.color='white';" 
-                      onmouseout="this.style.background='var(--comfy-input-bg)'; this.style.borderColor='var(--border-color)'; this.style.color='var(--input-text)';">取消</button>
+                      onmouseout="this.style.background='var(--comfy-input-bg)'; this.style.borderColor='var(--border-color)'; this.style.color='var(--input-text)';">${$t('cancelPlatformConfig')}</button>
                 </div>
             `;
 
             customDiv.dataset.cardType = "custom";
             customDiv.dataset.cardKey = customKey;
-            customDiv.dataset.initialName = customConfig.name || `自定义配置${customKey.slice(-1)}`;
+            customDiv.dataset.initialName = customConfig.name || $t('customConfig').replace('{num}', customKey.slice(-1));
             customDiv.dataset.initialApiBase = customConfig.api_base || "";
             customDiv.dataset.initialModelName = customConfig.model_name || "";
             customDiv.dataset.initialApiKey = customConfig.api_key || "";
@@ -769,7 +921,7 @@ class APIConfigManager {
                     if (selectEl) card.dataset.initialModel = selectEl.value;
                     if (keyInput) card.dataset.initialApiKey = keyInput.value;
                 } else {
-                    alert('保存失败，请重试');
+                    alert($t('saveFailed'));
                 }
             });
 
@@ -820,7 +972,7 @@ class APIConfigManager {
                     if (modelName) card.dataset.initialModelName = modelName.value;
                     if (apiKey) card.dataset.initialApiKey = apiKey.value;
                 } else {
-                    alert('保存失败，请重试');
+                    alert($t('saveFailed'));
                 }
             });
 
@@ -1201,17 +1353,17 @@ class APIConfigManager {
         const success = await this.saveConfig(newConfig);
         if (success) {
             this.config = newConfig;
-            alert("配置保存成功！");
+            alert($t('configSaved'));
             if (onSuccess) {
                 onSuccess();
             }
         } else {
-            alert("配置保存失败，请检查网络连接或重试。");
+            alert($t('configSaveFailed'));
         }
     }
 
     async restoreDefaultConfig(dialog) {
-        if (!confirm("确定要恢复默认配置吗？这将清空所有当前设置。")) {
+        if (!confirm($t('confirmRestoreDefault'))) {
             return;
         }
 
@@ -1234,9 +1386,9 @@ class APIConfigManager {
         }
 
         if (ok) {
-            alert("已恢复默认配置并已自动保存！");
+            alert($t('restoreDefaultSuccess'));
         } else {
-            alert("已恢复默认配置，但保存失败，请稍后重试或手动保存。");
+            alert($t('restoreDefaultFailed'));
         }
     }
 
@@ -1260,10 +1412,10 @@ class APIConfigManager {
             document.body.removeChild(link);
             URL.revokeObjectURL(url);
             
-            alert("配置导出成功！");
+            alert($t('exportSuccess'));
         } catch (error) {
             console.error("导出配置失败:", error);
-            alert("导出配置失败，请重试。");
+            alert($t('exportFailed'));
         }
     }
 
@@ -1293,7 +1445,7 @@ class APIConfigManager {
                     }
                     
                     // 显示导入确认对话框
-                    if (!confirm(`确定要导入配置文件吗？这将覆盖当前的所有设置。`)) {
+                    if (!confirm($t('confirmImportConfig'))) {
                         return;
                     }
                     
@@ -1324,14 +1476,14 @@ class APIConfigManager {
                             this.updateAdvancedParamsVisibility(this.config.advanced_params_enabled || false);
                         }
                         
-                        alert("配置导入成功！");
+                        alert($t('importSuccessMsg'));
                     } else {
-                        alert("配置导入失败，请重试。");
+                        alert($t('importFailedMsg'));
                     }
                     
                 } catch (error) {
                     console.error("解析配置文件失败:", error);
-                    alert(`导入失败：${error.message}`);
+                    alert($t('importError').replace('{error}', error.message));
                 }
             };
             input.click();
@@ -1359,7 +1511,7 @@ app.registerExtension({
                 nodeType.prototype.onNodeCreated = function () {
                     const r = onNodeCreated ? onNodeCreated.apply(this, arguments) : undefined;
                     
-                    const configButton = this.addWidget("button", "⚙️节点设置·Node Settings", null, () => {
+                    const configButton = this.addWidget("button", $t('nodeSettings'), null, () => {
                         const buttonElement = document.querySelector('.comfy-widget-value[value="Settings·设置"]');
                         apiConfigManager.showConfigDialog(buttonElement);
                     });

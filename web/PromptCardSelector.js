@@ -1,6 +1,25 @@
 import { app } from "/scripts/app.js";
 import { api } from "/scripts/api.js";
 
+const i18n = {
+    zh: {
+        cardPoolManager: "🗃️ 卡池管理器"
+    },
+    en: {
+        cardPoolManager: "🗃️ Card Pool Manager"
+    }
+};
+
+function getLocale() {
+    const comfyLocale = app?.ui?.settings?.getSettingValue?.('Comfy.Locale');
+    return comfyLocale === 'zh-CN' || comfyLocale === 'zh' ? 'zh' : 'en';
+}
+
+function $t(key) {
+    const locale = getLocale();
+    return i18n[locale][key] || i18n['en'][key] || key;
+}
+
 const commonStyles = {
     button: {
         base: { display:'inline-flex', alignItems:'center', justifyContent:'center', padding:'6px 12px', borderRadius:'6px', border:'1px solid', fontSize:'14px', fontWeight:'500', cursor:'pointer', transition:'all 0.2s ease', outline:'none' },
@@ -186,7 +205,7 @@ app.registerExtension({
     },
     nodeCreated(node){
         if (node.comfyClass === "PromptCardSelector"){
-            const btn = node.addWidget("button", "🗃️卡池管理器·Card Pool Manager", "open_card_pool", () => openPromptCardPool(node));
+            const btn = node.addWidget("button", $t('cardPoolManager'), "open_card_pool", () => openPromptCardPool(node));
             btn.serialize = false;
         }
     }

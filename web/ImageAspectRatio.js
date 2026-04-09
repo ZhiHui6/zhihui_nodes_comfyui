@@ -1,5 +1,24 @@
 import { app } from "../../../scripts/app.js";
 
+const i18n = {
+    zh: {
+        swapSize: "🔃 尺寸互换"
+    },
+    en: {
+        swapSize: "🔃 Swap Size"
+    }
+};
+
+function getLocale() {
+    const comfyLocale = app?.ui?.settings?.getSettingValue?.('Comfy.Locale');
+    return comfyLocale === 'zh-CN' || comfyLocale === 'zh' ? 'zh' : 'en';
+}
+
+function $t(key) {
+    const locale = getLocale();
+    return i18n[locale][key] || i18n['en'][key] || key;
+}
+
 app.registerExtension({
     name: "ImageAspectRatio",
     async beforeRegisterNodeDef(nodeType, nodeData, app) {
@@ -236,7 +255,7 @@ app.registerExtension({
                     const widthIdx = widgets.findIndex(w => w && w.name === "custom_width");
                     const heightIdx = widgets.findIndex(w => w && w.name === "custom_height");
                     const lockIdx = widgets.findIndex(w => w && w.name === "aspect_lock");
-                    const swapIdx = widgets.findIndex(w => w && w.name === "🔃尺寸互换·Swap_Size");
+                    const swapIdx = widgets.findIndex(w => w && w.name === $t('swapSize'));
                     
                     if (modeIdx < 0 || categoryIdx < 0 || sizeIdx < 0 || widthIdx < 0 || heightIdx < 0 || lockIdx < 0) return;
                     
@@ -263,7 +282,7 @@ app.registerExtension({
                         widgets.splice(modeIdx + 1, 0, widthWidget, heightWidget, lockWidget);
                         
                         if (!swapWidget) {
-                            swapWidget = this.addWidget("button", "🔃尺寸互换·Swap_Size", null, () => {
+                            swapWidget = this.addWidget("button", $t('swapSize'), null, () => {
                                 this.swapAll();
                             });
                             const curIdx = widgets.indexOf(swapWidget);
@@ -287,7 +306,7 @@ app.registerExtension({
                         widgets.splice(modeIdx + 1, 0, categoryWidget, sizeWidget);
                         
                         if (!swapWidget) {
-                            swapWidget = this.addWidget("button", "🔃尺寸互换·Swap_Size", null, () => {
+                            swapWidget = this.addWidget("button", $t('swapSize'), null, () => {
                                 this.swapAll();
                             });
                             const curIdx = widgets.indexOf(swapWidget);
