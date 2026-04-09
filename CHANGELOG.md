@@ -4,12 +4,15 @@
   - 输入端口最大数量限制为12个
   - 删除更新按钮，改为滑块值变化时自动同步端口
   - 移除所有提示性信息
+- Qwen3-VL多路径输入节点（Qwen3-VL Multiple Paths Input）：
+  - 优化节点输入数量动态更新逻辑，移除手动更新按钮
     <br>
 - Optimized ImageSwitchDualMode, TextSwitchDualMode, and LatentSwitchDualMode nodes:
   - Limited maximum input ports to 12
   - Removed Update button, ports auto-sync on slider value change
   - Removed all notification messages
-    <br>
+- Qwen3-VL Multiple Paths Input node:
+  - Optimized dynamic input count update logic, removed manual update button
 
 ## 1.0.23 2026-4-8
 - LM工作室节点(LMStudio):优化界面UI

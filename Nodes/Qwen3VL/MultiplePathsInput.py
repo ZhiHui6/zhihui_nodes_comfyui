@@ -5,7 +5,7 @@ class MultiplePathsInput:
     def INPUT_TYPES(s):
         return {
             "required": {
-                "inputcount": ("INT", {"default": 1, "min": 1, "max": 1000, "step": 1}),
+                "inputcount": ("INT", {"default": 1, "min": 1, "max": 12, "step": 1}),
                 "path_1": ("PATH",),
             },
             "optional": {}

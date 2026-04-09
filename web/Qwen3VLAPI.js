@@ -1380,22 +1380,6 @@ app.registerExtension({
                     this._type = "PATH";
                     this.inputs_offset = nodeData.name.includes("selective") ? 1 : 0;
                     
-                    const inputcountWidget = this.widgets.find(w => w.name === "inputcount");
-                    if (inputcountWidget) {
-                        const originalCallback = inputcountWidget.callback;
-                        inputcountWidget.callback = (value) => {
-                            if (originalCallback) originalCallback.call(this, value);
-                            this.updateInputs(value);
-                        };
-                    }
-                    
-                    this.addWidget("button", "Update inputs", null, () => {
-                        const target_number_of_inputs = this.widgets.find(
-                            (w) => w.name === "inputcount"
-                        )["value"];
-                        this.updateInputs(target_number_of_inputs);
-                    });
-                    
                     this.updateInputs = function(target_number_of_inputs) {
                         if (!this.inputs) {
                             this.inputs = [];
@@ -1421,6 +1405,36 @@ app.registerExtension({
                             }
                         }
                     };
+                    
+                    const inputcountWidget = this.widgets.find(w => w.name === "inputcount");
+                    if (inputcountWidget) {
+                        const self = this;
+                        const handleInputChange = () => {
+                            const n = parseInt(inputcountWidget.value) || 1;
+                            self.updateInputs(n);
+                        };
+                        const originalCallback = inputcountWidget.callback;
+                        inputcountWidget.callback = function(value) {
+                            if (originalCallback) originalCallback.call(this, value);
+                            handleInputChange();
+                        };
+                        const originalMouseUp = inputcountWidget.mouseUp;
+                        inputcountWidget.mouseUp = function(e, pos, node) {
+                            const result = originalMouseUp ? originalMouseUp.call(this, e, pos, node) : undefined;
+                            handleInputChange();
+                            return result;
+                        };
+                        const originalOnKeyDown = inputcountWidget.onKeyDown;
+                        inputcountWidget.onKeyDown = function(e) {
+                            const result = originalOnKeyDown ? originalOnKeyDown.call(this, e) : undefined;
+                            if (e.keyCode === 13) {
+                                handleInputChange();
+                            }
+                            return result;
+                        };
+                        const v = parseInt(inputcountWidget.value) || 1;
+                        this.updateInputs(v);
+                    }
                 };
                 break;
                 
