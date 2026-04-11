@@ -45,6 +45,8 @@ async def save_lmstudio_config(request):
             config["prompt_version"] = data["prompt_version"]
         if "show_log_panel" in data:
             config["show_log_panel"] = data["show_log_panel"]
+        if "folder_read_mode" in data:
+            config["folder_read_mode"] = data["folder_read_mode"]
         if _save_config(config):
             return web.json_response({"status": "success"})
         else:

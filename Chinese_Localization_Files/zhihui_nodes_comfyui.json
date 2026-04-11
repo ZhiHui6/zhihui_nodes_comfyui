@@ -231,5 +231,8 @@
     "time_count": "按时间（逐个时间）",
     "time_interval": "按时间（间隔时间）",
     "seconds":"秒",
-    "minutes":"分钟"
+    "minutes":"分钟",
+    "Image Caption":"图像反推",
+    "Detailed Analysis":"详细分析",
+    "Qwen3.5 Pro":"Qwen3.5专业版"
 }

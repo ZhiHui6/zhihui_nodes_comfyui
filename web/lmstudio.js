@@ -26,12 +26,12 @@ const i18n = {
         promptPresetVersion: "反推预设版本",
         newVersion: "新版预设",
         oldVersion: "旧版预设",
-        premiumVersion: "甄品预设",
+        premiumVersion: "臻品预设",
         newVersionHintPrefix: "新版预设包含更多选项：",
         newVersionHintOptions: "标签、简洁、详细、极详细、电影感、详细分析、短篇故事、优化扩展提示词",
         oldVersionHintPrefix: "旧版预设包含：",
         oldVersionHintOptions: "标签、极详细、短篇故事",
-        premiumVersionHintPrefix: "甄品预设：",
+        premiumVersionHintPrefix: "臻品预设：",
         premiumVersionHintOptions: "图像反推、详细分析、Qwen3.5专业版，源自社区各位业界大佬",
         fetchModelsTimeout: "获取模型列表超时",
         fetchModelsTimeoutDesc: "从LM Studio服务器获取可用模型列表的最大等待时间",
@@ -86,7 +86,7 @@ const i18n = {
         templateContent: "模板内容",
         templateNamePlaceholder: "请输入模板名称",
         templateContentPlaceholder: "请输入系统提示词内容",
-        noTemplates: "暂无模板，点击上方按钮创建",
+        noTemplates: "暂无模板，点击设置按钮进行模板管理",
         confirmDelete: "确定要删除此模板吗？",
         templateCreated: "模板创建成功",
         templateUpdated: "模板更新成功",
@@ -110,7 +110,16 @@ const i18n = {
         confirm: "确定",
         save: "保存",
         edit: "编辑模板",
-        delete: "删除"
+        delete: "删除",
+        folderReadMode: "文件夹读取模式",
+        folderReadModeDesc: "选择批量打标时的文件夹处理方式",
+        recursiveMode: "递归遍历模式",
+        sequentialMode: "顺序轮次模式",
+        recursiveModeDesc: "一次性遍历所有子文件夹，处理全部图片",
+        sequentialModeDesc: "按文件夹名称顺序依次处理，支持断点续传",
+        folderReadModeHint: "递归模式适合一次性处理所有图片；顺序模式适合分批处理，可在中断后继续",
+        navSettings: "节点设置",
+        navTemplates: "模板管理"
     },
     en: {
         title: "🤖 LM Studio Node Settings",
@@ -204,6 +213,7 @@ const i18n = {
         templateUpdateFailed: "Failed to update template",
         templateDeleteFailed: "Failed to delete template",
         templateNameRequired: "Template name is required",
+        noTemplates: "No templates yet, click the settings button to manage templates",
         searchTemplates: "Search templates...",
         sortByName: "Sort by name",
         sortByTime: "Sort by time",
@@ -219,7 +229,16 @@ const i18n = {
         confirm: "Confirm",
         save: "Save",
         edit: "Edit Template",
-        delete: "Delete"
+        delete: "Delete",
+        folderReadMode: "Folder Read Mode",
+        folderReadModeDesc: "Select folder processing method for batch tagging",
+        recursiveMode: "Recursive Mode",
+        sequentialMode: "Sequential Mode",
+        recursiveModeDesc: "Traverse all subfolders at once, process all images",
+        sequentialModeDesc: "Process folders in order by name, supports resume",
+        folderReadModeHint: "Recursive mode is suitable for processing all images at once; Sequential mode is suitable for batch processing and can resume after interruption",
+        navSettings: "Node Settings",
+        navTemplates: "Template Manager"
     }
 };
 
@@ -666,7 +685,6 @@ app.registerExtension({
                 templateBtn.type = "button";
                 templateBtn.className = "lmstudio-template-btn";
                 templateBtn.innerHTML = `<svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="display:block;"><rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect><line x1="3" y1="9" x2="21" y2="9"></line><line x1="9" y1="21" x2="9" y2="9"></line></svg>`;
-                templateBtn.title = $t('template');
                 templateBtn.style.cssText = `
                     position: absolute;
                     right: 3px;
@@ -1117,9 +1135,9 @@ function showLMStudioSettings(node) {
     const dialog = document.createElement("div");
     dialog.className = "comfy-modal";
     dialog.style.cssText = `
-        max-width: 1188px;
-        width: 100%;
-        min-height: 680px;
+        width: 1188px;
+        height: auto;
+        max-height: 90vh;
         background: #111827;
         border: 1px solid rgba(255, 255, 255, 0.12);
         border-radius: 10px;
@@ -1127,7 +1145,8 @@ function showLMStudioSettings(node) {
         padding: 16px 18px;
         color: #e8e8e8;
         z-index: 10002;
-        display: block;
+        display: flex;
+        flex-direction: column;
         opacity: 1;
         visibility: visible;
         pointer-events: auto;
@@ -1149,6 +1168,71 @@ function showLMStudioSettings(node) {
                 font-weight: 600;
                 color: #f0f0f0;
                 margin: 0;
+            }
+            #${uniqueId} .nav-menu {
+                display: flex;
+                gap: 4px;
+                margin-bottom: 12px;
+                padding: 4px;
+                background: rgba(0, 0, 0, 0.2);
+                border-radius: 8px;
+            }
+            #${uniqueId} .nav-tab {
+                flex: 1;
+                padding: 10px 20px;
+                background: transparent;
+                border: none;
+                border-radius: 6px;
+                color: #9ca3af;
+                font-size: 14px;
+                font-weight: 500;
+                cursor: pointer;
+                transition: all 0.2s ease;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                gap: 6px;
+            }
+            #${uniqueId} .nav-tab:hover {
+                background: rgba(102, 126, 234, 0.1);
+                color: #e8e8e8;
+            }
+            #${uniqueId} .nav-tab.active {
+                background: linear-gradient(135deg, #667eea, #5b67c8);
+                color: white;
+                box-shadow: 0 2px 8px rgba(102, 126, 234, 0.3);
+            }
+            #${uniqueId} .nav-tab svg {
+                width: 16px;
+                height: 16px;
+            }
+            #${uniqueId} .page-content {
+                display: none;
+                width: 100%;
+            }
+            #${uniqueId} .page-content.active {
+                display: block;
+            }
+            #${uniqueId} #page-settings,
+            #${uniqueId} #page-templates {
+                min-height: 920px;
+                max-height: 920px;
+                overflow-y: auto;
+                overflow-x: hidden;
+            }
+            #${uniqueId} #page-settings::-webkit-scrollbar,
+            #${uniqueId} #page-templates::-webkit-scrollbar {
+                width: 6px;
+            }
+            #${uniqueId} #page-settings::-webkit-scrollbar-track,
+            #${uniqueId} #page-templates::-webkit-scrollbar-track {
+                background: rgba(102, 126, 234, 0.1);
+                border-radius: 3px;
+            }
+            #${uniqueId} #page-settings::-webkit-scrollbar-thumb,
+            #${uniqueId} #page-templates::-webkit-scrollbar-thumb {
+                background: linear-gradient(180deg, #667eea, #5b67c8);
+                border-radius: 3px;
             }
             #${uniqueId} .circle-close {
                 width: 28px;
@@ -1574,16 +1658,82 @@ function showLMStudioSettings(node) {
                 color: #9ca3af;
                 flex: 1;
             }
-            #${uniqueId} .template-section {
+            #${uniqueId} .folder-read-mode-section {
                 margin-top: 16px;
                 padding: 12px 16px;
                 background: linear-gradient(145deg, #1a202c, #2d3748);
                 border: 1px solid rgba(255, 255, 255, 0.1);
                 border-radius: 8px;
             }
+            #${uniqueId} .folder-read-mode-title {
+                margin: 0 0 8px 0;
+                font-size: 14px;
+                font-weight: 600;
+                color: #ffffff;
+                display: flex;
+                align-items: center;
+                gap: 6px;
+            }
+            #${uniqueId} .folder-read-mode-row {
+                display: flex;
+                flex-direction: column;
+                gap: 10px;
+            }
+            #${uniqueId} .folder-read-mode-options {
+                display: flex;
+                gap: 16px;
+            }
+            #${uniqueId} .folder-read-mode-option {
+                display: flex;
+                align-items: center;
+                gap: 8px;
+                cursor: pointer;
+                padding: 8px 12px;
+                background: rgba(0, 0, 0, 0.2);
+                border-radius: 6px;
+                border: 2px solid transparent;
+                transition: all 0.2s ease;
+            }
+            #${uniqueId} .folder-read-mode-option:hover {
+                background: rgba(102, 126, 234, 0.1);
+            }
+            #${uniqueId} .folder-read-mode-option.active {
+                border-color: #667eea;
+                background: rgba(102, 126, 234, 0.15);
+            }
+            #${uniqueId} .folder-read-mode-option input[type="radio"] {
+                width: 16px;
+                height: 16px;
+                cursor: pointer;
+                accent-color: #667eea;
+            }
+            #${uniqueId} .folder-read-mode-option-label {
+                font-size: 13px;
+                color: #e8e8e8;
+                font-weight: 500;
+            }
+            #${uniqueId} .folder-read-mode-option-desc {
+                font-size: 11px;
+                color: #9ca3af;
+                margin-top: 2px;
+            }
+            #${uniqueId} .folder-read-mode-hint {
+                font-size: 12px;
+                color: #fbbf24;
+                padding: 8px 12px;
+                background: rgba(251, 191, 36, 0.1);
+                border-radius: 6px;
+                border-left: 3px solid #fbbf24;
+            }
+            #${uniqueId} .template-section {
+                padding: 16px;
+                background: linear-gradient(145deg, #1a202c, #2d3748);
+                border: 1px solid rgba(255, 255, 255, 0.1);
+                border-radius: 8px;
+            }
             #${uniqueId} .template-title {
                 margin: 0 0 12px 0;
-                font-size: 14px;
+                font-size: 16px;
                 font-weight: 600;
                 color: #ffffff;
                 display: flex;
@@ -1635,7 +1785,7 @@ function showLMStudioSettings(node) {
                 transform: translateY(-1px);
             }
             #${uniqueId} .template-list {
-                max-height: 200px;
+                max-height: 480px;
                 overflow-y: auto;
                 border: 1px solid rgba(255, 255, 255, 0.1);
                 border-radius: 6px;
@@ -1857,6 +2007,24 @@ function showLMStudioSettings(node) {
                 <h3 class="ui-title">${$t('title')}</h3>
                 <button class="circle-close" type="button"></button>
             </div>
+            <div class="nav-menu">
+                <button class="nav-tab active" data-page="settings" type="button">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <circle cx="12" cy="12" r="3"></circle>
+                        <path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"></path>
+                    </svg>
+                    ${$t('navSettings')}
+                </button>
+                <button class="nav-tab" data-page="templates" type="button">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect>
+                        <line x1="3" y1="9" x2="21" y2="9"></line>
+                        <line x1="9" y1="21" x2="9" y2="9"></line>
+                    </svg>
+                    ${$t('navTemplates')}
+                </button>
+            </div>
+            <div class="page-content active" id="page-settings">
             <div class="dashboard">
                 <h4 class="dashboard-title" style="margin: 0 0 10px 0;">
                     <span>📊</span>
@@ -1963,12 +2131,45 @@ function showLMStudioSettings(node) {
                 </h4>
                 <div class="log-panel-row">
                     <label class="log-panel-checkbox">
-                        <input type="checkbox" id="lmstudio-show-log-panel" checked>
+                        <input type="checkbox" id="lmstudio-show-log-panel">
                         <span class="log-panel-checkbox-label">${$t('enableLogPanel')}</span>
                     </label>
                     <span class="log-panel-hint">${$t('showLogPanelDesc')}</span>
                 </div>
             </div>
+            <div class="folder-read-mode-section">
+                <h4 class="folder-read-mode-title">
+                    <span>📁</span>
+                    <span>${$t('folderReadMode')}</span>
+                </h4>
+                <div class="folder-read-mode-row">
+                    <div class="folder-read-mode-options">
+                        <label class="folder-read-mode-option" id="folder-mode-recursive-label">
+                            <input type="radio" name="folder_read_mode" value="recursive" id="lmstudio-folder-mode-recursive" checked>
+                            <div>
+                                <div class="folder-read-mode-option-label">${$t('recursiveMode')}</div>
+                                <div class="folder-read-mode-option-desc">${$t('recursiveModeDesc')}</div>
+                            </div>
+                        </label>
+                        <label class="folder-read-mode-option" id="folder-mode-sequential-label">
+                            <input type="radio" name="folder_read_mode" value="sequential" id="lmstudio-folder-mode-sequential">
+                            <div>
+                                <div class="folder-read-mode-option-label">${$t('sequentialMode')}</div>
+                                <div class="folder-read-mode-option-desc">${$t('sequentialModeDesc')}</div>
+                            </div>
+                        </label>
+                    </div>
+                    <div class="folder-read-mode-hint">
+                        💡 ${$t('folderReadModeHint')}
+                    </div>
+                </div>
+            </div>
+            <div class="save-section">
+                <button class="reset-default-btn" type="button" id="lmstudio-reset-default">${$t('resetDefault')}</button>
+                <button class="save-all-btn" type="button" id="lmstudio-save-all">${$t('saveAll')}</button>
+            </div>
+            </div>
+            <div class="page-content" id="page-templates">
             <div class="template-section">
                 <h4 class="template-title">
                     <span>📋</span>
@@ -1986,9 +2187,6 @@ function showLMStudioSettings(node) {
                     <div class="template-empty">${$t('noTemplates')}</div>
                 </div>
             </div>
-            <div class="save-section">
-                <button class="reset-default-btn" type="button" id="lmstudio-reset-default">${$t('resetDefault')}</button>
-                <button class="save-all-btn" type="button" id="lmstudio-save-all">${$t('saveAll')}</button>
             </div>
         </div>
     `;
@@ -2019,6 +2217,32 @@ function showLMStudioSettings(node) {
     
     const closeBtn = dialog.querySelector(".circle-close");
     closeBtn.onclick = close;
+    
+    const navTabs = dialog.querySelectorAll(".nav-tab");
+    const switchPage = (pageName) => {
+        navTabs.forEach(tab => {
+            if (tab.dataset.page === pageName) {
+                tab.classList.add("active");
+            } else {
+                tab.classList.remove("active");
+            }
+        });
+        
+        const settingsPage = dialog.querySelector("#page-settings");
+        const templatesPage = dialog.querySelector("#page-templates");
+        
+        if (pageName === "settings") {
+            settingsPage.classList.add("active");
+            templatesPage.classList.remove("active");
+        } else {
+            settingsPage.classList.remove("active");
+            templatesPage.classList.add("active");
+        }
+    };
+    
+    navTabs.forEach(tab => {
+        tab.onclick = () => switchPage(tab.dataset.page);
+    });
     
     const refreshBtn = dialog.querySelector(".dashboard-refresh");
     
@@ -2396,6 +2620,16 @@ function showLMStudioSettings(node) {
                 showLogPanelCheckbox.checked = showLogPanel;
                 node.lmstudioState.showLogPanel = showLogPanel;
                 
+                const folderReadMode = config.folder_read_mode || "recursive";
+                const recursiveRadio = dialog.querySelector("#lmstudio-folder-mode-recursive");
+                const sequentialRadio = dialog.querySelector("#lmstudio-folder-mode-sequential");
+                if (folderReadMode === "sequential") {
+                    sequentialRadio.checked = true;
+                } else {
+                    recursiveRadio.checked = true;
+                }
+                updateFolderReadModeDisplay();
+                
                 updatePresetDisplay();
             }
         } catch (e) {
@@ -2411,6 +2645,25 @@ function showLMStudioSettings(node) {
             updatePresetDisplay();
         }
     };
+    
+    const updateFolderReadModeDisplay = () => {
+        const recursiveLabel = dialog.querySelector("#folder-mode-recursive-label");
+        const sequentialLabel = dialog.querySelector("#folder-mode-sequential-label");
+        const recursiveRadio = dialog.querySelector("#lmstudio-folder-mode-recursive");
+        
+        if (recursiveRadio.checked) {
+            recursiveLabel.classList.add("active");
+            sequentialLabel.classList.remove("active");
+        } else {
+            recursiveLabel.classList.remove("active");
+            sequentialLabel.classList.add("active");
+        }
+    };
+    
+    const recursiveRadio = dialog.querySelector("#lmstudio-folder-mode-recursive");
+    const sequentialRadio = dialog.querySelector("#lmstudio-folder-mode-sequential");
+    recursiveRadio.addEventListener("change", updateFolderReadModeDisplay);
+    sequentialRadio.addEventListener("change", updateFolderReadModeDisplay);
     
     const updatePromptVersionHint = () => {
         const hintEl = dialog.querySelector(".prompt-version-hint");
@@ -2511,11 +2764,13 @@ function showLMStudioSettings(node) {
     saveAllBtn.onclick = async () => {
         const selectedPreset = presetSelect.value;
         const showLogPanel = showLogPanelCheckbox.checked;
+        const folderReadMode = dialog.querySelector("#lmstudio-folder-mode-recursive").checked ? "recursive" : "sequential";
 
         const config = {
             preset: selectedPreset,
             prompt_version: promptVersionSelect.value,
             show_log_panel: showLogPanel,
+            folder_read_mode: folderReadMode,
             timeouts: {
                 fetch_models: parseInt(timeoutFetchInput.value),
                 api_call: parseInt(timeoutApiInput.value),
@@ -2580,6 +2835,12 @@ function showLMStudioSettings(node) {
                 if (node._logPanelHost) {
                     node._logPanelHost.style.display = "flex";
                 }
+                
+                const recursiveRadio = dialog.querySelector("#lmstudio-folder-mode-recursive");
+                const sequentialRadio = dialog.querySelector("#lmstudio-folder-mode-sequential");
+                recursiveRadio.checked = true;
+                sequentialRadio.checked = false;
+                updateFolderReadModeDisplay();
 
                 updatePresetDisplay();
 
@@ -2587,6 +2848,7 @@ function showLMStudioSettings(node) {
                     preset: "Ignore",
                     prompt_version: "new",
                     show_log_panel: true,
+                    folder_read_mode: "recursive",
                     timeouts: {
                         fetch_models: 5,
                         api_call: 450,

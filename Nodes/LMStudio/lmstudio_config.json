@@ -7,5 +7,12 @@
   },
   "preset": "Ignore",
   "prompt_version": "new",
-  "show_log_panel": false
+  "show_log_panel": false,
+  "folder_read_mode": "recursive",
+  "batch_progress": {
+    "current_folder": "",
+    "processed_folders": [],
+    "total_folders": 0,
+    "current_folder_index": 0
+  }
 }
