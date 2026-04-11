@@ -34,17 +34,13 @@ const i18n = {
         aliyun: "阿里云翻译",
         youdao: "有道翻译",
         zhipu: "智谱AI翻译",
-        free: "免费翻译",
-        tencent: "腾讯翻译",
+        free: "谷歌翻译（免费）",
         baiduDesc: "百度翻译API，支持多种语言互译，需要注册百度翻译开放平台获取API密钥。免费额度：标准版5万字符/月，高级版100万字符/月（需个人认证）",
         aliyunDesc: "阿里云翻译API，企业级翻译服务，支持多种语言和领域。免费额度：100万字符/月。",
         youdaoDesc: "有道翻译API，基于神经网络翻译技术，提供高质量翻译。免费额度：赠送50元的体验金。",
         zhipuDesc: "智谱AI翻译API，基于大语言模型技术，提供高质量翻译服务，需要智谱AI开放平台API密钥。免费额度：新用户默认获得每月一定数量的免费额度。",
-        freeDesc: "完全免费使用翻译服务，无需API密钥。",
-        model: "模型",
-        translatePlatform: "翻译平台",
-        tencentTranslator: "腾讯翻译君",
-        googleTranslate: "谷歌翻译"
+        freeDesc: "使用谷歌翻译，完全免费，无需API密钥。",
+        model: "模型"
     },
     en: {
         title: "⚙️ Translation Platform Configuration",
@@ -78,17 +74,13 @@ const i18n = {
         aliyun: "Aliyun Translate",
         youdao: "Youdao Translate",
         zhipu: "Zhipu AI Translate",
-        free: "Free Translate",
-        tencent: "Tencent Translate",
+        free: "Google Translate (Free)",
         baiduDesc: "Baidu Translate API supports multiple languages. Requires API key from Baidu Translate Open Platform. Free tier: 50K chars/month (Standard), 1M chars/month (Advanced with verification).",
         aliyunDesc: "Aliyun Translation API provides enterprise-level translation service supporting multiple languages and domains. Free tier: 1M chars/month.",
         youdaoDesc: "Youdao Translation API uses neural network technology for high-quality translation. Free tier: 50 CNY trial credit.",
         zhipuDesc: "Zhipu AI Translation API uses large language model technology for high-quality translation. Requires API key from Zhipu AI Open Platform. Free tier available for new users.",
-        freeDesc: "Completely free translation service, no API key required.",
-        model: "Model",
-        translatePlatform: "Translate Platform",
-        tencentTranslator: "Tencent Translator",
-        googleTranslate: "Google Translate"
+        freeDesc: "Completely free translation service using Google Translate, no API key required.",
+        model: "Model"
     }
 };
 
@@ -533,11 +525,8 @@ async function clearConfig() {
 
 function getPlatformFields(platform) {
     const locale = getLocale();
-    const tencentTranslator = locale === 'zh' ? "腾讯翻译君" : "Tencent Translator";
-    const googleTranslate = locale === 'zh' ? "谷歌翻译" : "Google Translate";
     const modelLabel = locale === 'zh' ? "模型" : "Model";
-    const platformLabel = locale === 'zh' ? "翻译平台" : "Translate Platform";
-    
+
     const fields = {
         baidu: [
             { name: "app_id", label: "APP ID", type: "text", required: true },
@@ -555,9 +544,7 @@ function getPlatformFields(platform) {
             { name: "api_key", label: "API Key", type: "text", required: true },
             { name: "model", label: modelLabel, type: "select", options: ["glm-4-flash", "glm-4.5-flash", "glm-4.6v-flash", "glm-4.7-flash"], default: "glm-4.7-flash" }
         ],
-        free: [
-            { name: "platform", label: platformLabel, type: "select", options: [tencentTranslator, googleTranslate], default: tencentTranslator }
-        ]
+        free: []
     };
     return fields[platform] || [];
 }

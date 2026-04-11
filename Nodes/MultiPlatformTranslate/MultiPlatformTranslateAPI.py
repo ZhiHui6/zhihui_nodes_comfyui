@@ -64,10 +64,10 @@ class MultiPlatformTranslateAPI:
                     "api_url": "https://open.bigmodel.cn/api/paas/v4/chat/completions"
                 },
                 "free": {
-                    "name": "免费翻译",
+                    "name": "谷歌翻译（免费）",
                     "enabled": True,
                     "config": {},
-                    "api_url": "https://transmart.qq.com/api/imt"
+                    "api_url": "https://translate.googleapis.com/translate_a/single"
                 }
             },
             "default_platform": "baidu"
@@ -215,58 +215,25 @@ class MultiPlatformTranslateAPI:
 
     async def test_free_connection(self, config):
         try:
-            platform = config.get("platform", "腾讯翻译君")
-            
-            if platform == "腾讯翻译君":
-                import uuid
-                url = "https://transmart.qq.com/api/imt"
-                post_data = {
-                    "header": {
-                        "fn": "auto_translation",
-                        "client_key": f"browser-chrome-{uuid.uuid4()}"
-                    },
-                    "type": "plain",
-                    "model_category": "normal",
-                    "source": {
-                        "lang": "en",
-                        "text_list": ["hello"]
-                    },
-                    "target": {
-                        "lang": "zh"
-                    }
-                }
-                headers = {
-                    'Content-Type': 'application/json',
-                    'user-agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36',
-                    'referer': 'https://transmart.qq.com/zh-CN/index'
-                }
-                response = requests.post(url, headers=headers, data=json.dumps(post_data), timeout=10)
-                
-                if response.status_code == 200:
-                    result = response.json()
-                    if 'auto_translation' in result:
-                        return {"success": True, "message": "腾讯翻译君连接成功"}
-            
-            elif platform == "谷歌翻译":
-                url = "https://translate.googleapis.com/translate_a/single"
-                params = {
-                    "client": "gtx",
-                    "sl": "en",
-                    "tl": "zh-CN",
-                    "dt": "t",
-                    "q": "hello"
-                }
-                headers = {
-                    'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/110.0.0.0 Safari/537.36'
-                }
-                response = requests.get(url, params=params, headers=headers, timeout=10)
-                
-                if response.status_code == 200:
-                    result = response.json()
-                    if result and isinstance(result, list) and len(result) > 0:
-                        return {"success": True, "message": "谷歌翻译连接成功"}
-                
-            return {"success": False, "error": f"{platform}测试失败"}
+            url = "https://translate.googleapis.com/translate_a/single"
+            params = {
+                "client": "gtx",
+                "sl": "en",
+                "tl": "zh-CN",
+                "dt": "t",
+                "q": "hello"
+            }
+            headers = {
+                'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/110.0.0.0 Safari/537.36'
+            }
+            response = requests.get(url, params=params, headers=headers, timeout=10)
+
+            if response.status_code == 200:
+                result = response.json()
+                if result and isinstance(result, list) and len(result) > 0:
+                    return {"success": True, "message": "谷歌翻译连接成功"}
+
+            return {"success": False, "error": "谷歌翻译测试失败"}
         except Exception as e:
             return {"success": False, "error": f"连接异常: {str(e)}"}
 
@@ -347,7 +314,6 @@ class MultiPlatformTranslateAPI:
             
             test_methods = {
                 "baidu": self.test_baidu_connection,
-                "tencent": self.test_tencent_connection,
                 "aliyun": self.test_aliyun_connection,
                 "youdao": self.test_youdao_connection,
                 "zhipu": self.test_zhipu_connection,

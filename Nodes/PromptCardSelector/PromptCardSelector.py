@@ -1,5 +1,6 @@
 import os
 import json
+import re
 from typing import Dict
 from aiohttp import web
 from server import PromptServer
@@ -58,6 +59,17 @@ class PromptCardSelector:
             pass
 
     @classmethod
+    def _extract_name_en(cls, content: str) -> str:
+        if not content:
+            return ""
+        lines = content.split('\n')[:10]
+        for line in lines:
+            match = re.match(r'^\s*\{\{英文名:\s*([^}]+)\}\}\s*$', line)
+            if match:
+                return match.group(1).strip()
+        return ""
+
+    @classmethod
     def list_prompt_cards(cls):
         cls._ensure_card_pool_dir()
         files = []
@@ -67,13 +79,35 @@ class PromptCardSelector:
                     if fn.lower().endswith('.txt'):
                         rel = os.path.relpath(os.path.join(root, fn), cls.PROMPT_CARD_POOL_DIR)
                         rel = rel.replace('\\', '/')
-                        files.append({"name": rel, "source": "system"})
+                        file_path = os.path.join(root, fn)
+                        name_en = ""
+                        try:
+                            with open(file_path, 'r', encoding='utf-8') as f:
+                                content = f.read(500)
+                                name_en = cls._extract_name_en(content)
+                        except:
+                            pass
+                        item = {"name": rel, "source": "system"}
+                        if name_en:
+                            item["name_en"] = name_en
+                        files.append(item)
             for root, _, fns in os.walk(cls.USER_PROMPT_CARD_POOL_DIR):
                 for fn in fns:
                     if fn.lower().endswith('.txt'):
                         rel = os.path.relpath(os.path.join(root, fn), cls.USER_PROMPT_CARD_POOL_DIR)
                         rel = rel.replace('\\', '/')
-                        files.append({"name": rel, "source": "user"})
+                        file_path = os.path.join(root, fn)
+                        name_en = ""
+                        try:
+                            with open(file_path, 'r', encoding='utf-8') as f:
+                                content = f.read(500)
+                                name_en = cls._extract_name_en(content)
+                        except:
+                            pass
+                        item = {"name": rel, "source": "user"}
+                        if name_en:
+                            item["name_en"] = name_en
+                        files.append(item)
         except Exception as e:
             print(f"Error walking prompt card pool: {e}")
         files.sort(key=lambda x: (x.get("source", "system"), x.get("name", "")))

@@ -1,5 +1,9 @@
 # 更新日志
 
+## 1.0.26 2026-4-11
+- 多平台翻译器(MultiPlatformTranslate)：移除已失效的腾讯免费翻译服务
+- 提示词卡选择器(PromptCardSelector): 优化界面UI，添加自动切换语言机制，支持中英文显示。
+
 ## 1.0.25 2026-4-10
 - 优化图像切换器（ImageSwitcherDualMode）、文本切换器（TextSwitchDualMode）、潜在空间切换器（LatentSwitchDualMode）节点：
   - 输入端口最大数量限制为12个

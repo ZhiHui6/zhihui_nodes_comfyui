@@ -47,7 +47,7 @@ class MultiPlatformTranslate:
                 "aliyun": {"name": "阿里云翻译", "config": {"access_key_id": "", "access_key_secret": ""}},
                 "youdao": {"name": "有道翻译", "config": {"app_key": "", "app_secret": ""}},
                 "zhipu": {"name": "智谱AI翻译", "config": {"api_key": "", "model": "glm-4-flash"}},
-                "free": {"name": "免费翻译", "config": {}}
+                "free": {"name": "谷歌翻译（免费）", "config": {}}
             }
         }
 
@@ -198,17 +198,10 @@ class MultiPlatformTranslate:
             raise Exception(f"Youdao Translate error: {result.get('errorCode', 'Unknown error')}")
 
     def translate_free(self, config, source_language, target_language, text):
-        """免费翻译方法，支持腾讯翻译君和谷歌翻译"""
+        """免费翻译方法，使用谷歌翻译"""
         if not text.strip():
             return text
-            
-        platform = config.get("platform", "腾讯翻译君")
-        
-        if platform == "谷歌翻译":
-            return self._translate_with_google(source_language, target_language, text)
-        else:
-            # 默认使用腾讯翻译君
-            return self._translate_with_tencent(source_language, target_language, text)
+        return self._translate_with_google(source_language, target_language, text)
     
     def _translate_with_google(self, source_language, target_language, text):
         """使用谷歌翻译进行翻译"""
@@ -259,68 +252,6 @@ class MultiPlatformTranslate:
             return text
         except Exception as e:
             print(f"Google free translation error: {e}")
-            return text
-
-    def _translate_with_tencent(self, source_language, target_language, text):
-        """使用腾讯翻译君进行翻译"""
-        lang_map = {
-            "auto": "auto",
-            "zh": "zh", 
-            "en": "en",
-            "ja": "ja",
-            "ko": "ko",
-            "fr": "fr",
-            "de": "de",
-            "es": "es",
-            "ru": "ru",
-            "ar": "ar"
-        }
-        
-        source_lang = lang_map.get(source_language, "zh")
-        target_lang = lang_map.get(target_language, "en")
-        
-        def do_translate(translate_text):
-            if not translate_text:
-                return ""
-            url = 'https://transmart.qq.com/api/imt'
-            post_data = {
-                "header": {
-                    "fn": "auto_translation",
-                    "client_key": "browser-chrome-110.0.0-Mac OS-df4bd4c5-a65d-44b2-a40f-42f34f3535f2-1677486696487"
-                },
-                "type": "plain",
-                "model_category": "normal",
-                "source": {
-                    "lang": source_lang,
-                    "text_list": [translate_text]
-                },
-                "target": {
-                    "lang": target_lang
-                }
-            }
-            headers = {
-                'Content-Type': 'application/json',
-                'user-agent': 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/110.0.0.0 Safari/537.36',
-                'referer': 'https://transmart.qq.com/zh-CN/index'
-            }
-            try:
-                response = requests.post(url, headers=headers, data=json.dumps(post_data))
-                result = response.json()
-                if response.status_code != 200 or 'auto_translation' not in result or not result['auto_translation']:
-                    error_msg = f"Translation failed with status code {response.status_code}: {result.get('error_msg', 'Unknown error')}"
-                    print(error_msg)
-                    raise RuntimeError(error_msg)
-                return '\n'.join(result['auto_translation'])
-            except Exception as e:
-                error_msg = f"Error during translation: {str(e)}"
-                print(error_msg)
-                raise RuntimeError(error_msg)
-
-        try:
-            translated_text = do_translate(text)
-            return translated_text
-        except Exception as e:
-            print(f"Tencent free translation error: {e}")
             return text
 
     def translate_zhipu(self, config, source_language, target_language, text):

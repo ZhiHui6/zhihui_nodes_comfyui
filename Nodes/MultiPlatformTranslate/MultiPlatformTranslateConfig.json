@@ -37,12 +37,10 @@
             "api_url": "https://open.bigmodel.cn/api/paas/v4/chat/completions"
         },
         "free": {
-            "name": "免费翻译",
+            "name": "谷歌翻译（免费）",
             "enabled": true,
-            "config": {
-                "platform": "腾讯翻译君"
-            },
-            "api_url": "https://transmart.qq.com/api/imt"
+            "config": {},
+            "api_url": "https://translate.googleapis.com/translate_a/single"
         }
     },
     "default_platform": "baidu"

@@ -7,5 +7,5 @@
   },
   "preset": "Ignore",
   "prompt_version": "new",
-  "show_log_panel": true
+  "show_log_panel": false
 }
