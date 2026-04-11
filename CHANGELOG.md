@@ -3,6 +3,15 @@
 ## 1.0.26 2026-4-11
 - 多平台翻译器(MultiPlatformTranslate)：移除已失效的腾讯免费翻译服务
 - 提示词卡选择器(PromptCardSelector): 优化界面UI，添加自动切换语言机制，支持中英文显示。
+- LM工作室节点(LMStudio): 
+  - 新增快捷系统提示词模板管理功能，支持创建、编辑、删除自定义模板
+  - 系统提示词输入框添加模板选择按钮和清空/恢复按钮
+  - 优化预设提示词版本选择，新增"甄品预设"选项
+    <br>
+- LMStudio node:
+  - Added Quick System Prompt Template Management feature with create, edit, delete support
+  - Added template selection button and clear/restore buttons to system prompt input
+  - Optimized preset prompt version selection with new "Premium Preset" option
 
 ## 1.0.25 2026-4-10
 - 优化图像切换器（ImageSwitcherDualMode）、文本切换器（TextSwitchDualMode）、潜在空间切换器（LatentSwitchDualMode）节点：

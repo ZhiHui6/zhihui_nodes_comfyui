@@ -1,0 +1,18 @@
+{
+  "templates": [
+    {
+      "id": "9bb761de-6794-41cf-91f4-bca6a2daf7c5",
+      "name": "啊啊",
+      "content": "地地道道的",
+      "created_at": 1775886607,
+      "updated_at": 1775886607
+    },
+    {
+      "id": "78364514-751f-4c25-aa31-9f8268f9498c",
+      "name": "懂的都懂",
+      "content": "啊啊啊啊",
+      "created_at": 1775886627,
+      "updated_at": 1775886627
+    }
+  ]
+}

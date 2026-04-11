@@ -1,7 +1,12 @@
 {
   "mode": "random",
   "split_rule": "auto",
-  "load_mode": "multi",
+  "load_mode": "single",
   "pool_shuffle": "sequential",
-  "selected": []
+  "selected": [
+    {
+      "name": "SFW/吊带背心紧身裤.txt",
+      "source": "system"
+    }
+  ]
 }

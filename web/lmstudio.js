@@ -4,7 +4,7 @@ const LMSTUDIO_EXT_ID = "ZhihuiNodes.LMStudio";
 
 const i18n = {
     zh: {
-        title: "🤖 LM Studio 状态设置",
+        title: "🤖 LM Studio节点设置",
         statusMonitoring: "服务状态监控",
         serverStatus: "服务器状态",
         connected: "已连接",
@@ -26,10 +26,13 @@ const i18n = {
         promptPresetVersion: "反推预设版本",
         newVersion: "新版预设",
         oldVersion: "旧版预设",
+        premiumVersion: "甄品预设",
         newVersionHintPrefix: "新版预设包含更多选项：",
         newVersionHintOptions: "标签、简洁、详细、极详细、电影感、详细分析、短篇故事、优化扩展提示词",
         oldVersionHintPrefix: "旧版预设包含：",
         oldVersionHintOptions: "标签、极详细、短篇故事",
+        premiumVersionHintPrefix: "甄品预设：",
+        premiumVersionHintOptions: "图像反推、详细分析、Qwen3.5专业版，源自社区各位业界大佬",
         fetchModelsTimeout: "获取模型列表超时",
         fetchModelsTimeoutDesc: "从LM Studio服务器获取可用模型列表的最大等待时间",
         apiCallTimeout: "API 调用超时",
@@ -69,13 +72,48 @@ const i18n = {
         logPanelTitle: "📋 推理日志",
         clearLog: "清屏",
         refreshModels: "🔄 刷新模型",
-        settings: "⚙️ 状态设置",
+        settings: "⚙️ 设置",
         refreshModelsSuccess: "模型列表已刷新",
         refreshModelsFailed: "获取模型列表失败",
-        noModelsFound: "未找到模型"
+        noModelsFound: "未找到模型",
+        template: "模板",
+        templateManagement: "快捷系统提示词模板管理",
+        templateList: "模板列表",
+        createTemplate: "新建模板",
+        editTemplate: "编辑快捷系统提示词模板",
+        deleteTemplate: "删除模板",
+        templateName: "模板名称",
+        templateContent: "模板内容",
+        templateNamePlaceholder: "请输入模板名称",
+        templateContentPlaceholder: "请输入系统提示词内容",
+        noTemplates: "暂无模板，点击上方按钮创建",
+        confirmDelete: "确定要删除此模板吗？",
+        templateCreated: "模板创建成功",
+        templateUpdated: "模板更新成功",
+        templateDeleted: "模板删除成功",
+        templateCreateFailed: "模板创建失败",
+        templateUpdateFailed: "模板更新失败",
+        templateDeleteFailed: "模板删除失败",
+        templateNameRequired: "模板名称不能为空",
+        searchTemplates: "搜索模板...",
+        sortByName: "按名称排序",
+        sortByTime: "按时间排序",
+        applyTemplate: "应用模板",
+        templateApplied: "模板已应用",
+        selectTemplate: "选择模板",
+        templateTooltip: "点击选择系统提示词模板",
+        clearContent: "清空内容",
+        restoreContent: "恢复内容",
+        clearTooltip: "点击清空当前输入框内容",
+        restoreTooltip: "点击恢复上次清空的内容",
+        cancel: "取消",
+        confirm: "确定",
+        save: "保存",
+        edit: "编辑模板",
+        delete: "删除"
     },
     en: {
-        title: "🤖 LM Studio Status Settings",
+        title: "🤖 LM Studio Node Settings",
         statusMonitoring: "Service Status Monitoring",
         serverStatus: "Server Status",
         connected: "Connected",
@@ -97,10 +135,13 @@ const i18n = {
         promptPresetVersion: "Prompt Preset Version",
         newVersion: "New Version",
         oldVersion: "Old Version",
+        premiumVersion: "Premium Preset",
         newVersionHintPrefix: "New presets include: ",
         newVersionHintOptions: "Tags, Simple, Detailed, Extreme Detailed, Cinematic, Detailed Analysis, Short Story ...",
         oldVersionHintPrefix: "Old presets include: ",
         oldVersionHintOptions: "Tags, Extreme Detailed, Short Story",
+        premiumVersionHintPrefix: "Premium presets (from community experts): ",
+        premiumVersionHintOptions: "Image Caption, Detailed Analysis, Qwen3.5 Pro, from community experts",
         fetchModelsTimeout: "Fetch Models Timeout",
         fetchModelsTimeoutDesc: "Maximum wait time to retrieve available models from LM Studio server",
         apiCallTimeout: "API Call Timeout",
@@ -143,7 +184,42 @@ const i18n = {
         settings: "⚙️ Settings",
         refreshModelsSuccess: "Model list refreshed",
         refreshModelsFailed: "Failed to fetch model list",
-        noModelsFound: "No models found"
+        noModelsFound: "No models found",
+        template: "Template",
+        templateManagement: "Quick System Prompt Template Management",
+        templateList: "Template List",
+        createTemplate: "Create Template",
+        editTemplate: "Edit Quick System Prompt Template",
+        deleteTemplate: "Delete Template",
+        templateName: "Template Name",
+        templateContent: "Template Content",
+        templateNamePlaceholder: "Enter template name",
+        templateContentPlaceholder: "Enter system prompt content",
+        noTemplates: "No templates yet, click button above to create",
+        confirmDelete: "Are you sure you want to delete this template?",
+        templateCreated: "Template created successfully",
+        templateUpdated: "Template updated successfully",
+        templateDeleted: "Template deleted successfully",
+        templateCreateFailed: "Failed to create template",
+        templateUpdateFailed: "Failed to update template",
+        templateDeleteFailed: "Failed to delete template",
+        templateNameRequired: "Template name is required",
+        searchTemplates: "Search templates...",
+        sortByName: "Sort by name",
+        sortByTime: "Sort by time",
+        applyTemplate: "Apply Template",
+        templateApplied: "Template applied",
+        selectTemplate: "Select Template",
+        templateTooltip: "Click to select system prompt template",
+        clearContent: "Clear Content",
+        restoreContent: "Restore Content",
+        clearTooltip: "Click to clear current input content",
+        restoreTooltip: "Click to restore last cleared content",
+        cancel: "Cancel",
+        confirm: "Confirm",
+        save: "Save",
+        edit: "Edit Template",
+        delete: "Delete"
     }
 };
 
@@ -155,6 +231,96 @@ function getLocale() {
 function $t(key) {
     const locale = getLocale();
     return i18n[locale][key] || i18n['en'][key] || key;
+}
+
+let templateTooltipEl = null;
+
+function showTemplateTooltip(btnEl) {
+    hideTemplateTooltip();
+    templateTooltipEl = document.createElement("div");
+    templateTooltipEl.style.cssText = `
+        position: fixed;
+        background: rgba(30, 41, 59, 0.95);
+        color: #e2e8f0;
+        padding: 6px 10px;
+        border-radius: 4px;
+        font-size: 11px;
+        z-index: 10004;
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+        pointer-events: none;
+        white-space: nowrap;
+        border: 1px solid rgba(255, 255, 255, 0.1);
+    `;
+    templateTooltipEl.textContent = $t('templateTooltip');
+    document.body.appendChild(templateTooltipEl);
+    
+    const btnRect = btnEl.getBoundingClientRect();
+    const tooltipRect = templateTooltipEl.getBoundingClientRect();
+    let left = btnRect.left + (btnRect.width / 2) - (tooltipRect.width / 2);
+    let top = btnRect.bottom + 6;
+    
+    if (left < 5) left = 5;
+    if (left + tooltipRect.width > window.innerWidth - 5) {
+        left = window.innerWidth - tooltipRect.width - 5;
+    }
+    if (top + tooltipRect.height > window.innerHeight - 5) {
+        top = btnRect.top - tooltipRect.height - 6;
+    }
+    
+    templateTooltipEl.style.left = left + "px";
+    templateTooltipEl.style.top = top + "px";
+}
+
+function hideTemplateTooltip() {
+    if (templateTooltipEl) {
+        templateTooltipEl.remove();
+        templateTooltipEl = null;
+    }
+}
+
+let clearTooltipEl = null;
+
+function showClearTooltip(btnEl, key) {
+    hideClearTooltip();
+    clearTooltipEl = document.createElement("div");
+    clearTooltipEl.style.cssText = `
+        position: fixed;
+        background: rgba(30, 41, 59, 0.95);
+        color: #e2e8f0;
+        padding: 6px 10px;
+        border-radius: 4px;
+        font-size: 11px;
+        z-index: 10004;
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+        pointer-events: none;
+        white-space: nowrap;
+        border: 1px solid rgba(255, 255, 255, 0.1);
+    `;
+    clearTooltipEl.textContent = $t(key);
+    document.body.appendChild(clearTooltipEl);
+    
+    const btnRect = btnEl.getBoundingClientRect();
+    const tooltipRect = clearTooltipEl.getBoundingClientRect();
+    let left = btnRect.left + (btnRect.width / 2) - (tooltipRect.width / 2);
+    let top = btnRect.bottom + 6;
+    
+    if (left < 5) left = 5;
+    if (left + tooltipRect.width > window.innerWidth - 5) {
+        left = window.innerWidth - tooltipRect.width - 5;
+    }
+    if (top + tooltipRect.height > window.innerHeight - 5) {
+        top = btnRect.top - tooltipRect.height - 6;
+    }
+    
+    clearTooltipEl.style.left = left + "px";
+    clearTooltipEl.style.top = top + "px";
+}
+
+function hideClearTooltip() {
+    if (clearTooltipEl) {
+        clearTooltipEl.remove();
+        clearTooltipEl = null;
+    }
 }
 
 function showToast(message, type = "info") {
@@ -188,6 +354,22 @@ function showToast(message, type = "info") {
         @keyframes fadeScaleDialog {
             from { transform: scale(0.9); opacity: 0; }
             to { transform: scale(1); opacity: 1; }
+        }
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+        @keyframes fadeOut {
+            from { opacity: 1; }
+            to { opacity: 0; }
+        }
+        @keyframes dropdownSlideIn {
+            from { transform: translateY(-8px) scale(0.95); opacity: 0; }
+            to { transform: translateY(0) scale(1); opacity: 1; }
+        }
+        @keyframes dropdownSlideOut {
+            from { transform: translateY(0) scale(1); opacity: 1; }
+            to { transform: translateY(-8px) scale(0.95); opacity: 0; }
         }
     `;
     document.head.appendChild(style);
@@ -463,7 +645,150 @@ app.registerExtension({
                 
                 this._createLogPanel();
                 
+                setTimeout(() => {
+                    this._addTemplateButtonToInput();
+                }, 100);
+                
                 return result;
+            };
+            
+            nodeType.prototype._addTemplateButtonToInput = function() {
+                const systemPromptWidget = this.widgets?.find(w => w.name === "system_prompt");
+                if (!systemPromptWidget || !systemPromptWidget.inputEl) return;
+                
+                const inputEl = systemPromptWidget.inputEl;
+                const parentEl = inputEl.parentElement;
+                if (!parentEl) return;
+                
+                parentEl.style.position = "relative";
+                
+                const templateBtn = document.createElement("button");
+                templateBtn.type = "button";
+                templateBtn.className = "lmstudio-template-btn";
+                templateBtn.innerHTML = `<svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="display:block;"><rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect><line x1="3" y1="9" x2="21" y2="9"></line><line x1="9" y1="21" x2="9" y2="9"></line></svg>`;
+                templateBtn.title = $t('template');
+                templateBtn.style.cssText = `
+                    position: absolute;
+                    right: 3px;
+                    top: 3px;
+                    width: 18px;
+                    height: 18px;
+                    padding: 0;
+                    background: rgba(102, 126, 234, 0.35);
+                    border: none;
+                    border-radius: 3px;
+                    cursor: pointer;
+                    display: none;
+                    align-items: center;
+                    justify-content: center;
+                    z-index: 10;
+                    transition: all 0.2s ease;
+                    opacity: 0;
+                    color: rgba(102, 126, 234, 0.9);
+                `;
+                
+                templateBtn.onmouseenter = () => {
+                    templateBtn.style.background = "rgba(102, 126, 234, 0.6)";
+                    templateBtn.style.color = "rgba(102, 126, 234, 1)";
+                    templateBtn.style.transform = "scale(1.1)";
+                    showTemplateTooltip(templateBtn);
+                };
+                templateBtn.onmouseleave = () => {
+                    templateBtn.style.background = "rgba(102, 126, 234, 0.35)";
+                    templateBtn.style.color = "rgba(102, 126, 234, 0.9)";
+                    templateBtn.style.transform = "scale(1)";
+                    hideTemplateTooltip();
+                };
+                
+                templateBtn.onclick = (e) => {
+                    e.preventDefault();
+                    e.stopPropagation();
+                    const rect = templateBtn.getBoundingClientRect();
+                    showTemplateSelector(this, rect);
+                };
+                
+                parentEl.appendChild(templateBtn);
+                
+                const clearBtn = document.createElement("button");
+                clearBtn.type = "button";
+                clearBtn.className = "lmstudio-clear-btn";
+                clearBtn.innerHTML = `<svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="display:block;"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>`;
+                clearBtn.style.cssText = `
+                    position: absolute;
+                    right: 24px;
+                    top: 3px;
+                    width: 18px;
+                    height: 18px;
+                    padding: 0;
+                    background: rgba(239, 68, 68, 0.35);
+                    border: none;
+                    border-radius: 3px;
+                    cursor: pointer;
+                    display: none;
+                    align-items: center;
+                    justify-content: center;
+                    z-index: 10;
+                    transition: all 0.2s ease;
+                    opacity: 0;
+                    color: rgba(239, 68, 68, 0.9);
+                `;
+                
+                clearBtn.onmouseenter = () => {
+                    clearBtn.style.background = "rgba(239, 68, 68, 0.6)";
+                    clearBtn.style.color = "rgba(239, 68, 68, 1)";
+                    clearBtn.style.transform = "scale(1.1)";
+                    showClearTooltip(clearBtn, this._lastClearedContent ? 'restoreTooltip' : 'clearTooltip');
+                };
+                clearBtn.onmouseleave = () => {
+                    clearBtn.style.background = "rgba(239, 68, 68, 0.35)";
+                    clearBtn.style.color = "rgba(239, 68, 68, 0.9)";
+                    clearBtn.style.transform = "scale(1)";
+                    hideClearTooltip();
+                };
+                
+                clearBtn.onclick = (e) => {
+                    e.preventDefault();
+                    e.stopPropagation();
+                    if (this._lastClearedContent !== undefined) {
+                        inputEl.value = this._lastClearedContent;
+                        systemPromptWidget.value = this._lastClearedContent;
+                        this._lastClearedContent = undefined;
+                        clearBtn.innerHTML = `<svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="display:block;"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>`;
+                        clearBtn.style.background = "rgba(239, 68, 68, 0.35)";
+                        showToast($t('restoreContent'), "success");
+                    } else {
+                        this._lastClearedContent = inputEl.value;
+                        inputEl.value = "";
+                        systemPromptWidget.value = "";
+                        clearBtn.innerHTML = `<svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="display:block;"><polyline points="1 4 1 10 7 10"></polyline><polyline points="23 4 23 10 17 10"></polyline><path d="M20.49 15a9 9 0 1 1-2.12-9.36L23 10"></path></svg>`;
+                        clearBtn.style.background = "rgba(34, 197, 94, 0.35)";
+                        showToast($t('clearContent'), "success");
+                    }
+                    inputEl.dispatchEvent(new Event('input', { bubbles: true }));
+                };
+                
+                parentEl.appendChild(clearBtn);
+                
+                inputEl.addEventListener("focus", () => {
+                    templateBtn.style.display = "flex";
+                    clearBtn.style.display = "flex";
+                    setTimeout(() => {
+                        templateBtn.style.opacity = "1";
+                        clearBtn.style.opacity = "1";
+                    }, 10);
+                });
+                
+                inputEl.addEventListener("blur", () => {
+                    templateBtn.style.opacity = "0";
+                    clearBtn.style.opacity = "0";
+                    setTimeout(() => {
+                        templateBtn.style.display = "none";
+                        clearBtn.style.display = "none";
+                    }, 200);
+                });
+                
+                this._templateBtn = templateBtn;
+                this._clearBtn = clearBtn;
             };
             
             nodeType.prototype._refreshModelsList = async function() {
@@ -523,6 +848,253 @@ app.registerExtension({
         }
     }
 });
+
+async function showTemplateSelector(node, btnRect) {
+    const overlay = document.createElement("div");
+    overlay.className = "lmstudio-template-dropdown";
+    overlay.style.cssText = `
+        position: fixed;
+        z-index: 10001;
+        animation: dropdownSlideIn 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+        transform-origin: top center;
+    `;
+    
+    const dialog = document.createElement("div");
+    dialog.style.cssText = `
+        width: 320px;
+        max-width: 90vw;
+        max-height: 350px;
+        background: #1f2937;
+        border: 1px solid rgba(255, 255, 255, 0.15);
+        border-radius: 8px;
+        padding: 12px;
+        color: #e8e8e8;
+        box-shadow: 0 8px 32px rgba(0, 0, 0, 0.4);
+        display: flex;
+        flex-direction: column;
+    `;
+    
+    const header = document.createElement("div");
+    header.style.cssText = `
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        margin-bottom: 10px;
+    `;
+    
+    const title = document.createElement("h3");
+    title.style.cssText = `
+        margin: 0;
+        font-size: 13px;
+        font-weight: 600;
+        color: #f0f0f0;
+    `;
+    title.textContent = $t('selectTemplate');
+    
+    const closeBtn = document.createElement("button");
+    closeBtn.style.cssText = `
+        width: 20px;
+        height: 20px;
+        border-radius: 50%;
+        border: 1px solid rgba(255, 255, 255, 0.25);
+        background: transparent;
+        cursor: pointer;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        color: #9ca3af;
+        font-size: 12px;
+        transition: all 0.2s ease;
+    `;
+    closeBtn.innerHTML = "×";
+    closeBtn.onmouseover = () => {
+        closeBtn.style.background = "#b91c1c";
+        closeBtn.style.borderColor = "#ef4444";
+        closeBtn.style.color = "#fff";
+    };
+    closeBtn.onmouseout = () => {
+        closeBtn.style.background = "transparent";
+        closeBtn.style.borderColor = "rgba(255, 255, 255, 0.25)";
+        closeBtn.style.color = "#9ca3af";
+    };
+    
+    header.appendChild(title);
+    header.appendChild(closeBtn);
+    
+    const searchInput = document.createElement("input");
+    searchInput.type = "text";
+    searchInput.placeholder = $t('searchTemplates');
+    searchInput.style.cssText = `
+        width: 100%;
+        padding: 6px 10px;
+        background: #111827;
+        border: 1px solid rgba(255, 255, 255, 0.15);
+        border-radius: 6px;
+        color: #e8e8e8;
+        font-size: 12px;
+        margin-bottom: 8px;
+        box-sizing: border-box;
+    `;
+    
+    const listContainer = document.createElement("div");
+    listContainer.style.cssText = `
+        flex: 1;
+        overflow-y: auto;
+        border: 1px solid rgba(255, 255, 255, 0.1);
+        border-radius: 6px;
+        min-height: 60px;
+        max-height: 220px;
+    `;
+    
+    const loadingEl = document.createElement("div");
+    loadingEl.style.cssText = `
+        padding: 20px;
+        text-align: center;
+        color: #9ca3af;
+        font-size: 12px;
+    `;
+    loadingEl.textContent = $t('checking');
+    listContainer.appendChild(loadingEl);
+    
+    dialog.appendChild(header);
+    dialog.appendChild(searchInput);
+    dialog.appendChild(listContainer);
+    overlay.appendChild(dialog);
+    
+    const close = () => {
+        overlay.style.animation = "dropdownSlideOut 0.15s ease forwards";
+        setTimeout(() => {
+            if (overlay.parentNode) overlay.remove();
+        }, 150);
+    };
+    
+    closeBtn.onclick = close;
+    
+    const handleClickOutside = (e) => {
+        if (!overlay.contains(e.target)) {
+            close();
+            document.removeEventListener("mousedown", handleClickOutside);
+        }
+    };
+    setTimeout(() => {
+        document.addEventListener("mousedown", handleClickOutside);
+    }, 10);
+    
+    const renderList = (templates, searchTerm = "") => {
+        let filtered = templates;
+        if (searchTerm) {
+            const term = searchTerm.toLowerCase();
+            filtered = templates.filter(t => 
+                t.name.toLowerCase().includes(term) || 
+                t.content.toLowerCase().includes(term)
+            );
+        }
+        
+        if (filtered.length === 0) {
+            listContainer.innerHTML = `
+                <div style="padding: 20px; text-align: center; color: #9ca3af; font-size: 12px;">
+                    ${$t('noTemplates')}
+                </div>
+            `;
+            return;
+        }
+        
+        listContainer.innerHTML = filtered.map(template => `
+            <div class="template-select-item" data-id="${template.id}" style="
+                padding: 8px 10px;
+                border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+                cursor: pointer;
+                transition: background 0.15s ease;
+            ">
+                <div style="font-size: 12px; font-weight: 500; color: #e8e8e8; margin-bottom: 2px;">
+                    ${template.name}
+                </div>
+                <div style="font-size: 11px; color: #9ca3af; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; max-width: 100%;">
+                    ${template.content.substring(0, 60)}${template.content.length > 60 ? '...' : ''}
+                </div>
+            </div>
+        `).join("");
+        
+        listContainer.querySelectorAll(".template-select-item").forEach(item => {
+            item.onmouseover = () => {
+                item.style.background = "rgba(102, 126, 234, 0.15)";
+            };
+            item.onmouseout = () => {
+                item.style.background = "transparent";
+            };
+            item.onclick = () => {
+                const template = templates.find(t => t.id === item.dataset.id);
+                if (template) {
+                    const systemPromptWidget = node.widgets?.find(w => w.name === "system_prompt");
+                    if (systemPromptWidget) {
+                        systemPromptWidget.value = template.content;
+                        if (systemPromptWidget.callback) {
+                            systemPromptWidget.callback(template.content);
+                        }
+                        node.setDirtyCanvas(true, true);
+                        showToast($t('templateApplied'), "success");
+                    }
+                }
+                close();
+            };
+        });
+    };
+    
+    searchInput.addEventListener("input", (e) => {
+        const searchTerm = e.target.value;
+        renderList(currentTemplates, searchTerm);
+    });
+    
+    let currentTemplates = [];
+    
+    try {
+        const response = await fetch("/zhihui/lmstudio/templates");
+        if (response.ok) {
+            const data = await response.json();
+            currentTemplates = data.templates || [];
+            renderList(currentTemplates);
+        } else {
+            listContainer.innerHTML = `
+                <div style="padding: 20px; text-align: center; color: #ef4444; font-size: 12px;">
+                    ${$t('templateDeleteFailed')}
+                </div>
+            `;
+        }
+    } catch (e) {
+        listContainer.innerHTML = `
+            <div style="padding: 20px; text-align: center; color: #ef4444; font-size: 12px;">
+                ${$t('templateDeleteFailed')}
+            </div>
+        `;
+    }
+    
+    document.body.appendChild(overlay);
+    
+    const dialogRect = dialog.getBoundingClientRect();
+    let left = btnRect.left;
+    let top = btnRect.bottom + 4;
+    
+    if (left + dialogRect.width > window.innerWidth - 10) {
+        left = window.innerWidth - dialogRect.width - 10;
+    }
+    
+    if (top + dialogRect.height > window.innerHeight - 10) {
+        top = btnRect.top - dialogRect.height - 4;
+    }
+    
+    if (top < 10) {
+        top = 10;
+    }
+    
+    if (left < 10) {
+        left = 10;
+    }
+    
+    overlay.style.left = left + "px";
+    overlay.style.top = top + "px";
+    
+    searchInput.focus();
+}
 
 function showLMStudioSettings(node) {
     const overlay = document.createElement("div");
@@ -1002,6 +1574,145 @@ function showLMStudioSettings(node) {
                 color: #9ca3af;
                 flex: 1;
             }
+            #${uniqueId} .template-section {
+                margin-top: 16px;
+                padding: 12px 16px;
+                background: linear-gradient(145deg, #1a202c, #2d3748);
+                border: 1px solid rgba(255, 255, 255, 0.1);
+                border-radius: 8px;
+            }
+            #${uniqueId} .template-title {
+                margin: 0 0 12px 0;
+                font-size: 14px;
+                font-weight: 600;
+                color: #ffffff;
+                display: flex;
+                align-items: center;
+                gap: 6px;
+            }
+            #${uniqueId} .template-toolbar {
+                display: flex;
+                gap: 8px;
+                margin-bottom: 12px;
+                flex-wrap: wrap;
+            }
+            #${uniqueId} .template-search {
+                flex: 1;
+                min-width: 150px;
+                padding: 8px 12px;
+                background: #1f2937;
+                border: 1px solid rgba(255, 255, 255, 0.15);
+                border-radius: 6px;
+                color: #e8e8e8;
+                font-size: 13px;
+            }
+            #${uniqueId} .template-search:focus {
+                outline: none;
+                border-color: #667eea;
+            }
+            #${uniqueId} .template-sort {
+                padding: 8px 12px;
+                background: #1f2937;
+                border: 1px solid rgba(255, 255, 255, 0.15);
+                border-radius: 6px;
+                color: #e8e8e8;
+                font-size: 13px;
+                cursor: pointer;
+            }
+            #${uniqueId} .template-create-btn {
+                padding: 8px 16px;
+                background: linear-gradient(135deg, #667eea, #5b67c8);
+                color: white;
+                border: none;
+                border-radius: 6px;
+                cursor: pointer;
+                font-size: 13px;
+                font-weight: 500;
+                transition: all 0.2s ease;
+            }
+            #${uniqueId} .template-create-btn:hover {
+                background: linear-gradient(135deg, #5b67c8, #4a57b8);
+                transform: translateY(-1px);
+            }
+            #${uniqueId} .template-list {
+                max-height: 200px;
+                overflow-y: auto;
+                border: 1px solid rgba(255, 255, 255, 0.1);
+                border-radius: 6px;
+            }
+            #${uniqueId} .template-list::-webkit-scrollbar {
+                width: 6px;
+            }
+            #${uniqueId} .template-list::-webkit-scrollbar-track {
+                background: rgba(102, 126, 234, 0.1);
+                border-radius: 3px;
+            }
+            #${uniqueId} .template-list::-webkit-scrollbar-thumb {
+                background: linear-gradient(180deg, #667eea, #5b67c8);
+                border-radius: 3px;
+            }
+            #${uniqueId} .template-item {
+                display: flex;
+                align-items: center;
+                justify-content: space-between;
+                padding: 10px 12px;
+                border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+                transition: background 0.2s ease;
+            }
+            #${uniqueId} .template-item:last-child {
+                border-bottom: none;
+            }
+            #${uniqueId} .template-item:hover {
+                background: rgba(102, 126, 234, 0.1);
+            }
+            #${uniqueId} .template-item-name {
+                font-size: 13px;
+                color: #e8e8e8;
+                font-weight: 500;
+                flex: 1;
+                overflow: hidden;
+                text-overflow: ellipsis;
+                white-space: nowrap;
+            }
+            #${uniqueId} .template-item-time {
+                font-size: 11px;
+                color: #9ca3af;
+                margin-left: 8px;
+            }
+            #${uniqueId} .template-item-actions {
+                display: flex;
+                gap: 6px;
+                margin-left: 12px;
+            }
+            #${uniqueId} .template-action-btn {
+                padding: 4px 10px;
+                border: none;
+                border-radius: 4px;
+                cursor: pointer;
+                font-size: 12px;
+                font-weight: 500;
+                transition: all 0.2s ease;
+            }
+            #${uniqueId} .template-edit-btn {
+                background: rgba(102, 126, 234, 0.2);
+                color: #667eea;
+            }
+            #${uniqueId} .template-edit-btn:hover {
+                background: rgba(102, 126, 234, 0.3);
+            }
+            #${uniqueId} .template-delete-btn {
+                background: rgba(239, 68, 68, 0.2);
+                color: #ef4444;
+            }
+            #${uniqueId} .template-delete-btn:hover {
+                background: rgba(239, 68, 68, 0.3);
+            }
+            #${uniqueId} .template-empty {
+                padding: 24px;
+                text-align: center;
+                color: #9ca3af;
+                font-size: 13px;
+            }
             #${uniqueId} .timeout-apply-btn {
                 width: 100%;
                 padding: 10px 16px;
@@ -1237,6 +1948,7 @@ function showLMStudioSettings(node) {
                     <select class="prompt-version-select" id="lmstudio-prompt-version">
                         <option value="new">${$t('newVersion')}</option>
                         <option value="old">${$t('oldVersion')}</option>
+                        <option value="premium">${$t('premiumVersion')}</option>
                     </select>
                     <span class="prompt-version-hint">
                         <span class="hint-prefix">${$t('newVersionHintPrefix')}</span>
@@ -1255,6 +1967,23 @@ function showLMStudioSettings(node) {
                         <span class="log-panel-checkbox-label">${$t('enableLogPanel')}</span>
                     </label>
                     <span class="log-panel-hint">${$t('showLogPanelDesc')}</span>
+                </div>
+            </div>
+            <div class="template-section">
+                <h4 class="template-title">
+                    <span>📋</span>
+                    <span>${$t('templateManagement')}</span>
+                </h4>
+                <div class="template-toolbar">
+                    <input type="text" class="template-search" id="lmstudio-template-search" placeholder="${$t('searchTemplates')}">
+                    <select class="template-sort" id="lmstudio-template-sort">
+                        <option value="name">${$t('sortByName')}</option>
+                        <option value="time">${$t('sortByTime')}</option>
+                    </select>
+                    <button class="template-create-btn" type="button" id="lmstudio-template-create">${$t('createTemplate')}</button>
+                </div>
+                <div class="template-list" id="lmstudio-template-list">
+                    <div class="template-empty">${$t('noTemplates')}</div>
                 </div>
             </div>
             <div class="save-section">
@@ -1431,6 +2160,218 @@ function showLMStudioSettings(node) {
     let originalPromptVersion = "new";
     const showLogPanelCheckbox = dialog.querySelector("#lmstudio-show-log-panel");
     
+    let templates = [];
+    let templateSearchInput = dialog.querySelector("#lmstudio-template-search");
+    let templateSortSelect = dialog.querySelector("#lmstudio-template-sort");
+    let templateListEl = dialog.querySelector("#lmstudio-template-list");
+    let templateCreateBtn = dialog.querySelector("#lmstudio-template-create");
+    
+    const loadTemplates = async () => {
+        try {
+            const response = await fetch("/zhihui/lmstudio/templates");
+            if (response.ok) {
+                const data = await response.json();
+                templates = data.templates || [];
+                renderTemplateList();
+            }
+        } catch (e) {
+            templates = [];
+            renderTemplateList();
+        }
+    };
+    
+    const formatTime = (timestamp) => {
+        const date = new Date(timestamp * 1000);
+        return date.toLocaleDateString() + " " + date.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+    };
+    
+    const renderTemplateList = () => {
+        let filteredTemplates = [...templates];
+        
+        const searchTerm = templateSearchInput.value.toLowerCase().trim();
+        if (searchTerm) {
+            filteredTemplates = filteredTemplates.filter(t => 
+                t.name.toLowerCase().includes(searchTerm) || 
+                t.content.toLowerCase().includes(searchTerm)
+            );
+        }
+        
+        const sortBy = templateSortSelect.value;
+        if (sortBy === "name") {
+            filteredTemplates.sort((a, b) => a.name.localeCompare(b.name));
+        } else {
+            filteredTemplates.sort((a, b) => b.updated_at - a.updated_at);
+        }
+        
+        if (filteredTemplates.length === 0) {
+            templateListEl.innerHTML = `<div class="template-empty">${$t('noTemplates')}</div>`;
+            return;
+        }
+        
+        templateListEl.innerHTML = filteredTemplates.map(template => `
+            <div class="template-item" data-id="${template.id}">
+                <span class="template-item-name" title="${template.name}">${template.name}</span>
+                <span class="template-item-time">${formatTime(template.updated_at)}</span>
+                <div class="template-item-actions">
+                    <button class="template-action-btn template-edit-btn" data-id="${template.id}">${$t('edit')}</button>
+                    <button class="template-action-btn template-delete-btn" data-id="${template.id}">${$t('delete')}</button>
+                </div>
+            </div>
+        `).join("");
+        
+        templateListEl.querySelectorAll(".template-edit-btn").forEach(btn => {
+            btn.onclick = () => showTemplateEditor(btn.dataset.id);
+        });
+        
+        templateListEl.querySelectorAll(".template-delete-btn").forEach(btn => {
+            btn.onclick = () => deleteTemplate(btn.dataset.id);
+        });
+    };
+    
+    const showTemplateEditor = (templateId = null) => {
+        const template = templateId ? templates.find(t => t.id === templateId) : null;
+        const isEdit = !!template;
+        
+        const editorOverlay = document.createElement("div");
+        editorOverlay.style.cssText = `
+            position: fixed;
+            left: 0;
+            top: 0;
+            width: 100vw;
+            height: 100vh;
+            background: rgba(0, 0, 0, 0.5);
+            z-index: 10005;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        `;
+        
+        const editorDialog = document.createElement("div");
+        editorDialog.style.cssText = `
+            width: 600px;
+            max-width: 90vw;
+            background: #1f2937;
+            border: 1px solid rgba(255, 255, 255, 0.15);
+            border-radius: 12px;
+            padding: 24px;
+            color: #e8e8e8;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.5);
+        `;
+        
+        editorDialog.innerHTML = `
+            <h3 style="margin: 0 0 20px 0; font-size: 18px; font-weight: 600;">
+                ${isEdit ? $t('editTemplate') : $t('createTemplate')}
+            </h3>
+            <div style="margin-bottom: 16px;">
+                <label style="display: block; margin-bottom: 8px; font-size: 13px; color: #9ca3af;">
+                    ${$t('templateName')}
+                </label>
+                <input type="text" id="template-name-input" value="${template ? template.name : ''}" 
+                    placeholder="${$t('templateNamePlaceholder')}"
+                    style="width: 100%; padding: 10px 12px; background: #111827; border: 1px solid rgba(255, 255, 255, 0.15); 
+                    border-radius: 6px; color: #e8e8e8; font-size: 14px; box-sizing: border-box;">
+            </div>
+            <div style="margin-bottom: 20px;">
+                <label style="display: block; margin-bottom: 8px; font-size: 13px; color: #9ca3af;">
+                    ${$t('templateContent')}
+                </label>
+                <textarea id="template-content-input" placeholder="${$t('templateContentPlaceholder')}"
+                    style="width: 100%; height: 200px; padding: 10px 12px; background: #111827; 
+                    border: 1px solid rgba(255, 255, 255, 0.15); border-radius: 6px; color: #e8e8e8; 
+                    font-size: 13px; resize: vertical; box-sizing: border-box; font-family: inherit;">${template ? template.content : ''}</textarea>
+            </div>
+            <div style="display: flex; gap: 12px; justify-content: flex-end;">
+                <button id="template-cancel-btn" style="padding: 10px 24px; background: transparent; 
+                    color: #9ca3af; border: 1px solid rgba(255, 255, 255, 0.2); border-radius: 6px; 
+                    cursor: pointer; font-size: 14px;">${$t('cancel')}</button>
+                <button id="template-save-btn" style="padding: 10px 24px; background: linear-gradient(135deg, #22c55e, #16a34a); 
+                    color: white; border: none; border-radius: 6px; cursor: pointer; font-size: 14px; 
+                    font-weight: 600;">${$t('save')}</button>
+            </div>
+        `;
+        
+        const closeEditor = () => {
+            editorOverlay.remove();
+        };
+        
+        editorDialog.querySelector("#template-cancel-btn").onclick = closeEditor;
+        editorOverlay.onclick = (e) => {
+            if (e.target === editorOverlay) closeEditor();
+        };
+        
+        editorDialog.querySelector("#template-save-btn").onclick = async () => {
+            const nameInput = editorDialog.querySelector("#template-name-input");
+            const contentInput = editorDialog.querySelector("#template-content-input");
+            
+            const name = nameInput.value.trim();
+            const content = contentInput.value.trim();
+            
+            if (!name) {
+                showToast($t('templateNameRequired'), "error");
+                return;
+            }
+            
+            try {
+                let response;
+                if (isEdit) {
+                    response = await fetch(`/zhihui/lmstudio/templates/${templateId}`, {
+                        method: "PUT",
+                        headers: { "Content-Type": "application/json" },
+                        body: JSON.stringify({ name, content })
+                    });
+                } else {
+                    response = await fetch("/zhihui/lmstudio/templates", {
+                        method: "POST",
+                        headers: { "Content-Type": "application/json" },
+                        body: JSON.stringify({ name, content })
+                    });
+                }
+                
+                const result = await response.json();
+                
+                if (result.status === "success") {
+                    showToast(isEdit ? $t('templateUpdated') : $t('templateCreated'), "success");
+                    closeEditor();
+                    await loadTemplates();
+                } else {
+                    showToast(isEdit ? $t('templateUpdateFailed') : $t('templateCreateFailed'), "error");
+                }
+            } catch (e) {
+                showToast(isEdit ? $t('templateUpdateFailed') : $t('templateCreateFailed'), "error");
+            }
+        };
+        
+        editorOverlay.appendChild(editorDialog);
+        document.body.appendChild(editorOverlay);
+        
+        editorDialog.querySelector("#template-name-input").focus();
+    };
+    
+    const deleteTemplate = async (templateId) => {
+        showConfirm($t('confirmDelete'), async () => {
+            try {
+                const response = await fetch(`/zhihui/lmstudio/templates/${templateId}`, {
+                    method: "DELETE"
+                });
+                
+                const result = await response.json();
+                
+                if (result.status === "success") {
+                    showToast($t('templateDeleted'), "success");
+                    await loadTemplates();
+                } else {
+                    showToast($t('templateDeleteFailed'), "error");
+                }
+            } catch (e) {
+                showToast($t('templateDeleteFailed'), "error");
+            }
+        });
+    };
+    
+    templateSearchInput.addEventListener("input", renderTemplateList);
+    templateSortSelect.addEventListener("change", renderTemplateList);
+    templateCreateBtn.onclick = () => showTemplateEditor();
+    
     const loadConfig = async () => {
         try {
             const response = await fetch("/zhihui/lmstudio/config");
@@ -1474,10 +2415,21 @@ function showLMStudioSettings(node) {
     const updatePromptVersionHint = () => {
         const hintEl = dialog.querySelector(".prompt-version-hint");
         if (hintEl) {
-            const isNew = promptVersionSelect.value === "new";
+            const version = promptVersionSelect.value;
+            let prefixKey, optionsKey;
+            if (version === "premium") {
+                prefixKey = "premiumVersionHintPrefix";
+                optionsKey = "premiumVersionHintOptions";
+            } else if (version === "old") {
+                prefixKey = "oldVersionHintPrefix";
+                optionsKey = "oldVersionHintOptions";
+            } else {
+                prefixKey = "newVersionHintPrefix";
+                optionsKey = "newVersionHintOptions";
+            }
             hintEl.innerHTML = `
-                <span class="hint-prefix">${isNew ? $t('newVersionHintPrefix') : $t('oldVersionHintPrefix')}</span>
-                <span class="hint-options">${isNew ? $t('newVersionHintOptions') : $t('oldVersionHintOptions')}</span>
+                <span class="hint-prefix">${$t(prefixKey)}</span>
+                <span class="hint-options">${$t(optionsKey)}</span>
             `;
         }
     };
@@ -1667,6 +2619,7 @@ function showLMStudioSettings(node) {
     };
 
     loadConfig();
+    loadTemplates();
     
     refreshDashboard();
 
