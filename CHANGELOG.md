@@ -1,5 +1,10 @@
 # 更新日志
 
+## 1.0.27 2026-4-12
+- LM工作室节点(LMStudio): 优化模板选择器和设置对话框的样式和交互
+  <br>
+- LMStudio node: Optimized template selector and settings dialog styles and interactions
+
 ## 1.0.26 2026-4-11
 - 多平台翻译器(MultiPlatformTranslate)：移除已失效的腾讯免费翻译服务
 - 提示词卡选择器(PromptCardSelector): 优化界面UI，添加自动切换语言机制，支持中英文显示。

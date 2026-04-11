@@ -397,7 +397,7 @@ function showToast(message, type = "info") {
     setTimeout(() => {
         toast.style.animation = "fadeScale 0.3s ease reverse";
         setTimeout(() => toast.remove(), 300);
-    }, 3000);
+    }, 1500);
 }
 
 function showConfirm(message, onConfirm, onCancel) {
@@ -903,9 +903,12 @@ async function showTemplateSelector(node, btnRect) {
     const title = document.createElement("h3");
     title.style.cssText = `
         margin: 0;
-        font-size: 13px;
+        font-size: 15px;
         font-weight: 600;
-        color: #f0f0f0;
+        background: linear-gradient(90deg, #667eea, #764ba2);
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+        background-clip: text;
     `;
     title.textContent = $t('selectTemplate');
     
@@ -961,8 +964,30 @@ async function showTemplateSelector(node, btnRect) {
         border: 1px solid rgba(255, 255, 255, 0.1);
         border-radius: 6px;
         min-height: 60px;
-        max-height: 220px;
+        max-height: 380px;
+        scrollbar-width: thin;
+        scrollbar-color: rgba(102, 126, 234, 0.5) rgba(255, 255, 255, 0.05);
     `;
+    
+    const scrollbarStyle = document.createElement("style");
+    scrollbarStyle.textContent = `
+        .template-select-list::-webkit-scrollbar {
+            width: 6px;
+        }
+        .template-select-list::-webkit-scrollbar-track {
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 3px;
+        }
+        .template-select-list::-webkit-scrollbar-thumb {
+            background: linear-gradient(180deg, rgba(102, 126, 234, 0.6), rgba(118, 75, 162, 0.6));
+            border-radius: 3px;
+        }
+        .template-select-list::-webkit-scrollbar-thumb:hover {
+            background: linear-gradient(180deg, rgba(102, 126, 234, 0.8), rgba(118, 75, 162, 0.8));
+        }
+    `;
+    document.head.appendChild(scrollbarStyle);
+    listContainer.className = "template-select-list";
     
     const loadingEl = document.createElement("div");
     loadingEl.style.cssText = `
@@ -1019,16 +1044,13 @@ async function showTemplateSelector(node, btnRect) {
         
         listContainer.innerHTML = filtered.map(template => `
             <div class="template-select-item" data-id="${template.id}" style="
-                padding: 8px 10px;
+                padding: 10px 12px;
                 border-bottom: 1px solid rgba(255, 255, 255, 0.05);
                 cursor: pointer;
                 transition: background 0.15s ease;
             ">
-                <div style="font-size: 12px; font-weight: 500; color: #e8e8e8; margin-bottom: 2px;">
+                <div style="font-size: 14px; font-weight: 500; color: #e8e8e8;">
                     ${template.name}
-                </div>
-                <div style="font-size: 11px; color: #9ca3af; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; max-width: 100%;">
-                    ${template.content.substring(0, 60)}${template.content.length > 60 ? '...' : ''}
                 </div>
             </div>
         `).join("");
@@ -1691,11 +1713,12 @@ function showLMStudioSettings(node) {
                 padding: 8px 12px;
                 background: rgba(0, 0, 0, 0.2);
                 border-radius: 6px;
-                border: 2px solid transparent;
+                border: 1px solid rgba(255, 255, 255, 0.1);
                 transition: all 0.2s ease;
             }
             #${uniqueId} .folder-read-mode-option:hover {
                 background: rgba(102, 126, 234, 0.1);
+                border-color: rgba(102, 126, 234, 0.3);
             }
             #${uniqueId} .folder-read-mode-option.active {
                 border-color: #667eea;
@@ -1895,12 +1918,11 @@ function showLMStudioSettings(node) {
                 font-size: 14px;
                 font-weight: 600;
                 transition: all 0.2s ease;
-                box-shadow: 0 4px 12px rgba(34, 197, 94, 0.3);
             }
             #${uniqueId} .reset-default-btn {
                 flex: 1;
                 padding: 12px 20px;
-                background: linear-gradient(135deg, #6b7280, #4b5563);
+                background: linear-gradient(135deg, #3b82f6, #2563eb);
                 color: white;
                 border: none;
                 border-radius: 8px;
@@ -1908,23 +1930,12 @@ function showLMStudioSettings(node) {
                 font-size: 14px;
                 font-weight: 600;
                 transition: all 0.2s ease;
-                box-shadow: 0 4px 12px rgba(107, 114, 128, 0.3);
             }
             #${uniqueId} .reset-default-btn:hover {
-                background: linear-gradient(135deg, #4b5563, #374151);
-                transform: translateY(-1px);
-                box-shadow: 0 6px 16px rgba(107, 114, 128, 0.4);
-            }
-            #${uniqueId} .reset-default-btn:active {
-                transform: translateY(0);
+                background: linear-gradient(135deg, #2563eb, #1d4ed8);
             }
             #${uniqueId} .save-all-btn:hover {
                 background: linear-gradient(135deg, #16a34a, #15803d);
-                transform: translateY(-1px);
-                box-shadow: 0 6px 16px rgba(34, 197, 94, 0.4);
-            }
-            #${uniqueId} .save-all-btn:active {
-                transform: translateY(0);
             }
             #${uniqueId} .preset-info {
                 font-size: 12px;
@@ -2474,12 +2485,16 @@ function showLMStudioSettings(node) {
         editorDialog.style.cssText = `
             width: 600px;
             max-width: 90vw;
+            height: 85vh;
+            max-height: 800px;
             background: #1f2937;
             border: 1px solid rgba(255, 255, 255, 0.15);
             border-radius: 12px;
             padding: 24px;
             color: #e8e8e8;
             box-shadow: 0 20px 60px rgba(0, 0, 0, 0.5);
+            display: flex;
+            flex-direction: column;
         `;
         
         editorDialog.innerHTML = `
@@ -2495,22 +2510,26 @@ function showLMStudioSettings(node) {
                     style="width: 100%; padding: 10px 12px; background: #111827; border: 1px solid rgba(255, 255, 255, 0.15); 
                     border-radius: 6px; color: #e8e8e8; font-size: 14px; box-sizing: border-box;">
             </div>
-            <div style="margin-bottom: 20px;">
+            <div style="margin-bottom: 20px; flex: 1; display: flex; flex-direction: column;">
                 <label style="display: block; margin-bottom: 8px; font-size: 13px; color: #9ca3af;">
                     ${$t('templateContent')}
                 </label>
                 <textarea id="template-content-input" placeholder="${$t('templateContentPlaceholder')}"
-                    style="width: 100%; height: 200px; padding: 10px 12px; background: #111827; 
+                    style="width: 100%; flex: 1; min-height: 300px; padding: 10px 12px; background: #111827; 
                     border: 1px solid rgba(255, 255, 255, 0.15); border-radius: 6px; color: #e8e8e8; 
-                    font-size: 13px; resize: vertical; box-sizing: border-box; font-family: inherit;">${template ? template.content : ''}</textarea>
+                    font-size: 13px; resize: none; box-sizing: border-box; font-family: inherit;">${template ? template.content : ''}</textarea>
             </div>
             <div style="display: flex; gap: 12px; justify-content: flex-end;">
-                <button id="template-cancel-btn" style="padding: 10px 24px; background: transparent; 
-                    color: #9ca3af; border: 1px solid rgba(255, 255, 255, 0.2); border-radius: 6px; 
-                    cursor: pointer; font-size: 14px;">${$t('cancel')}</button>
+                <button id="template-cancel-btn" style="padding: 10px 24px; background: linear-gradient(135deg, #ef4444, #dc2626); 
+                    color: white; border: none; border-radius: 6px; cursor: pointer; font-size: 14px; 
+                    font-weight: 600; transition: all 0.2s ease;"
+                    onmouseover="this.style.background='linear-gradient(135deg, #f87171, #ef4444)';"
+                    onmouseout="this.style.background='linear-gradient(135deg, #ef4444, #dc2626)';">${$t('cancel')}</button>
                 <button id="template-save-btn" style="padding: 10px 24px; background: linear-gradient(135deg, #22c55e, #16a34a); 
                     color: white; border: none; border-radius: 6px; cursor: pointer; font-size: 14px; 
-                    font-weight: 600;">${$t('save')}</button>
+                    font-weight: 600; transition: all 0.2s ease;"
+                    onmouseover="this.style.background='linear-gradient(135deg, #4ade80, #22c55e)';"
+                    onmouseout="this.style.background='linear-gradient(135deg, #22c55e, #16a34a)';">${$t('save')}</button>
             </div>
         `;
         
@@ -2519,9 +2538,6 @@ function showLMStudioSettings(node) {
         };
         
         editorDialog.querySelector("#template-cancel-btn").onclick = closeEditor;
-        editorOverlay.onclick = (e) => {
-            if (e.target === editorOverlay) closeEditor();
-        };
         
         editorDialog.querySelector("#template-save-btn").onclick = async () => {
             const nameInput = editorDialog.querySelector("#template-name-input");
@@ -2830,10 +2846,10 @@ function showLMStudioSettings(node) {
                 timeoutUnloadInput.value = 30;
                 promptVersionSelect.value = "new";
                 originalPromptVersion = "new";
-                showLogPanelCheckbox.checked = true;
-                node.lmstudioState.showLogPanel = true;
+                showLogPanelCheckbox.checked = false;
+                node.lmstudioState.showLogPanel = false;
                 if (node._logPanelHost) {
-                    node._logPanelHost.style.display = "flex";
+                    node._logPanelHost.style.display = "none";
                 }
                 
                 const recursiveRadio = dialog.querySelector("#lmstudio-folder-mode-recursive");
@@ -2847,7 +2863,7 @@ function showLMStudioSettings(node) {
                 const config = {
                     preset: "Ignore",
                     prompt_version: "new",
-                    show_log_panel: true,
+                    show_log_panel: false,
                     folder_read_mode: "recursive",
                     timeouts: {
                         fetch_models: 5,

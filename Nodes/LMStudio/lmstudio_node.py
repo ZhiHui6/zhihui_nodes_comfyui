@@ -690,6 +690,7 @@ class LMStudioNode:
     ):
         if remove_think_tags:
             result = self._remove_think_content(result)
+        result = result.strip() if isinstance(result, str) else result
         if unload_model:
             self._unload_model(endpoint)
         return {"ui": {"log_info": [log_info]}, "result": (result,)}
