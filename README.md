@@ -21,7 +21,7 @@
 
 - 📝 **全面文本处理**：提供多行文本编辑、文本合并分离、内容提取修改、语言过滤等文本操作节点。
 
-- 🎯 **智能提示词系统**：标签选择器、Kontext预设增强版、摄影提示词生成器、万相视频提示词生成器等专业的提示词生成工具。
+- 🎯 **智能提示词系统**：标签选择器、图像编辑预设、摄影提示词生成器、万相视频提示词生成器等专业的提示词生成工具。
 
 - 🖼️ **实用图像工具**：支持多算法图像缩放、智能切换、颜色移除等等。
 
@@ -164,15 +164,8 @@
 </tr>
 
 <tr>
-<td><b>文本显示器</b><br><code>ShowText</code></td>
-<td>用于在ComfyUI界面中显示文本内容的节点，支持多行文本展示，可实时显示上游节点传递的文本信息，便于调试和查看中间结果。
-<br>
-<div align="left">
-<a href="images/文本显示器.jpg" target="_blank">
-<img src="images/文本显示器.jpg" alt="文本显示" width="45%"/>
-</a>
-</div>
-</td>
+<td><b>显示任何</b><br><code>ShowAny</code></td>
+<td>用于在ComfyUI界面中显示任意类型内容的节点，支持多行文本展示，可实时显示上游节点传递的文本信息，便于调试和查看中间结果。支持标准模式和排错模式两种显示方式。</td>
 </tr>
 <tr>
 <td><b>文本编辑器（继续运行）</b><br><code>TextEditorWithContinue</code></td>
@@ -220,38 +213,8 @@
 <th>功能描述</th>
 </tr>
 <tr>
-<td><b>Kontext预设基础版</b><br><code>LoadKontextPresetsBasic</code></td>
-<td>提供专业的图像变换预设库，包含13项专业预设。为图像生成提供风格化指导，帮助用户快速应用常见的艺术风格和效果。
-
-<br>
-<div align="left">
-<a href="images/Kontext预设集基础版.jpg" target="_blank">
-<img src="images/Kontext预设集基础版.jpg" alt="Kontext预设基础版" width="45%"/>
-</a>
-</div>
-</td>
-</tr>
-<tr>
-<td><b>Kontext预设增强版</b><br><code>KontextPresetsPlus</code></td>
-<td>
-
-提供专业的图像变换预设，内置免费在线扩写功能，支持用户自定义预设，为图像编辑提供创意指导。
-
-<b>特点</b>：
-- <b>丰富预设库</b>：包含20余项专业预设
-- <b>双预设库</b>：支持默认预设和用户自定义预设，用户可自由新增更多创意预设，通过分类标识区分预设来源。<a href="doc/Kontext_Presets_User_File_Instructions.md" style="font-weight:bold;color:yellow;">用户预设使用说明</a>
-- <b>智能扩写</b>：支持多种LLM模型对预设内容进行创意扩写
-- <b>灵活输出</b>：支持输出原始预设内容、完整信息或AI扩写后的内容
-
-<div align="left">
-<a href="images/Kontext预设增强版节点展示.jpg" target="_blank">
-<img src="images/Kontext预设增强版节点展示.jpg" alt="节点展示" width="45%" style="margin-right:5%"/>
-</a>
-<a href="images/Kontext预设增强版效果预览.jpg" target="_blank">
-<img src="images/Kontext预设增强版效果预览.jpg" alt="效果展示" width="45%"/>
-</a>
-</div>
-</td>
+<td><b>图像编辑预设</b><br><code>ImageEditingPresets</code></td>
+<td>提供专业的图像编辑预设库，包含多种专业预设，为图像生成提供风格化指导，帮助用户快速应用常见的艺术风格和效果。</td>
 </tr>
 <tr>
 <td><b>摄影提示词生成器</b><br><code>PhotographPromptGenerator</code></td>
@@ -731,7 +694,7 @@
 </tr>
 
 <tr>
-<td><b>Qwen3-VL高级版</b><br><code>Qwen3VLAdv</code></td>
+<td><b>Qwen3-VL高级版</b><br><code>Qwen3VLAdvanced</code></td>
 <td>
 基于阿里巴巴Qwen3-VL模型的专业级视觉理解节点，集成众多预设提示词模板，支持智能批量处理、高级量化技术和思维链推理功能。提供从标签生成到创意分析的多种预设模式，具备解锁限制、多语言输出、批量处理等高级特性。
 
@@ -1089,6 +1052,33 @@
 <br>
 <div align="left">
 <img src="images/IntNode.jpg" alt="整数节点" width="45%"/>
+</div>
+</td>
+</tr>
+<tr>
+<td><b>组开关管理器</b><br><code>GroupSwitchManager</code></td>
+<td>
+
+可视化群组开关管理工具，自动检测工作流中的所有群组，提供一键启用/禁用功能，支持颜色过滤、标题匹配、拖拽排序和群组联动配置。
+
+<b>核心功能</b>：
+- <b>智能过滤</b>：支持按颜色或标题关键词筛选群组
+- <b>拖拽排序</b>：自定义群组显示顺序
+- <b>联动配置</b>：配置群组间的联动规则，实现开关联动效果
+- <b>快速导航</b>：点击箭头快速定位到对应群组位置
+- <b>双模式支持</b>：支持禁用模式和忽略模式
+
+<br>
+<div align="left">
+<a href="images/Group Switch Manager1.jpg" target="_blank">
+<img src="images/Group Switch Manager1.jpg" alt="组开关管理器-主界面" width="30%"/>
+</a>
+<a href="images/Group Switch Manager2.jpg" target="_blank">
+<img src="images/Group Switch Manager2.jpg" alt="组开关管理器-设置界面" width="30%"/>
+</a>
+<a href="images/Group Switch Manager3.jpg" target="_blank">
+<img src="images/Group Switch Manager3.jpg" alt="组开关管理器-联动配置" width="30%"/>
+</a>
 </div>
 </td>
 </tr>

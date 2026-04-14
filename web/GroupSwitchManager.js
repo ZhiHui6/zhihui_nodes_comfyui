@@ -1,0 +1,2557 @@
+import { app } from "/scripts/app.js";
+
+const i18n = {
+    zh: {
+        title: "组开关管理器",
+        colorFilter: "颜色过滤",
+        colorFilterTitle: "按颜色过滤组",
+        allColors: "所有",
+        refresh: "刷新",
+        dragSort: "拖拽排序",
+        navigateToGroup: "跳转到组",
+        linkageConfig: "联动配置：",
+        whenGroupOn: "组开启时",
+        whenGroupOff: "组关闭时",
+        cancel: "取消",
+        confirm: "确定",
+        enable: "开启",
+        disable: "关闭",
+        modeLabel: "运行模式",
+        modeDisable: "禁用模式",
+        modeBypass: "忽略模式",
+        colorRed: "红色",
+        colorBrown: "棕色",
+        colorGreen: "绿色",
+        colorBlue: "蓝色",
+        colorPaleBlue: "浅蓝色",
+        colorCyan: "青色",
+        colorPurple: "紫色",
+        colorYellow: "黄色",
+        colorBlack: "黑色",
+        settings: "设置",
+        matchMode: "匹配模式",
+        matchColors: "匹配颜色",
+        matchTitle: "匹配标题",
+        toggleRestriction: "切换限制",
+        restrictionDefault: "默认",
+        restrictionMaxOne: "最多一个",
+        restrictionAlwaysOne: "始终一个",
+        matchTitlePlaceholder: "输入标题关键词...",
+        matchTitleHelp: "使用逗号分隔多个关键词"
+    },
+    en: {
+        title: "Group Switch Manager",
+        colorFilter: "Color Filter",
+        colorFilterTitle: "Filter groups by color",
+        allColors: "All",
+        refresh: "Refresh",
+        dragSort: "Drag to sort",
+        navigateToGroup: "Navigate to group",
+        linkageConfig: "Linkage Config: ",
+        whenGroupOn: "When Group ON",
+        whenGroupOff: "When Group OFF",
+        cancel: "Cancel",
+        confirm: "Confirm",
+        enable: "Enable",
+        disable: "Disable",
+        modeLabel: "Execution Mode",
+        modeDisable: "Disable Mode",
+        modeBypass: "Bypass Mode",
+        colorRed: "Red",
+        colorBrown: "Brown",
+        colorGreen: "Green",
+        colorBlue: "Blue",
+        colorPaleBlue: "Pale Blue",
+        colorCyan: "Cyan",
+        colorPurple: "Purple",
+        colorYellow: "Yellow",
+        colorBlack: "Black",
+        settings: "Settings",
+        matchMode: "Match Mode",
+        matchColors: "Match Colors",
+        matchTitle: "Match Title",
+        toggleRestriction: "Toggle Restriction",
+        restrictionDefault: "Default",
+        restrictionMaxOne: "Max One",
+        restrictionAlwaysOne: "Always One",
+        matchTitlePlaceholder: "Enter title keywords...",
+        matchTitleHelp: "Use commas to separate multiple keywords"
+    }
+};
+
+function getLocale() {
+    const comfyLocale = app?.ui?.settings?.getSettingValue?.('Comfy.Locale');
+    return comfyLocale === 'zh-CN' || comfyLocale === 'zh' ? 'zh' : 'en';
+}
+
+function t(key) {
+    const locale = getLocale();
+    return i18n[locale][key] || i18n['en'][key] || key;
+}
+
+let currentLocale = 'zh';
+let localeChangeListeners = [];
+
+function onLocaleChange(callback) {
+    localeChangeListeners.push(callback);
+}
+
+function initLocaleWatcher() {
+    currentLocale = getLocale();
+    setInterval(() => {
+        const newLocale = getLocale();
+        if (newLocale !== currentLocale) {
+            currentLocale = newLocale;
+            localeChangeListeners.forEach(cb => cb(newLocale));
+        }
+    }, 1000);
+}
+
+function reduceNodesDepthFirst(nodeOrNodes, reduceFn, reduceTo) {
+    const nodes = Array.isArray(nodeOrNodes) ? nodeOrNodes : [nodeOrNodes];
+    const stack = nodes.map((node) => ({ node }));
+
+    while (stack.length > 0) {
+        const { node } = stack.pop();
+        const result = reduceFn(node, reduceTo);
+        if (result !== undefined && result !== reduceTo) {
+            reduceTo = result;
+        }
+
+        if (node.isSubgraphNode?.() && node.subgraph) {
+            const children = node.subgraph.nodes;
+            for (let i = children.length - 1; i >= 0; i--) {
+                stack.push({ node: children[i] });
+            }
+        }
+    }
+    return reduceTo;
+}
+
+function changeModeOfNodes(nodeOrNodes, mode) {
+    reduceNodesDepthFirst(nodeOrNodes, (n) => {
+        n.mode = mode;
+    });
+}
+
+function getGroupNodes(group) {
+    return Array.from(group._children).filter((c) => c instanceof LGraphNode);
+}
+
+class GroupSwitchManagerService {
+    constructor() {
+        this.msThreshold = 400;
+        this.msLastUpdate = 0;
+        this.nodes = [];
+        this.runScheduledForMs = null;
+        this.runScheduleTimeout = null;
+        this.runScheduleAnimation = null;
+        this.cachedGroups = null;
+        this.cachedGroupStates = null;
+    }
+
+    addNode(node) {
+        this.nodes.push(node);
+        this.scheduleRun(8);
+    }
+
+    removeNode(node) {
+        const index = this.nodes.indexOf(node);
+        if (index > -1) {
+            this.nodes.splice(index, 1);
+        }
+        if (!this.nodes?.length) {
+            this.clearScheduledRun();
+            this.cachedGroups = null;
+            this.cachedGroupStates = null;
+        }
+    }
+
+    run() {
+        if (!this.runScheduledForMs) {
+            return;
+        }
+        for (const node of this.nodes) {
+            node.refreshWidgets();
+        }
+        this.clearScheduledRun();
+        this.scheduleRun();
+    }
+
+    scheduleRun(ms = 500) {
+        if (this.runScheduledForMs && ms < this.runScheduledForMs) {
+            this.clearScheduledRun();
+        }
+        if (!this.runScheduledForMs && this.nodes.length) {
+            this.runScheduledForMs = ms;
+            this.runScheduleTimeout = setTimeout(() => {
+                this.runScheduleAnimation = requestAnimationFrame(() => this.run());
+            }, ms);
+        }
+    }
+
+    clearScheduledRun() {
+        this.runScheduleTimeout && clearTimeout(this.runScheduleTimeout);
+        this.runScheduleAnimation && cancelAnimationFrame(this.runScheduleAnimation);
+        this.runScheduleTimeout = null;
+        this.runScheduleAnimation = null;
+        this.runScheduledForMs = null;
+    }
+
+    getGroups() {
+        const now = Date.now();
+        if (!this.cachedGroups || now - this.msLastUpdate > this.msThreshold) {
+            this.cachedGroups = this.computeGroups();
+            this.msLastUpdate = now;
+        }
+        return this.cachedGroups;
+    }
+
+    computeGroups() {
+        if (!app.graph || !app.graph._groups) return [];
+        const groups = [...app.graph._groups].filter(g => g && g.title);
+        for (const group of groups) {
+            const nodes = getGroupNodes(group);
+            group._gmm_hasAnyActiveNode = nodes.some(n => n.mode === 0);
+        }
+        return groups;
+    }
+
+    getGroupStates() {
+        if (!this.cachedGroupStates) {
+            this.cachedGroupStates = this.computeGroupStates();
+            setTimeout(() => {
+                this.cachedGroupStates = null;
+            }, 50);
+        }
+        return this.cachedGroupStates;
+    }
+
+    computeGroupStates() {
+        const states = new Map();
+        if (!app.graph || !app.graph._groups) return states;
+        
+        for (const group of app.graph._groups) {
+            if (!group || !group.title) continue;
+            const nodes = getGroupNodes(group);
+            const hasActiveNode = nodes.some(n => n.mode === 0);
+            states.set(group.title, {
+                enabled: hasActiveNode,
+                group: group
+            });
+        }
+        return states;
+    }
+}
+
+const GMM_SERVICE = new GroupSwitchManagerService();
+
+app.registerExtension({
+    name: "GroupSwitchManager",
+
+    async init(app) {
+        initLocaleWatcher();
+    },
+
+    async beforeRegisterNodeDef(nodeType, nodeData, app) {
+        if (nodeData.name !== "GroupSwitchManager") return;
+
+        const onNodeCreated = nodeType.prototype.onNodeCreated;
+        nodeType.prototype.onNodeCreated = function () {
+            const result = onNodeCreated?.apply(this, arguments);
+
+            this._gmmInstanceId = `gmm_${Date.now()}_${Math.random().toString(36).substring(2, 9)}`;
+            this.properties = this.properties || {};
+            this.properties.groups = this.properties.groups || [];
+            this.properties.selectedColorFilter = this.properties.selectedColorFilter || '';
+            this.properties.groupOrder = this.properties.groupOrder || [];
+            this.properties.groupStatesCache = this.properties.groupStatesCache || {};
+            this.properties.switchMode = this.properties.switchMode || 'ignore';
+            this.properties.matchMode = this.properties.matchMode || 'colors';
+            this.properties.titleKeywords = this.properties.titleKeywords || '';
+            this.properties.toggleRestriction = this.properties.toggleRestriction || 'default';
+            this.groupReferences = new WeakMap();
+            this._processingStack = new Set();
+            this.size = [400, 500];
+            this.createCustomUI();
+            this._gmmEventHandler = (e) => {
+                if (e.detail && e.detail.sourceId !== this._gmmInstanceId) {
+                    this.updateGroupsList();
+                }
+            };
+
+            window.addEventListener('group-mute-changed', this._gmmEventHandler);
+
+            return result;
+        };
+
+        const onAdded = nodeType.prototype.onAdded;
+        nodeType.prototype.onAdded = function (graph) {
+            onAdded?.apply(this, arguments);
+            GMM_SERVICE.addNode(this);
+        };
+
+        const onRemoved = nodeType.prototype.onRemoved;
+        nodeType.prototype.onRemoved = function () {
+            GMM_SERVICE.removeNode(this);
+            if (this._gmmEventHandler) {
+                window.removeEventListener('group-mute-changed', this._gmmEventHandler);
+            }
+            if (this._localeChangeHandler) {
+                const index = localeChangeListeners.indexOf(this._localeChangeHandler);
+                if (index > -1) {
+                    localeChangeListeners.splice(index, 1);
+                }
+            }
+            onRemoved?.apply(this, arguments);
+        };
+
+        nodeType.prototype.createCustomUI = function () {
+            try {
+                const container = document.createElement('div');
+                container.className = 'gmm-container';
+
+                this.addStyles();
+
+                container.innerHTML = `
+                <div class="gmm-content">
+                    <div class="gmm-groups-header">
+                        <div class="gmm-header-controls">
+                            <span class="gmm-mode-indicator" id="gmm-mode-indicator">${t('modeDisableShort')}</span>
+                            <button class="gmm-settings-button" id="gmm-settings-btn">
+                                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                    <path d="M14.7 6.3a1 1 0 0 0 0 1.4l1.6 1.6a1 1 0 0 0 1.4 0l3.77-3.77a6 6 0 0 1-7.94 7.94l-6.91 6.91a2.12 2.12 0 0 1-3-3l6.91-6.91a6 6 0 0 1 7.94-7.94l-3.76 3.76z"></path>
+                                </svg>
+                            </button>
+                            <button class="gmm-refresh-button" id="gmm-refresh">
+                                <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                    <polyline points="23 4 23 10 17 10"></polyline>
+                                    <polyline points="1 20 1 14 7 14"></polyline>
+                                    <path d="M3.51 9a9 9 0 0 1 14.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0 0 20.49 15"></path>
+                                </svg>
+                            </button>
+                        </div>
+                    </div>
+                    <div class="gmm-groups-list" id="gmm-groups-list"></div>
+                </div>
+            `;
+
+                this.addDOMWidget("gmm_ui", "div", container);
+                this.customUI = container;
+                this.bindUIEvents();
+                this.updateModeIndicator();
+                this.updateGroupsList();
+
+                setTimeout(() => {
+                    this.refreshColorFilter();
+                }, 50);
+
+                this._localeChangeHandler = (newLocale) => {
+                    this.updateUILanguage();
+                };
+                onLocaleChange(this._localeChangeHandler);
+
+            } catch (error) {
+            }
+        };
+
+        nodeType.prototype.addStyles = function () {
+            if (document.querySelector('#gmm-styles')) return;
+
+            const style = document.createElement('style');
+            style.id = 'gmm-styles';
+            style.textContent = `
+                .gmm-container {
+                    width: 100%;
+                    height: 100%;
+                    display: flex;
+                    flex-direction: column;
+                    background: #1e1e2e;
+                    border: 1px solid rgba(255, 255, 255, 0.1);
+                    border-radius: 8px;
+                    overflow: hidden;
+                    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+                    font-size: 11px;
+                    color: #E0E0E0;
+                    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
+                }
+
+                .gmm-content {
+                    flex: 1;
+                    display: flex;
+                    flex-direction: column;
+                    overflow: hidden;
+                    background: rgba(30, 30, 46, 0.5);
+                }
+
+                .gmm-groups-header {
+                    padding: 6px 10px;
+                    border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+                    display: flex;
+                    align-items: center;
+                    justify-content: space-between;
+                    position: relative;
+                }
+
+                .gmm-header-controls {
+                    position: relative;
+                    display: flex;
+                    align-items: center;
+                    gap: 8px;
+                    justify-content: flex-end;
+                    flex: 1;
+                }
+
+                .gmm-dropdown-container {
+                    position: relative;
+                    display: flex;
+                    align-items: center;
+                    gap: 8px;
+                }
+
+                .gmm-dropdown-label {
+                    font-size: 10px;
+                    color: #B0B0B0;
+                    white-space: nowrap;
+                    font-weight: 500;
+                    width: auto;
+                    flex-shrink: 0;
+                }
+
+                .gmm-custom-dropdown {
+                    position: relative;
+                    flex: 1;
+                    min-width: 0;
+                }
+
+                .gmm-dropdown-trigger {
+                    background: linear-gradient(145deg, rgba(50, 50, 70, 0.9) 0%, rgba(40, 40, 60, 0.95) 100%);
+                    border: 1px solid rgba(116, 55, 149, 0.5);
+                    border-radius: 6px;
+                    padding: 5px 8px;
+                    color: #F0F0F0;
+                    font-size: 10px;
+                    cursor: pointer;
+                    display: flex;
+                    align-items: center;
+                    justify-content: space-between;
+                    gap: 6px;
+                    transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+                    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2), inset 0 1px 0 rgba(255, 255, 255, 0.05);
+                }
+
+                .gmm-dropdown-trigger:hover {
+                    background: linear-gradient(145deg, rgba(60, 60, 85, 0.95) 0%, rgba(50, 50, 75, 1) 100%);
+                    border-color: rgba(139, 75, 168, 0.7);
+                    box-shadow: 0 3px 8px rgba(116, 55, 149, 0.25), inset 0 1px 0 rgba(255, 255, 255, 0.08);
+                }
+
+                .gmm-custom-dropdown.open .gmm-dropdown-trigger {
+                    border-color: rgba(155, 89, 182, 0.9);
+                    background: linear-gradient(145deg, rgba(65, 65, 90, 1) 0%, rgba(55, 55, 80, 1) 100%);
+                    box-shadow: 0 0 0 3px rgba(116, 55, 149, 0.2), 0 4px 12px rgba(116, 55, 149, 0.3);
+                }
+
+                .gmm-dropdown-text {
+                    flex: 1;
+                    overflow: hidden;
+                    text-overflow: ellipsis;
+                    white-space: nowrap;
+                    font-weight: 500;
+                    letter-spacing: 0.3px;
+                }
+
+                .gmm-dropdown-arrow {
+                    flex-shrink: 0;
+                    transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+                    color: rgba(200, 180, 220, 0.8);
+                }
+
+                .gmm-custom-dropdown.open .gmm-dropdown-arrow {
+                    transform: rotate(180deg);
+                    color: rgba(155, 89, 182, 1);
+                }
+
+                .gmm-dropdown-menu {
+                    position: absolute;
+                    top: calc(100% + 4px);
+                    left: 0;
+                    right: 0;
+                    background: linear-gradient(180deg, rgba(45, 45, 65, 0.98) 0%, rgba(35, 35, 55, 0.99) 100%);
+                    border: 1px solid rgba(116, 55, 149, 0.4);
+                    border-radius: 8px;
+                    padding: 4px;
+                    z-index: 1000;
+                    opacity: 0;
+                    transform: translateY(-8px) scale(0.96);
+                    transform-origin: top center;
+                    pointer-events: none;
+                    transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+                    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.4), 0 2px 8px rgba(116, 55, 149, 0.2);
+                    backdrop-filter: blur(8px);
+                    max-height: 200px;
+                    overflow-y: auto;
+                }
+
+                .gmm-dropdown-menu::-webkit-scrollbar {
+                    width: 4px;
+                }
+
+                .gmm-dropdown-menu::-webkit-scrollbar-track {
+                    background: rgba(30, 30, 45, 0.5);
+                    border-radius: 2px;
+                }
+
+                .gmm-dropdown-menu::-webkit-scrollbar-thumb {
+                    background: rgba(116, 55, 149, 0.5);
+                    border-radius: 2px;
+                }
+
+                .gmm-dropdown-menu::-webkit-scrollbar-thumb:hover {
+                    background: rgba(139, 75, 168, 0.7);
+                }
+
+                .gmm-custom-dropdown.open .gmm-dropdown-menu {
+                    opacity: 1;
+                    transform: translateY(0) scale(1);
+                    pointer-events: auto;
+                }
+
+                .gmm-dropdown-item {
+                    padding: 8px 12px;
+                    color: #D0D0E0;
+                    font-size: 13px;
+                    cursor: pointer;
+                    border-radius: 4px;
+                    transition: all 0.2s ease;
+                    white-space: nowrap;
+                    overflow: hidden;
+                    text-overflow: ellipsis;
+                    position: relative;
+                    font-weight: 400;
+                }
+
+                .gmm-dropdown-item:hover {
+                    background: rgba(116, 55, 149, 0.25);
+                    color: #FFFFFF;
+                }
+
+                .gmm-dropdown-item.active {
+                    background: linear-gradient(90deg, rgba(116, 55, 149, 0.4) 0%, rgba(139, 75, 168, 0.3) 100%);
+                    color: #FFFFFF;
+                    font-weight: 500;
+                }
+
+                .gmm-dropdown-item.active::before {
+                    content: '';
+                    position: absolute;
+                    left: 0;
+                    top: 50%;
+                    transform: translateY(-50%);
+                    width: 3px;
+                    height: 60%;
+                    background: linear-gradient(180deg, #9b59b6 0%, #743795 100%);
+                    border-radius: 0 2px 2px 0;
+                }
+
+                .gmm-dropdown-item:not(:last-child) {
+                    margin-bottom: 2px;
+                }
+
+                .gmm-dropdown-item.gmm-color-item {
+                    position: relative;
+                    padding-left: 18px;
+                }
+
+                .gmm-dropdown-item.gmm-color-item::before {
+                    content: '';
+                    position: absolute;
+                    left: 6px;
+                    top: 50%;
+                    transform: translateY(-50%);
+                    width: 8px;
+                    height: 8px;
+                    border-radius: 50%;
+                    background: var(--item-color, #888);
+                    box-shadow: 0 0 0 1px rgba(255, 255, 255, 0.2);
+                }
+
+                .gmm-match-filter-container {
+                    position: relative;
+                    display: flex;
+                    align-items: center;
+                }
+
+                .gmm-color-filter-wrapper {
+                    display: flex;
+                    align-items: center;
+                    gap: 8px;
+                    width: 100%;
+                }
+
+                .gmm-groups-title {
+                    font-size: 10px;
+                    font-weight: 500;
+                    color: #B0B0B0;
+                }
+
+                .gmm-settings-button {
+                    background: rgba(116, 55, 149, 0.2);
+                    border: 1px solid rgba(116, 55, 149, 0.3);
+                    border-radius: 4px;
+                    padding: 0;
+                    width: 22px;
+                    height: 22px;
+                    cursor: pointer;
+                    transition: all 0.2s ease;
+                    display: flex;
+                    align-items: center;
+                    justify-content: center;
+                    color: #B0B0B0;
+                    font-size: 11px;
+                    flex-shrink: 0;
+                    box-sizing: border-box;
+                }
+
+                .gmm-settings-button:hover {
+                    background: rgba(116, 55, 149, 0.4);
+                    border-color: rgba(116, 55, 149, 0.5);
+                    color: #E0E0E0;
+                }
+
+                .gmm-settings-button svg {
+                    width: 12px;
+                    height: 12px;
+                    stroke: currentColor;
+                }
+
+                .gmm-mode-indicator {
+                    margin-right: auto;
+                    font-size: 12px;
+                    color: #8b4ba8;
+                    font-weight: 600;
+                    padding: 4px 10px;
+                    height: 22px;
+                    line-height: 14px;
+                    background: rgba(116, 55, 149, 0.15);
+                    border: 1px solid rgba(116, 55, 149, 0.3);
+                    border-radius: 4px;
+                    white-space: nowrap;
+                    display: flex;
+                    align-items: center;
+                    box-sizing: border-box;
+                }
+
+                .gmm-refresh-button {
+                    background: rgba(116, 55, 149, 0.2);
+                    border: 1px solid rgba(116, 55, 149, 0.3);
+                    border-radius: 4px;
+                    padding: 0;
+                    width: 22px;
+                    height: 22px;
+                    cursor: pointer;
+                    transition: all 0.2s ease;
+                    display: flex;
+                    align-items: center;
+                    justify-content: center;
+                    box-sizing: border-box;
+                }
+
+                .gmm-refresh-button:hover {
+                    background: rgba(116, 55, 149, 0.4);
+                    border-color: rgba(116, 55, 149, 0.5);
+                }
+
+                .gmm-refresh-button svg {
+                    width: 10px;
+                    height: 10px;
+                    stroke: #B0B0B0;
+                    stroke-width: 2.5;
+                }
+
+                .gmm-groups-list {
+                    flex: 1;
+                    overflow-y: auto;
+                    padding: 4px;
+                }
+
+                .gmm-groups-list::-webkit-scrollbar {
+                    width: 4px;
+                }
+
+                .gmm-groups-list::-webkit-scrollbar-track {
+                    background: rgba(0, 0, 0, 0.1);
+                    border-radius: 2px;
+                }
+
+                .gmm-groups-list::-webkit-scrollbar-thumb {
+                    background: rgba(116, 55, 149, 0.5);
+                    border-radius: 2px;
+                }
+
+                .gmm-groups-list::-webkit-scrollbar-thumb:hover {
+                    background: rgba(116, 55, 149, 0.7);
+                }
+
+                .gmm-group-item {
+                    background: linear-gradient(135deg, rgba(42, 42, 62, 0.6) 0%, rgba(58, 58, 78, 0.6) 100%);
+                    border: 1px solid rgba(255, 255, 255, 0.1);
+                    border-radius: 4px;
+                    padding: 3px 6px;
+                    margin-bottom: 2px;
+                    transition: all 0.2s ease;
+                }
+
+                .gmm-group-item:hover {
+                    border-color: rgba(116, 55, 149, 0.5);
+                    box-shadow: 0 1px 4px rgba(116, 55, 149, 0.2);
+                }
+
+                .gmm-group-header {
+                    display: flex;
+                    align-items: center;
+                    gap: 4px;
+                }
+
+                .gmm-group-name {
+                    flex: 1;
+                    color: #E0E0E0;
+                    font-size: 13px;
+                    font-weight: 500;
+                    overflow: hidden;
+                    text-overflow: ellipsis;
+                    white-space: nowrap;
+                    min-width: 0;
+                }
+
+                .gmm-switch {
+                    width: 18px;
+                    height: 18px;
+                    border-radius: 50%;
+                    background: linear-gradient(135deg, rgba(116, 55, 149, 0.3) 0%, rgba(139, 75, 168, 0.3) 100%);
+                    border: 1px solid rgba(116, 55, 149, 0.5);
+                    transition: all 0.3s ease;
+                    cursor: pointer;
+                    flex-shrink: 0;
+                    display: flex;
+                    align-items: center;
+                    justify-content: center;
+                    position: relative;
+                }
+
+                .gmm-switch svg {
+                    width: 10px;
+                    height: 10px;
+                    stroke: rgba(255, 255, 255, 0.3);
+                    transition: all 0.3s ease;
+                }
+
+                .gmm-switch:hover {
+                    box-shadow: 0 0 12px rgba(139, 75, 168, 0.4);
+                    transform: scale(1.1);
+                }
+
+                .gmm-switch.active {
+                    background: linear-gradient(135deg, #743795 0%, #8b4ba8 100%);
+                    border-color: #8b4ba8;
+                    box-shadow: 0 0 8px rgba(139, 75, 168, 0.6);
+                }
+
+                .gmm-switch.active svg {
+                    stroke: white;
+                }
+
+                .gmm-linkage-button {
+                    width: 18px;
+                    height: 18px;
+                    border-radius: 50%;
+                    background: rgba(116, 55, 149, 0.2);
+                    border: 1px solid rgba(116, 55, 149, 0.3);
+                    display: flex;
+                    align-items: center;
+                    justify-content: center;
+                    transition: all 0.2s ease;
+                    cursor: pointer;
+                    flex-shrink: 0;
+                }
+
+                .gmm-linkage-button svg {
+                    width: 10px;
+                    height: 10px;
+                    stroke: #B0B0B0;
+                    transition: all 0.2s ease;
+                }
+
+                .gmm-linkage-button:hover {
+                    background: rgba(116, 55, 149, 0.4);
+                    border-color: rgba(116, 55, 149, 0.5);
+                    transform: scale(1.1);
+                }
+
+                .gmm-linkage-button:hover svg {
+                    stroke: #E0E0E0;
+                }
+
+                .gmm-linkage-button.active {
+                    background: linear-gradient(135deg, #743795 0%, #8b4ba8 100%);
+                    border-color: #8b4ba8;
+                    box-shadow: 0 0 8px rgba(139, 75, 168, 0.6);
+                }
+
+                .gmm-linkage-button.active svg {
+                    stroke: white;
+                }
+
+                .gmm-navigate-button {
+                    width: 18px;
+                    height: 18px;
+                    border-radius: 4px;
+                    background: rgba(74, 144, 226, 0.2);
+                    border: 1px solid rgba(74, 144, 226, 0.3);
+                    display: flex;
+                    align-items: center;
+                    justify-content: center;
+                    transition: all 0.2s ease;
+                    cursor: pointer;
+                    flex-shrink: 0;
+                }
+
+                .gmm-navigate-button svg {
+                    width: 10px;
+                    height: 10px;
+                    stroke: #4A90E2;
+                    transition: all 0.2s ease;
+                }
+
+                .gmm-navigate-button:hover {
+                    background: rgba(74, 144, 226, 0.4);
+                    border-color: rgba(74, 144, 226, 0.6);
+                    transform: scale(1.1);
+                }
+
+                .gmm-navigate-button:hover svg {
+                    stroke: #6FA8E8;
+                }
+
+                @keyframes gmmFadeIn {
+                    from {
+                        opacity: 0;
+                        transform: translateY(5px);
+                    }
+                    to {
+                        opacity: 1;
+                        transform: translateY(0);
+                    }
+                }
+
+                /* 联动配置对话框 */
+                .gmm-linkage-dialog {
+                    position: fixed;
+                    top: 50%;
+                    left: 50%;
+                    transform: translate(-50%, -50%) scale(0.9);
+                    background: #1e1e2e;
+                    border: 1px solid rgba(116, 55, 149, 0.5);
+                    border-radius: 12px;
+                    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.5), 0 0 0 1px rgba(116, 55, 149, 0.2);
+                    padding: 16px;
+                    min-width: 280px;
+                    max-width: 340px;
+                    z-index: 10000;
+                    opacity: 0;
+                    animation: gmmDialogShow 0.3s cubic-bezier(0.4, 0, 0.2, 1) forwards;
+                }
+
+                @keyframes gmmDialogShow {
+                    0% {
+                        opacity: 0;
+                        transform: translate(-50%, -50%) scale(0.9);
+                    }
+                    100% {
+                        opacity: 1;
+                        transform: translate(-50%, -50%) scale(1);
+                    }
+                }
+
+                .gmm-linkage-dialog.closing {
+                    animation: gmmDialogHide 0.2s cubic-bezier(0.4, 0, 0.2, 1) forwards;
+                }
+
+                @keyframes gmmDialogHide {
+                    0% {
+                        opacity: 1;
+                        transform: translate(-50%, -50%) scale(1);
+                    }
+                    100% {
+                        opacity: 0;
+                        transform: translate(-50%, -50%) scale(0.9);
+                    }
+                }
+
+                .gmm-dialog-header {
+                    display: flex;
+                    align-items: center;
+                    justify-content: space-between;
+                    margin-bottom: 16px;
+                    padding-bottom: 12px;
+                    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+                }
+
+                .gmm-dialog-header h3 {
+                    margin: 0;
+                    font-size: 14px;
+                    font-weight: 600;
+                    color: #E0E0E0;
+                    flex: 1;
+                    overflow: hidden;
+                    text-overflow: ellipsis;
+                    white-space: nowrap;
+                    min-width: 0;
+                    padding-right: 12px;
+                }
+
+                .gmm-dialog-close {
+                    width: 24px;
+                    height: 24px;
+                    border-radius: 6px;
+                    background: rgba(220, 38, 38, 0.2);
+                    border: 1px solid rgba(220, 38, 38, 0.3);
+                    color: #E0E0E0;
+                    font-size: 16px;
+                    line-height: 22px;
+                    text-align: center;
+                    cursor: pointer;
+                    transition: all 0.2s ease;
+                }
+
+                .gmm-dialog-close:hover {
+                    background: rgba(220, 38, 38, 0.4);
+                    border-color: rgba(220, 38, 38, 0.5);
+                }
+
+                .gmm-linkage-section {
+                    margin-bottom: 16px;
+                }
+
+                .gmm-section-header {
+                    display: flex;
+                    align-items: center;
+                    justify-content: space-between;
+                    margin-bottom: 8px;
+                }
+
+                .gmm-section-header span {
+                    font-size: 13px;
+                    font-weight: 600;
+                    color: #B0B0B0;
+                }
+
+                .gmm-add-rule {
+                    width: 22px;
+                    height: 22px;
+                    border-radius: 6px;
+                    background: linear-gradient(135deg, #743795 0%, #8b4ba8 100%);
+                    border: none;
+                    color: white;
+                    font-size: 16px;
+                    line-height: 22px;
+                    text-align: center;
+                    cursor: pointer;
+                    transition: all 0.2s ease;
+                }
+
+                .gmm-add-rule:hover {
+                    background: linear-gradient(135deg, #8b4ba8 0%, #a35dbe 100%);
+                }
+
+                .gmm-rules-list {
+                    display: flex;
+                    flex-direction: column;
+                    gap: 6px;
+                }
+
+                .gmm-rule-item {
+                    display: flex;
+                    align-items: center;
+                    gap: 6px;
+                    padding: 6px 8px;
+                    background: rgba(42, 42, 62, 0.6);
+                    border: 1px solid rgba(255, 255, 255, 0.1);
+                    border-radius: 6px;
+                    animation: gmmFadeIn 0.3s ease-out;
+                }
+
+                .gmm-rule-item .gmm-custom-dropdown {
+                    flex: 1;
+                    min-width: 0;
+                }
+
+                .gmm-rule-item .gmm-dropdown-trigger {
+                    padding: 4px 8px;
+                    font-size: 12px;
+                    width: 100%;
+                    box-sizing: border-box;
+                }
+
+                .gmm-rule-item .gmm-rule-action-dropdown {
+                    flex: 0 0 auto;
+                    width: 80px;
+                }
+
+                .gmm-rule-item .gmm-dropdown-menu {
+                    max-height: 120px;
+                }
+
+                .gmm-delete-rule {
+                    width: 22px;
+                    height: 22px;
+                    border-radius: 6px;
+                    background: linear-gradient(135deg, rgba(220, 38, 38, 0.8) 0%, rgba(185, 28, 28, 0.8) 100%);
+                    border: 1px solid rgba(255, 255, 255, 0.1);
+                    color: white;
+                    font-size: 14px;
+                    cursor: pointer;
+                    transition: all 0.2s ease;
+                    flex-shrink: 0;
+                    display: flex;
+                    align-items: center;
+                    justify-content: center;
+                }
+
+                .gmm-delete-rule:hover {
+                    background: linear-gradient(135deg, rgba(239, 68, 68, 0.9) 0%, rgba(220, 38, 38, 0.9) 100%);
+                }
+
+                .gmm-dialog-footer {
+                    display: flex;
+                    gap: 10px;
+                    margin-top: 16px;
+                    padding-top: 12px;
+                    border-top: 1px solid rgba(255, 255, 255, 0.1);
+                }
+
+                .gmm-button {
+                    flex: 1;
+                    padding: 10px 16px;
+                    background: linear-gradient(135deg, rgba(64, 64, 84, 0.8) 0%, rgba(74, 74, 94, 0.8) 100%);
+                    border: 1px solid rgba(255, 255, 255, 0.1);
+                    border-radius: 8px;
+                    color: #E0E0E0;
+                    cursor: pointer;
+                    font-size: 13px;
+                    font-weight: 500;
+                    transition: all 0.2s ease;
+                }
+
+                .gmm-button:hover {
+                    background: linear-gradient(135deg, rgba(84, 84, 104, 0.9) 0%, rgba(94, 94, 114, 0.9) 100%);
+                    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
+                }
+
+                .gmm-button-primary {
+                    background: linear-gradient(135deg, #743795 0%, #8b4ba8 100%);
+                    border: 1px solid rgba(139, 75, 168, 0.5);
+                }
+
+                .gmm-button-primary:hover {
+                    background: linear-gradient(135deg, #8b4ba8 0%, #a35dbe 100%);
+                    box-shadow: 0 4px 12px rgba(116, 55, 149, 0.4);
+                }
+
+                .gmm-settings-dialog {
+                    position: fixed;
+                    top: 50%;
+                    left: 50%;
+                    transform: translate(-50%, -50%) scale(0.9);
+                    background: #1e1e2e;
+                    border: 1px solid rgba(116, 55, 149, 0.5);
+                    border-radius: 12px;
+                    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.5), 0 0 0 1px rgba(116, 55, 149, 0.2);
+                    padding: 16px;
+                    min-width: 280px;
+                    max-width: 340px;
+                    z-index: 10000;
+                    opacity: 0;
+                    animation: gmmDialogShow 0.3s cubic-bezier(0.4, 0, 0.2, 1) forwards;
+                }
+
+                .gmm-settings-dialog.closing {
+                    animation: gmmDialogHide 0.2s cubic-bezier(0.4, 0, 0.2, 1) forwards;
+                }
+
+                .gmm-settings-dialog-content {
+                    display: flex;
+                    flex-direction: column;
+                    gap: 12px;
+                }
+
+                .gmm-settings-dialog-title {
+                    font-size: 16px;
+                    font-weight: 600;
+                    color: #E0E0E0;
+                    margin: 0 0 12px 0;
+                    padding-bottom: 12px;
+                    border-bottom: 1px solid rgba(116, 55, 149, 0.3);
+                }
+
+                .gmm-settings-dialog-item {
+                    display: flex;
+                    flex-direction: row;
+                    align-items: center;
+                    gap: 12px;
+                }
+
+                .gmm-settings-dialog-label {
+                    font-size: 13px;
+                    color: #B0B0B0;
+                    font-weight: 500;
+                    flex: 0 0 auto;
+                    width: 120px;
+                }
+
+                .gmm-settings-dialog .gmm-custom-dropdown {
+                    flex: 1;
+                    width: auto;
+                }
+
+                .gmm-settings-dialog .gmm-dropdown-trigger {
+                    padding: 8px 12px;
+                    font-size: 14px;
+                    width: 100%;
+                }
+
+                .gmm-drag-handle {
+                    width: 14px;
+                    height: 18px;
+                    display: flex;
+                    align-items: center;
+                    justify-content: center;
+                    cursor: grab;
+                    flex-shrink: 0;
+                    opacity: 0.4;
+                    transition: opacity 0.2s ease;
+                    margin-right: 2px;
+                }
+
+                .gmm-drag-handle:hover {
+                    opacity: 0.8;
+                }
+
+                .gmm-drag-handle:active {
+                    cursor: grabbing;
+                }
+
+                .gmm-drag-handle svg {
+                    width: 10px;
+                    height: 10px;
+                    fill: #B0B0B0;
+                }
+
+                .gmm-group-item[draggable="true"] {
+                    cursor: grab;
+                }
+
+                .gmm-group-item[draggable="true"]:active {
+                    cursor: grabbing;
+                }
+
+                .gmm-group-item.gmm-drag-over {
+                    border: 2px dashed #743795;
+                    background: linear-gradient(135deg, rgba(116, 55, 149, 0.2) 0%, rgba(139, 75, 168, 0.2) 100%);
+                }
+
+                .gmm-title-match-input {
+                    background: rgba(45, 45, 65, 0.9);
+                    border: 1px solid rgba(116, 55, 149, 0.4);
+                    border-radius: 4px;
+                    padding: 8px 12px;
+                    color: #F0F0F0;
+                    font-size: 14px;
+                    flex: 1;
+                    width: 100%;
+                    transition: all 0.2s ease;
+                }
+
+                .gmm-title-match-input:focus {
+                    outline: none;
+                    border-color: #8b4ba8;
+                    background: rgba(55, 55, 75, 0.95);
+                }
+
+                .gmm-title-match-input::placeholder {
+                    color: #888;
+                    font-size: 9px;
+                }
+
+                .gmm-title-match-wrapper {
+                    display: flex;
+                    align-items: center;
+                    width: 100%;
+                }
+            `;
+            document.head.appendChild(style);
+        };
+
+        nodeType.prototype.updateUILanguage = function () {
+            if (!this.customUI) return;
+
+            const titleEl = this.customUI.querySelector('.gmm-groups-title');
+            if (titleEl) titleEl.textContent = t('title');
+
+            const settingsBtn = this.customUI.querySelector('#gmm-settings-btn .gmm-settings-text');
+            if (settingsBtn) settingsBtn.textContent = t('settings');
+
+            this.updateModeIndicator();
+            this.updateGroupsList();
+        };
+
+        nodeType.prototype.updateModeIndicator = function () {
+            if (!this.customUI) return;
+            const indicator = this.customUI.querySelector('#gmm-mode-indicator');
+            if (indicator) {
+                const mode = this.properties.switchMode || 'ignore';
+                indicator.textContent = mode === 'ignore' ? t('modeDisable') : t('modeBypass');
+            }
+        };
+
+        nodeType.prototype.bindUIEvents = function () {
+            const container = this.customUI;
+
+            const settingsBtn = container.querySelector('#gmm-settings-btn');
+            if (settingsBtn) {
+                settingsBtn.addEventListener('click', (e) => {
+                    e.stopPropagation();
+                    this.showSettingsDialog();
+                });
+            }
+
+            const refreshButton = container.querySelector('#gmm-refresh');
+            if (refreshButton) {
+                refreshButton.addEventListener('click', () => {
+                    this.refreshGroupsList();
+                });
+            }
+
+            const setupCustomDropdown = (dropdownId, propertyName, onChangeCallback) => {
+                const dropdown = container.querySelector(`#${dropdownId}`);
+                if (!dropdown) return;
+
+                const trigger = dropdown.querySelector('.gmm-dropdown-trigger');
+                const items = dropdown.querySelectorAll('.gmm-dropdown-item');
+                const textSpan = dropdown.querySelector('.gmm-dropdown-text');
+
+                trigger.addEventListener('click', (e) => {
+                    e.stopPropagation();
+                    const isOpen = dropdown.classList.contains('open');
+                    
+                    document.querySelectorAll('.gmm-custom-dropdown.open').forEach(d => {
+                        if (d !== dropdown) d.classList.remove('open');
+                    });
+                    
+                    dropdown.classList.toggle('open', !isOpen);
+                });
+
+                items.forEach(item => {
+                    item.addEventListener('click', (e) => {
+                        e.stopPropagation();
+                        const value = item.getAttribute('data-value');
+                        const text = item.textContent;
+
+                        items.forEach(i => i.classList.remove('active'));
+                        item.classList.add('active');
+
+                        dropdown.setAttribute('data-value', value);
+                        if (textSpan) textSpan.textContent = text;
+
+                        dropdown.classList.remove('open');
+
+                        if (propertyName) {
+                            this.properties[propertyName] = value;
+                        }
+                        if (onChangeCallback) {
+                            onChangeCallback(value);
+                        }
+                    });
+                });
+            };
+
+            document.addEventListener('click', () => {
+                document.querySelectorAll('.gmm-custom-dropdown.open').forEach(d => {
+                    d.classList.remove('open');
+                });
+            });
+
+        };
+
+        nodeType.prototype.updateGroupsList = function () {
+            const listContainer = this.customUI.querySelector('#gmm-groups-list');
+            if (!listContainer) {
+                return;
+            }
+
+            listContainer.innerHTML = '';
+
+            const allWorkflowGroups = this.getWorkflowGroups();
+
+            const sortedGroups = this.sortGroupsByOrder(allWorkflowGroups);
+
+            let displayGroups = sortedGroups;
+
+            if (this.properties.matchMode === 'title' && this.properties.titleKeywords) {
+                const keywords = this.properties.titleKeywords.split(',').map(k => k.trim().toLowerCase()).filter(k => k);
+                if (keywords.length > 0) {
+                    displayGroups = displayGroups.filter(group => {
+                        const title = (group.title || '').toLowerCase();
+                        return keywords.some(keyword => title.includes(keyword));
+                    });
+                }
+            } else if (this.properties.selectedColorFilter) {
+                let filterColor = this.properties.selectedColorFilter.trim().toLowerCase();
+
+                if (typeof LGraphCanvas !== 'undefined' && LGraphCanvas.node_colors) {
+                    if (LGraphCanvas.node_colors[filterColor]) {
+                        filterColor = LGraphCanvas.node_colors[filterColor].groupcolor;
+                    } else {
+                        const underscoreColor = filterColor.replace(/\s+/g, '_');
+                        if (LGraphCanvas.node_colors[underscoreColor]) {
+                            filterColor = LGraphCanvas.node_colors[underscoreColor].groupcolor;
+                        } else {
+                            const spacelessColor = filterColor.replace(/\s+/g, '');
+                            if (LGraphCanvas.node_colors[spacelessColor]) {
+                                filterColor = LGraphCanvas.node_colors[spacelessColor].groupcolor;
+                            }
+                        }
+                    }
+                }
+
+                filterColor = filterColor.replace("#", "").toLowerCase();
+                if (filterColor.length === 3) {
+                    filterColor = filterColor.replace(/(.)(.)(.)/, "$1$1$2$2$3$3");
+                }
+                filterColor = `#${filterColor}`;
+
+                displayGroups = sortedGroups.filter(group => {
+                    if (!group.color) return false;
+                    let groupColor = group.color.replace("#", "").trim().toLowerCase();
+                    if (groupColor.length === 3) {
+                        groupColor = groupColor.replace(/(.)(.)(.)/, "$1$1$2$2$3$3");
+                    }
+                    groupColor = `#${groupColor}`;
+                    return groupColor === filterColor;
+                });
+            }
+
+            displayGroups.forEach(group => {
+                let groupConfig = this.properties.groups.find(g => g.group_name === group.title);
+                if (!groupConfig) {
+                    groupConfig = {
+                        id: Date.now() + Math.random(),
+                        group_name: group.title,
+                        enabled: this.isGroupEnabled(group),
+                        linkage: {
+                            on_enable: [],
+                            on_disable: []
+                        }
+                    };
+                    this.properties.groups.push(groupConfig);
+                } else {
+                    groupConfig.enabled = this.isGroupEnabled(group);
+                }
+
+                if (!this.groupReferences.has(group)) {
+                    this.groupReferences.set(group, group.title);
+                }
+
+                const groupItem = this.createGroupItem(groupConfig, group);
+                listContainer.appendChild(groupItem);
+            });
+
+            const beforeCleanupCount = this.properties.groups.length;
+            this.properties.groups = this.properties.groups.filter(config =>
+                allWorkflowGroups.some(g => g.title === config.group_name)
+            );
+            const afterCleanupCount = this.properties.groups.length;
+            if (beforeCleanupCount !== afterCleanupCount) {
+            }
+
+            logger.info('[GMM-UI] === 组列表更新完成 ===');
+        };
+
+        nodeType.prototype.getWorkflowGroups = function () {
+            if (!app.graph || !app.graph._groups) return [];
+            return app.graph._groups.filter(g => g && g.title);
+        };
+
+        nodeType.prototype.sortGroupsByOrder = function (groups) {
+            if (!groups || groups.length === 0) {
+                return [];
+            }
+
+            if (!this.properties.groupOrder || this.properties.groupOrder.length === 0) {
+                const sorted = groups.slice().sort((a, b) => a.title.localeCompare(b.title, 'zh-CN'));
+                return sorted;
+            }
+
+            const orderMap = new Map();
+            this.properties.groupOrder.forEach((name, index) => {
+                orderMap.set(name, index);
+            });
+
+            const orderedGroups = [];
+            const unorderedGroups = [];
+
+            groups.forEach(group => {
+                if (orderMap.has(group.title)) {
+                    orderedGroups.push(group);
+                } else {
+                    unorderedGroups.push(group);
+                }
+            });
+
+            orderedGroups.sort((a, b) => {
+                return orderMap.get(a.title) - orderMap.get(b.title);
+            });
+
+            unorderedGroups.sort((a, b) => a.title.localeCompare(b.title, 'zh-CN'));
+
+            const result = [...orderedGroups, ...unorderedGroups];
+            return result;
+        };
+
+        nodeType.prototype.isGroupEnabled = function (group) {
+            if (!group) return false;
+
+            const nodes = this.getNodesInGroup(group);
+            if (nodes.length === 0) return false;
+
+            let hasActiveNode = false;
+            reduceNodesDepthFirst(nodes, (node) => {
+                if (node.mode === 0) { // LiteGraph.ALWAYS = 0
+                    hasActiveNode = true;
+                }
+            });
+            return hasActiveNode;
+        };
+
+        nodeType.prototype.refreshWidgets = function () {
+            if (!this.customUI) return;
+
+            const groups = GMM_SERVICE.getGroups();
+            const listContainer = this.customUI.querySelector('#gmm-color-filter-dropdown')?.closest('.gmm-groups-header')?.nextElementSibling || this.customUI.querySelector('#gmm-groups-list');
+            if (!listContainer) return;
+
+            let filterColors = [];
+            if (this.properties.matchMode === 'title' && this.properties.titleKeywords) {
+                // 标题过滤模式
+            } else if (this.properties.selectedColorFilter) {
+                let filterColor = this.properties.selectedColorFilter.trim().toLowerCase();
+                if (typeof LGraphCanvas !== 'undefined' && LGraphCanvas.node_colors) {
+                    if (LGraphCanvas.node_colors[filterColor]) {
+                        filterColor = LGraphCanvas.node_colors[filterColor].groupcolor;
+                    } else {
+                        const underscoreColor = filterColor.replace(/\s+/g, '_');
+                        if (LGraphCanvas.node_colors[underscoreColor]) {
+                            filterColor = LGraphCanvas.node_colors[underscoreColor].groupcolor;
+                        } else {
+                            const spacelessColor = filterColor.replace(/\s+/g, '');
+                            if (LGraphCanvas.node_colors[spacelessColor]) {
+                                filterColor = LGraphCanvas.node_colors[spacelessColor].groupcolor;
+                            }
+                        }
+                    }
+                }
+                filterColor = filterColor.replace("#", "").toLowerCase();
+                if (filterColor.length === 3) {
+                    filterColor = filterColor.replace(/(.)(.)(.)/, "$1$1$2$2$3$3");
+                }
+                filterColors = [`#${filterColor}`];
+            }
+
+            const displayGroups = groups.filter(group => {
+                if (!group || !group.title) return false;
+                if (this.properties.matchMode === 'title' && this.properties.titleKeywords) {
+                    const keywords = this.properties.titleKeywords.split(',').map(k => k.trim().toLowerCase()).filter(k => k);
+                    if (keywords.length > 0) {
+                        const title = (group.title || '').toLowerCase();
+                        return keywords.some(keyword => title.includes(keyword));
+                    }
+                } else if (filterColors.length > 0) {
+                    if (!group.color) return false;
+                    let groupColor = group.color.replace("#", "").trim().toLowerCase();
+                    if (groupColor.length === 3) {
+                        groupColor = groupColor.replace(/(.)(.)(.)/, "$1$1$2$2$3$3");
+                    }
+                    groupColor = `#${groupColor}`;
+                    return filterColors.includes(groupColor);
+                }
+                return true;
+            });
+
+            const sortedGroups = this.sortGroupsByOrder(displayGroups);
+
+            let index = 0;
+            let isDirty = false;
+
+            for (const group of sortedGroups) {
+                const currentEnabled = group._gmm_hasAnyActiveNode;
+                let groupConfig = this.properties.groups.find(g => g.group_name === group.title);
+
+                if (!groupConfig) {
+                    groupConfig = {
+                        id: Date.now() + Math.random(),
+                        group_name: group.title,
+                        enabled: currentEnabled,
+                        linkage: { on_enable: [], on_disable: [] }
+                    };
+                    this.properties.groups.push(groupConfig);
+                } else {
+                    groupConfig.enabled = currentEnabled;
+                }
+
+                if (!this.groupReferences.has(group)) {
+                    this.groupReferences.set(group, group.title);
+                }
+
+                const cachedName = this.groupReferences.get(group);
+                if (cachedName && cachedName !== group.title) {
+                    const oldConfig = this.properties.groups.find(g => g.group_name === cachedName);
+                    if (oldConfig) {
+                        oldConfig.group_name = group.title;
+                    }
+                    const orderIndex = this.properties.groupOrder.indexOf(cachedName);
+                    if (orderIndex !== -1) {
+                        this.properties.groupOrder[orderIndex] = group.title;
+                    }
+                    this.updateLinkageReferences(cachedName, group.title);
+                    this.groupReferences.set(group, group.title);
+                }
+
+                let groupItem = listContainer.children[index];
+                const expectedId = `gmm-group-${group.title}`;
+
+                if (!groupItem || groupItem.getAttribute('data-group-name') !== group.title) {
+                    const newItem = this.createGroupItem(groupConfig, group);
+                    newItem.setAttribute('data-group-name', group.title);
+                    newItem.id = expectedId;
+
+                    if (groupItem) {
+                        listContainer.insertBefore(newItem, groupItem);
+                    } else {
+                        listContainer.appendChild(newItem);
+                    }
+                    groupItem = newItem;
+                    isDirty = true;
+                } else {
+                    const toggleBtn = groupItem.querySelector('.gmm-group-toggle');
+                    if (toggleBtn) {
+                        const isEnabled = toggleBtn.classList.contains('enabled');
+                        if (isEnabled !== currentEnabled) {
+                            toggleBtn.classList.toggle('enabled', currentEnabled);
+                            toggleBtn.textContent = currentEnabled ? t('disable') : t('enable');
+                            toggleBtn.style.background = currentEnabled
+                                ? 'linear-gradient(135deg, #e74c3c 0%, #c0392b 100%)'
+                                : 'linear-gradient(135deg, #27ae60 0%, #229954 100%)';
+                            isDirty = true;
+                        }
+                    }
+
+                    const nameEl = groupItem.querySelector('.gmm-group-name');
+                    if (nameEl && nameEl.textContent !== group.title) {
+                        nameEl.textContent = group.title;
+                        isDirty = true;
+                    }
+                }
+
+                this.properties.groupStatesCache[group.title] = currentEnabled;
+                index++;
+            }
+
+            while (listContainer.children[index]) {
+                listContainer.removeChild(listContainer.children[index]);
+                isDirty = true;
+            }
+
+            this.properties.groups = this.properties.groups.filter(config =>
+                groups.some(g => g.title === config.group_name)
+            );
+
+            if (isDirty) {
+                this.setDirtyCanvas(true, false);
+            }
+        };
+
+        nodeType.prototype.checkGroupStatesChange = function () {
+            if (!app.graph || !app.graph._groups) return;
+
+            let hasStateChange = false;
+            let hasRename = false;
+
+            app.graph._groups.forEach(group => {
+                if (!group || !group.title) return;
+
+                const cachedName = this.groupReferences.get(group);
+                if (cachedName && cachedName !== group.title) {
+                    const config = this.properties.groups.find(g => g.group_name === cachedName);
+                    if (config) {
+                        config.group_name = group.title;
+                    }
+
+                    const orderIndex = this.properties.groupOrder.indexOf(cachedName);
+                    if (orderIndex !== -1) {
+                        this.properties.groupOrder[orderIndex] = group.title;
+                    }
+
+                    if (this.properties.groupStatesCache[cachedName] !== undefined) {
+                        this.properties.groupStatesCache[group.title] = this.properties.groupStatesCache[cachedName];
+                        delete this.properties.groupStatesCache[cachedName];
+                    }
+
+                    this.updateLinkageReferences(cachedName, group.title);
+                    this.groupReferences.set(group, group.title);
+
+                    hasRename = true;
+                }
+
+                const currentState = this.isGroupEnabled(group);
+                const cachedState = this.properties.groupStatesCache[group.title];
+
+                if (cachedState !== undefined && cachedState !== currentState) {
+                    hasStateChange = true;
+                }
+
+                this.properties.groupStatesCache[group.title] = currentState;
+            });
+
+            if (hasStateChange || hasRename) {
+                this.updateGroupsList();
+            }
+        };
+
+        nodeType.prototype.updateLinkageReferences = function (oldName, newName) {
+            if (!oldName || !newName || oldName === newName) return;
+
+            this.properties.groups.forEach(groupConfig => {
+                if (!groupConfig.linkage) return;
+
+                if (Array.isArray(groupConfig.linkage.on_enable)) {
+                    groupConfig.linkage.on_enable.forEach(rule => {
+                        if (rule.target_group === oldName) {
+                            rule.target_group = newName;
+                        }
+                    });
+                }
+
+                if (Array.isArray(groupConfig.linkage.on_disable)) {
+                    groupConfig.linkage.on_disable.forEach(rule => {
+                        if (rule.target_group === oldName) {
+                            rule.target_group = newName;
+                        }
+                    });
+                }
+            });
+        };
+
+        nodeType.prototype.getNodesInGroup = function (group) {
+            if (!group || !app.graph) return [];
+
+            if (group.recomputeInsideNodes) {
+                group.recomputeInsideNodes();
+            }
+
+            return getGroupNodes(group);
+        };
+
+        nodeType.prototype.truncateText = function (text, maxLength = 30) {
+            if (!text || text.length <= maxLength) return text;
+            return text.substring(0, maxLength) + '...';
+        };
+
+        nodeType.prototype.createGroupItem = function (groupConfig, group) {
+            const item = document.createElement('div');
+            item.className = 'gmm-group-item';
+            item.dataset.groupName = groupConfig.group_name;
+            item.draggable = true;
+
+            const displayName = this.truncateText(groupConfig.group_name, 30);
+            const fullName = groupConfig.group_name || '';
+
+            const hasLinkage = groupConfig.linkage &&
+                (groupConfig.linkage.on_enable?.length > 0 ||
+                 groupConfig.linkage.on_disable?.length > 0);
+
+            item.innerHTML = `
+                <div class="gmm-group-header">
+                    <div class="gmm-drag-handle">
+                        <svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round">
+                            <circle cx="9" cy="5" r="1.5"></circle>
+                            <circle cx="9" cy="12" r="1.5"></circle>
+                            <circle cx="9" cy="19" r="1.5"></circle>
+                            <circle cx="15" cy="5" r="1.5"></circle>
+                            <circle cx="15" cy="12" r="1.5"></circle>
+                            <circle cx="15" cy="19" r="1.5"></circle>
+                        </svg>
+                    </div>
+                    <span class="gmm-group-name">${displayName}</span>
+                    <div class="gmm-switch ${groupConfig.enabled ? 'active' : ''}">
+                        <svg viewBox="0 0 24 24" fill="none" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                            <path d="M18.36 6.64a9 9 0 1 1-12.73 0"></path>
+                            <line x1="12" y1="2" x2="12" y2="12"></line>
+                        </svg>
+                    </div>
+                    <div class="gmm-linkage-button ${hasLinkage ? 'active' : ''}">
+                        <svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"></path>
+                            <path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"></path>
+                        </svg>
+                    </div>
+                    <div class="gmm-navigate-button">
+                        <svg viewBox="0 0 24 24" fill="none" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                            <path d="M5 12h14m-7-7l7 7-7 7"/>
+                        </svg>
+                    </div>
+                </div>
+            `;
+
+            const switchBtn = item.querySelector('.gmm-switch');
+            switchBtn.addEventListener('click', (e) => {
+                e.stopPropagation();
+                this.toggleGroup(groupConfig.group_name, !groupConfig.enabled);
+            });
+
+            const linkageBtn = item.querySelector('.gmm-linkage-button');
+            linkageBtn.addEventListener('click', (e) => {
+                e.stopPropagation();
+                this.showLinkageDialog(groupConfig);
+            });
+
+            const navigateBtn = item.querySelector('.gmm-navigate-button');
+            if (navigateBtn) {
+                navigateBtn.addEventListener('click', (e) => {
+                    e.stopPropagation();
+                    this.navigateToGroup(groupConfig.group_name);
+                });
+            }
+
+            item.addEventListener('dragstart', (e) => this.onDragStart(e, groupConfig.group_name));
+            item.addEventListener('dragover', (e) => this.onDragOver(e));
+            item.addEventListener('drop', (e) => this.onDrop(e, groupConfig.group_name));
+            item.addEventListener('dragend', (e) => this.onDragEnd(e));
+            item.addEventListener('dragenter', (e) => this.onDragEnter(e));
+            item.addEventListener('dragleave', (e) => this.onDragLeave(e));
+
+            return item;
+        };
+
+        nodeType.prototype.onDragStart = function (e, groupName) {
+            e.stopPropagation();
+            this._draggedGroup = groupName;
+            e.target.style.opacity = '0.5';
+            e.dataTransfer.effectAllowed = 'move';
+            e.dataTransfer.setData('text/plain', groupName);
+        };
+
+        nodeType.prototype.onDragOver = function (e) {
+            e.preventDefault();
+            e.stopPropagation();
+            e.dataTransfer.dropEffect = 'move';
+        };
+
+        nodeType.prototype.onDragEnter = function (e) {
+            e.preventDefault();
+            e.stopPropagation();
+            const target = e.currentTarget;
+            if (target && target.classList.contains('gmm-group-item')) {
+                target.classList.add('gmm-drag-over');
+            }
+        };
+
+        nodeType.prototype.onDragLeave = function (e) {
+            e.preventDefault();
+            e.stopPropagation();
+            const target = e.currentTarget;
+            if (target && target.classList.contains('gmm-group-item')) {
+                target.classList.remove('gmm-drag-over');
+            }
+        };
+
+        nodeType.prototype.onDrop = function (e, targetGroupName) {
+            e.preventDefault();
+            e.stopPropagation();
+
+            const target = e.currentTarget;
+            if (target) {
+                target.classList.remove('gmm-drag-over');
+            }
+
+            const draggedGroupName = this._draggedGroup;
+            if (!draggedGroupName || draggedGroupName === targetGroupName) {
+                return;
+            }
+
+            this.updateGroupOrder(draggedGroupName, targetGroupName);
+            this.updateGroupsList();
+        };
+
+        nodeType.prototype.onDragEnd = function (e) {
+            e.stopPropagation();
+            e.target.style.opacity = '';
+            this._draggedGroup = null;
+
+            const items = this.customUI.querySelectorAll('.gmm-group-item');
+            items.forEach(item => item.classList.remove('gmm-drag-over'));
+        };
+
+        nodeType.prototype.updateGroupOrder = function (draggedGroupName, targetGroupName) {
+            const allGroups = this.getWorkflowGroups();
+            const sortedGroups = this.sortGroupsByOrder(allGroups);
+            const newOrder = sortedGroups.map(g => g.title);
+            const draggedIndex = newOrder.indexOf(draggedGroupName);
+            const targetIndex = newOrder.indexOf(targetGroupName);
+
+            if (draggedIndex === -1 || targetIndex === -1) {
+                return;
+            }
+
+            newOrder.splice(draggedIndex, 1);
+
+            let insertIndex = targetIndex;
+            if (draggedIndex < targetIndex) {
+                insertIndex = targetIndex;
+            }
+            newOrder.splice(insertIndex, 0, draggedGroupName);
+
+            this.properties.groupOrder = newOrder;
+        };
+
+        nodeType.prototype.toggleGroup = function (groupName, enable) {
+            if (!this._processingStack) {
+                this._processingStack = new Set();
+            }
+
+            if (this._processingStack.has(groupName)) {
+                return;
+            }
+
+            const group = app.graph._groups.find(g => g.title === groupName);
+            if (!group) {
+                return;
+            }
+
+            const nodes = this.getNodesInGroup(group);
+            if (nodes.length === 0) {
+                return;
+            }
+
+            this._processingStack.add(groupName);
+
+            try {
+                const toggleRestriction = this.properties.toggleRestriction || 'default';
+
+                if (enable && toggleRestriction !== 'default') {
+                    const currentEnabledGroups = this.properties.groups.filter(g => g.enabled);
+                    
+                    if (toggleRestriction === 'always_one') {
+                        currentEnabledGroups.forEach(g => {
+                            if (g.group_name !== groupName) {
+                                this.toggleGroupInternal(g.group_name, false);
+                            }
+                        });
+                    } else if (toggleRestriction === 'max_one') {
+                        if (currentEnabledGroups.length > 0) {
+                            const existingEnabled = currentEnabledGroups.find(g => g.group_name !== groupName);
+                            if (existingEnabled) {
+                                this.toggleGroupInternal(existingEnabled.group_name, false);
+                            }
+                        }
+                    }
+                }
+
+                this.toggleGroupInternal(groupName, enable);
+
+                this.updateGroupsList();
+                app.graph.setDirtyCanvas(true, true);
+
+                const event = new CustomEvent('group-mute-changed', {
+                    detail: {
+                        sourceId: this._gmmInstanceId,
+                        groupName: groupName,
+                        enabled: enable,
+                        timestamp: Date.now()
+                    }
+                });
+                window.dispatchEvent(event);
+            } finally {
+                this._processingStack.delete(groupName);
+            }
+        };
+
+        nodeType.prototype.toggleGroupInternal = function (groupName, enable) {
+            const group = app.graph._groups.find(g => g.title === groupName);
+            if (!group) return;
+
+            const nodes = this.getNodesInGroup(group);
+            if (nodes.length === 0) return;
+
+            const switchMode = this.properties.switchMode || 'ignore';
+            let mode;
+            if (enable) {
+                mode = 0;
+            } else {
+                mode = switchMode === 'bypass' ? 4 : 2;
+            }
+            changeModeOfNodes(nodes, mode);
+
+            const config = this.properties.groups.find(g => g.group_name === groupName);
+            if (config) {
+                config.enabled = enable;
+            }
+
+            this.applyLinkage(groupName, enable);
+        };
+
+        nodeType.prototype.navigateToGroup = function (groupName) {
+            const group = app.graph._groups.find(g => g.title === groupName);
+            if (!group) {
+                return;
+            }
+
+            const canvas = app.canvas;
+
+            canvas.centerOnNode(group);
+
+            const zoomCurrent = canvas.ds?.scale || 1;
+            const zoomX = canvas.canvas.width / group._size[0] - 0.02;
+            const zoomY = canvas.canvas.height / group._size[1] - 0.02;
+
+            canvas.setZoom(Math.min(zoomCurrent, zoomX, zoomY), [
+                canvas.canvas.width / 2,
+                canvas.canvas.height / 2,
+            ]);
+
+            canvas.setDirty(true, true);
+        };
+
+        nodeType.prototype.applyLinkage = function (groupName, enabled) {
+            const config = this.properties.groups.find(g => g.group_name === groupName);
+            if (!config || !config.linkage) return;
+
+            const rules = enabled ? config.linkage.on_enable : config.linkage.on_disable;
+            if (!rules || !Array.isArray(rules)) return;
+
+            rules.forEach(rule => {
+                const targetEnable = rule.action === "enable";
+                this.toggleGroup(rule.target_group, targetEnable);
+            });
+        };
+
+        nodeType.prototype.showSettingsDialog = function () {
+            const dialog = document.createElement('div');
+            dialog.className = 'gmm-settings-dialog';
+
+            const locale = getLocale();
+            const currentMode = this.properties.switchMode || 'ignore';
+            const currentRestriction = this.properties.toggleRestriction || 'default';
+            const currentMatchMode = this.properties.matchMode || 'colors';
+            const currentColorFilter = this.properties.selectedColorFilter || '';
+            const currentTitleKeywords = this.properties.titleKeywords || '';
+
+            const modeOptions = [
+                { value: 'ignore', label: t('modeDisable') },
+                { value: 'bypass', label: t('modeBypass') }
+            ];
+
+            const restrictionOptions = [
+                { value: 'default', label: t('restrictionDefault') },
+                { value: 'max_one', label: t('restrictionMaxOne') },
+                { value: 'always_one', label: t('restrictionAlwaysOne') }
+            ];
+
+            const matchModeOptions = [
+                { value: 'colors', label: t('matchColors') },
+                { value: 'title', label: t('matchTitle') }
+            ];
+
+            const colorOptions = [
+                { value: '', label: t('allColors') },
+                { value: 'red', label: t('colorRed'), color: '#c44' },
+                { value: 'brown', label: t('colorBrown'), color: '#a52a2a' },
+                { value: 'green', label: t('colorGreen'), color: '#2e8b57' },
+                { value: 'blue', label: t('colorBlue'), color: '#4682b4' },
+                { value: 'pale blue', label: t('colorPaleBlue'), color: '#87ceeb' },
+                { value: 'cyan', label: t('colorCyan'), color: '#00bcd4' },
+                { value: 'purple', label: t('colorPurple'), color: '#9370db' },
+                { value: 'yellow', label: t('colorYellow'), color: '#f0e68c' },
+                { value: 'black', label: t('colorBlack'), color: '#333333' }
+            ];
+
+            const createDropdownHTML = (id, options, currentValue) => {
+                const currentOption = options.find(o => o.value === currentValue) || options[0];
+                return `
+                    <div class="gmm-custom-dropdown" id="${id}" data-value="${currentValue}">
+                        <div class="gmm-dropdown-trigger">
+                            <span class="gmm-dropdown-text">${currentOption.label}</span>
+                            <svg class="gmm-dropdown-arrow" width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <polyline points="6 9 12 15 18 9"></polyline>
+                            </svg>
+                        </div>
+                        <div class="gmm-dropdown-menu">
+                            ${options.map(o => `<div class="gmm-dropdown-item ${o.value === currentValue ? 'active' : ''} ${o.color ? 'gmm-color-item' : ''}" data-value="${o.value}" ${o.color ? `style="--item-color: ${o.color}"` : ''}>${o.label}</div>`).join('')}
+                        </div>
+                    </div>
+                `;
+            };
+
+            dialog.innerHTML = `
+                <div class="gmm-dialog-header">
+                    <h3>${t('settings')}</h3>
+                    <button class="gmm-dialog-close">×</button>
+                </div>
+                <div class="gmm-settings-dialog-content">
+                    <div class="gmm-settings-dialog-item">
+                        <span class="gmm-settings-dialog-label">${t('modeLabel')}</span>
+                        ${createDropdownHTML('gmm-dialog-mode', modeOptions, currentMode)}
+                    </div>
+                    <div class="gmm-settings-dialog-item">
+                        <span class="gmm-settings-dialog-label">${t('toggleRestriction')}</span>
+                        ${createDropdownHTML('gmm-dialog-restriction', restrictionOptions, currentRestriction)}
+                    </div>
+                    <div class="gmm-settings-dialog-item">
+                        <span class="gmm-settings-dialog-label">${t('matchMode')}</span>
+                        ${createDropdownHTML('gmm-dialog-match-mode', matchModeOptions, currentMatchMode)}
+                    </div>
+                    <div class="gmm-settings-dialog-item" id="gmm-dialog-filter-item" style="display: ${currentMatchMode === 'colors' ? 'flex' : 'none'};">
+                        <span class="gmm-settings-dialog-label">${t('colorFilter')}</span>
+                        ${createDropdownHTML('gmm-dialog-color-filter', colorOptions, currentColorFilter)}
+                    </div>
+                    <div class="gmm-settings-dialog-item" id="gmm-dialog-title-item" style="display: ${currentMatchMode === 'title' ? 'flex' : 'none'};">
+                        <span class="gmm-settings-dialog-label">${t('matchTitle')}</span>
+                        <input type="text" class="gmm-title-match-input" id="gmm-dialog-title-keywords" placeholder="${t('matchTitlePlaceholder')}" value="${currentTitleKeywords}">
+                    </div>
+                </div>
+                <div class="gmm-dialog-footer">
+                    <button class="gmm-button" id="gmm-settings-cancel">${t('cancel')}</button>
+                    <button class="gmm-button gmm-button-primary" id="gmm-settings-save">${t('confirm')}</button>
+                </div>
+            `;
+
+            document.body.appendChild(dialog);
+
+            const setupDropdown = (dropdownId, propertyName, onChange) => {
+                const dropdown = dialog.querySelector(`#${dropdownId}`);
+                if (!dropdown) return;
+
+                const trigger = dropdown.querySelector('.gmm-dropdown-trigger');
+                const items = dropdown.querySelectorAll('.gmm-dropdown-item');
+                const textSpan = dropdown.querySelector('.gmm-dropdown-text');
+
+                trigger.addEventListener('click', (e) => {
+                    e.stopPropagation();
+                    const isOpen = dropdown.classList.contains('open');
+                    dialog.querySelectorAll('.gmm-custom-dropdown.open').forEach(d => d.classList.remove('open'));
+                    dropdown.classList.toggle('open', !isOpen);
+                });
+
+                items.forEach(item => {
+                    item.addEventListener('click', (e) => {
+                        e.stopPropagation();
+                        const value = item.getAttribute('data-value');
+                        items.forEach(i => i.classList.remove('active'));
+                        item.classList.add('active');
+                        dropdown.setAttribute('data-value', value);
+                        if (textSpan) textSpan.textContent = item.textContent;
+                        dropdown.classList.remove('open');
+                        if (onChange) onChange(value);
+                    });
+                });
+            };
+
+            setupDropdown('gmm-dialog-mode', 'switchMode');
+            setupDropdown('gmm-dialog-restriction', 'toggleRestriction');
+            setupDropdown('gmm-dialog-color-filter', 'selectedColorFilter');
+
+            const filterItem = dialog.querySelector('#gmm-dialog-filter-item');
+            const titleItem = dialog.querySelector('#gmm-dialog-title-item');
+
+            setupDropdown('gmm-dialog-match-mode', 'matchMode', (value) => {
+                if (filterItem) filterItem.style.display = value === 'colors' ? 'flex' : 'none';
+                if (titleItem) titleItem.style.display = value === 'title' ? 'flex' : 'none';
+            });
+
+            const closeDialog = () => {
+                dialog.classList.add('closing');
+                setTimeout(() => dialog.remove(), 200);
+            };
+
+            dialog.querySelector('.gmm-dialog-close').addEventListener('click', closeDialog);
+            dialog.querySelector('#gmm-settings-cancel').addEventListener('click', closeDialog);
+
+            dialog.querySelector('#gmm-settings-save').addEventListener('click', (e) => {
+                e.stopPropagation();
+                this.properties.switchMode = dialog.querySelector('#gmm-dialog-mode').getAttribute('data-value');
+                this.properties.toggleRestriction = dialog.querySelector('#gmm-dialog-restriction').getAttribute('data-value');
+                this.properties.matchMode = dialog.querySelector('#gmm-dialog-match-mode').getAttribute('data-value');
+                this.properties.selectedColorFilter = dialog.querySelector('#gmm-dialog-color-filter').getAttribute('data-value');
+                this.properties.titleKeywords = dialog.querySelector('#gmm-dialog-title-keywords').value;
+                this.updateModeIndicator();
+                this.refreshWidgets();
+                closeDialog();
+            });
+
+            setTimeout(() => {
+                const closeOnOutsideClick = (e) => {
+                    if (!dialog.contains(e.target) && document.body.contains(dialog)) {
+                        closeDialog();
+                        document.removeEventListener('click', closeOnOutsideClick);
+                    }
+                };
+                document.addEventListener('click', closeOnOutsideClick);
+            }, 100);
+
+            document.addEventListener('click', (e) => {
+                if (!dialog.contains(e.target)) {
+                    dialog.querySelectorAll('.gmm-custom-dropdown.open').forEach(d => d.classList.remove('open'));
+                }
+            });
+        };
+
+        nodeType.prototype.showLinkageDialog = function (groupConfig) {
+            const dialog = document.createElement('div');
+            dialog.className = 'gmm-linkage-dialog';
+
+            const displayName = this.truncateText(groupConfig.group_name, 25);
+            const fullName = groupConfig.group_name || '';
+
+            dialog.innerHTML = `
+                <div class="gmm-dialog-header">
+                    <h3>${t('linkageConfig')}${displayName}</h3>
+                    <button class="gmm-dialog-close">×</button>
+                </div>
+                <div class="gmm-settings-dialog-content">
+                    <div class="gmm-linkage-section">
+                        <div class="gmm-section-header">
+                            <span>${t('whenGroupOn')}</span>
+                            <button class="gmm-add-rule" data-type="on_enable">+</button>
+                        </div>
+                        <div class="gmm-rules-list" id="gmm-rules-enable"></div>
+                    </div>
+
+                    <div class="gmm-linkage-section">
+                        <div class="gmm-section-header">
+                            <span>${t('whenGroupOff')}</span>
+                            <button class="gmm-add-rule" data-type="on_disable">+</button>
+                        </div>
+                        <div class="gmm-rules-list" id="gmm-rules-disable"></div>
+                    </div>
+                </div>
+                <div class="gmm-dialog-footer">
+                    <button class="gmm-button" id="gmm-cancel">${t('cancel')}</button>
+                    <button class="gmm-button gmm-button-primary" id="gmm-save">${t('confirm')}</button>
+                </div>
+            `;
+
+            document.body.appendChild(dialog);
+
+            dialog.addEventListener('click', (e) => {
+                e.stopPropagation();
+            });
+
+            const tempConfig = JSON.parse(JSON.stringify(groupConfig));
+
+            this.renderRules(dialog, tempConfig, 'on_enable');
+            this.renderRules(dialog, tempConfig, 'on_disable');
+
+            dialog.querySelectorAll('.gmm-add-rule').forEach(btn => {
+                btn.addEventListener('click', (e) => {
+                    e.stopPropagation();
+                    e.preventDefault();
+                    const type = btn.dataset.type;
+                    this.addRule(dialog, tempConfig, type);
+                });
+            });
+
+            const closeDialog = () => {
+                dialog.classList.add('closing');
+                setTimeout(() => {
+                    dialog.remove();
+                }, 200);
+            };
+
+            dialog.querySelector('.gmm-dialog-close').addEventListener('click', (e) => {
+                e.stopPropagation();
+                closeDialog();
+            });
+
+            dialog.querySelector('#gmm-cancel').addEventListener('click', (e) => {
+                e.stopPropagation();
+                closeDialog();
+            });
+
+            dialog.querySelector('#gmm-save').addEventListener('click', (e) => {
+                e.stopPropagation();
+                const originalConfig = this.properties.groups.find(g => g.group_name === groupConfig.group_name);
+                if (originalConfig) {
+                    originalConfig.linkage = tempConfig.linkage;
+                }
+                this.refreshWidgets();
+                closeDialog();
+            });
+
+            setTimeout(() => {
+                const closeOnOutsideClick = (e) => {
+                    if (!dialog.contains(e.target) && document.body.contains(dialog)) {
+                        closeDialog();
+                        document.removeEventListener('click', closeOnOutsideClick);
+                    }
+                };
+                document.addEventListener('click', closeOnOutsideClick);
+            }, 100);
+        };
+
+        nodeType.prototype.renderRules = function (dialog, config, type) {
+            const listId = type === 'on_enable' ? 'gmm-rules-enable' : 'gmm-rules-disable';
+            const list = dialog.querySelector(`#${listId}`);
+            if (!list) return;
+
+            list.innerHTML = '';
+
+            const rules = config.linkage[type] || [];
+            rules.forEach((rule, index) => {
+                const ruleItem = this.createRuleItem(dialog, config, type, rule, index);
+                list.appendChild(ruleItem);
+            });
+        };
+
+        nodeType.prototype.truncateText = function (text, maxLength = 30) {
+            if (!text || text.length <= maxLength) return text;
+            return text.substring(0, maxLength) + '...';
+        };
+
+        nodeType.prototype.createRuleItem = function (dialog, config, type, rule, index) {
+            const item = document.createElement('div');
+            item.className = 'gmm-rule-item';
+            item.dataset.index = index;
+
+            const availableGroups = this.getWorkflowGroups()
+                .filter(g => g.title !== config.group_name)
+                .map(g => g.title)
+                .sort((a, b) => a.localeCompare(b, 'zh-CN'));
+
+            const groupOptions = availableGroups.map(name => {
+                const active = name === rule.target_group ? 'active' : '';
+                const displayName = this.truncateText(name, 30);
+                return `<div class="gmm-dropdown-item ${active}" data-value="${name}">${displayName}</div>`;
+            }).join('');
+
+            const actionOptions = [
+                { value: 'enable', label: t('enable'), active: rule.action === 'enable' ? 'active' : '' },
+                { value: 'disable', label: t('disable'), active: rule.action === 'disable' ? 'active' : '' }
+            ].map(o => `<div class="gmm-dropdown-item ${o.active}" data-value="${o.value}">${o.label}</div>`).join('');
+
+            item.innerHTML = `
+                <div class="gmm-custom-dropdown gmm-rule-target-dropdown">
+                    <div class="gmm-dropdown-trigger">
+                        <span class="gmm-dropdown-text">${this.truncateText(rule.target_group, 30)}</span>
+                        <svg class="gmm-dropdown-arrow" width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <polyline points="6 9 12 15 18 9"></polyline>
+                        </svg>
+                    </div>
+                    <div class="gmm-dropdown-menu">
+                        ${groupOptions}
+                    </div>
+                </div>
+                <div class="gmm-custom-dropdown gmm-rule-action-dropdown">
+                    <div class="gmm-dropdown-trigger">
+                        <span class="gmm-dropdown-text">${rule.action === 'enable' ? t('enable') : t('disable')}</span>
+                        <svg class="gmm-dropdown-arrow" width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <polyline points="6 9 12 15 18 9"></polyline>
+                        </svg>
+                    </div>
+                    <div class="gmm-dropdown-menu">
+                        ${actionOptions}
+                    </div>
+                </div>
+                <button class="gmm-delete-rule">×</button>
+            `;
+
+            const targetDropdown = item.querySelector('.gmm-rule-target-dropdown');
+            targetDropdown.setAttribute('data-value', rule.target_group);
+
+            const actionDropdown = item.querySelector('.gmm-rule-action-dropdown');
+            actionDropdown.setAttribute('data-value', rule.action);
+
+            item.querySelectorAll('.gmm-custom-dropdown').forEach(dropdown => {
+                const trigger = dropdown.querySelector('.gmm-dropdown-trigger');
+                const items = dropdown.querySelectorAll('.gmm-dropdown-item');
+                const textSpan = dropdown.querySelector('.gmm-dropdown-text');
+
+                trigger.addEventListener('click', (e) => {
+                    e.stopPropagation();
+                    const isOpen = dropdown.classList.contains('open');
+                    dialog.querySelectorAll('.gmm-custom-dropdown.open').forEach(d => {
+                        if (d !== dropdown) d.classList.remove('open');
+                    });
+                    dropdown.classList.toggle('open', !isOpen);
+                });
+
+                items.forEach(opt => {
+                    opt.addEventListener('click', (e) => {
+                        e.stopPropagation();
+                        const value = opt.getAttribute('data-value');
+                        const text = opt.textContent;
+
+                        items.forEach(i => i.classList.remove('active'));
+                        opt.classList.add('active');
+
+                        textSpan.textContent = text;
+                        dropdown.setAttribute('data-value', value);
+                        dropdown.classList.remove('open');
+
+                        if (dropdown.classList.contains('gmm-rule-target-dropdown')) {
+                            rule.target_group = value;
+                        } else if (dropdown.classList.contains('gmm-rule-action-dropdown')) {
+                            rule.action = value;
+                        }
+                    });
+                });
+            });
+
+            item.querySelector('.gmm-delete-rule').addEventListener('click', (e) => {
+                e.stopPropagation();
+                e.preventDefault();
+                config.linkage[type].splice(index, 1);
+                this.renderRules(dialog, config, type);
+            });
+
+            return item;
+        };
+
+        nodeType.prototype.addRule = function (dialog, config, type) {
+            const availableGroups = this.getWorkflowGroups()
+                .filter(g => g.title !== config.group_name)
+                .sort((a, b) => a.title.localeCompare(b.title, 'zh-CN'));
+
+            if (availableGroups.length === 0) {
+                return;
+            }
+
+            const newRule = {
+                target_group: availableGroups[0].title,
+                action: "enable"
+            };
+
+            config.linkage[type].push(newRule);
+            this.renderRules(dialog, config, type);
+        };
+
+        nodeType.prototype.refreshGroupsList = function () {
+            this.refreshColorFilter();
+            this.updateGroupsList();
+        };
+
+        nodeType.prototype.getAvailableGroupColors = function () {
+            const builtinColors = [
+                'red', 'brown', 'green', 'blue', 'pale blue',
+                'cyan', 'purple', 'yellow', 'black'
+            ];
+            return builtinColors;
+        };
+
+        nodeType.prototype.refreshColorFilter = function () {
+            const colorFilterDropdown = this.customUI.querySelector('#gmm-color-filter-dropdown');
+            const colorFilterMenu = this.customUI.querySelector('#gmm-color-filter-menu');
+            if (!colorFilterDropdown || !colorFilterMenu) return;
+
+            const currentValue = colorFilterDropdown.getAttribute('data-value') || '';
+
+            const builtinColors = this.getAvailableGroupColors();
+
+            let items = [];
+
+            builtinColors.forEach(colorName => {
+                const displayName = this.getColorDisplayName(colorName);
+                const isSelected = currentValue === colorName;
+
+                let hexColor = null;
+                if (typeof LGraphCanvas !== 'undefined' && LGraphCanvas.node_colors) {
+                    const normalizedName = colorName.toLowerCase();
+                    if (LGraphCanvas.node_colors[normalizedName]) {
+                        hexColor = LGraphCanvas.node_colors[normalizedName].groupcolor;
+                    } else {
+                        const underscoreColor = normalizedName.replace(/\s+/g, '_');
+                        if (LGraphCanvas.node_colors[underscoreColor]) {
+                            hexColor = LGraphCanvas.node_colors[underscoreColor].groupcolor;
+                        } else {
+                            const spacelessColor = normalizedName.replace(/\s+/g, '');
+                            if (LGraphCanvas.node_colors[spacelessColor]) {
+                                hexColor = LGraphCanvas.node_colors[spacelessColor].groupcolor;
+                            }
+                        }
+                    }
+                }
+
+                const activeClass = isSelected ? 'active' : '';
+                const colorStyle = hexColor ? `style="--item-color: ${hexColor};"` : '';
+
+                items.push(`<div class="gmm-dropdown-item gmm-color-item ${activeClass}" data-value="${colorName}" ${colorStyle}>${displayName}</div>`);
+            });
+
+            const allItems = [
+                `<div class="gmm-dropdown-item ${currentValue === '' ? 'active' : ''}" data-value="">${t('allColors')}</div>`,
+                ...items
+            ].join('');
+
+            colorFilterMenu.innerHTML = allItems;
+
+            const validValues = ['', ...builtinColors];
+            if (currentValue && !validValues.includes(currentValue)) {
+                colorFilterDropdown.setAttribute('data-value', '');
+                this.properties.selectedColorFilter = '';
+                const triggerText = colorFilterDropdown.querySelector('.gmm-dropdown-text');
+                if (triggerText) triggerText.textContent = t('allColors');
+            }
+
+            this.bindColorFilterEvents();
+        };
+
+        nodeType.prototype.bindColorFilterEvents = function () {
+            const colorFilterDropdown = this.customUI.querySelector('#gmm-color-filter-dropdown');
+            if (!colorFilterDropdown) return;
+
+            const items = colorFilterDropdown.querySelectorAll('.gmm-dropdown-item');
+            const textSpan = colorFilterDropdown.querySelector('.gmm-dropdown-text');
+
+            items.forEach(item => {
+                item.addEventListener('click', (e) => {
+                    e.stopPropagation();
+                    const value = item.getAttribute('data-value');
+                    const text = item.textContent;
+
+                    items.forEach(i => i.classList.remove('active'));
+                    item.classList.add('active');
+
+                    colorFilterDropdown.setAttribute('data-value', value);
+                    if (textSpan) textSpan.textContent = text;
+
+                    colorFilterDropdown.classList.remove('open');
+
+                    this.properties.selectedColorFilter = value;
+                    this.updateGroupsList();
+                });
+            });
+        };
+
+        nodeType.prototype.getColorDisplayName = function (color) {
+            if (!color) return t('allColors');
+
+            const colorMap = {
+                'red': 'colorRed',
+                'brown': 'colorBrown',
+                'green': 'colorGreen',
+                'blue': 'colorBlue',
+                'pale blue': 'colorPaleBlue',
+                'cyan': 'colorCyan',
+                'purple': 'colorPurple',
+                'yellow': 'colorYellow',
+                'black': 'colorBlack'
+            };
+
+            const lowerColor = color.toLowerCase();
+            if (colorMap[lowerColor]) {
+                return t(colorMap[lowerColor]);
+            }
+
+            return color;
+        };
+
+        nodeType.prototype.getContrastColor = function (hexColor) {
+            if (!hexColor) return '#E0E0E0';
+
+            const color = hexColor.replace('#', '');
+
+            const r = parseInt(color.substr(0, 2), 16);
+            const g = parseInt(color.substr(2, 2), 16);
+            const b = parseInt(color.substr(4, 2), 16);
+
+            const brightness = (r * 299 + g * 587 + b * 114) / 1000;
+
+            return brightness > 128 ? '#000000' : '#FFFFFF';
+        };
+
+        const onSerialize = nodeType.prototype.onSerialize;
+        nodeType.prototype.onSerialize = function (info) {
+            const data = onSerialize?.apply?.(this, arguments);
+
+            info.groups = this.properties.groups || [];
+            info.selectedColorFilter = this.properties.selectedColorFilter || '';
+            info.groupOrder = this.properties.groupOrder || [];
+            info.switchMode = this.properties.switchMode || 'ignore';
+
+            return data;
+        };
+
+        const onConfigure = nodeType.prototype.onConfigure;
+        nodeType.prototype.onConfigure = function (info) {
+            onConfigure?.apply?.(this, arguments);
+
+            if (info.groups && Array.isArray(info.groups)) {
+                this.properties.groups = info.groups;
+            }
+
+            if (info.selectedColorFilter !== undefined && typeof info.selectedColorFilter === 'string') {
+                this.properties.selectedColorFilter = info.selectedColorFilter;
+            } else {
+                this.properties.selectedColorFilter = '';
+            }
+
+            if (info.groupOrder && Array.isArray(info.groupOrder)) {
+                this.properties.groupOrder = info.groupOrder;
+            } else {
+                this.properties.groupOrder = [];
+            }
+
+            if (info.switchMode !== undefined && (info.switchMode === 'ignore' || info.switchMode === 'bypass')) {
+                this.properties.switchMode = info.switchMode;
+            } else {
+                this.properties.switchMode = 'ignore';
+            }
+
+            if (this.customUI) {
+                setTimeout(() => {
+                    this.refreshColorFilter();
+                    this.updateGroupsList();
+
+                    const colorFilterDropdown = this.customUI.querySelector('#gmm-color-filter-dropdown');
+                    if (colorFilterDropdown) {
+                        const colorValue = this.properties.selectedColorFilter || '';
+                        colorFilterDropdown.setAttribute('data-value', colorValue);
+                        const colorItems = colorFilterDropdown.querySelectorAll('.gmm-dropdown-item');
+                        colorItems.forEach(item => {
+                            item.classList.toggle('active', item.getAttribute('data-value') === colorValue);
+                        });
+                        const colorText = colorFilterDropdown.querySelector('.gmm-dropdown-text');
+                        if (colorText) {
+                            const activeItem = colorFilterDropdown.querySelector('.gmm-dropdown-item.active');
+                            if (activeItem) colorText.textContent = activeItem.textContent;
+                        }
+                    }
+
+                    const modeDropdown = this.customUI.querySelector('#gmm-mode-dropdown');
+                    if (modeDropdown) {
+                        const modeValue = this.properties.switchMode || 'ignore';
+                        modeDropdown.setAttribute('data-value', modeValue);
+                        const modeItems = modeDropdown.querySelectorAll('.gmm-dropdown-item');
+                        modeItems.forEach(item => {
+                            item.classList.toggle('active', item.getAttribute('data-value') === modeValue);
+                        });
+                        const modeText = modeDropdown.querySelector('.gmm-dropdown-text');
+                        if (modeText) {
+                            const activeItem = modeDropdown.querySelector('.gmm-dropdown-item.active');
+                            if (activeItem) modeText.textContent = activeItem.textContent;
+                        }
+                    }
+                }, 100);
+            }
+        };
+
+    }
+});

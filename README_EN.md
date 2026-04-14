@@ -21,7 +21,7 @@ Provides dedicated Chinese localization files, which can be used with the ComfyU
 
 - 📝 **Comprehensive Text Processing**: Provides text operation nodes including multi-line text editing, text merging and separation, content extraction and modification, and language filtering.
 
-- 🎯 **Intelligent Prompt System**: Professional prompt generation tools such as Tag Selector, Kontext Presets Plus, Photography Prompt Generator, and WanXiang Video Prompt Generator.
+- 🎯 **Intelligent Prompt System**: Professional prompt generation tools such as Tag Selector, Image Editing Presets, Photography Prompt Generator, and WanXiang Video Prompt Generator.
 
 - 🖼️ **Practical Image Tools**: Supports multi-algorithm image scaling, intelligent switching, color removal, and more.
 
@@ -163,16 +163,8 @@ This node collection contains numerous nodes with different functionalities, div
 </td>
 </tr>
 <tr>
-<td><b>Text Display</b><br><code>ShowText</code></td>
-<td>A node for displaying text content in the ComfyUI interface, supporting multi-line text display, which can show text information passed from upstream nodes in real-time, facilitating debugging and viewing intermediate results.
-
-<br>
-<div align="left">
-<a href="images/文本显示器.jpg" target="_blank">
-<img src="images/文本显示器.jpg" alt="Text Display" width="45%"/>
-</a>
-</div>
-</td>
+<td><b>Show Any</b><br><code>ShowAny</code></td>
+<td>A node for displaying any type of content in the ComfyUI interface, supporting multi-line text display, which can show text information passed from upstream nodes in real-time, facilitating debugging and viewing intermediate results. Supports both standard mode and debug mode.</td>
 </tr>
 <tr>
 <td><b>Text Editor (Continue Execution)</b><br><code>TextEditorWithContinue</code></td>
@@ -220,38 +212,8 @@ This node collection contains numerous nodes with different functionalities, div
 <th>Function Description</th>
 </tr>
 <tr>
-<td><b>Kontext Presets Basic</b><br><code>LoadKontextPresetsBasic</code></td>
-<td>Provides a professional image transformation preset library, containing 13 professional presets. Offers stylized guidance for image generation, helping users quickly apply common artistic styles and effects.
-
-<br>
-<div align="left">
-<a href="images/Kontext预设集基础版.jpg" target="_blank">
-<img src="images/Kontext预设集基础版.jpg" alt="Kontext Presets Basic" width="45%"/>
-</a>
-</div>
-</td>
-</tr>
-<tr>
-<td><b>Kontext Presets Plus</b><br><code>KontextPresetsPlus</code></td>
-<td>
-
-Provides professional image transformation presets with built-in free online expansion functionality, supporting user-defined presets for creative guidance in image editing.
-
-<b>Features</b>:
-- <b>Rich Preset Library</b>: Contains over 20 professional presets
-- <b>Dual Preset Libraries</b>: Supports default presets and user-defined presets, users can freely add more creative presets, distinguished by category identifiers. <a href="doc/Kontext_Presets_User_File_Instructions.md" style="font-weight:bold;color:yellow;">User Preset Usage Instructions</a>
-- <b>Intelligent Expansion</b>: Supports multiple LLM models for creative expansion of preset content
-- <b>Flexible Output</b>: Supports outputting original preset content, complete information, or AI-expanded content
-
-<div align="left">
-<a href="images/Kontext预设增强版节点展示.jpg" target="_blank">
-<img src="images/Kontext预设增强版节点展示.jpg" alt="Node Display" width="45%" style="margin-right:5%"/>
-</a>
-<a href="images/Kontext预设增强版效果预览.jpg" target="_blank">
-<img src="images/Kontext预设增强版效果预览.jpg" alt="Effect Display" width="45%"/>
-</a>
-</div>
-</td>
+<td><b>Image Editing Presets</b><br><code>ImageEditingPresets</code></td>
+<td>Provides a professional image editing preset library with various professional presets, offering stylized guidance for image generation, helping users quickly apply common artistic styles and effects.</td>
 </tr>
 <tr>
 <td><b>Photography Prompt Generator</b><br><code>PhotographPromptGenerator</code></td>
@@ -738,7 +700,7 @@ Basic vision understanding node based on Alibaba's Qwen3-VL model, providing con
 </tr>
 
 <tr>
-<td><b>Qwen3-VL Advanced</b><br><code>Qwen3VLAdv</code></td>
+<td><b>Qwen3-VL Advanced</b><br><code>Qwen3VLAdvanced</code></td>
 <td>
 Professional-grade vision understanding node based on Alibaba's Qwen3-VL model, integrating numerous preset prompt templates, supporting intelligent batch processing, advanced quantization techniques, and chain-of-thought reasoning functions. Provides various preset modes from tag generation to creative analysis, with advanced features such as limit unlocking, multi-language output, and batch processing.
 
@@ -1092,6 +1054,33 @@ Outputs a configurable integer value for unified parameter control. Supports int
 <br>
 <div align="left">
 <img src="images/IntNode.jpg" alt="Integer Node" width="45%"/>
+</div>
+</td>
+</tr>
+<tr>
+<td><b>Group Switch Manager</b><br><code>GroupSwitchManager</code></td>
+<td>
+
+Visual group switch management tool that automatically detects all groups in the workflow, provides one-click enable/disable functionality, supports color filtering, title matching, drag-and-drop sorting, and group linkage configuration.
+
+<b>Core Features</b>:
+- <b>Smart Filtering</b>: Supports filtering groups by color or title keywords
+- <b>Drag Sorting</b>: Customize group display order
+- <b>Linkage Config</b>: Configure linkage rules between groups for switch linkage effects
+- <b>Quick Navigation</b>: Click arrow to quickly navigate to the corresponding group position
+- <b>Dual Mode Support</b>: Supports Disable Mode and Bypass Mode
+
+<br>
+<div align="left">
+<a href="images/Group Switch Manager1.jpg" target="_blank">
+<img src="images/Group Switch Manager1.jpg" alt="Group Switch Manager - Main Interface" width="30%"/>
+</a>
+<a href="images/Group Switch Manager2.jpg" target="_blank">
+<img src="images/Group Switch Manager2.jpg" alt="Group Switch Manager - Settings Dialog" width="30%"/>
+</a>
+<a href="images/Group Switch Manager3.jpg" target="_blank">
+<img src="images/Group Switch Manager3.jpg" alt="Group Switch Manager - Linkage Config" width="30%"/>
+</a>
 </div>
 </td>
 </tr>

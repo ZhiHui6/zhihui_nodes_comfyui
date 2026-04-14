@@ -63,6 +63,7 @@ from .Nodes.IntNode import IntNode
 from .Nodes.PromptExpander import PromptExpander
 from .Nodes.LMStudio.lmstudio_node import LMStudioNode
 from .Nodes.LMStudio import lmstudio_api
+from .Nodes.GroupSwitchManager import GroupSwitchManager
 
 import os
 
@@ -128,6 +129,7 @@ NODE_CLASS_MAPPINGS = {
     "IntNode": IntNode,
     "PromptExpander": PromptExpander,
     "LMStudioNode": LMStudioNode,
+    "GroupSwitchManager": GroupSwitchManager,
 }
 
 NODE_DISPLAY_NAME_MAPPINGS = {
@@ -192,6 +194,7 @@ NODE_DISPLAY_NAME_MAPPINGS = {
     "IntNode": "Int",
     "PromptExpander": "Prompt Expander",
     "LMStudioNode": "LM Studio Node",
+    "GroupSwitchManager": "Group Switch Manager",
 }
 
 WEB_DIRECTORY = os.path.join(os.path.dirname(os.path.abspath(__file__)), "web")
