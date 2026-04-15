@@ -33,8 +33,7 @@ const i18n = {
         matchColors: "匹配颜色",
         matchTitle: "匹配标题",
         toggleRestriction: "切换限制",
-        restrictionDefault: "默认",
-        restrictionMaxOne: "最多一个",
+        restrictionUnlimited: "无限制",
         restrictionAlwaysOne: "始终一个",
         matchTitlePlaceholder: "输入标题关键词...",
         matchTitleHelp: "使用逗号分隔多个关键词"
@@ -71,8 +70,7 @@ const i18n = {
         matchColors: "Match Colors",
         matchTitle: "Match Title",
         toggleRestriction: "Toggle Restriction",
-        restrictionDefault: "Default",
-        restrictionMaxOne: "Max One",
+        restrictionUnlimited: "Unlimited",
         restrictionAlwaysOne: "Always One",
         matchTitlePlaceholder: "Enter title keywords...",
         matchTitleHelp: "Use commas to separate multiple keywords"
@@ -269,7 +267,7 @@ app.registerExtension({
             this.properties.switchMode = this.properties.switchMode || 'ignore';
             this.properties.matchMode = this.properties.matchMode || 'colors';
             this.properties.titleKeywords = this.properties.titleKeywords || '';
-            this.properties.toggleRestriction = this.properties.toggleRestriction || 'default';
+            this.properties.toggleRestriction = this.properties.toggleRestriction || 'unlimited';
             this.groupReferences = new WeakMap();
             this._processingStack = new Set();
             this.size = [400, 500];
@@ -1950,9 +1948,9 @@ app.registerExtension({
             this._processingStack.add(groupName);
 
             try {
-                const toggleRestriction = this.properties.toggleRestriction || 'default';
+                const toggleRestriction = this.properties.toggleRestriction || 'unlimited';
 
-                if (enable && toggleRestriction !== 'default') {
+                if (enable && toggleRestriction !== 'unlimited') {
                     const currentEnabledGroups = this.properties.groups.filter(g => g.enabled);
                     
                     if (toggleRestriction === 'always_one') {
@@ -1961,13 +1959,6 @@ app.registerExtension({
                                 this.toggleGroupInternal(g.group_name, false);
                             }
                         });
-                    } else if (toggleRestriction === 'max_one') {
-                        if (currentEnabledGroups.length > 0) {
-                            const existingEnabled = currentEnabledGroups.find(g => g.group_name !== groupName);
-                            if (existingEnabled) {
-                                this.toggleGroupInternal(existingEnabled.group_name, false);
-                            }
-                        }
                     }
                 }
 
@@ -2055,7 +2046,7 @@ app.registerExtension({
 
             const locale = getLocale();
             const currentMode = this.properties.switchMode || 'ignore';
-            const currentRestriction = this.properties.toggleRestriction || 'default';
+            const currentRestriction = this.properties.toggleRestriction || 'unlimited';
             const currentMatchMode = this.properties.matchMode || 'colors';
             const currentColorFilter = this.properties.selectedColorFilter || '';
             const currentTitleKeywords = this.properties.titleKeywords || '';
@@ -2066,8 +2057,7 @@ app.registerExtension({
             ];
 
             const restrictionOptions = [
-                { value: 'default', label: t('restrictionDefault') },
-                { value: 'max_one', label: t('restrictionMaxOne') },
+                { value: 'unlimited', label: t('restrictionUnlimited') },
                 { value: 'always_one', label: t('restrictionAlwaysOne') }
             ];
 

@@ -1,10 +1,14 @@
 # 更新日志
 
 ## 1.0.29 2026-4-15
-- 组开关管理器节点(GroupSwitchManager)：修复分组排序功能失灵问题。
+- 组开关管理器节点(GroupSwitchManager)：
+  - 修复分组排序功能失灵问题
+  - 移除"最多一个"限制选项，简化切换限制逻辑
 - 多平台翻译器(MultiPlatformTranslate):优化调整翻译设置界面样式和交互效果
   <br>
-- GroupSwitchManager node: Fixed the issue where group sorting function was not working.
+- GroupSwitchManager node: 
+  - Fixed the issue where group sorting function was not working.
+  - Removed "At Most One" limit option, simplifying switch limit logic.
 - MultiPlatformTranslate node: Optimized translation settings interface styles and interactions
 
 ## 1.0.28 2026-4-14
