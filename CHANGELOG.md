@@ -1,6 +1,16 @@
 # 更新日志
+
+## 1.0.29 2026-4-15
+- 组开关管理器节点(GroupSwitchManager)：修复分组排序功能失灵问题。
+- 多平台翻译器(MultiPlatformTranslate):优化调整翻译设置界面样式和交互效果
+  <br>
+- GroupSwitchManager node: Fixed the issue where group sorting function was not working.
+- MultiPlatformTranslate node: Optimized translation settings interface styles and interactions
+
 ## 1.0.28 2026-4-14
 - 新增GroupSwitchManager（分组开关管理器）节点，用于管理分组的开关状态。
+  <br>
+- Added GroupSwitchManager node for managing group switch states.
 
 ## 1.0.27 2026-4-12
 - LM工作室节点(LMStudio): 优化模板选择器和设置对话框的样式和交互

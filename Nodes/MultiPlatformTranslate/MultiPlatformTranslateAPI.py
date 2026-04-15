@@ -63,8 +63,8 @@ class MultiPlatformTranslateAPI:
                     "config": {"api_key": "", "model": "glm-4-flash"},
                     "api_url": "https://open.bigmodel.cn/api/paas/v4/chat/completions"
                 },
-                "free": {
-                    "name": "谷歌翻译（免费）",
+                "google": {
+                    "name": "谷歌翻译",
                     "enabled": True,
                     "config": {},
                     "api_url": "https://translate.googleapis.com/translate_a/single"
@@ -213,7 +213,7 @@ class MultiPlatformTranslateAPI:
         except Exception as e:
             return {"success": False, "error": f"连接异常: {str(e)}"}
 
-    async def test_free_connection(self, config):
+    async def test_google_connection(self, config):
         try:
             url = "https://translate.googleapis.com/translate_a/single"
             params = {
@@ -317,7 +317,7 @@ class MultiPlatformTranslateAPI:
                 "aliyun": self.test_aliyun_connection,
                 "youdao": self.test_youdao_connection,
                 "zhipu": self.test_zhipu_connection,
-                "free": self.test_free_connection
+                "google": self.test_google_connection
             }
             
             test_method = test_methods.get(platform)

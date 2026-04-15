@@ -888,7 +888,7 @@
     },
     "MultiPlatformTranslate": {
         "title": "多平台翻译器",
-        "description": "多平台翻译节点，支持阿里云、有道和免费翻译服务。点击下方的'配置管理'按钮来管理各平台的API设置。",
+        "description": "多平台翻译节点，支持百度、阿里云、有道、智谱AI和免费翻译服务。点击下方的'配置管理'按钮来管理各平台的API设置。",
         "inputs": {
             "your_text": "输入文本"
         },

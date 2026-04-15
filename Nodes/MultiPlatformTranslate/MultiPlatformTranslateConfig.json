@@ -36,8 +36,8 @@
             },
             "api_url": "https://open.bigmodel.cn/api/paas/v4/chat/completions"
         },
-        "free": {
-            "name": "谷歌翻译（免费）",
+        "google": {
+            "name": "谷歌翻译",
             "enabled": true,
             "config": {},
             "api_url": "https://translate.googleapis.com/translate_a/single"

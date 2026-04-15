@@ -14,7 +14,7 @@ const i18n = {
         hidePassword: "隐藏密码",
         inputPlaceholder: "请输入",
         configTitle: "配置",
-        googleWarning: "⚠️ 注意：谷歌翻译需要特殊网络环境支持才能正常使用。",
+        googleWarning: "⚠️ 注意：访问谷歌翻译需要特殊网络环境支持，请确保网络可以正常访问 Google 服务。",
         loadConfigFailed: "无法加载配置文件",
         confirmClear: "确定要清除所有配置信息吗？此操作不可恢复！",
         clearSuccess: "✅ 所有配置信息已清除！",
@@ -34,12 +34,12 @@ const i18n = {
         aliyun: "阿里云翻译",
         youdao: "有道翻译",
         zhipu: "智谱AI翻译",
-        free: "谷歌翻译（免费）",
+        google: "谷歌翻译",
         baiduDesc: "百度翻译API，支持多种语言互译，需要注册百度翻译开放平台获取API密钥。免费额度：标准版5万字符/月，高级版100万字符/月（需个人认证）",
         aliyunDesc: "阿里云翻译API，企业级翻译服务，支持多种语言和领域。免费额度：100万字符/月。",
         youdaoDesc: "有道翻译API，基于神经网络翻译技术，提供高质量翻译。免费额度：赠送50元的体验金。",
         zhipuDesc: "智谱AI翻译API，基于大语言模型技术，提供高质量翻译服务，需要智谱AI开放平台API密钥。免费额度：新用户默认获得每月一定数量的免费额度。",
-        freeDesc: "使用谷歌翻译，完全免费，无需API密钥。",
+        googleDesc: "谷歌翻译免费使用，无需API密钥。",
         model: "模型"
     },
     en: {
@@ -54,7 +54,7 @@ const i18n = {
         hidePassword: "Hide Password",
         inputPlaceholder: "Enter",
         configTitle: "Configuration",
-        googleWarning: "⚠️ Note: Google Translate requires special network environment to work properly.",
+        googleWarning: "⚠️ Note: Accessing Google Translate requires special network environment. Please ensure your network can access the Google services to access Google Translate.",
         loadConfigFailed: "Failed to load configuration file",
         confirmClear: "Are you sure you want to clear all configuration? This action cannot be undone!",
         clearSuccess: "✅ All configuration cleared!",
@@ -74,12 +74,12 @@ const i18n = {
         aliyun: "Aliyun Translate",
         youdao: "Youdao Translate",
         zhipu: "Zhipu AI Translate",
-        free: "Google Translate (Free)",
+        google: "Google Translate",
         baiduDesc: "Baidu Translate API supports multiple languages. Requires API key from Baidu Translate Open Platform. Free tier: 50K chars/month (Standard), 1M chars/month (Advanced with verification).",
         aliyunDesc: "Aliyun Translation API provides enterprise-level translation service supporting multiple languages and domains. Free tier: 1M chars/month.",
         youdaoDesc: "Youdao Translation API uses neural network technology for high-quality translation. Free tier: 50 CNY trial credit.",
         zhipuDesc: "Zhipu AI Translation API uses large language model technology for high-quality translation. Requires API key from Zhipu AI Open Platform. Free tier available for new users.",
-        freeDesc: "Completely free translation service using Google Translate, no API key required.",
+        googleDesc: "Google Translate Free to use, no API key required.",
         model: "Model"
     }
 };
@@ -125,7 +125,7 @@ const Utils = {
 const StyleManager = {
     getStyles() {
         return {
-            base: "width:600px;height:435px;background:#0f172a;border:1px solid #1e293b;border-radius:12px;box-shadow:0 10px 25px rgba(0,0,0,0.5);padding:0;color:#f8fafc;z-index:10002;display:block;opacity:1;visibility:visible;pointer-events:auto;",
+            base: "width:750px;height:435px;background:#0f172a;border:1px solid #1e293b;border-radius:12px;box-shadow:0 10px 25px rgba(0,0,0,0.5);padding:0;color:#f8fafc;z-index:10002;display:block;opacity:1;visibility:visible;pointer-events:auto;",
             overlay: "position:fixed;left:0;top:0;width:100vw;height:100vh;background:rgba(0,0,0,0.6);backdrop-filter:blur(4px);-webkit-backdrop-filter:blur(4px);z-index:10001;display:flex;align-items:center;justify-content:center;",
             input: "background:#1e293b; color:#f8fafc; border:1px solid #334155; border-radius:6px; padding:6px 12px; font-size:14px; transition:all .2s ease; height:32px; width:66.67%;",
             button: "border:none; border-radius:6px; padding:6px 12px; font-size:13px; font-weight:600; cursor:pointer; transition:all .2s ease;",
@@ -544,7 +544,7 @@ function getPlatformFields(platform) {
             { name: "api_key", label: "API Key", type: "text", required: true },
             { name: "model", label: modelLabel, type: "select", options: ["glm-4-flash", "glm-4.5-flash", "glm-4.6v-flash", "glm-4.7-flash"], default: "glm-4.7-flash" }
         ],
-        free: []
+        google: []
     };
     return fields[platform] || [];
 }
@@ -571,9 +571,9 @@ function getPlatformInfo(platform) {
             description: $t('zhipuDesc'),
             website: "https://open.bigmodel.cn/"
         },
-        free: {
-            name: $t('free'),
-            description: $t('freeDesc'),
+        google: {
+            name: $t('google'),
+            description: $t('googleDesc'),
             website: ""
         }
     };
@@ -601,7 +601,7 @@ async function openSettings(node) {
             aliyun: $t('aliyun'),
             youdao: $t('youdao'),
             zhipu: $t('zhipu'),
-            free: $t('free')
+            google: $t('google')
         };
         
         return `
@@ -725,15 +725,15 @@ async function openSettings(node) {
                     </div>
                 ` : ""}
 
-                ${currentPlatform === 'free' ? `
-                <div id="google-warning" class="platform-warning" style="display: ${platformData.config.platform === googleTranslate ? 'block' : 'none'}; margin-bottom: 15px; padding: 10px; background-color: rgba(245, 158, 11, 0.1); border: 1px solid rgba(245, 158, 11, 0.3); border-radius: 6px;">
+                ${currentPlatform === 'google' ? `
+                <div id="google-warning" class="platform-warning" style="margin-bottom: 15px; padding: 10px; background-color: rgba(245, 158, 11, 0.1); border: 1px solid rgba(245, 158, 11, 0.3); border-radius: 6px;">
                     <p style="color: #f59e0b; margin: 0; font-size: 14px;">${$t('googleWarning')}</p>
                 </div>
                 ` : ''}
 
                 ${fieldsHtml}
 
-                <div class="form-actions">
+                <div class="form-actions" style="margin-top: auto; padding-top: 15px;">
                     <button id="btn-clear" class="btn-clear" style="background: linear-gradient(135deg, #dc2626 0%, #b91c1c 100%); color: #fff; border: none; border-radius: 6px; padding: 6px 12px; font-size: 13px; font-weight: 600; cursor: pointer; box-shadow: 0 2px 8px rgba(220, 38, 38, 0.3); margin-right: auto;">${$t('clearAllConfig')}</button>
                     <button id="btn-backup" class="btn-backup" style="background: linear-gradient(135deg, #6366f1 0%, #4f46e5 100%); color: #fff; border: none; border-radius: 6px; padding: 6px 12px; font-size: 13px; font-weight: 600; cursor: pointer; box-shadow: 0 2px 8px rgba(99, 102, 241, 0.3); margin-right: 8px;">${$t('backupPlatformInfo')}</button>
                     <button id="btn-import" class="btn-import" style="background: linear-gradient(135deg, #8b5cf6 0%, #7c3aed 100%); color: #fff; border: none; border-radius: 6px; padding: 6px 12px; font-size: 13px; font-weight: 600; cursor: pointer; box-shadow: 0 2px 8px rgba(139, 92, 246, 0.3); margin-right: 8px;">${$t('importPlatformInfo')}</button>
@@ -776,14 +776,10 @@ async function openSettings(node) {
             });
         });
 
-        // 监听平台选择变化（针对免费翻译的谷歌翻译警告）
+        // 监听平台选择变化（针对谷歌翻译的警告）
         const platformSelect = dialog.querySelector('#field-platform');
-        if (platformSelect && currentPlatform === 'free') {
+        if (platformSelect && currentPlatform === 'google') {
             platformSelect.addEventListener('change', (e) => {
-                const warningEl = dialog.querySelector('#google-warning');
-                if (warningEl) {
-                    warningEl.style.display = e.target.value === googleTranslate ? 'block' : 'none';
-                }
             });
         }
 
@@ -827,7 +823,7 @@ async function openSettings(node) {
                 aliyun: $t('aliyun'),
                 youdao: $t('youdao'),
                 zhipu: $t('zhipu'),
-                free: $t('free')
+                google: $t('google')
             };
             const platformDisplayName = platformNames[currentPlatform] || currentPlatform;
             
@@ -902,7 +898,7 @@ async function openSettings(node) {
                     const importedConfig = JSON.parse(text);
                     
                     if (importedConfig && importedConfig.platforms) {
-                        const validPlatforms = ['baidu', 'tencent', 'aliyun', 'youdao', 'zhipu', 'free'];
+                        const validPlatforms = ['baidu', 'tencent', 'aliyun', 'youdao', 'zhipu', 'google'];
                         let hasValidConfig = false;
                         
                         for (const platform of validPlatforms) {

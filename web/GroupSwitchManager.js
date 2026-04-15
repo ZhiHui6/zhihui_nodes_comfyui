@@ -713,6 +713,13 @@ app.registerExtension({
                     gap: 4px;
                 }
 
+                .gmm-group-color-indicator {
+                    width: 4px;
+                    height: 16px;
+                    border-radius: 2px;
+                    flex-shrink: 0;
+                }
+
                 .gmm-group-name {
                     flex: 1;
                     color: #E0E0E0;
@@ -1121,30 +1128,43 @@ app.registerExtension({
                 }
 
                 .gmm-drag-handle {
-                    width: 14px;
-                    height: 18px;
+                    width: 16px;
+                    height: 20px;
                     display: flex;
                     align-items: center;
                     justify-content: center;
                     cursor: grab;
                     flex-shrink: 0;
-                    opacity: 0.4;
-                    transition: opacity 0.2s ease;
-                    margin-right: 2px;
+                    opacity: 0.5;
+                    transition: all 0.2s ease;
+                    margin-right: 4px;
+                    border-radius: 3px;
+                    background: transparent;
                 }
 
                 .gmm-drag-handle:hover {
-                    opacity: 0.8;
+                    opacity: 1;
+                    background: rgba(116, 55, 149, 0.15);
                 }
 
                 .gmm-drag-handle:active {
                     cursor: grabbing;
+                    background: rgba(116, 55, 149, 0.25);
                 }
 
                 .gmm-drag-handle svg {
-                    width: 10px;
-                    height: 10px;
-                    fill: #B0B0B0;
+                    width: 12px;
+                    height: 12px;
+                    stroke: #B0B0B0;
+                    stroke-width: 2;
+                }
+
+                .gmm-drag-handle:hover svg {
+                    stroke: #8b4ba8;
+                }
+
+                .gmm-group-item {
+                    transition: transform 0.2s ease, box-shadow 0.2s ease, opacity 0.2s ease, border-color 0.2s ease, background 0.2s ease;
                 }
 
                 .gmm-group-item[draggable="true"] {
@@ -1155,9 +1175,39 @@ app.registerExtension({
                     cursor: grabbing;
                 }
 
+                .gmm-group-item.gmm-dragging {
+                    opacity: 0.4;
+                    transform: scale(0.98);
+                    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.3);
+                    z-index: 100;
+                }
+
                 .gmm-group-item.gmm-drag-over {
-                    border: 2px dashed #743795;
-                    background: linear-gradient(135deg, rgba(116, 55, 149, 0.2) 0%, rgba(139, 75, 168, 0.2) 100%);
+                    border: 2px solid #8b4ba8;
+                    background: linear-gradient(135deg, rgba(116, 55, 149, 0.25) 0%, rgba(139, 75, 168, 0.25) 100%);
+                    transform: scale(1.02);
+                    box-shadow: 0 4px 16px rgba(116, 55, 149, 0.3);
+                }
+
+                .gmm-group-item.gmm-drag-over-top {
+                    border-top: 2px solid #8b4ba8;
+                    border-top-left-radius: 8px;
+                    border-top-right-radius: 8px;
+                }
+
+                .gmm-group-item.gmm-drag-over-bottom {
+                    border-bottom: 2px solid #8b4ba8;
+                    border-bottom-left-radius: 8px;
+                    border-bottom-right-radius: 8px;
+                }
+
+                .gmm-drag-placeholder {
+                    background: rgba(116, 55, 149, 0.1);
+                    border: 2px dashed rgba(139, 75, 168, 0.5);
+                    border-radius: 6px;
+                    margin-bottom: 4px;
+                    min-height: 32px;
+                    transition: all 0.2s ease;
                 }
 
                 .gmm-title-match-input {
@@ -1560,6 +1610,17 @@ app.registerExtension({
                         nameEl.textContent = group.title;
                         isDirty = true;
                     }
+
+                    const colorIndicator = groupItem.querySelector('.gmm-group-color-indicator');
+                    if (colorIndicator) {
+                        const currentColor = group?.color || '#888888';
+                        const currentBg = colorIndicator.style.backgroundColor;
+                        const normalizedCurrent = currentColor.startsWith('#') ? currentColor : '#' + currentColor;
+                        if (!currentBg || currentBg !== normalizedCurrent) {
+                            colorIndicator.style.backgroundColor = normalizedCurrent;
+                            isDirty = true;
+                        }
+                    }
                 }
 
                 this.properties.groupStatesCache[group.title] = currentEnabled;
@@ -1670,7 +1731,7 @@ app.registerExtension({
             const item = document.createElement('div');
             item.className = 'gmm-group-item';
             item.dataset.groupName = groupConfig.group_name;
-            item.draggable = true;
+            item.draggable = false;
 
             const displayName = this.truncateText(groupConfig.group_name, 30);
             const fullName = groupConfig.group_name || '';
@@ -1678,6 +1739,8 @@ app.registerExtension({
             const hasLinkage = groupConfig.linkage &&
                 (groupConfig.linkage.on_enable?.length > 0 ||
                  groupConfig.linkage.on_disable?.length > 0);
+
+            const groupColor = group?.color || '#888888';
 
             item.innerHTML = `
                 <div class="gmm-group-header">
@@ -1691,6 +1754,7 @@ app.registerExtension({
                             <circle cx="15" cy="19" r="1.5"></circle>
                         </svg>
                     </div>
+                    <div class="gmm-group-color-indicator" style="background-color: ${groupColor};"></div>
                     <span class="gmm-group-name">${displayName}</span>
                     <div class="gmm-switch ${groupConfig.enabled ? 'active' : ''}">
                         <svg viewBox="0 0 24 24" fill="none" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
@@ -1739,21 +1803,48 @@ app.registerExtension({
             item.addEventListener('dragenter', (e) => this.onDragEnter(e));
             item.addEventListener('dragleave', (e) => this.onDragLeave(e));
 
+            const dragHandle = item.querySelector('.gmm-drag-handle');
+            if (dragHandle) {
+                dragHandle.addEventListener('mousedown', (e) => {
+                    item.setAttribute('draggable', 'true');
+                });
+                dragHandle.addEventListener('mouseup', (e) => {
+                    if (!this._draggedGroup) {
+                        item.setAttribute('draggable', 'false');
+                    }
+                });
+            }
+
             return item;
         };
 
         nodeType.prototype.onDragStart = function (e, groupName) {
             e.stopPropagation();
             this._draggedGroup = groupName;
-            e.target.style.opacity = '0.5';
+            e.target.classList.add('gmm-dragging');
             e.dataTransfer.effectAllowed = 'move';
             e.dataTransfer.setData('text/plain', groupName);
+            e.dataTransfer.setDragImage(e.target, 0, 0);
+            
+            setTimeout(() => {
+                e.target.style.opacity = '0.4';
+            }, 0);
         };
 
         nodeType.prototype.onDragOver = function (e) {
             e.preventDefault();
             e.stopPropagation();
             e.dataTransfer.dropEffect = 'move';
+            
+            const target = e.currentTarget;
+            if (!target || !target.classList.contains('gmm-group-item')) return;
+            
+            const rect = target.getBoundingClientRect();
+            const midY = rect.top + rect.height / 2;
+            const isTopHalf = e.clientY < midY;
+            
+            target.classList.remove('gmm-drag-over-top', 'gmm-drag-over-bottom');
+            target.classList.add(isTopHalf ? 'gmm-drag-over-top' : 'gmm-drag-over-bottom');
         };
 
         nodeType.prototype.onDragEnter = function (e) {
@@ -1770,7 +1861,11 @@ app.registerExtension({
             e.stopPropagation();
             const target = e.currentTarget;
             if (target && target.classList.contains('gmm-group-item')) {
-                target.classList.remove('gmm-drag-over');
+                const rect = target.getBoundingClientRect();
+                if (e.clientX < rect.left || e.clientX >= rect.right || 
+                    e.clientY < rect.top || e.clientY >= rect.bottom) {
+                    target.classList.remove('gmm-drag-over', 'gmm-drag-over-top', 'gmm-drag-over-bottom');
+                }
             }
         };
 
@@ -1779,8 +1874,10 @@ app.registerExtension({
             e.stopPropagation();
 
             const target = e.currentTarget;
+            const isTopHalf = target.classList.contains('gmm-drag-over-top');
+            
             if (target) {
-                target.classList.remove('gmm-drag-over');
+                target.classList.remove('gmm-drag-over', 'gmm-drag-over-top', 'gmm-drag-over-bottom');
             }
 
             const draggedGroupName = this._draggedGroup;
@@ -1788,20 +1885,24 @@ app.registerExtension({
                 return;
             }
 
-            this.updateGroupOrder(draggedGroupName, targetGroupName);
+            this.updateGroupOrder(draggedGroupName, targetGroupName, isTopHalf);
             this.updateGroupsList();
         };
 
         nodeType.prototype.onDragEnd = function (e) {
             e.stopPropagation();
             e.target.style.opacity = '';
+            e.target.classList.remove('gmm-dragging');
             this._draggedGroup = null;
 
             const items = this.customUI.querySelectorAll('.gmm-group-item');
-            items.forEach(item => item.classList.remove('gmm-drag-over'));
+            items.forEach(item => {
+                item.classList.remove('gmm-drag-over', 'gmm-drag-over-top', 'gmm-drag-over-bottom');
+                item.setAttribute('draggable', 'false');
+            });
         };
 
-        nodeType.prototype.updateGroupOrder = function (draggedGroupName, targetGroupName) {
+        nodeType.prototype.updateGroupOrder = function (draggedGroupName, targetGroupName, isTopHalf = true) {
             const allGroups = this.getWorkflowGroups();
             const sortedGroups = this.sortGroupsByOrder(allGroups);
             const newOrder = sortedGroups.map(g => g.title);
@@ -1814,10 +1915,14 @@ app.registerExtension({
 
             newOrder.splice(draggedIndex, 1);
 
-            let insertIndex = targetIndex;
+            let insertIndex;
             if (draggedIndex < targetIndex) {
-                insertIndex = targetIndex;
+                insertIndex = isTopHalf ? targetIndex - 1 : targetIndex;
+            } else {
+                insertIndex = isTopHalf ? targetIndex : targetIndex + 1;
             }
+            
+            insertIndex = Math.max(0, Math.min(insertIndex, newOrder.length));
             newOrder.splice(insertIndex, 0, draggedGroupName);
 
             this.properties.groupOrder = newOrder;

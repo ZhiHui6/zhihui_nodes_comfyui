@@ -15,7 +15,7 @@ class MultiPlatformTranslate:
         return {
             "required": {
                 "enable_translate": ("BOOLEAN", {"default": True}),
-                "platform": (["baidu", "aliyun", "youdao", "zhipu", "free"], {"default": "baidu"}),
+                "platform": (["baidu", "aliyun", "youdao", "zhipu", "google"], {"default": "baidu"}),
                 "source_language": (["auto", "zh", "en", "ja", "ko", "fr", "de", "es", "ru", "ar"], {"default": "auto"}),
                 "target_language": (["zh", "en", "ja", "ko", "fr", "de", "es", "ru", "ar"], {"default": "en"}),
                 "your_text": ("STRING", {"default": "", "multiline": True}),
@@ -47,7 +47,7 @@ class MultiPlatformTranslate:
                 "aliyun": {"name": "阿里云翻译", "config": {"access_key_id": "", "access_key_secret": ""}},
                 "youdao": {"name": "有道翻译", "config": {"app_key": "", "app_secret": ""}},
                 "zhipu": {"name": "智谱AI翻译", "config": {"api_key": "", "model": "glm-4-flash"}},
-                "free": {"name": "谷歌翻译（免费）", "config": {}}
+                "google": {"name": "谷歌翻译", "config": {}}
             }
         }
 
@@ -78,8 +78,8 @@ class MultiPlatformTranslate:
                 result = self.translate_youdao(platform_config["config"], source_language, target_language, your_text)
             elif platform == "zhipu":
                 result = self.translate_zhipu(platform_config["config"], source_language, target_language, your_text)
-            elif platform == "free":
-                result = self.translate_free(platform_config["config"], source_language, target_language, your_text)
+            elif platform == "google":
+                result = self.translate_google(platform_config["config"], source_language, target_language, your_text)
             else:
                 result = your_text
 
@@ -149,9 +149,9 @@ class MultiPlatformTranslate:
                 return result['Data']['Translated']
             else:
 
-                return self.translate_free({}, source_language, target_language, text)
+                return self.translate_google({}, source_language, target_language, text)
         except:
-            return self.translate_free({}, source_language, target_language, text)
+            return self.translate_google({}, source_language, target_language, text)
 
     def truncate(self, q):
         """
@@ -197,7 +197,7 @@ class MultiPlatformTranslate:
         else:
             raise Exception(f"Youdao Translate error: {result.get('errorCode', 'Unknown error')}")
 
-    def translate_free(self, config, source_language, target_language, text):
+    def translate_google(self, config, source_language, target_language, text):
         """免费翻译方法，使用谷歌翻译"""
         if not text.strip():
             return text
@@ -251,7 +251,7 @@ class MultiPlatformTranslate:
             print(error_msg)
             return text
         except Exception as e:
-            print(f"Google free translation error: {e}")
+            print(f"Google translation error: {e}")
             return text
 
     def translate_zhipu(self, config, source_language, target_language, text):
