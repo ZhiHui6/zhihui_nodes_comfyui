@@ -36,7 +36,25 @@ const i18n = {
         restrictionUnlimited: "无限制",
         restrictionAlwaysOne: "始终一个",
         matchTitlePlaceholder: "输入标题关键词...",
-        matchTitleHelp: "使用逗号分隔多个关键词"
+        matchTitleHelp: "使用逗号分隔多个关键词",
+        helpTitle: "组开关管理器",
+        helpDesc: "用于可视化管理工作流中的组开关状态，并配置组之间的联动规则。",
+        helpFeaturesTitle: "功能",
+        helpFeature1: "显示工作流中的所有组及其当前状态",
+        helpFeature2: "点击开关按钮快速启用/禁用组",
+        helpFeature3: "支持按颜色或标题关键词过滤组",
+        helpFeature4: "配置组之间的联动规则（当一个组状态改变时，自动触发其他组的状态变化）",
+        helpFeature5: "支持拖拽排序组列表",
+        helpFeature6: "点击定位按钮快速跳转到组的位置",
+        helpUsageTitle: "使用说明",
+        helpUsage1: "开关按钮：点击可切换组的启用/禁用状态",
+        helpUsage2: "联动按钮：点击配置该组的联动规则",
+        helpUsage3: "定位按钮：点击在画布中定位到该组",
+        helpUsage4: "设置按钮：配置运行模式、匹配模式等选项",
+        helpUsage5: "刷新按钮：手动刷新组列表",
+        helpModeTitle: "运行模式",
+        helpModeDisable: "禁用模式：关闭的组会被禁用（不参与执行）",
+        helpModeBypass: "忽略模式：关闭的组会被忽略（但节点仍会执行）"
     },
     en: {
         title: "Group Switch Manager",
@@ -73,7 +91,25 @@ const i18n = {
         restrictionUnlimited: "Unlimited",
         restrictionAlwaysOne: "Always One",
         matchTitlePlaceholder: "Enter title keywords...",
-        matchTitleHelp: "Use commas to separate multiple keywords"
+        matchTitleHelp: "Use commas to separate multiple keywords",
+        helpTitle: "Group Switch Manager",
+        helpDesc: "Used to visually manage group on/off states in the workflow and configure linkage rules between groups.",
+        helpFeaturesTitle: "Features",
+        helpFeature1: "Display all groups in the workflow and their current status",
+        helpFeature2: "Click toggle button to quickly enable/disable groups",
+        helpFeature3: "Support filtering groups by color or title keywords",
+        helpFeature4: "Configure linkage rules between groups (when one group's state changes, automatically trigger other groups' state changes)",
+        helpFeature5: "Support drag-and-drop sorting of group list",
+        helpFeature6: "Click navigate button to quickly jump to group's location",
+        helpUsageTitle: "Usage",
+        helpUsage1: "Toggle Button: Click to switch group's enable/disable state",
+        helpUsage2: "Linkage Button: Click to configure linkage rules for this group",
+        helpUsage3: "Navigate Button: Click to locate the group on canvas",
+        helpUsage4: "Settings Button: Configure execution mode, match mode, etc.",
+        helpUsage5: "Refresh Button: Manually refresh group list",
+        helpModeTitle: "Execution Mode",
+        helpModeDisable: "Disable Mode: Disabled groups will be disabled (not participating in execution)",
+        helpModeBypass: "Bypass Mode: Disabled groups will be bypassed (but nodes will still execute)"
     }
 };
 
@@ -103,6 +139,76 @@ function initLocaleWatcher() {
             localeChangeListeners.forEach(cb => cb(newLocale));
         }
     }, 1000);
+}
+
+function getDescriptionHTML() {
+    return `<h3 style="margin:0 0 12px 0;color:#60a5fa;font-size:18px;font-weight:600;padding-bottom:8px;border-bottom:1px solid rgba(96, 165, 250, 0.2);letter-spacing:0.2px;">${t('helpTitle')}</h3>
+<p style="margin:0 0 16px 0;color:#e2e8f0;">${t('helpDesc')}</p>
+<h4 style="margin:12px 0 8px 0;color:#38bdf8;font-size:14px;font-weight:600;text-transform:uppercase;letter-spacing:0.5px;">${t('helpFeaturesTitle')}</h4>
+<ul style="margin:0;padding:0;">
+<li style="margin:4px 0;padding-left:6px;list-style:none;position:relative;color:#e2e8f0;">${t('helpFeature1')}</li>
+<li style="margin:4px 0;padding-left:6px;list-style:none;position:relative;color:#e2e8f0;">${t('helpFeature2')}</li>
+<li style="margin:4px 0;padding-left:6px;list-style:none;position:relative;color:#e2e8f0;">${t('helpFeature3')}</li>
+<li style="margin:4px 0;padding-left:6px;list-style:none;position:relative;color:#e2e8f0;">${t('helpFeature4')}</li>
+<li style="margin:4px 0;padding-left:6px;list-style:none;position:relative;color:#e2e8f0;">${t('helpFeature5')}</li>
+<li style="margin:4px 0;padding-left:6px;list-style:none;position:relative;color:#e2e8f0;">${t('helpFeature6')}</li>
+</ul>
+<h4 style="margin:12px 0 8px 0;color:#38bdf8;font-size:14px;font-weight:600;text-transform:uppercase;letter-spacing:0.5px;">${t('helpUsageTitle')}</h4>
+<ul style="margin:0;padding:0;">
+<li style="margin:4px 0;padding-left:6px;list-style:none;position:relative;color:#e2e8f0;">${t('helpUsage1')}</li>
+<li style="margin:4px 0;padding-left:6px;list-style:none;position:relative;color:#e2e8f0;">${t('helpUsage2')}</li>
+<li style="margin:4px 0;padding-left:6px;list-style:none;position:relative;color:#e2e8f0;">${t('helpUsage3')}</li>
+<li style="margin:4px 0;padding-left:6px;list-style:none;position:relative;color:#e2e8f0;">${t('helpUsage4')}</li>
+<li style="margin:4px 0;padding-left:6px;list-style:none;position:relative;color:#e2e8f0;">${t('helpUsage5')}</li>
+</ul>
+<h4 style="margin:12px 0 8px 0;color:#38bdf8;font-size:14px;font-weight:600;text-transform:uppercase;letter-spacing:0.5px;">${t('helpModeTitle')}</h4>
+<ul style="margin:0;padding:0;">
+<li style="margin:4px 0;padding-left:6px;list-style:none;position:relative;color:#e2e8f0;">${t('helpModeDisable')}</li>
+<li style="margin:4px 0;padding-left:6px;list-style:none;position:relative;color:#e2e8f0;">${t('helpModeBypass')}</li>
+</ul>`;
+}
+
+function createHelpPopup(description, onClose) {
+    const docElement = document.createElement('div');
+    docElement.style.cssText = `
+        background: linear-gradient(135deg, rgba(15, 23, 42, 0.98) 0%, rgba(30, 41, 59, 0.98) 100%);
+        backdrop-filter: blur(16px);
+        -webkit-backdrop-filter: blur(16px);
+        position: absolute;
+        color: #e2e8f0;
+        font: 13px 'Segoe UI', system-ui, -apple-system, sans-serif;
+        line-height: 1.6;
+        padding: 20px 24px 24px 24px;
+        border-radius: 16px;
+        border: 1px solid rgba(99, 179, 237, 0.3);
+        z-index: 1000;
+        overflow: hidden;
+        max-width: 560px;
+        max-height: 600px;
+        min-width: 400px;
+        box-shadow: 
+            0 0 40px rgba(59, 130, 246, 0.15),
+            0 20px 60px rgba(0, 0, 0, 0.4),
+            inset 0 1px 0 rgba(255, 255, 255, 0.08);
+    `;
+
+    docElement.innerHTML = `<div style="overflow-y:auto;max-height:540px;padding-right:8px;scrollbar-width:thin;scrollbar-color:rgba(96,165,250,0.3) transparent;">${description}</div>`;
+
+    const accent = document.createElement('div');
+    accent.style.cssText = `
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        height: 3px;
+        background: linear-gradient(90deg, #3b82f6, #06b6d4, #3b82f6);
+        border-radius: 16px 16px 0 0;
+        opacity: 0.8;
+    `;
+    docElement.insertBefore(accent, docElement.firstChild);
+
+    document.body.appendChild(docElement);
+    return docElement;
 }
 
 function reduceNodesDepthFirst(nodeOrNodes, reduceFn, reduceTo) {
@@ -271,6 +377,9 @@ app.registerExtension({
             this.groupReferences = new WeakMap();
             this._processingStack = new Set();
             this.size = [400, 500];
+            this._gmmHelp = false;
+            this._gmmHelpElement = null;
+            this._gmmHelpLocale = getLocale();
             this.createCustomUI();
             this._gmmEventHandler = (e) => {
                 if (e.detail && e.detail.sourceId !== this._gmmInstanceId) {
@@ -300,6 +409,10 @@ app.registerExtension({
                 if (index > -1) {
                     localeChangeListeners.splice(index, 1);
                 }
+            }
+            if (this._gmmHelpElement) {
+                this._gmmHelpElement.remove();
+                this._gmmHelpElement = null;
             }
             onRemoved?.apply(this, arguments);
         };
@@ -2646,6 +2759,94 @@ app.registerExtension({
                     }
                 }, 100);
             }
+        };
+
+        const iconSize = 24;
+        const iconMargin = 4;
+
+        const drawFg = nodeType.prototype.onDrawForeground;
+        nodeType.prototype.onDrawForeground = function (ctx) {
+            const currentLocale = getLocale();
+            if (this._gmmHelpLocale !== currentLocale) {
+                this._gmmHelpLocale = currentLocale;
+                if (this._gmmHelpElement) {
+                    this._gmmHelpElement.querySelector('div').innerHTML = getDescriptionHTML();
+                }
+            }
+
+            const r = drawFg ? drawFg.apply(this, arguments) : undefined;
+            if (this.flags.collapsed) return r;
+
+            const x = this.size[0] - iconSize - iconMargin;
+            const y = -LiteGraph.NODE_TITLE_HEIGHT + (LiteGraph.NODE_TITLE_HEIGHT - iconSize) / 2;
+
+            if (this._gmmHelp && this._gmmHelpElement === null) {
+                this._gmmHelpElement = createHelpPopup(getDescriptionHTML(), () => {
+                    this._gmmHelp = false;
+                    this._gmmHelpElement = null;
+                });
+            }
+            else if (!this._gmmHelp && this._gmmHelpElement !== null) {
+                this._gmmHelpElement.remove();
+                this._gmmHelpElement = null;
+            }
+
+            if (this._gmmHelp && this._gmmHelpElement !== null) {
+                const rect = ctx.canvas.getBoundingClientRect();
+                const scaleX = rect.width / ctx.canvas.width;
+                const scaleY = rect.height / ctx.canvas.height;
+
+                const transform = new DOMMatrix()
+                    .scaleSelf(scaleX, scaleY)
+                    .multiplySelf(ctx.getTransform())
+                    .translateSelf(this.size[0] * scaleX * Math.max(1.0, window.devicePixelRatio), 0)
+                    .translateSelf(10, -32);
+
+                const bcr = app.canvas.canvas.getBoundingClientRect();
+                this._gmmHelpElement.style.left = `${transform.e + bcr.x}px`;
+                this._gmmHelpElement.style.top = `${transform.f + bcr.y}px`;
+            }
+
+            ctx.save();
+            ctx.translate(x, y);
+            ctx.scale(iconSize / 32, iconSize / 32);
+
+            ctx.beginPath();
+            ctx.arc(16, 16, 14, 0, Math.PI * 2);
+            ctx.fillStyle = this._gmmHelp ? 'rgba(59, 130, 246, 0.3)' : 'rgba(59, 130, 246, 0.15)';
+            ctx.fill();
+
+            ctx.beginPath();
+            ctx.arc(16, 16, 14, 0, Math.PI * 2);
+            ctx.strokeStyle = this._gmmHelp ? '#60a5fa' : 'rgba(96, 165, 250, 0.6)';
+            ctx.lineWidth = 2;
+            ctx.stroke();
+
+            ctx.font = 'bold 24px system-ui';
+            ctx.textAlign = 'center';
+            ctx.textBaseline = 'middle';
+            ctx.fillStyle = this._gmmHelp ? '#93c5fd' : '#60a5fa';
+            ctx.fillText('?', 16, 19);
+
+            ctx.restore();
+            return r;
+        };
+
+        const mouseDown = nodeType.prototype.onMouseDown;
+        nodeType.prototype.onMouseDown = function (e, localPos, canvas) {
+            const r = mouseDown ? mouseDown.apply(this, arguments) : undefined;
+            const iconX = this.size[0] - iconSize - iconMargin;
+            const iconY = -LiteGraph.NODE_TITLE_HEIGHT + (LiteGraph.NODE_TITLE_HEIGHT - iconSize) / 2;
+            if (
+                localPos[0] > iconX &&
+                localPos[0] < iconX + iconSize &&
+                localPos[1] > iconY &&
+                localPos[1] < iconY + iconSize
+            ) {
+                this._gmmHelp = !this._gmmHelp;
+                return true;
+            }
+            return r;
         };
 
     }
