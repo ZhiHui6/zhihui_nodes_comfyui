@@ -2,10 +2,48 @@ import { app } from "../../../scripts/app.js";
 
 const i18n = {
     zh: {
-        swapSize: "🔃 尺寸互换"
+        swapSize: "🔃 尺寸互换",
+        nodeTitle: "图像纵横比节点",
+        description: "用于设置图像的纵横比和尺寸，支持多种模型的预设尺寸，可快速选择常用比例或自定义尺寸。",
+        featuresTitle: "功能",
+        feature1: "支持多种模型的预设尺寸（Qwen、Flux、Wan、SDXL等）",
+        feature2: "提供常用纵横比快速选择",
+        feature3: "支持自定义尺寸和宽高锁定",
+        feature4: "支持批量大小设置",
+        feature5: "输出潜空间张量",
+        usageTitle: "使用说明",
+        presetMode: "预设模式",
+        presetModeDesc: "选择模型预设，自动提供该模型支持的尺寸选项",
+        customMode: "自定义模式",
+        customModeDesc: "手动输入宽度和高度，可选择锁定纵横比",
+        batchSize: "批量大小",
+        batchSizeDesc: "设置生成的潜空间批量大小",
+        outputTitle: "输出",
+        outputWidth: "宽度：输出图像宽度",
+        outputHeight: "高度：输出图像高度",
+        outputLatent: "潜空间：生成的潜空间张量"
     },
     en: {
-        swapSize: "🔃 Swap Size"
+        swapSize: "🔃 Swap Size",
+        nodeTitle: "Image Aspect Ratio Node",
+        description: "Used to set image aspect ratio and dimensions, supporting preset dimensions for multiple models, with quick selection of common ratios or custom sizes.",
+        featuresTitle: "Features",
+        feature1: "Supports preset dimensions for multiple models (Qwen, Flux, Wan, SDXL, etc.)",
+        feature2: "Provides quick selection of common aspect ratios",
+        feature3: "Supports custom dimensions and aspect ratio locking",
+        feature4: "Supports batch size setting",
+        feature5: "Outputs latent space tensor",
+        usageTitle: "Usage",
+        presetMode: "Preset Mode",
+        presetModeDesc: "Select model preset to automatically provide size options supported by that model",
+        customMode: "Custom Mode",
+        customModeDesc: "Manually input width and height, with option to lock aspect ratio",
+        batchSize: "Batch Size",
+        batchSizeDesc: "Set batch size for generated latent space",
+        outputTitle: "Output",
+        outputWidth: "Width: Output image width",
+        outputHeight: "Height: Output image height",
+        outputLatent: "Latent: Generated latent space tensor"
     }
 };
 
@@ -19,6 +57,74 @@ function $t(key) {
     return i18n[locale][key] || i18n['en'][key] || key;
 }
 
+function getDescriptionHTML() {
+    return `<h3 style="margin:0 0 12px 0;color:#60a5fa;font-size:18px;font-weight:600;padding-bottom:8px;border-bottom:1px solid rgba(96, 165, 250, 0.2);letter-spacing:0.2px;">${$t('nodeTitle')}</h3>
+<p style="margin:0 0 16px 0;color:#e2e8f0;">${$t('description')}</p>
+<h4 style="margin:12px 0 8px 0;color:#38bdf8;font-size:14px;font-weight:600;text-transform:uppercase;letter-spacing:0.5px;">${$t('featuresTitle')}</h4>
+<ul style="margin:0;padding:0;">
+<li style="margin:4px 0;padding-left:6px;list-style:none;position:relative;color:#e2e8f0;">${$t('feature1')}</li>
+<li style="margin:4px 0;padding-left:6px;list-style:none;position:relative;color:#e2e8f0;">${$t('feature2')}</li>
+<li style="margin:4px 0;padding-left:6px;list-style:none;position:relative;color:#e2e8f0;">${$t('feature3')}</li>
+<li style="margin:4px 0;padding-left:6px;list-style:none;position:relative;color:#e2e8f0;">${$t('feature4')}</li>
+<li style="margin:4px 0;padding-left:6px;list-style:none;position:relative;color:#e2e8f0;">${$t('feature5')}</li>
+</ul>
+<h4 style="margin:12px 0 8px 0;color:#38bdf8;font-size:14px;font-weight:600;text-transform:uppercase;letter-spacing:0.5px;">${$t('usageTitle')}</h4>
+<ul style="margin:0;padding:0;">
+<li style="margin:4px 0;padding-left:6px;list-style:none;position:relative;"><strong style="color:#f1f5f9;font-weight:500;">${$t('presetMode')}</strong>: <span style="color:#e2e8f0;">${$t('presetModeDesc')}</span></li>
+<li style="margin:4px 0;padding-left:6px;list-style:none;position:relative;"><strong style="color:#f1f5f9;font-weight:500;">${$t('customMode')}</strong>: <span style="color:#e2e8f0;">${$t('customModeDesc')}</span></li>
+<li style="margin:4px 0;padding-left:6px;list-style:none;position:relative;"><strong style="color:#f1f5f9;font-weight:500;">${$t('batchSize')}</strong>: <span style="color:#e2e8f0;">${$t('batchSizeDesc')}</span></li>
+</ul>
+<h4 style="margin:12px 0 8px 0;color:#38bdf8;font-size:14px;font-weight:600;text-transform:uppercase;letter-spacing:0.5px;">${$t('outputTitle')}</h4>
+<ul style="margin:0;padding:0;">
+<li style="margin:4px 0;padding-left:6px;list-style:none;position:relative;color:#e2e8f0;">${$t('outputWidth')}</li>
+<li style="margin:4px 0;padding-left:6px;list-style:none;position:relative;color:#e2e8f0;">${$t('outputHeight')}</li>
+<li style="margin:4px 0;padding-left:6px;list-style:none;position:relative;color:#e2e8f0;">${$t('outputLatent')}</li>
+</ul>`;
+}
+
+function createHelpPopup(description, onClose) {
+    const docElement = document.createElement('div');
+    docElement.style.cssText = `
+        background: linear-gradient(135deg, rgba(15, 23, 42, 0.98) 0%, rgba(30, 41, 59, 0.98) 100%);
+        backdrop-filter: blur(16px);
+        -webkit-backdrop-filter: blur(16px);
+        position: absolute;
+        color: #e2e8f0;
+        font: 13px 'Segoe UI', system-ui, -apple-system, sans-serif;
+        line-height: 1.6;
+        padding: 20px 24px 24px 24px;
+        border-radius: 16px;
+        border: 1px solid rgba(99, 179, 237, 0.3);
+        z-index: 1000;
+        overflow: hidden;
+        max-width: 560px;
+        max-height: 600px;
+        min-width: 400px;
+        box-shadow: 
+            0 0 40px rgba(59, 130, 246, 0.15),
+            0 20px 60px rgba(0, 0, 0, 0.4),
+            inset 0 1px 0 rgba(255, 255, 255, 0.08);
+    `;
+
+    docElement.innerHTML = `<div style="overflow-y:auto;max-height:540px;padding-right:8px;scrollbar-width:thin;scrollbar-color:rgba(96,165,250,0.3) transparent;">${description}</div>`;
+
+    const accent = document.createElement('div');
+    accent.style.cssText = `
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        height: 3px;
+        background: linear-gradient(90deg, #3b82f6, #06b6d4, #3b82f6);
+        border-radius: 16px 16px 0 0;
+        opacity: 0.8;
+    `;
+    docElement.insertBefore(accent, docElement.firstChild);
+
+    document.body.appendChild(docElement);
+    return docElement;
+}
+
 app.registerExtension({
     name: "ImageAspectRatio",
     async beforeRegisterNodeDef(nodeType, nodeData, app) {
@@ -28,6 +134,8 @@ app.registerExtension({
                 const r = onNodeCreated ? onNodeCreated.apply(this, arguments) : undefined;
                 
                 this.initialized = true;
+                this._imageAspectRatioHelp = false;
+                this._imageAspectRatioLocale = getLocale();
                 
                 this.lastCustomSize = { width: 1328, height: 1328 };
                 this.lastPresetSize = null;
@@ -494,6 +602,110 @@ app.registerExtension({
                     }
                 }, 100);
                 
+                return r;
+            };
+
+            const iconSize = 24;
+            const iconMargin = 4;
+            let helpElement = null;
+            let currentHelpLocale = null;
+
+            const drawFg = nodeType.prototype.onDrawForeground;
+            nodeType.prototype.onDrawForeground = function (ctx) {
+                const currentLocale = getLocale();
+                if (this._imageAspectRatioLocale !== currentLocale) {
+                    this._imageAspectRatioLocale = currentLocale;
+                }
+                
+                const r = drawFg ? drawFg.apply(this, arguments) : undefined;
+                if (this.flags.collapsed) return r;
+
+                const x = this.size[0] - iconSize - iconMargin;
+                const y = -LiteGraph.NODE_TITLE_HEIGHT + (LiteGraph.NODE_TITLE_HEIGHT - iconSize) / 2;
+
+                if (this._imageAspectRatioHelp && helpElement === null) {
+                    currentHelpLocale = currentLocale;
+                    helpElement = createHelpPopup(getDescriptionHTML(), () => {
+                        this._imageAspectRatioHelp = false;
+                        helpElement = null;
+                    });
+                }
+                else if (!this._imageAspectRatioHelp && helpElement !== null) {
+                    helpElement.remove();
+                    helpElement = null;
+                    currentHelpLocale = null;
+                }
+                else if (this._imageAspectRatioHelp && helpElement !== null && currentHelpLocale !== currentLocale) {
+                    helpElement.querySelector('div').innerHTML = getDescriptionHTML();
+                    currentHelpLocale = currentLocale;
+                }
+
+                if (this._imageAspectRatioHelp && helpElement !== null) {
+                    const rect = ctx.canvas.getBoundingClientRect();
+                    const scaleX = rect.width / ctx.canvas.width;
+                    const scaleY = rect.height / ctx.canvas.height;
+
+                    const transform = new DOMMatrix()
+                        .scaleSelf(scaleX, scaleY)
+                        .multiplySelf(ctx.getTransform())
+                        .translateSelf(this.size[0] * scaleX * Math.max(1.0, window.devicePixelRatio), 0)
+                        .translateSelf(10, -32);
+
+                    const bcr = app.canvas.canvas.getBoundingClientRect();
+                    helpElement.style.left = `${transform.e + bcr.x}px`;
+                    helpElement.style.top = `${transform.f + bcr.y}px`;
+                }
+
+                ctx.save();
+                ctx.translate(x, y);
+                ctx.scale(iconSize / 32, iconSize / 32);
+                
+                ctx.beginPath();
+                ctx.arc(16, 16, 14, 0, Math.PI * 2);
+                ctx.fillStyle = this._imageAspectRatioHelp ? 'rgba(59, 130, 246, 0.3)' : 'rgba(59, 130, 246, 0.15)';
+                ctx.fill();
+                
+                ctx.beginPath();
+                ctx.arc(16, 16, 14, 0, Math.PI * 2);
+                ctx.strokeStyle = this._imageAspectRatioHelp ? '#60a5fa' : 'rgba(96, 165, 250, 0.6)';
+                ctx.lineWidth = 2;
+                ctx.stroke();
+                
+                ctx.font = 'bold 24px system-ui';
+                ctx.textAlign = 'center';
+                ctx.textBaseline = 'middle';
+                ctx.fillStyle = this._imageAspectRatioHelp ? '#93c5fd' : '#60a5fa';
+                ctx.fillText('?', 16, 19);
+                
+                ctx.restore();
+                return r;
+            };
+
+            const mouseDown = nodeType.prototype.onMouseDown;
+            nodeType.prototype.onMouseDown = function (e, localPos, canvas) {
+                const r = mouseDown ? mouseDown.apply(this, arguments) : undefined;
+                const iconX = this.size[0] - iconSize - iconMargin;
+                const iconY = -LiteGraph.NODE_TITLE_HEIGHT + (LiteGraph.NODE_TITLE_HEIGHT - iconSize) / 2;
+                if (
+                    localPos[0] > iconX &&
+                    localPos[0] < iconX + iconSize &&
+                    localPos[1] > iconY &&
+                    localPos[1] < iconY + iconSize
+                ) {
+                    this._imageAspectRatioHelp = !this._imageAspectRatioHelp;
+                    return true;
+                }
+                return r;
+            };
+
+            const onRemoved = nodeType.prototype.onRemoved;
+            nodeType.prototype.onRemoved = function () {
+                const r = onRemoved ? onRemoved.apply(this, []) : undefined;
+                if (helpElement) {
+                    helpElement.remove();
+                    helpElement = null;
+                    currentHelpLocale = null;
+                }
                 return r;
             };
         }

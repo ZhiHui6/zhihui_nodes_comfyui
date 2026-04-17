@@ -1,3 +1,5 @@
+import torch
+
 class ImageAspectRatio:
     PRESETS_QWEN = {
         "1:1": {
@@ -338,38 +340,47 @@ class ImageAspectRatio:
                 "custom_width": ("INT", {"default": 1328, "min": 1, "max": 8192, "step": 1}),
                 "custom_height": ("INT", {"default": 1328, "min": 1, "max": 8192, "step": 1}),
                 "aspect_lock": ("BOOLEAN", {"default": False}),
+                "batch_size": ("INT", {"default": 1, "min": 1, "max": 64, "step": 1}),
             }
         }
 
-    RETURN_TYPES = ("INT", "INT")
-    RETURN_NAMES = ("width", "height")
+    RETURN_TYPES = ("INT", "INT", "LATENT")
+    RETURN_NAMES = ("width", "height", "latent")
     FUNCTION = "get_dimensions"
     CATEGORY = "Zhi.AI/Image"
     DESCRIPTION = "Smart image aspect ratio setting node, supporting preset dimensions for multiple models like Qwen, Flux, Wan, SDXL, with quick selection of common ratios or custom sizes"
 
-    def get_dimensions(self, preset_mode, aspect_category, aspect_size, custom_width=1328, custom_height=1328, aspect_lock=False):
+    def get_dimensions(self, preset_mode, aspect_category, aspect_size, custom_width=1328, custom_height=1328, aspect_lock=False, batch_size=1):
         if custom_width is None:
             custom_width = 1328
         if custom_height is None:
             custom_height = 1328
+        if batch_size is None:
+            batch_size = 1
 
         if preset_mode == "Custom Size":
-            return (custom_width, custom_height)
-
-        preset_maps = {
-            "Qwen image": self.PRESETS_QWEN,
-            "Flux": self.PRESETS_FLUX,
-            "Flux.2": self.PRESETS_FLUX2,
-            "Flux2 klein": self.PRESETS_FLUX2_KLEIN,
-            "Wan": self.PRESETS_WAN,
-            "SDXL": self.PRESETS_SD,
-            "LTX2.3": self.PRESETS_LTX2,
-            "Z-image": self.PRESETS_ZIMAGE
-        }
-
-        preset_map = preset_maps.get(preset_mode, self.PRESETS_QWEN)
-
-        if aspect_category in preset_map and aspect_size in preset_map[aspect_category]:
-            return preset_map[aspect_category][aspect_size]
+            width, height = custom_width, custom_height
         else:
-            return (custom_width, custom_height)
+            preset_maps = {
+                "Qwen image": self.PRESETS_QWEN,
+                "Flux": self.PRESETS_FLUX,
+                "Flux.2": self.PRESETS_FLUX2,
+                "Flux2 klein": self.PRESETS_FLUX2_KLEIN,
+                "Wan": self.PRESETS_WAN,
+                "SDXL": self.PRESETS_SD,
+                "LTX2.3": self.PRESETS_LTX2,
+                "Z-image": self.PRESETS_ZIMAGE
+            }
+
+            preset_map = preset_maps.get(preset_mode, self.PRESETS_QWEN)
+
+            if aspect_category in preset_map and aspect_size in preset_map[aspect_category]:
+                width, height = preset_map[aspect_category][aspect_size]
+            else:
+                width, height = custom_width, custom_height
+
+        latent_height = height // 8
+        latent_width = width // 8
+        latent = {"samples": torch.zeros([batch_size, 4, latent_height, latent_width])}
+
+        return (width, height, latent)
