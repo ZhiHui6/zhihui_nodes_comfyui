@@ -32,6 +32,10 @@ const i18n = {
         matchMode: "匹配模式",
         matchColors: "匹配颜色",
         matchTitle: "匹配标题",
+        matchNone: "无匹配",
+        navigateIndicator: "导航指示",
+        show: "显示",
+        hide: "隐藏",
         toggleRestriction: "切换限制",
         restrictionUnlimited: "无限制",
         restrictionAlwaysOne: "始终一个",
@@ -87,6 +91,10 @@ const i18n = {
         matchMode: "Match Mode",
         matchColors: "Match Colors",
         matchTitle: "Match Title",
+        matchNone: "No Match",
+        navigateIndicator: "Navigate Indicator",
+        show: "Show",
+        hide: "Hide",
         toggleRestriction: "Toggle Restriction",
         restrictionUnlimited: "Unlimited",
         restrictionAlwaysOne: "Always One",
@@ -367,13 +375,14 @@ app.registerExtension({
             this._gmmInstanceId = `gmm_${Date.now()}_${Math.random().toString(36).substring(2, 9)}`;
             this.properties = this.properties || {};
             this.properties.groups = this.properties.groups || [];
-            this.properties.selectedColorFilter = this.properties.selectedColorFilter || '';
+            this.properties.selectedColorFilter = this.properties.selectedColorFilter || 'red';
             this.properties.groupOrder = this.properties.groupOrder || [];
             this.properties.groupStatesCache = this.properties.groupStatesCache || {};
             this.properties.switchMode = this.properties.switchMode || 'ignore';
-            this.properties.matchMode = this.properties.matchMode || 'colors';
+            this.properties.matchMode = this.properties.matchMode || 'none';
             this.properties.titleKeywords = this.properties.titleKeywords || '';
             this.properties.toggleRestriction = this.properties.toggleRestriction || 'unlimited';
+            this.properties.showNavigateIndicator = this.properties.showNavigateIndicator !== undefined ? this.properties.showNavigateIndicator : true;
             this.groupReferences = new WeakMap();
             this._processingStack = new Set();
             this.size = [400, 500];
@@ -1458,7 +1467,8 @@ app.registerExtension({
 
             let displayGroups = sortedGroups;
 
-            if (this.properties.matchMode === 'title' && this.properties.titleKeywords) {
+            if (this.properties.matchMode === 'none') {
+            } else if (this.properties.matchMode === 'title' && this.properties.titleKeywords) {
                 const keywords = this.properties.titleKeywords.split(',').map(k => k.trim().toLowerCase()).filter(k => k);
                 if (keywords.length > 0) {
                     displayGroups = displayGroups.filter(group => {
@@ -1466,7 +1476,7 @@ app.registerExtension({
                         return keywords.some(keyword => title.includes(keyword));
                     });
                 }
-            } else if (this.properties.selectedColorFilter) {
+            } else if (this.properties.matchMode === 'colors' && this.properties.selectedColorFilter) {
                 let filterColor = this.properties.selectedColorFilter.trim().toLowerCase();
 
                 if (typeof LGraphCanvas !== 'undefined' && LGraphCanvas.node_colors) {
@@ -1602,9 +1612,9 @@ app.registerExtension({
             if (!listContainer) return;
 
             let filterColors = [];
-            if (this.properties.matchMode === 'title' && this.properties.titleKeywords) {
-                // 标题过滤模式
-            } else if (this.properties.selectedColorFilter) {
+            if (this.properties.matchMode === 'none') {
+            } else if (this.properties.matchMode === 'title' && this.properties.titleKeywords) {
+            } else if (this.properties.matchMode === 'colors' && this.properties.selectedColorFilter) {
                 let filterColor = this.properties.selectedColorFilter.trim().toLowerCase();
                 if (typeof LGraphCanvas !== 'undefined' && LGraphCanvas.node_colors) {
                     if (LGraphCanvas.node_colors[filterColor]) {
@@ -1630,13 +1640,16 @@ app.registerExtension({
 
             const displayGroups = groups.filter(group => {
                 if (!group || !group.title) return false;
-                if (this.properties.matchMode === 'title' && this.properties.titleKeywords) {
+                if (this.properties.matchMode === 'none') {
+                    return true;
+                } else if (this.properties.matchMode === 'title' && this.properties.titleKeywords) {
                     const keywords = this.properties.titleKeywords.split(',').map(k => k.trim().toLowerCase()).filter(k => k);
                     if (keywords.length > 0) {
                         const title = (group.title || '').toLowerCase();
                         return keywords.some(keyword => title.includes(keyword));
                     }
-                } else if (filterColors.length > 0) {
+                    return true;
+                } else if (this.properties.matchMode === 'colors' && filterColors.length > 0) {
                     if (!group.color) return false;
                     let groupColor = group.color.replace("#", "").trim().toLowerCase();
                     if (groupColor.length === 3) {
@@ -1852,6 +1865,7 @@ app.registerExtension({
                  groupConfig.linkage.on_disable?.length > 0);
 
             const groupColor = group?.color || '#888888';
+            const showNavigate = this.properties.showNavigateIndicator !== undefined ? this.properties.showNavigateIndicator : true;
 
             item.innerHTML = `
                 <div class="gmm-group-header">
@@ -1879,7 +1893,7 @@ app.registerExtension({
                             <path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"></path>
                         </svg>
                     </div>
-                    <div class="gmm-navigate-button">
+                    <div class="gmm-navigate-button" style="display: ${showNavigate ? 'flex' : 'none'};">
                         <svg viewBox="0 0 24 24" fill="none" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
                             <path d="M5 12h14m-7-7l7 7-7 7"/>
                         </svg>
@@ -2140,6 +2154,15 @@ app.registerExtension({
             canvas.setDirty(true, true);
         };
 
+        nodeType.prototype.updateNavigateButtons = function () {
+            if (!this.customUI) return;
+            const showNavigate = this.properties.showNavigateIndicator !== undefined ? this.properties.showNavigateIndicator : true;
+            const navigateButtons = this.customUI.querySelectorAll('.gmm-navigate-button');
+            navigateButtons.forEach(btn => {
+                btn.style.display = showNavigate ? 'flex' : 'none';
+            });
+        };
+
         nodeType.prototype.applyLinkage = function (groupName, enabled) {
             const config = this.properties.groups.find(g => g.group_name === groupName);
             if (!config || !config.linkage) return;
@@ -2160,9 +2183,10 @@ app.registerExtension({
             const locale = getLocale();
             const currentMode = this.properties.switchMode || 'ignore';
             const currentRestriction = this.properties.toggleRestriction || 'unlimited';
-            const currentMatchMode = this.properties.matchMode || 'colors';
+            const currentMatchMode = this.properties.matchMode || 'none';
             const currentColorFilter = this.properties.selectedColorFilter || '';
             const currentTitleKeywords = this.properties.titleKeywords || '';
+            const currentShowNavigateIndicator = this.properties.showNavigateIndicator !== undefined ? this.properties.showNavigateIndicator : true;
 
             const modeOptions = [
                 { value: 'ignore', label: t('modeDisable') },
@@ -2175,12 +2199,12 @@ app.registerExtension({
             ];
 
             const matchModeOptions = [
+                { value: 'none', label: t('matchNone') },
                 { value: 'colors', label: t('matchColors') },
                 { value: 'title', label: t('matchTitle') }
             ];
 
             const colorOptions = [
-                { value: '', label: t('allColors') },
                 { value: 'red', label: t('colorRed'), color: '#c44' },
                 { value: 'brown', label: t('colorBrown'), color: '#a52a2a' },
                 { value: 'green', label: t('colorGreen'), color: '#2e8b57' },
@@ -2190,6 +2214,11 @@ app.registerExtension({
                 { value: 'purple', label: t('colorPurple'), color: '#9370db' },
                 { value: 'yellow', label: t('colorYellow'), color: '#f0e68c' },
                 { value: 'black', label: t('colorBlack'), color: '#333333' }
+            ];
+
+            const navigateIndicatorOptions = [
+                { value: 'true', label: t('show') },
+                { value: 'false', label: t('hide') }
             ];
 
             const createDropdownHTML = (id, options, currentValue) => {
@@ -2234,6 +2263,10 @@ app.registerExtension({
                     <div class="gmm-settings-dialog-item" id="gmm-dialog-title-item" style="display: ${currentMatchMode === 'title' ? 'flex' : 'none'};">
                         <span class="gmm-settings-dialog-label">${t('matchTitle')}</span>
                         <input type="text" class="gmm-title-match-input" id="gmm-dialog-title-keywords" placeholder="${t('matchTitlePlaceholder')}" value="${currentTitleKeywords}">
+                    </div>
+                    <div class="gmm-settings-dialog-item">
+                        <span class="gmm-settings-dialog-label">${t('navigateIndicator')}</span>
+                        ${createDropdownHTML('gmm-dialog-navigate-indicator', navigateIndicatorOptions, String(currentShowNavigateIndicator))}
                     </div>
                 </div>
                 <div class="gmm-dialog-footer">
@@ -2284,6 +2317,7 @@ app.registerExtension({
                 if (filterItem) filterItem.style.display = value === 'colors' ? 'flex' : 'none';
                 if (titleItem) titleItem.style.display = value === 'title' ? 'flex' : 'none';
             });
+            setupDropdown('gmm-dialog-navigate-indicator', 'showNavigateIndicator');
 
             const closeDialog = () => {
                 dialog.classList.add('closing');
@@ -2300,8 +2334,10 @@ app.registerExtension({
                 this.properties.matchMode = dialog.querySelector('#gmm-dialog-match-mode').getAttribute('data-value');
                 this.properties.selectedColorFilter = dialog.querySelector('#gmm-dialog-color-filter').getAttribute('data-value');
                 this.properties.titleKeywords = dialog.querySelector('#gmm-dialog-title-keywords').value;
+                this.properties.showNavigateIndicator = dialog.querySelector('#gmm-dialog-navigate-indicator').getAttribute('data-value') === 'true';
                 this.updateModeIndicator();
                 this.refreshWidgets();
+                this.updateNavigateButtons();
                 closeDialog();
             });
 
@@ -2610,12 +2646,12 @@ app.registerExtension({
 
             colorFilterMenu.innerHTML = allItems;
 
-            const validValues = ['', ...builtinColors];
+            const validValues = [...builtinColors];
             if (currentValue && !validValues.includes(currentValue)) {
-                colorFilterDropdown.setAttribute('data-value', '');
-                this.properties.selectedColorFilter = '';
+                colorFilterDropdown.setAttribute('data-value', 'red');
+                this.properties.selectedColorFilter = 'red';
                 const triggerText = colorFilterDropdown.querySelector('.gmm-dropdown-text');
-                if (triggerText) triggerText.textContent = t('allColors');
+                if (triggerText) triggerText.textContent = t('colorRed');
             }
 
             this.bindColorFilterEvents();
@@ -2649,7 +2685,7 @@ app.registerExtension({
         };
 
         nodeType.prototype.getColorDisplayName = function (color) {
-            if (!color) return t('allColors');
+            if (!color) return t('colorRed');
 
             const colorMap = {
                 'red': 'colorRed',
@@ -2690,9 +2726,10 @@ app.registerExtension({
             const data = onSerialize?.apply?.(this, arguments);
 
             info.groups = this.properties.groups || [];
-            info.selectedColorFilter = this.properties.selectedColorFilter || '';
+            info.selectedColorFilter = this.properties.selectedColorFilter || 'red';
             info.groupOrder = this.properties.groupOrder || [];
             info.switchMode = this.properties.switchMode || 'ignore';
+            info.showNavigateIndicator = this.properties.showNavigateIndicator !== undefined ? this.properties.showNavigateIndicator : true;
 
             return data;
         };
@@ -2708,7 +2745,7 @@ app.registerExtension({
             if (info.selectedColorFilter !== undefined && typeof info.selectedColorFilter === 'string') {
                 this.properties.selectedColorFilter = info.selectedColorFilter;
             } else {
-                this.properties.selectedColorFilter = '';
+                this.properties.selectedColorFilter = 'red';
             }
 
             if (info.groupOrder && Array.isArray(info.groupOrder)) {
@@ -2723,14 +2760,21 @@ app.registerExtension({
                 this.properties.switchMode = 'ignore';
             }
 
+            if (info.showNavigateIndicator !== undefined) {
+                this.properties.showNavigateIndicator = info.showNavigateIndicator;
+            } else {
+                this.properties.showNavigateIndicator = true;
+            }
+
             if (this.customUI) {
                 setTimeout(() => {
                     this.refreshColorFilter();
                     this.updateGroupsList();
+                    this.updateNavigateButtons();
 
                     const colorFilterDropdown = this.customUI.querySelector('#gmm-color-filter-dropdown');
                     if (colorFilterDropdown) {
-                        const colorValue = this.properties.selectedColorFilter || '';
+                        const colorValue = this.properties.selectedColorFilter || 'red';
                         colorFilterDropdown.setAttribute('data-value', colorValue);
                         const colorItems = colorFilterDropdown.querySelectorAll('.gmm-dropdown-item');
                         colorItems.forEach(item => {
