@@ -1,0 +1,21 @@
+{
+  "天际线": "city",
+  "城市风景": "cityscape",
+  "街道": "street",
+  "市中心": "downtown",
+  "人群": "crowd",
+  "小巷": "alleyway",
+  "大道": "in_main_street",
+  "路口": "Intersection",
+  "草坪": "lawn",
+  "路径": "path",
+  "路面": "pavement",
+  "路标": "road_sign",
+  "路障": "traffic_cone",
+  "路灯": "lamppost",
+  "灯柱": "lamppost",
+  "电线杆和电线": "power_lines",
+  "长凳": "bench",
+  "自动贩卖机": "vending_machine",
+  "摩天楼": "Skyscraper"
+}

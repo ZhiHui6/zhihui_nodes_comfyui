@@ -1,0 +1,17 @@
+{
+  "吸血鬼": "vampire",
+  "狼人": "werewolf",
+  "僵尸": "zombie",
+  "幽灵": "ghost",
+  "恶魔": "demon",
+  "天使": "angel",
+  "死神": "death",
+  "巫妖": "lich",
+  "巫婆": "witch",
+  "巫师": "wizard",
+  "魔法师": "mage",
+  "术士": "warlock",
+  "牧师": "priest",
+  "圣骑士": "paladin",
+  "德鲁伊": "druid"
+}

@@ -1,0 +1,14 @@
+{
+  "多角度": "multiple_angles",
+  "分屏显示": "split_screen",
+  "画中画": "picture_in_picture",
+  "审核过的/有码": "censored",
+  "未审核的/无码": "uncensored",
+  "无脸男": "faceless_male",
+  "血": "blood",
+  "第一人称视角": "pov",
+  "主观视角": "subjective_view",
+  "第三人称视角": "third_person_view",
+  "透明效果": "transparency_effect",
+  "X光效果": "x_ray_effect"
+}

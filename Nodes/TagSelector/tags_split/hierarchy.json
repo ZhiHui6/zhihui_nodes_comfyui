@@ -1,0 +1,953 @@
+{
+  "常规标签": {
+    "file": "general_tags.json",
+    "children": {
+      "画质": {
+        "file": "quality.json",
+        "children": null
+      },
+      "负面标签": {
+        "file": "negative_tags.json",
+        "children": null
+      },
+      "摄影": {
+        "file": "photography.json",
+        "children": null
+      },
+      "光影": {
+        "file": "light_shadow.json",
+        "children": null
+      },
+      "构图": {
+        "file": "composition.json",
+        "children": null
+      },
+      "商业摄影": {
+        "file": "commercial_photography.json",
+        "children": null
+      }
+    }
+  },
+  "艺术题材": {
+    "file": "art_themes.json",
+    "children": {
+      "技法形式": {
+        "file": "techniques.json",
+        "children": null
+      },
+      "艺术家风格": {
+        "file": "artist_styles.json",
+        "children": null
+      },
+      "艺术流派": {
+        "file": "art_movements.json",
+        "children": null
+      },
+      "媒介与效果": {
+        "file": "media_effects.json",
+        "children": null
+      },
+      "装饰图案": {
+        "file": "decorative_patterns.json",
+        "children": null
+      },
+      "色彩与质感": {
+        "file": "color_texture.json",
+        "children": null
+      },
+      "国风": {
+        "file": "chinese_traditional.json",
+        "children": null
+      }
+    }
+  },
+  "人物类": {
+    "file": "character.json",
+    "children": {
+      "国籍": {
+        "file": "nationality.json",
+        "children": {
+          "亚洲": {
+            "file": "asia.json",
+            "children": {
+              "东亚": {
+                "file": "east_asia.json",
+                "children": null
+              },
+              "东南亚": {
+                "file": "southeast_asia.json",
+                "children": null
+              },
+              "南亚": {
+                "file": "south_asia.json",
+                "children": null
+              },
+              "西亚/中东": {
+                "file": "west_asia_middle_east.json",
+                "children": null
+              },
+              "中亚": {
+                "file": "central_asia.json",
+                "children": null
+              }
+            }
+          },
+          "欧洲": {
+            "file": "europe.json",
+            "children": {
+              "北欧": {
+                "file": "northern_europe.json",
+                "children": null
+              },
+              "西欧": {
+                "file": "western_europe.json",
+                "children": null
+              },
+              "中欧": {
+                "file": "central_europe.json",
+                "children": null
+              },
+              "南欧": {
+                "file": "southern_europe.json",
+                "children": null
+              },
+              "东欧": {
+                "file": "eastern_europe.json",
+                "children": null
+              }
+            }
+          },
+          "非洲": {
+            "file": "africa.json",
+            "children": {
+              "北非": {
+                "file": "north_africa.json",
+                "children": null
+              },
+              "西非": {
+                "file": "west_africa.json",
+                "children": null
+              },
+              "中非": {
+                "file": "central_africa.json",
+                "children": null
+              },
+              "东非": {
+                "file": "east_africa.json",
+                "children": null
+              },
+              "南非": {
+                "file": "southern_africa.json",
+                "children": null
+              }
+            }
+          },
+          "北美洲": {
+            "file": "north_america.json",
+            "children": {
+              "北美": {
+                "file": "north_america_region.json",
+                "children": null
+              },
+              "中美洲": {
+                "file": "central_america.json",
+                "children": null
+              },
+              "加勒比海地区": {
+                "file": "caribbean.json",
+                "children": null
+              }
+            }
+          },
+          "南美洲": {
+            "file": "south_america.json",
+            "children": {
+              "南美": {
+                "file": "south_america_region.json",
+                "children": null
+              }
+            }
+          },
+          "大洋洲": {
+            "file": "oceania.json",
+            "children": {
+              "澳大利亚和新西兰": {
+                "file": "australia_new_zealand.json",
+                "children": null
+              },
+              "美拉尼西亚": {
+                "file": "melanesia.json",
+                "children": null
+              },
+              "密克罗尼西亚": {
+                "file": "micronesia.json",
+                "children": null
+              },
+              "波利尼西亚": {
+                "file": "polynesia.json",
+                "children": null
+              }
+            }
+          },
+          "极地地区": {
+            "file": "polar_regions.json",
+            "children": {
+              "北极地区": {
+                "file": "arctic.json",
+                "children": null
+              },
+              "南极地区": {
+                "file": "antarctic.json",
+                "children": null
+              }
+            }
+          },
+          "特殊地区": {
+            "file": "special_regions.json",
+            "children": {
+              "海外领地": {
+                "file": "overseas_territories.json",
+                "children": null
+              }
+            }
+          }
+        }
+      },
+      "外貌与特征": {
+        "file": "appearance_features.json",
+        "children": null
+      },
+      "角色": {
+        "file": "characters.json",
+        "children": {
+          "动漫角色": {
+            "file": "anime_characters.json",
+            "children": {
+              "《原神》": {
+                "file": "genshin_impact.json",
+                "children": null
+              },
+              "《崩坏：星穹铁道》": {
+                "file": "honkai_star_rail.json",
+                "children": null
+              },
+              "《崩坏3》": {
+                "file": "honkai_impact_3rd.json",
+                "children": null
+              },
+              "《Fate》": {
+                "file": "fate_series.json",
+                "children": null
+              },
+              "《火影忍者》": {
+                "file": "naruto.json",
+                "children": null
+              },
+              "《海贼王》": {
+                "file": "one_piece.json",
+                "children": null
+              },
+              "《鬼灭之刃》": {
+                "file": "demon_slayer.json",
+                "children": null
+              },
+              "《咒术回战》": {
+                "file": "jujutsu_kaisen.json",
+                "children": null
+              },
+              "《进击的巨人》": {
+                "file": "attack_on_titan.json",
+                "children": null
+              },
+              "《我的英雄学院》": {
+                "file": "my_hero_academia.json",
+                "children": null
+              },
+              "《刀剑神域》": {
+                "file": "sword_art_online.json",
+                "children": null
+              },
+              "《Re:从零开始的异世界生活》": {
+                "file": "re_zero.json",
+                "children": null
+              },
+              "《约会大作战》": {
+                "file": "date_a_live.json",
+                "children": null
+              },
+              "《魔法少女小圆》": {
+                "file": "madoka_magica.json",
+                "children": null
+              },
+              "《EVA》": {
+                "file": "evangelion.json",
+                "children": null
+              },
+              "《凉宫春日的忧郁》": {
+                "file": "haruhi_suzumiya.json",
+                "children": null
+              },
+              "《美少女战士》": {
+                "file": "sailor_moon.json",
+                "children": null
+              },
+              "《龙珠》": {
+                "file": "dragon_ball.json",
+                "children": null
+              },
+              "《名侦探柯南》": {
+                "file": "detective_conan.json",
+                "children": null
+              },
+              "《哆啦A梦》": {
+                "file": "doraemon.json",
+                "children": null
+              },
+              "《宝可梦》": {
+                "file": "pokemon.json",
+                "children": null
+              },
+              "《钢之炼金术师》": {
+                "file": "fullmetal_alchemist.json",
+                "children": null
+              },
+              "《死亡笔记》": {
+                "file": "death_note.json",
+                "children": null
+              },
+              "《银魂》": {
+                "file": "gintama.json",
+                "children": null
+              },
+              "《家庭教师》": {
+                "file": "reborn.json",
+                "children": null
+              },
+              "《妖精的尾巴》": {
+                "file": "fairy_tail.json",
+                "children": null
+              }
+            }
+          },
+          "游戏角色": {
+            "file": "game_characters.json",
+            "children": {
+              "《最终幻想》": {
+                "file": "final_fantasy.json",
+                "children": null
+              },
+              "《尼尔：机械纪元》": {
+                "file": "nier_automata.json",
+                "children": null
+              },
+              "《生化危机》": {
+                "file": "resident_evil.json",
+                "children": null
+              },
+              "《巫师3：狂猎》": {
+                "file": "the_witcher.json",
+                "children": null
+              },
+              "《黑暗之魂》": {
+                "file": "dark_souls.json",
+                "children": null
+              },
+              "《只狼：影逝二度》": {
+                "file": "sekiro.json",
+                "children": null
+              },
+              "《艾尔登法环》": {
+                "file": "elden_ring.json",
+                "children": null
+              },
+              "《赛博朋克2077》": {
+                "file": "cyberpunk_2077.json",
+                "children": null
+              },
+              "《守望先锋》": {
+                "file": "overwatch.json",
+                "children": null
+              },
+              "《英雄联盟》": {
+                "file": "league_of_legends.json",
+                "children": null
+              },
+              "《王者荣耀》": {
+                "file": "honor_of_kings.json",
+                "children": null
+              },
+              "《明日方舟》": {
+                "file": "arknights.json",
+                "children": null
+              },
+              "《碧蓝航线》": {
+                "file": "azur_lane.json",
+                "children": null
+              },
+              "《少女前线》": {
+                "file": "girls_frontline.json",
+                "children": null
+              },
+              "《街头霸王》": {
+                "file": "street_fighter.json",
+                "children": null
+              },
+              "《拳皇》": {
+                "file": "king_of_fighters.json",
+                "children": null
+              },
+              "《铁拳》": {
+                "file": "tekken.json",
+                "children": null
+              },
+              "《死或生》": {
+                "file": "dead_or_alive.json",
+                "children": null
+              },
+              "《罪恶装备》": {
+                "file": "guilty_gear.json",
+                "children": null
+              },
+              "《月姬格斗》": {
+                "file": "melty_blood.json",
+                "children": null
+              },
+              "《苍翼默示录》": {
+                "file": "blazblue.json",
+                "children": null
+              },
+              "《第五人格》": {
+                "file": "identity_v.json",
+                "children": null
+              }
+            }
+          },
+          "二次元虚拟偶像": {
+            "file": "virtual_idols.json",
+            "children": null
+          },
+          "3D动画角色": {
+            "file": "3d_animation_characters.json",
+            "children": {
+              "《RWBY》": {
+                "file": "rwby.json",
+                "children": null
+              },
+              "《爱死机》": {
+                "file": "love_death_robots.json",
+                "children": null
+              },
+              "《蜘蛛侠：平行宇宙》": {
+                "file": "spider_verse.json",
+                "children": null
+              },
+              "《冰雪奇缘》": {
+                "file": "frozen.json",
+                "children": null
+              },
+              "《疯狂动物城》": {
+                "file": "zootopia.json",
+                "children": null
+              },
+              "《寻梦环游记》": {
+                "file": "coco.json",
+                "children": null
+              },
+              "《玩具总动员》": {
+                "file": "toy_story.json",
+                "children": null
+              },
+              "《怪物公司》": {
+                "file": "monsters_inc.json",
+                "children": null
+              },
+              "《超人总动员》": {
+                "file": "the_incredibles.json",
+                "children": null
+              },
+              "《料理鼠王》": {
+                "file": "ratatouille.json",
+                "children": null
+              },
+              "《飞屋环游记》": {
+                "file": "up.json",
+                "children": null
+              },
+              "《头脑特工队》": {
+                "file": "inside_out.json",
+                "children": null
+              },
+              "《疯狂原始人》": {
+                "file": "the_croods.json",
+                "children": null
+              },
+              "《驯龙高手》": {
+                "file": "how_to_train_your_dragon.json",
+                "children": null
+              },
+              "《功夫熊猫》": {
+                "file": "kung_fu_panda.json",
+                "children": null
+              },
+              "《马达加斯加》": {
+                "file": "madagascar.json",
+                "children": null
+              },
+              "《怪物史莱克》": {
+                "file": "shrek.json",
+                "children": null
+              },
+              "《卑鄙的我》": {
+                "file": "despicable_me.json",
+                "children": null
+              },
+              "《无敌破坏王》": {
+                "file": "wreck_it_ralph.json",
+                "children": null
+              },
+              "《海洋奇缘》": {
+                "file": "moana.json",
+                "children": null
+              },
+              "《魔发奇缘》": {
+                "file": "tangled.json",
+                "children": null
+              },
+              "《勇敢传说》": {
+                "file": "brave.json",
+                "children": null
+              },
+              "《小美人鱼》": {
+                "file": "the_little_mermaid.json",
+                "children": null
+              },
+              "《美女与野兽》": {
+                "file": "beauty_and_the_beast.json",
+                "children": null
+              },
+              "《阿拉丁》": {
+                "file": "aladdin.json",
+                "children": null
+              },
+              "《狮子王》": {
+                "file": "the_lion_king.json",
+                "children": null
+              }
+            }
+          }
+        }
+      },
+      "人设": {
+        "file": "character_design.json",
+        "children": {
+          "职业": {
+            "file": "profession.json",
+            "children": null
+          },
+          "性别/年龄": {
+            "file": "gender_age.json",
+            "children": null
+          },
+          "胸部": {
+            "file": "chest.json",
+            "children": null
+          },
+          "脸型": {
+            "file": "face_shape.json",
+            "children": null
+          },
+          "鼻子": {
+            "file": "nose.json",
+            "children": null
+          },
+          "嘴巴": {
+            "file": "mouth.json",
+            "children": null
+          },
+          "皮肤": {
+            "file": "skin.json",
+            "children": null
+          },
+          "体型": {
+            "file": "body_type.json",
+            "children": null
+          },
+          "眉毛": {
+            "file": "eyebrows.json",
+            "children": null
+          },
+          "头发": {
+            "file": "hair.json",
+            "children": {
+              "颜色": {
+                "file": "color.json",
+                "children": null
+              },
+              "长度": {
+                "file": "length.json",
+                "children": null
+              },
+              "马尾": {
+                "file": "ponytail.json",
+                "children": null
+              },
+              "辫子": {
+                "file": "braids.json",
+                "children": null
+              },
+              "刘海": {
+                "file": "bangs.json",
+                "children": null
+              },
+              "其他": {
+                "file": "other.json",
+                "children": null
+              }
+            }
+          },
+          "眼睛": {
+            "file": "eyes.json",
+            "children": null
+          },
+          "瞳孔": {
+            "file": "pupils.json",
+            "children": null
+          }
+        }
+      },
+      "服饰": {
+        "file": "clothing.json",
+        "children": {
+          "常服": {
+            "file": "casual_clothes.json",
+            "children": {
+              "上装": {
+                "file": "tops.json",
+                "children": null
+              },
+              "下装": {
+                "file": "bottoms.json",
+                "children": null
+              },
+              "泳装": {
+                "file": "swimwear.json",
+                "children": null
+              },
+              "运动装": {
+                "file": "sportswear.json",
+                "children": null
+              },
+              "内衣": {
+                "file": "underwear.json",
+                "children": null
+              },
+              "配饰": {
+                "file": "accessories.json",
+                "children": null
+              },
+              "鞋类": {
+                "file": "footwear.json",
+                "children": null
+              },
+              "睡衣": {
+                "file": "sleepwear.json",
+                "children": null
+              },
+              "帽子": {
+                "file": "hats.json",
+                "children": null
+              },
+              "连袜裤": {
+                "file": "tights.json",
+                "children": null
+              },
+              "围巾": {
+                "file": "scarves.json",
+                "children": null
+              },
+              "丝袜": {
+                "file": "stockings.json",
+                "children": null
+              },
+              "深V": {
+                "file": "deep_v.json",
+                "children": null
+              },
+              "包臀": {
+                "file": "bodycon.json",
+                "children": null
+              },
+              "蕾丝": {
+                "file": "lace.json",
+                "children": null
+              },
+              "裙子": {
+                "file": "dresses.json",
+                "children": null
+              }
+            }
+          },
+          "制服COS": {
+            "file": "uniform_cosplay.json",
+            "children": null
+          },
+          "传统服饰": {
+            "file": "traditional_clothing.json",
+            "children": null
+          }
+        }
+      },
+      "情景": {
+        "file": "scenarios.json",
+        "children": null
+      },
+      "动作/表情": {
+        "file": "actions_expressions.json",
+        "children": {
+          "姿态动作": {
+            "file": "posture_actions.json",
+            "children": null
+          },
+          "多人互动": {
+            "file": "multi_person_interaction.json",
+            "children": null
+          },
+          "手部": {
+            "file": "hands.json",
+            "children": null
+          },
+          "腿部": {
+            "file": "legs.json",
+            "children": null
+          },
+          "眼神": {
+            "file": "eye_contact.json",
+            "children": null
+          },
+          "表情": {
+            "file": "expressions.json",
+            "children": {
+              "正面情绪": {
+                "file": "positive_emotions.json",
+                "children": null
+              },
+              "负面情绪": {
+                "file": "negative_emotions.json",
+                "children": null
+              },
+              "其他": {
+                "file": "other.json",
+                "children": null
+              },
+              "嘴型": {
+                "file": "mouth_shapes.json",
+                "children": null
+              }
+            }
+          }
+        }
+      },
+      "道具": {
+        "file": "props.json",
+        "children": {
+          "翅膀": {
+            "file": "wings.json",
+            "children": null
+          },
+          "尾巴": {
+            "file": "tails.json",
+            "children": null
+          },
+          "耳朵": {
+            "file": "ears.json",
+            "children": null
+          },
+          "角": {
+            "file": "horns.json",
+            "children": null
+          }
+        }
+      }
+    }
+  },
+  "场景类": {
+    "file": "scene.json",
+    "children": {
+      "室外": {
+        "file": "outdoor.json",
+        "children": null
+      },
+      "城市": {
+        "file": "city.json",
+        "children": null
+      },
+      "建筑": {
+        "file": "architecture.json",
+        "children": null
+      },
+      "室内装饰": {
+        "file": "interior_decor.json",
+        "children": null
+      },
+      "自然景观": {
+        "file": "natural_scenery.json",
+        "children": null
+      },
+      "人造景观": {
+        "file": "man_made_scenery.json",
+        "children": null
+      },
+      "光线环境": {
+        "file": "lighting_environment.json",
+        "children": null
+      },
+      "背景环境": {
+        "file": "background_environment.json",
+        "children": null
+      },
+      "反射效果": {
+        "file": "reflection_effects.json",
+        "children": null
+      },
+      "情感与氛围": {
+        "file": "emotion_atmosphere.json",
+        "children": null
+      }
+    }
+  },
+  "灵感套装": {
+    "file": "inspiration_sets.json",
+    "children": {
+      "潪佳精选": {
+        "file": "zhijia_selection.json",
+        "children": null
+      },
+      "成人题材": {
+        "file": "adult_themes.json",
+        "children": null
+      }
+    }
+  },
+  "涩影湿": {
+    "file": "nsfw_tags.json",
+    "children": {
+      "性暗示": {
+        "file": "teasing.json",
+        "children": null
+      },
+      "性行为": {
+        "file": "nsfw.json",
+        "children": {
+          "性行为类型": {
+            "file": "sex_types.json",
+            "children": null
+          },
+          "身体部位": {
+            "file": "body_parts.json",
+            "children": null
+          },
+          "道具与玩具": {
+            "file": "toys_props.json",
+            "children": null
+          },
+          "束缚与调教": {
+            "file": "bondage_training.json",
+            "children": null
+          },
+          "特殊癖好与情境": {
+            "file": "special_fetishes.json",
+            "children": null
+          },
+          "视觉风格与特定元素": {
+            "file": "visual_styles.json",
+            "children": null
+          },
+          "欲望表情": {
+            "file": "desire_expressions.json",
+            "children": null
+          }
+        }
+      }
+    }
+  },
+  "动物生物": {
+    "file": "animals_creatures.json",
+    "children": {
+      "动物": {
+        "file": "animals.json",
+        "children": {
+          "哺乳动物": {
+            "file": "mammals.json",
+            "children": null
+          },
+          "鸟类": {
+            "file": "birds.json",
+            "children": null
+          },
+          "爬行动物": {
+            "file": "reptiles.json",
+            "children": null
+          },
+          "两栖动物": {
+            "file": "amphibians.json",
+            "children": null
+          },
+          "鱼类": {
+            "file": "fish.json",
+            "children": null
+          },
+          "昆虫": {
+            "file": "insects.json",
+            "children": null
+          },
+          "家养动物": {
+            "file": "domestic_animals.json",
+            "children": null
+          }
+        }
+      },
+      "幻想生物": {
+        "file": "fantasy_creatures.json",
+        "children": {
+          "龙类": {
+            "file": "dragons.json",
+            "children": null
+          },
+          "神话生物": {
+            "file": "mythical_creatures.json",
+            "children": null
+          },
+          "幻想动物": {
+            "file": "fantasy_animals.json",
+            "children": null
+          },
+          "外星生物": {
+            "file": "alien_creatures.json",
+            "children": null
+          },
+          "超自然生物": {
+            "file": "supernatural_creatures.json",
+            "children": null
+          },
+          "科幻生物": {
+            "file": "sci_fi_creatures.json",
+            "children": null
+          }
+        }
+      },
+      "行为动态": {
+        "file": "behavior_dynamics.json",
+        "children": {
+          "动物行为": {
+            "file": "animal_behavior.json",
+            "children": null
+          },
+          "幻想生物行为": {
+            "file": "fantasy_creature_behavior.json",
+            "children": null
+          }
+        }
+      }
+    }
+  }
+}

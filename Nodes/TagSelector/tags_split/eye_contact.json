@@ -1,0 +1,19 @@
+{
+  "面向镜头": "facing_viewer",
+  "看向镜头": "looking_at_viewer",
+  "眼神接触": "eye-contact",
+  "盯着看": "eyeball",
+  "凝视": "staring",
+  "回眸": "looking_back",
+  "人物倾斜": "gradient",
+  "人物视角向下看↘": "looking_down",
+  "人物视角抬头看↗": "looking_up",
+  "面向别处": "facing_away",
+  "看向侧面": "looking_to_the_side",
+  "看着别处": "looking_away",
+  "遥望": "looking_afar",
+  "向外看": "looking_outside",
+  "歪头": "head_tilt",
+  "低头": "head_down",
+  "照镜子": "looking_at_mirror"
+}

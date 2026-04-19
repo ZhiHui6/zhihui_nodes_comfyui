@@ -1,0 +1,20 @@
+{
+  "滤镜效果": "filter_effect",
+  "夜视效果": "night_vision",
+  "红外效果": "infrared_effect",
+  "镜像效果": "mirror_effect",
+  "反射效果": "reflection_effect",
+  "淡入淡出": "fade_in_out",
+  "溶解效果": "dissolve_effect",
+  "模糊效果": "blur_effect",
+  "锐化效果": "sharpen_effect",
+  "万花筒效果": "kaleidoscope_effect",
+  "棱镜效果": "prism_effect",
+  "胶片滤镜": "Analog Film",
+  "电影质感": "Cinematic",
+  "胶片电影": "Celluloid",
+  "复古风格": "Retro Style",
+  "杂志封面": "Magazine Cover",
+  "海报": "Poster",
+  "拍立得": "Polaroid"
+}

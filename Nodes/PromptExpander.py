@@ -45,7 +45,7 @@ class PromptExpander:
         return {
             "required": {
                 "platform": (platforms, {"default": "auto"}),
-                "writing_style": (["Natural", "Tag", "Custom"], {"default": "Natural"}),
+                "writing_style": (["Natural", "Tag", "JSON", "Custom"], {"default": "Natural"}),
                 "output_language": (["English", "Chinese"], {"default": "English"}),
                 "max_tokens": ("INT", {"default": 2048, "min": 256, "max": 8192, "step": 256}),
                 "prompt": ("STRING", {"default": "", "multiline": True}),
@@ -125,7 +125,47 @@ class PromptExpander:
 7. 技术标签：构图方式、镜头参数、渲染技术等
 8. 保持原意的同时，通过标签组合实现创造性的视觉延伸
 9. {lang_instruction}
-10. 输出格式：只输出标签组合，使用英文逗号分隔，不要解释"""
+10. 输出格式：只输出标签组合，使用英文逗号分隔，不要解释""",
+
+            "JSON": f"""你是一位精通AI绘画提示词结构化设计的专家，擅长将描述转化为结构清晰的JSON格式提示词。
+
+你的任务是将用户的描述转化为结构化的JSON格式，便于程序解析和处理。
+
+输出JSON结构说明：
+{{
+    "quality": ["画质相关标签，如masterpiece, best quality, highly detailed等"],
+    "subject": {{
+        "main": "主体描述，如人物、物体、场景等",
+        "appearance": ["外观特征，如发型、肤色、体型等"],
+        "clothing": ["服装描述"],
+        "accessories": ["配饰描述"],
+        "pose": ["姿态动作"],
+        "expression": ["表情描述"]
+    }},
+    "environment": {{
+        "location": "场景位置",
+        "lighting": ["光线效果"],
+        "atmosphere": ["氛围描述"],
+        "background": ["背景元素"]
+    }},
+    "style": {{
+        "art_style": ["艺术风格，如写实、动漫、油画等"],
+        "technique": ["技法，如水彩、素描、3D渲染等"],
+        "color_palette": ["色彩风格"]
+    }},
+    "technical": {{
+        "composition": ["构图方式"],
+        "camera": ["镜头参数"],
+        "rendering": ["渲染技术"]
+    }}
+}}
+
+扩写原则：
+1. 根据用户描述的内容，智能填充JSON结构的各个字段
+2. 如果某些字段不适用，可以省略或设为空数组
+3. 标签使用英文，描述性文字根据输出语言选择
+4. {lang_instruction}
+5. 输出格式：只输出JSON对象，不要添加任何解释或markdown代码块标记"""
         }
         return prompts.get(writing_style, prompts["Natural"])
 

@@ -1178,3 +1178,5 @@ app.registerExtension({
         watchLanguageChanges();
     }
 });
+
+window.openZhihuiApiSettings = openSettings;

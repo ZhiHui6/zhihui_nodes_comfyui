@@ -1,4 +1,38 @@
-# 更新日志
+# 更新日志 / Changelog
+
+## 1.0.31 2026-4-19
+- 标签选择器节点(TagSelector):
+  - 主节点界面添加帮助按钮，可显示节点信息
+  - 新增标签的权重调节功能
+  - 新增“随机权重方案”预设，包含16个预设
+  - 调整成人内容为默认关闭
+  - 标签选择界面更改为只能通过关闭按钮退出
+  - 新增扩写风格选项"结构化JSON"
+  <br> 
+  - TagSelector node:
+  - Added help button to main node interface to display node information
+  - Added tag weight adjustment feature
+  - Added "Random Weight Presets" with 16 preset options
+  - Set adult content to disabled by default
+  - Changed tag selection interface to only exit via close button
+  - Added expansion style option "Structured JSON"
+
+## 1.0.30 2026-4-17
+- 图像宽高比节点(ImageAspectRatio): 扩展图像宽高比节点功能，支持设置批量大小和输出潜空间张量
+- 组开关管理器节点(GroupSwitchManager)：
+  - 匹配模式新增"无匹配"选项，默认显示所有组
+  - 颜色过滤移除"所有"选项
+  - 设置中新增"导航指示"选项，可控制导航按钮的显示/隐藏
+- 标签选择器节点(TagSelectorRandomGenerator):
+  - 优化随机标签生成逻辑
+  <br>
+  - ImageAspectRatio node: Extended functionality to support batch size setting and latent space tensor output
+- GroupSwitchManager node:
+  - Added "No Match" option to match mode, displaying all groups by default
+  - Removed "All" option from color filter
+  - Added "Navigation Indicator" option in settings to control navigation button visibility
+- TagSelectorRandomGenerator node:
+  - Optimized random tag generation logic
 
 ## 1.0.29 2026-4-15
 - 组开关管理器节点(GroupSwitchManager)：

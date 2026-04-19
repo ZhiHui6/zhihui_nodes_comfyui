@@ -1,4 +1,1226 @@
-let randomGeneratorDialog = null;
+let currentTagSelectorDialog = null;
+
+const randomPresets = {
+    '默认预设': {
+        description: '恢复所有权重为初始默认状态，优化画质细节',
+        icon: '🔄',
+        color: '#22c55e',
+        settings: {
+            categories: {
+                '常规标签.画质': { enabled: true, weight: 1, count: 1 },
+                '常规标签.摄影': { enabled: true, weight: 1, count: 1 },
+                '常规标签.构图': { enabled: true, weight: 1, count: 1 },
+                '常规标签.光影': { enabled: true, weight: 1, count: 1 },
+                '艺术题材.艺术家风格': { enabled: true, weight: 1, count: 1 },
+                '艺术题材.艺术流派': { enabled: true, weight: 1, count: 1 },
+                '艺术题材.技法形式': { enabled: true, weight: 1, count: 1 },
+                '艺术题材.媒介与效果': { enabled: true, weight: 1, count: 1 },
+                '艺术题材.装饰图案': { enabled: true, weight: 1, count: 1 },
+                '艺术题材.色彩与质感': { enabled: true, weight: 1, count: 1 },
+                '人物类.角色.动漫角色': { enabled: true, weight: 1, count: 1 },
+                '人物类.角色.游戏角色': { enabled: true, weight: 1, count: 1 },
+                '人物类.角色.二次元虚拟偶像': { enabled: true, weight: 1, count: 1 },
+                '人物类.角色.3D动画角色': { enabled: true, weight: 1, count: 1 },
+                '人物类.外貌与特征': { enabled: true, weight: 1, count: 1 },
+                '人物类.人设.职业': { enabled: true, weight: 1, count: 1 },
+                '人物类.人设.性别/年龄': { enabled: true, weight: 1, count: 1 },
+                '人物类.人设.胸部': { enabled: true, weight: 1, count: 1 },
+                '人物类.人设.脸型': { enabled: true, weight: 1, count: 1 },
+                '人物类.人设.鼻子': { enabled: true, weight: 1, count: 1 },
+                '人物类.人设.嘴巴': { enabled: true, weight: 1, count: 1 },
+                '人物类.人设.皮肤': { enabled: true, weight: 1, count: 1 },
+                '人物类.人设.体型': { enabled: true, weight: 1, count: 1 },
+                '人物类.人设.眉毛': { enabled: true, weight: 1, count: 1 },
+                '人物类.人设.头发': { enabled: true, weight: 1, count: 1 },
+                '人物类.人设.眼睛': { enabled: true, weight: 1, count: 1 },
+                '人物类.人设.瞳孔': { enabled: true, weight: 1, count: 1 },
+                '人物类.服饰': { enabled: true, weight: 1, count: 1 },
+                '人物类.服饰.常服': { enabled: true, weight: 1, count: 1 },
+                '人物类.服饰.泳装': { enabled: true, weight: 1, count: 1 },
+                '人物类.服饰.运动装': { enabled: true, weight: 1, count: 1 },
+                '人物类.服饰.内衣': { enabled: true, weight: 1, count: 1 },
+                '人物类.服饰.配饰': { enabled: true, weight: 1, count: 1 },
+                '人物类.服饰.鞋类': { enabled: true, weight: 1, count: 1 },
+                '人物类.服饰.睡衣': { enabled: true, weight: 1, count: 1 },
+                '人物类.服饰.帽子': { enabled: true, weight: 1, count: 1 },
+                '人物类.服饰.制服COS': { enabled: true, weight: 1, count: 1 },
+                '人物类.服饰.传统服饰': { enabled: true, weight: 1, count: 1 },
+                '动作/表情.姿态动作': { enabled: true, weight: 1, count: 1 },
+                '动作/表情.多人互动': { enabled: true, weight: 1, count: 1 },
+                '动作/表情.手部': { enabled: true, weight: 1, count: 1 },
+                '动作/表情.腿部': { enabled: true, weight: 1, count: 1 },
+                '动作/表情.眼神': { enabled: true, weight: 1, count: 1 },
+                '动作/表情.表情': { enabled: true, weight: 1, count: 1 },
+                '动作/表情.嘴型': { enabled: true, weight: 1, count: 1 },
+                '道具.翅膀': { enabled: true, weight: 1, count: 1 },
+                '道具.尾巴': { enabled: true, weight: 1, count: 1 },
+                '道具.耳朵': { enabled: true, weight: 1, count: 1 },
+                '道具.角': { enabled: true, weight: 1, count: 1 },
+                '场景类.光线环境': { enabled: true, weight: 1, count: 1 },
+                '场景类.情感与氛围': { enabled: true, weight: 1, count: 1 },
+                '场景类.背景环境': { enabled: true, weight: 1, count: 1 },
+                '场景类.反射效果': { enabled: true, weight: 1, count: 1 },
+                '场景类.室外': { enabled: true, weight: 1, count: 1 },
+                '场景类.城市': { enabled: true, weight: 1, count: 1 },
+                '场景类.建筑': { enabled: true, weight: 1, count: 1 },
+                '场景类.室内装饰': { enabled: true, weight: 1, count: 1 },
+                '场景类.自然景观': { enabled: true, weight: 1, count: 1 },
+                '场景类.人造景观': { enabled: true, weight: 1, count: 1 },
+                '动物生物.动物': { enabled: true, weight: 1, count: 1 },
+                '动物生物.幻想生物': { enabled: true, weight: 1, count: 1 },
+                '动物生物.行为动态': { enabled: true, weight: 1, count: 1 }
+            },
+            adultCategories: {
+                '涩影湿.性暗示': { enabled: false, weight: 1, count: 1 },
+                '涩影湿.性行为.性行为类型': { enabled: false, weight: 1, count: 1 },
+                '涩影湿.性行为.身体部位': { enabled: false, weight: 1, count: 1 },
+                '涩影湿.性行为.道具与玩具': { enabled: false, weight: 1, count: 1 },
+                '涩影湿.性行为.束缚与调教': { enabled: false, weight: 1, count: 1 },
+                '涩影湿.性行为.特殊癖好与情境': { enabled: false, weight: 1, count: 1 },
+                '涩影湿.性行为.视觉风格与特定元素': { enabled: false, weight: 1, count: 1 },
+                '涩影湿.性行为.欲望表情': { enabled: false, weight: 1, count: 1 }
+            },
+            excludedCategories: ['自定义', '灵感套装'],
+            includeNSFW: false,
+            totalTagsRange: { min: 15, max: 25 }
+        }
+    },
+    '人物肖像': {
+        description: '专注于人物面部特征和表情，极致细节刻画，适合生成精美肖像画',
+        icon: '👤',
+        color: '#1e40af',
+        settings: {
+            categories: {
+                '常规标签.画质': { enabled: true, weight: 5, count: 2 },
+                '常规标签.摄影': { enabled: true, weight: 3, count: 1 },
+                '常规标签.构图': { enabled: true, weight: 3, count: 1 },
+                '常规标签.光影': { enabled: true, weight: 4, count: 1 },
+                '艺术题材.艺术家风格': { enabled: true, weight: 2, count: 1 },
+                '艺术题材.艺术流派': { enabled: false, weight: 1, count: 1 },
+                '艺术题材.技法形式': { enabled: true, weight: 2, count: 1 },
+                '艺术题材.媒介与效果': { enabled: true, weight: 2, count: 1 },
+                '艺术题材.装饰图案': { enabled: false, weight: 1, count: 1 },
+                '艺术题材.色彩与质感': { enabled: true, weight: 3, count: 1 },
+                '人物类.角色.动漫角色': { enabled: false, weight: 1, count: 1 },
+                '人物类.角色.游戏角色': { enabled: false, weight: 1, count: 1 },
+                '人物类.角色.二次元虚拟偶像': { enabled: false, weight: 1, count: 1 },
+                '人物类.角色.3D动画角色': { enabled: false, weight: 1, count: 1 },
+                '人物类.外貌与特征': { enabled: true, weight: 4, count: 3 },
+                '人物类.人设.职业': { enabled: true, weight: 1, count: 1 },
+                '人物类.人设.性别/年龄': { enabled: true, weight: 3, count: 1 },
+                '人物类.人设.胸部': { enabled: true, weight: 2, count: 1 },
+                '人物类.人设.脸型': { enabled: true, weight: 3, count: 1 },
+                '人物类.人设.鼻子': { enabled: true, weight: 2, count: 1 },
+                '人物类.人设.嘴巴': { enabled: true, weight: 3, count: 1 },
+                '人物类.人设.皮肤': { enabled: true, weight: 3, count: 1 },
+                '人物类.人设.体型': { enabled: true, weight: 2, count: 1 },
+                '人物类.人设.眉毛': { enabled: true, weight: 3, count: 1 },
+                '人物类.人设.头发': { enabled: true, weight: 4, count: 2 },
+                '人物类.人设.眼睛': { enabled: true, weight: 4, count: 2 },
+                '人物类.人设.瞳孔': { enabled: true, weight: 3, count: 1 },
+                '人物类.服饰': { enabled: true, weight: 2, count: 1 },
+                '人物类.服饰.常服': { enabled: true, weight: 2, count: 1 },
+                '人物类.服饰.泳装': { enabled: false, weight: 1, count: 1 },
+                '人物类.服饰.运动装': { enabled: false, weight: 1, count: 1 },
+                '人物类.服饰.内衣': { enabled: false, weight: 1, count: 1 },
+                '人物类.服饰.配饰': { enabled: true, weight: 2, count: 1 },
+                '人物类.服饰.鞋类': { enabled: false, weight: 1, count: 1 },
+                '人物类.服饰.睡衣': { enabled: false, weight: 1, count: 1 },
+                '人物类.服饰.帽子': { enabled: true, weight: 2, count: 1 },
+                '人物类.服饰.制服COS': { enabled: false, weight: 1, count: 1 },
+                '人物类.服饰.传统服饰': { enabled: true, weight: 2, count: 1 },
+                '动作/表情.姿态动作': { enabled: true, weight: 2, count: 1 },
+                '动作/表情.多人互动': { enabled: false, weight: 1, count: 1 },
+                '动作/表情.手部': { enabled: true, weight: 2, count: 1 },
+                '动作/表情.腿部': { enabled: false, weight: 1, count: 1 },
+                '动作/表情.眼神': { enabled: true, weight: 4, count: 1 },
+                '动作/表情.表情': { enabled: true, weight: 4, count: 1 },
+                '动作/表情.嘴型': { enabled: true, weight: 3, count: 1 },
+                '道具.翅膀': { enabled: false, weight: 1, count: 1 },
+                '道具.尾巴': { enabled: false, weight: 1, count: 1 },
+                '道具.耳朵': { enabled: false, weight: 1, count: 1 },
+                '道具.角': { enabled: false, weight: 1, count: 1 },
+                '场景类.光线环境': { enabled: true, weight: 4, count: 1 },
+                '场景类.情感与氛围': { enabled: true, weight: 3, count: 1 },
+                '场景类.背景环境': { enabled: true, weight: 2, count: 1 },
+                '场景类.反射效果': { enabled: true, weight: 2, count: 1 },
+                '场景类.室外': { enabled: false, weight: 1, count: 1 },
+                '场景类.城市': { enabled: false, weight: 1, count: 1 },
+                '场景类.建筑': { enabled: false, weight: 1, count: 1 },
+                '场景类.室内装饰': { enabled: true, weight: 2, count: 1 },
+                '场景类.自然景观': { enabled: false, weight: 1, count: 1 },
+                '场景类.人造景观': { enabled: false, weight: 1, count: 1 },
+                '动物生物.动物': { enabled: false, weight: 1, count: 1 },
+                '动物生物.幻想生物': { enabled: false, weight: 1, count: 1 },
+                '动物生物.行为动态': { enabled: false, weight: 1, count: 1 }
+            },
+            adultCategories: {},
+            excludedCategories: ['自定义', '灵感套装'],
+            includeNSFW: false,
+            totalTagsRange: { min: 12, max: 18 }
+        }
+    },
+    '全身人物': {
+        description: '专注于人物整体形象，包含服装和姿态，细节丰富的人物插画',
+        icon: '🧍',
+        color: '#92400e',
+        settings: {
+            categories: {
+                '常规标签.画质': { enabled: true, weight: 4, count: 2 },
+                '常规标签.摄影': { enabled: true, weight: 3, count: 1 },
+                '常规标签.构图': { enabled: true, weight: 4, count: 1 },
+                '常规标签.光影': { enabled: true, weight: 3, count: 1 },
+                '艺术题材.艺术家风格': { enabled: true, weight: 2, count: 1 },
+                '艺术题材.艺术流派': { enabled: false, weight: 1, count: 1 },
+                '艺术题材.技法形式': { enabled: true, weight: 2, count: 1 },
+                '艺术题材.媒介与效果': { enabled: true, weight: 2, count: 1 },
+                '艺术题材.装饰图案': { enabled: false, weight: 1, count: 1 },
+                '艺术题材.色彩与质感': { enabled: true, weight: 3, count: 1 },
+                '人物类.角色.动漫角色': { enabled: false, weight: 1, count: 1 },
+                '人物类.角色.游戏角色': { enabled: false, weight: 1, count: 1 },
+                '人物类.角色.二次元虚拟偶像': { enabled: false, weight: 1, count: 1 },
+                '人物类.角色.3D动画角色': { enabled: false, weight: 1, count: 1 },
+                '人物类.外貌与特征': { enabled: true, weight: 3, count: 2 },
+                '人物类.人设.职业': { enabled: true, weight: 2, count: 1 },
+                '人物类.人设.性别/年龄': { enabled: true, weight: 3, count: 1 },
+                '人物类.人设.胸部': { enabled: true, weight: 2, count: 1 },
+                '人物类.人设.脸型': { enabled: true, weight: 2, count: 1 },
+                '人物类.人设.鼻子': { enabled: true, weight: 2, count: 1 },
+                '人物类.人设.嘴巴': { enabled: true, weight: 2, count: 1 },
+                '人物类.人设.皮肤': { enabled: true, weight: 2, count: 1 },
+                '人物类.人设.体型': { enabled: true, weight: 3, count: 1 },
+                '人物类.人设.眉毛': { enabled: true, weight: 2, count: 1 },
+                '人物类.人设.头发': { enabled: true, weight: 3, count: 1 },
+                '人物类.人设.眼睛': { enabled: true, weight: 3, count: 1 },
+                '人物类.人设.瞳孔': { enabled: true, weight: 2, count: 1 },
+                '人物类.服饰': { enabled: true, weight: 4, count: 2 },
+                '人物类.服饰.常服': { enabled: true, weight: 3, count: 1 },
+                '人物类.服饰.泳装': { enabled: true, weight: 2, count: 1 },
+                '人物类.服饰.运动装': { enabled: true, weight: 2, count: 1 },
+                '人物类.服饰.内衣': { enabled: false, weight: 1, count: 1 },
+                '人物类.服饰.配饰': { enabled: true, weight: 3, count: 1 },
+                '人物类.服饰.鞋类': { enabled: true, weight: 2, count: 1 },
+                '人物类.服饰.睡衣': { enabled: false, weight: 1, count: 1 },
+                '人物类.服饰.帽子': { enabled: true, weight: 2, count: 1 },
+                '人物类.服饰.制服COS': { enabled: true, weight: 2, count: 1 },
+                '人物类.服饰.传统服饰': { enabled: true, weight: 2, count: 1 },
+                '动作/表情.姿态动作': { enabled: true, weight: 4, count: 1 },
+                '动作/表情.多人互动': { enabled: false, weight: 1, count: 1 },
+                '动作/表情.手部': { enabled: true, weight: 3, count: 1 },
+                '动作/表情.腿部': { enabled: true, weight: 3, count: 1 },
+                '动作/表情.眼神': { enabled: true, weight: 2, count: 1 },
+                '动作/表情.表情': { enabled: true, weight: 3, count: 1 },
+                '动作/表情.嘴型': { enabled: true, weight: 2, count: 1 },
+                '道具.翅膀': { enabled: true, weight: 2, count: 1 },
+                '道具.尾巴': { enabled: true, weight: 2, count: 1 },
+                '道具.耳朵': { enabled: true, weight: 2, count: 1 },
+                '道具.角': { enabled: true, weight: 2, count: 1 },
+                '场景类.光线环境': { enabled: true, weight: 3, count: 1 },
+                '场景类.情感与氛围': { enabled: true, weight: 3, count: 1 },
+                '场景类.背景环境': { enabled: true, weight: 3, count: 1 },
+                '场景类.反射效果': { enabled: true, weight: 2, count: 1 },
+                '场景类.室外': { enabled: true, weight: 2, count: 1 },
+                '场景类.城市': { enabled: true, weight: 2, count: 1 },
+                '场景类.建筑': { enabled: true, weight: 2, count: 1 },
+                '场景类.室内装饰': { enabled: true, weight: 2, count: 1 },
+                '场景类.自然景观': { enabled: true, weight: 2, count: 1 },
+                '场景类.人造景观': { enabled: true, weight: 2, count: 1 },
+                '动物生物.动物': { enabled: false, weight: 1, count: 1 },
+                '动物生物.幻想生物': { enabled: false, weight: 1, count: 1 },
+                '动物生物.行为动态': { enabled: false, weight: 1, count: 1 }
+            },
+            adultCategories: {},
+            excludedCategories: ['自定义', '灵感套装'],
+            includeNSFW: false,
+            totalTagsRange: { min: 16, max: 24 }
+        }
+    },
+    '风景场景': {
+        description: '专注于自然和城市景观，极致光影氛围，适合生成精美风景画',
+        icon: '🏞️',
+        color: '#047857',
+        settings: {
+            categories: {
+                '常规标签.画质': { enabled: true, weight: 5, count: 2 },
+                '常规标签.摄影': { enabled: true, weight: 3, count: 1 },
+                '常规标签.构图': { enabled: true, weight: 4, count: 1 },
+                '常规标签.光影': { enabled: true, weight: 4, count: 1 },
+                '艺术题材.艺术家风格': { enabled: true, weight: 2, count: 1 },
+                '艺术题材.艺术流派': { enabled: true, weight: 2, count: 1 },
+                '艺术题材.技法形式': { enabled: true, weight: 2, count: 1 },
+                '艺术题材.媒介与效果': { enabled: true, weight: 2, count: 1 },
+                '艺术题材.装饰图案': { enabled: false, weight: 1, count: 1 },
+                '艺术题材.色彩与质感': { enabled: true, weight: 4, count: 1 },
+                '人物类.角色.动漫角色': { enabled: false, weight: 1, count: 1 },
+                '人物类.角色.游戏角色': { enabled: false, weight: 1, count: 1 },
+                '人物类.角色.二次元虚拟偶像': { enabled: false, weight: 1, count: 1 },
+                '人物类.角色.3D动画角色': { enabled: false, weight: 1, count: 1 },
+                '人物类.外貌与特征': { enabled: false, weight: 1, count: 1 },
+                '人物类.人设.职业': { enabled: false, weight: 1, count: 1 },
+                '人物类.人设.性别/年龄': { enabled: false, weight: 1, count: 1 },
+                '人物类.人设.胸部': { enabled: false, weight: 1, count: 1 },
+                '人物类.人设.脸型': { enabled: false, weight: 1, count: 1 },
+                '人物类.人设.鼻子': { enabled: false, weight: 1, count: 1 },
+                '人物类.人设.嘴巴': { enabled: false, weight: 1, count: 1 },
+                '人物类.人设.皮肤': { enabled: false, weight: 1, count: 1 },
+                '人物类.人设.体型': { enabled: false, weight: 1, count: 1 },
+                '人物类.人设.眉毛': { enabled: false, weight: 1, count: 1 },
+                '人物类.人设.头发': { enabled: false, weight: 1, count: 1 },
+                '人物类.人设.眼睛': { enabled: false, weight: 1, count: 1 },
+                '人物类.人设.瞳孔': { enabled: false, weight: 1, count: 1 },
+                '人物类.服饰': { enabled: false, weight: 1, count: 1 },
+                '人物类.服饰.常服': { enabled: false, weight: 1, count: 1 },
+                '人物类.服饰.泳装': { enabled: false, weight: 1, count: 1 },
+                '人物类.服饰.运动装': { enabled: false, weight: 1, count: 1 },
+                '人物类.服饰.内衣': { enabled: false, weight: 1, count: 1 },
+                '人物类.服饰.配饰': { enabled: false, weight: 1, count: 1 },
+                '人物类.服饰.鞋类': { enabled: false, weight: 1, count: 1 },
+                '人物类.服饰.睡衣': { enabled: false, weight: 1, count: 1 },
+                '人物类.服饰.帽子': { enabled: false, weight: 1, count: 1 },
+                '人物类.服饰.制服COS': { enabled: false, weight: 1, count: 1 },
+                '人物类.服饰.传统服饰': { enabled: false, weight: 1, count: 1 },
+                '动作/表情.姿态动作': { enabled: false, weight: 1, count: 1 },
+                '动作/表情.多人互动': { enabled: false, weight: 1, count: 1 },
+                '动作/表情.手部': { enabled: false, weight: 1, count: 1 },
+                '动作/表情.腿部': { enabled: false, weight: 1, count: 1 },
+                '动作/表情.眼神': { enabled: false, weight: 1, count: 1 },
+                '动作/表情.表情': { enabled: false, weight: 1, count: 1 },
+                '动作/表情.嘴型': { enabled: false, weight: 1, count: 1 },
+                '道具.翅膀': { enabled: false, weight: 1, count: 1 },
+                '道具.尾巴': { enabled: false, weight: 1, count: 1 },
+                '道具.耳朵': { enabled: false, weight: 1, count: 1 },
+                '道具.角': { enabled: false, weight: 1, count: 1 },
+                '场景类.光线环境': { enabled: true, weight: 4, count: 1 },
+                '场景类.情感与氛围': { enabled: true, weight: 4, count: 1 },
+                '场景类.背景环境': { enabled: true, weight: 4, count: 1 },
+                '场景类.反射效果': { enabled: true, weight: 3, count: 1 },
+                '场景类.室外': { enabled: true, weight: 4, count: 1 },
+                '场景类.城市': { enabled: true, weight: 3, count: 1 },
+                '场景类.建筑': { enabled: true, weight: 4, count: 1 },
+                '场景类.室内装饰': { enabled: true, weight: 3, count: 1 },
+                '场景类.自然景观': { enabled: true, weight: 4, count: 2 },
+                '场景类.人造景观': { enabled: true, weight: 3, count: 1 },
+                '动物生物.动物': { enabled: true, weight: 2, count: 1 },
+                '动物生物.幻想生物': { enabled: true, weight: 2, count: 1 },
+                '动物生物.行为动态': { enabled: true, weight: 2, count: 1 }
+            },
+            adultCategories: {},
+            excludedCategories: ['自定义', '灵感套装'],
+            includeNSFW: false,
+            totalTagsRange: { min: 14, max: 22 }
+        }
+    },
+    '艺术创作': {
+        description: '专注于艺术风格和技法，独特视觉表现，适合创意艺术作品',
+        icon: '🎨',
+        color: '#f59e0b',
+        settings: {
+            categories: {
+                '常规标签.画质': { enabled: true, weight: 4, count: 2 },
+                '常规标签.摄影': { enabled: true, weight: 2, count: 1 },
+                '常规标签.构图': { enabled: true, weight: 3, count: 1 },
+                '常规标签.光影': { enabled: true, weight: 3, count: 1 },
+                '艺术题材.艺术家风格': { enabled: true, weight: 4, count: 1 },
+                '艺术题材.艺术流派': { enabled: true, weight: 4, count: 1 },
+                '艺术题材.技法形式': { enabled: true, weight: 4, count: 1 },
+                '艺术题材.媒介与效果': { enabled: true, weight: 3, count: 1 },
+                '艺术题材.装饰图案': { enabled: true, weight: 3, count: 1 },
+                '艺术题材.色彩与质感': { enabled: true, weight: 4, count: 1 },
+                '人物类.角色.动漫角色': { enabled: false, weight: 1, count: 1 },
+                '人物类.角色.游戏角色': { enabled: false, weight: 1, count: 1 },
+                '人物类.角色.二次元虚拟偶像': { enabled: false, weight: 1, count: 1 },
+                '人物类.角色.3D动画角色': { enabled: false, weight: 1, count: 1 },
+                '人物类.外貌与特征': { enabled: true, weight: 2, count: 1 },
+                '人物类.人设.职业': { enabled: true, weight: 2, count: 1 },
+                '人物类.人设.性别/年龄': { enabled: true, weight: 2, count: 1 },
+                '人物类.人设.胸部': { enabled: false, weight: 1, count: 1 },
+                '人物类.人设.脸型': { enabled: true, weight: 2, count: 1 },
+                '人物类.人设.鼻子': { enabled: true, weight: 2, count: 1 },
+                '人物类.人设.嘴巴': { enabled: true, weight: 2, count: 1 },
+                '人物类.人设.皮肤': { enabled: true, weight: 2, count: 1 },
+                '人物类.人设.体型': { enabled: true, weight: 2, count: 1 },
+                '人物类.人设.眉毛': { enabled: true, weight: 2, count: 1 },
+                '人物类.人设.头发': { enabled: true, weight: 2, count: 1 },
+                '人物类.人设.眼睛': { enabled: true, weight: 2, count: 1 },
+                '人物类.人设.瞳孔': { enabled: true, weight: 2, count: 1 },
+                '人物类.服饰': { enabled: true, weight: 2, count: 1 },
+                '人物类.服饰.常服': { enabled: true, weight: 2, count: 1 },
+                '人物类.服饰.泳装': { enabled: false, weight: 1, count: 1 },
+                '人物类.服饰.运动装': { enabled: false, weight: 1, count: 1 },
+                '人物类.服饰.内衣': { enabled: false, weight: 1, count: 1 },
+                '人物类.服饰.配饰': { enabled: true, weight: 2, count: 1 },
+                '人物类.服饰.鞋类': { enabled: false, weight: 1, count: 1 },
+                '人物类.服饰.睡衣': { enabled: false, weight: 1, count: 1 },
+                '人物类.服饰.帽子': { enabled: true, weight: 2, count: 1 },
+                '人物类.服饰.制服COS': { enabled: false, weight: 1, count: 1 },
+                '人物类.服饰.传统服饰': { enabled: true, weight: 2, count: 1 },
+                '动作/表情.姿态动作': { enabled: true, weight: 2, count: 1 },
+                '动作/表情.多人互动': { enabled: false, weight: 1, count: 1 },
+                '动作/表情.手部': { enabled: true, weight: 2, count: 1 },
+                '动作/表情.腿部': { enabled: true, weight: 2, count: 1 },
+                '动作/表情.眼神': { enabled: true, weight: 2, count: 1 },
+                '动作/表情.表情': { enabled: true, weight: 2, count: 1 },
+                '动作/表情.嘴型': { enabled: true, weight: 2, count: 1 },
+                '道具.翅膀': { enabled: true, weight: 2, count: 1 },
+                '道具.尾巴': { enabled: true, weight: 2, count: 1 },
+                '道具.耳朵': { enabled: true, weight: 2, count: 1 },
+                '道具.角': { enabled: true, weight: 2, count: 1 },
+                '场景类.光线环境': { enabled: true, weight: 3, count: 1 },
+                '场景类.情感与氛围': { enabled: true, weight: 4, count: 1 },
+                '场景类.背景环境': { enabled: true, weight: 3, count: 1 },
+                '场景类.反射效果': { enabled: true, weight: 2, count: 1 },
+                '场景类.室外': { enabled: true, weight: 2, count: 1 },
+                '场景类.城市': { enabled: true, weight: 2, count: 1 },
+                '场景类.建筑': { enabled: true, weight: 2, count: 1 },
+                '场景类.室内装饰': { enabled: true, weight: 2, count: 1 },
+                '场景类.自然景观': { enabled: true, weight: 2, count: 1 },
+                '场景类.人造景观': { enabled: true, weight: 2, count: 1 },
+                '动物生物.动物': { enabled: true, weight: 2, count: 1 },
+                '动物生物.幻想生物': { enabled: true, weight: 2, count: 1 },
+                '动物生物.行为动态': { enabled: true, weight: 2, count: 1 }
+            },
+            adultCategories: {},
+            excludedCategories: ['自定义', '灵感套装'],
+            includeNSFW: false,
+            totalTagsRange: { min: 14, max: 22 }
+        }
+    },
+    '太空科幻': {
+        description: '专注于太空、星际和科技主题，未来感光影效果，适合生成科幻场景',
+        icon: '🚀',
+        color: '#0ea5e9',
+        settings: {
+            categories: {
+                '常规标签.画质': { enabled: true, weight: 4, count: 2 },
+                '常规标签.摄影': { enabled: true, weight: 3, count: 1 },
+                '常规标签.构图': { enabled: true, weight: 3, count: 1 },
+                '常规标签.光影': { enabled: true, weight: 4, count: 1 },
+                '艺术题材.艺术家风格': { enabled: true, weight: 2, count: 1 },
+                '艺术题材.艺术流派': { enabled: false, weight: 1, count: 1 },
+                '艺术题材.技法形式': { enabled: true, weight: 2, count: 1 },
+                '艺术题材.媒介与效果': { enabled: true, weight: 3, count: 1 },
+                '艺术题材.装饰图案': { enabled: false, weight: 1, count: 1 },
+                '艺术题材.色彩与质感': { enabled: true, weight: 3, count: 1 },
+                '人物类.角色.动漫角色': { enabled: false, weight: 1, count: 1 },
+                '人物类.角色.游戏角色': { enabled: false, weight: 1, count: 1 },
+                '人物类.角色.二次元虚拟偶像': { enabled: false, weight: 1, count: 1 },
+                '人物类.角色.3D动画角色': { enabled: false, weight: 1, count: 1 },
+                '人物类.外貌与特征': { enabled: true, weight: 3, count: 1 },
+                '人物类.人设.职业': { enabled: true, weight: 3, count: 1 },
+                '人物类.人设.性别/年龄': { enabled: true, weight: 2, count: 1 },
+                '人物类.人设.胸部': { enabled: false, weight: 1, count: 1 },
+                '人物类.人设.脸型': { enabled: true, weight: 2, count: 1 },
+                '人物类.人设.鼻子': { enabled: true, weight: 2, count: 1 },
+                '人物类.人设.嘴巴': { enabled: true, weight: 2, count: 1 },
+                '人物类.人设.皮肤': { enabled: true, weight: 2, count: 1 },
+                '人物类.人设.体型': { enabled: true, weight: 2, count: 1 },
+                '人物类.人设.眉毛': { enabled: true, weight: 2, count: 1 },
+                '人物类.人设.头发': { enabled: true, weight: 2, count: 1 },
+                '人物类.人设.眼睛': { enabled: true, weight: 2, count: 1 },
+                '人物类.人设.瞳孔': { enabled: true, weight: 2, count: 1 },
+                '人物类.服饰': { enabled: true, weight: 3, count: 1 },
+                '人物类.服饰.常服': { enabled: false, weight: 1, count: 1 },
+                '人物类.服饰.泳装': { enabled: false, weight: 1, count: 1 },
+                '人物类.服饰.运动装': { enabled: false, weight: 1, count: 1 },
+                '人物类.服饰.内衣': { enabled: false, weight: 1, count: 1 },
+                '人物类.服饰.配饰': { enabled: true, weight: 2, count: 1 },
+                '人物类.服饰.鞋类': { enabled: false, weight: 1, count: 1 },
+                '人物类.服饰.睡衣': { enabled: false, weight: 1, count: 1 },
+                '人物类.服饰.帽子': { enabled: true, weight: 2, count: 1 },
+                '人物类.服饰.制服COS': { enabled: true, weight: 3, count: 1 },
+                '人物类.服饰.传统服饰': { enabled: false, weight: 1, count: 1 },
+                '动作/表情.姿态动作': { enabled: true, weight: 2, count: 1 },
+                '动作/表情.多人互动': { enabled: false, weight: 1, count: 1 },
+                '动作/表情.手部': { enabled: true, weight: 2, count: 1 },
+                '动作/表情.腿部': { enabled: true, weight: 2, count: 1 },
+                '动作/表情.眼神': { enabled: true, weight: 2, count: 1 },
+                '动作/表情.表情': { enabled: true, weight: 2, count: 1 },
+                '动作/表情.嘴型': { enabled: true, weight: 2, count: 1 },
+                '道具.翅膀': { enabled: false, weight: 1, count: 1 },
+                '道具.尾巴': { enabled: false, weight: 1, count: 1 },
+                '道具.耳朵': { enabled: false, weight: 1, count: 1 },
+                '道具.角': { enabled: false, weight: 1, count: 1 },
+                '场景类.光线环境': { enabled: true, weight: 4, count: 1 },
+                '场景类.情感与氛围': { enabled: true, weight: 3, count: 1 },
+                '场景类.背景环境': { enabled: true, weight: 3, count: 1 },
+                '场景类.反射效果': { enabled: true, weight: 2, count: 1 },
+                '场景类.室外': { enabled: true, weight: 4, count: 1 },
+                '场景类.城市': { enabled: false, weight: 1, count: 1 },
+                '场景类.建筑': { enabled: true, weight: 3, count: 1 },
+                '场景类.室内装饰': { enabled: true, weight: 3, count: 1 },
+                '场景类.自然景观': { enabled: false, weight: 1, count: 1 },
+                '场景类.人造景观': { enabled: true, weight: 4, count: 1 },
+                '动物生物.动物': { enabled: false, weight: 1, count: 1 },
+                '动物生物.幻想生物': { enabled: true, weight: 2, count: 1 },
+                '动物生物.行为动态': { enabled: false, weight: 1, count: 1 }
+            },
+            adultCategories: {},
+            excludedCategories: ['自定义', '灵感套装'],
+            includeNSFW: false,
+            totalTagsRange: { min: 14, max: 22 }
+        }
+    },
+    '中国风': {
+        description: '专注于中国传统服饰和东方美学元素，古韵意境，精美国风插画',
+        icon: '🏮',
+        color: '#dc2626',
+        settings: {
+            categories: {
+                '常规标签.画质': { enabled: true, weight: 4, count: 2 },
+                '常规标签.摄影': { enabled: true, weight: 3, count: 1 },
+                '常规标签.构图': { enabled: true, weight: 3, count: 1 },
+                '常规标签.光影': { enabled: true, weight: 3, count: 1 },
+                '艺术题材.艺术家风格': { enabled: true, weight: 2, count: 1 },
+                '艺术题材.艺术流派': { enabled: true, weight: 3, count: 1 },
+                '艺术题材.技法形式': { enabled: true, weight: 3, count: 1 },
+                '艺术题材.媒介与效果': { enabled: true, weight: 2, count: 1 },
+                '艺术题材.装饰图案': { enabled: true, weight: 3, count: 1 },
+                '艺术题材.色彩与质感': { enabled: true, weight: 3, count: 1 },
+                '人物类.角色.动漫角色': { enabled: false, weight: 1, count: 1 },
+                '人物类.角色.游戏角色': { enabled: false, weight: 1, count: 1 },
+                '人物类.角色.二次元虚拟偶像': { enabled: false, weight: 1, count: 1 },
+                '人物类.角色.3D动画角色': { enabled: false, weight: 1, count: 1 },
+                '人物类.外貌与特征': { enabled: true, weight: 3, count: 2 },
+                '人物类.人设.职业': { enabled: true, weight: 2, count: 1 },
+                '人物类.人设.性别/年龄': { enabled: true, weight: 3, count: 1 },
+                '人物类.人设.胸部': { enabled: true, weight: 2, count: 1 },
+                '人物类.人设.脸型': { enabled: true, weight: 3, count: 1 },
+                '人物类.人设.鼻子': { enabled: true, weight: 2, count: 1 },
+                '人物类.人设.嘴巴': { enabled: true, weight: 2, count: 1 },
+                '人物类.人设.皮肤': { enabled: true, weight: 2, count: 1 },
+                '人物类.人设.体型': { enabled: true, weight: 2, count: 1 },
+                '人物类.人设.眉毛': { enabled: true, weight: 3, count: 1 },
+                '人物类.人设.头发': { enabled: true, weight: 4, count: 1 },
+                '人物类.人设.眼睛': { enabled: true, weight: 3, count: 1 },
+                '人物类.人设.瞳孔': { enabled: true, weight: 2, count: 1 },
+                '人物类.服饰': { enabled: true, weight: 4, count: 2 },
+                '人物类.服饰.常服': { enabled: false, weight: 1, count: 1 },
+                '人物类.服饰.泳装': { enabled: false, weight: 1, count: 1 },
+                '人物类.服饰.运动装': { enabled: false, weight: 1, count: 1 },
+                '人物类.服饰.内衣': { enabled: false, weight: 1, count: 1 },
+                '人物类.服饰.配饰': { enabled: true, weight: 3, count: 1 },
+                '人物类.服饰.鞋类': { enabled: true, weight: 2, count: 1 },
+                '人物类.服饰.睡衣': { enabled: false, weight: 1, count: 1 },
+                '人物类.服饰.帽子': { enabled: true, weight: 2, count: 1 },
+                '人物类.服饰.制服COS': { enabled: false, weight: 1, count: 1 },
+                '人物类.服饰.传统服饰': { enabled: true, weight: 4, count: 2 },
+                '动作/表情.姿态动作': { enabled: true, weight: 3, count: 1 },
+                '动作/表情.多人互动': { enabled: false, weight: 1, count: 1 },
+                '动作/表情.手部': { enabled: true, weight: 2, count: 1 },
+                '动作/表情.腿部': { enabled: true, weight: 2, count: 1 },
+                '动作/表情.眼神': { enabled: true, weight: 3, count: 1 },
+                '动作/表情.表情': { enabled: true, weight: 3, count: 1 },
+                '动作/表情.嘴型': { enabled: true, weight: 2, count: 1 },
+                '道具.翅膀': { enabled: false, weight: 1, count: 1 },
+                '道具.尾巴': { enabled: false, weight: 1, count: 1 },
+                '道具.耳朵': { enabled: false, weight: 1, count: 1 },
+                '道具.角': { enabled: false, weight: 1, count: 1 },
+                '场景类.光线环境': { enabled: true, weight: 3, count: 1 },
+                '场景类.情感与氛围': { enabled: true, weight: 4, count: 1 },
+                '场景类.背景环境': { enabled: true, weight: 3, count: 1 },
+                '场景类.反射效果': { enabled: true, weight: 2, count: 1 },
+                '场景类.室外': { enabled: true, weight: 3, count: 1 },
+                '场景类.城市': { enabled: false, weight: 1, count: 1 },
+                '场景类.建筑': { enabled: true, weight: 3, count: 1 },
+                '场景类.室内装饰': { enabled: true, weight: 3, count: 1 },
+                '场景类.自然景观': { enabled: true, weight: 3, count: 1 },
+                '场景类.人造景观': { enabled: true, weight: 2, count: 1 },
+                '动物生物.动物': { enabled: false, weight: 1, count: 1 },
+                '动物生物.幻想生物': { enabled: false, weight: 1, count: 1 },
+                '动物生物.行为动态': { enabled: false, weight: 1, count: 1 }
+            },
+            adultCategories: {},
+            excludedCategories: ['自定义', '灵感套装'],
+            includeNSFW: false,
+            totalTagsRange: { min: 16, max: 24 }
+        }
+    },
+    '科幻赛博': {
+        description: '专注于赛博朋克风格，霓虹灯光和未来城市',
+        icon: '🤖',
+        color: '#a855f7',
+        settings: {
+            categories: {
+                '常规标签.画质': { enabled: true, weight: 3, count: 1 },
+                '常规标签.摄影': { enabled: true, weight: 2, count: 1 },
+                '常规标签.构图': { enabled: true, weight: 2, count: 1 },
+                '常规标签.光影': { enabled: true, weight: 3, count: 1 },
+                '艺术题材.艺术家风格': { enabled: true, weight: 1, count: 1 },
+                '艺术题材.艺术流派': { enabled: true, weight: 1, count: 1 },
+                '艺术题材.技法形式': { enabled: true, weight: 1, count: 1 },
+                '艺术题材.媒介与效果': { enabled: true, weight: 2, count: 1 },
+                '艺术题材.装饰图案': { enabled: false, weight: 1, count: 1 },
+                '艺术题材.色彩与质感': { enabled: true, weight: 3, count: 1 },
+                '人物类.角色.动漫角色': { enabled: false, weight: 1, count: 1 },
+                '人物类.角色.游戏角色': { enabled: false, weight: 1, count: 1 },
+                '人物类.角色.二次元虚拟偶像': { enabled: false, weight: 1, count: 1 },
+                '人物类.角色.3D动画角色': { enabled: false, weight: 1, count: 1 },
+                '人物类.外貌与特征': { enabled: true, weight: 2, count: 1 },
+                '人物类.人设.职业': { enabled: true, weight: 2, count: 1 },
+                '人物类.人设.性别/年龄': { enabled: true, weight: 1, count: 1 },
+                '人物类.人设.胸部': { enabled: true, weight: 1, count: 1 },
+                '人物类.人设.脸型': { enabled: true, weight: 1, count: 1 },
+                '人物类.人设.鼻子': { enabled: true, weight: 1, count: 1 },
+                '人物类.人设.嘴巴': { enabled: true, weight: 1, count: 1 },
+                '人物类.人设.皮肤': { enabled: true, weight: 1, count: 1 },
+                '人物类.人设.体型': { enabled: true, weight: 1, count: 1 },
+                '人物类.人设.眉毛': { enabled: true, weight: 1, count: 1 },
+                '人物类.人设.头发': { enabled: true, weight: 2, count: 1 },
+                '人物类.人设.眼睛': { enabled: true, weight: 2, count: 1 },
+                '人物类.人设.瞳孔': { enabled: true, weight: 1, count: 1 },
+                '人物类.服饰': { enabled: true, weight: 3, count: 2 },
+                '人物类.服饰.常服': { enabled: false, weight: 1, count: 1 },
+                '人物类.服饰.泳装': { enabled: false, weight: 1, count: 1 },
+                '人物类.服饰.运动装': { enabled: false, weight: 1, count: 1 },
+                '人物类.服饰.内衣': { enabled: false, weight: 1, count: 1 },
+                '人物类.服饰.配饰': { enabled: true, weight: 2, count: 1 },
+                '人物类.服饰.鞋类': { enabled: true, weight: 1, count: 1 },
+                '人物类.服饰.睡衣': { enabled: false, weight: 1, count: 1 },
+                '人物类.服饰.帽子': { enabled: true, weight: 1, count: 1 },
+                '人物类.服饰.制服COS': { enabled: true, weight: 2, count: 1 },
+                '人物类.服饰.传统服饰': { enabled: false, weight: 1, count: 1 },
+                '动作/表情.姿态动作': { enabled: true, weight: 2, count: 1 },
+                '动作/表情.多人互动': { enabled: false, weight: 1, count: 1 },
+                '动作/表情.手部': { enabled: true, weight: 1, count: 1 },
+                '动作/表情.腿部': { enabled: true, weight: 1, count: 1 },
+                '动作/表情.眼神': { enabled: true, weight: 1, count: 1 },
+                '动作/表情.表情': { enabled: true, weight: 1, count: 1 },
+                '动作/表情.嘴型': { enabled: true, weight: 1, count: 1 },
+                '道具.翅膀': { enabled: false, weight: 1, count: 1 },
+                '道具.尾巴': { enabled: false, weight: 1, count: 1 },
+                '道具.耳朵': { enabled: true, weight: 1, count: 1 },
+                '道具.角': { enabled: false, weight: 1, count: 1 },
+                '场景类.光线环境': { enabled: true, weight: 3, count: 1 },
+                '场景类.情感与氛围': { enabled: true, weight: 3, count: 1 },
+                '场景类.背景环境': { enabled: true, weight: 2, count: 1 },
+                '场景类.反射效果': { enabled: true, weight: 2, count: 1 },
+                '场景类.室外': { enabled: true, weight: 2, count: 1 },
+                '场景类.城市': { enabled: true, weight: 3, count: 1 },
+                '场景类.建筑': { enabled: true, weight: 2, count: 1 },
+                '场景类.室内装饰': { enabled: true, weight: 1, count: 1 },
+                '场景类.自然景观': { enabled: false, weight: 1, count: 1 },
+                '场景类.人造景观': { enabled: true, weight: 2, count: 1 },
+                '动物生物.动物': { enabled: false, weight: 1, count: 1 },
+                '动物生物.幻想生物': { enabled: false, weight: 1, count: 1 },
+                '动物生物.行为动态': { enabled: false, weight: 1, count: 1 }
+            },
+            adultCategories: {},
+            excludedCategories: ['自定义', '灵感套装'],
+            includeNSFW: false,
+            totalTagsRange: { min: 12, max: 20 }
+        }
+    },
+    '二次元动漫': {
+        description: '专注于动漫角色、二次元虚拟偶像，日系动漫风格',
+        icon: '🎭',
+        color: '#0d9488',
+        settings: {
+            categories: {
+                '常规标签.画质': { enabled: true, weight: 3, count: 1 },
+                '常规标签.摄影': { enabled: true, weight: 2, count: 1 },
+                '常规标签.构图': { enabled: true, weight: 2, count: 1 },
+                '常规标签.光影': { enabled: true, weight: 2, count: 1 },
+                '艺术题材.艺术家风格': { enabled: true, weight: 1, count: 1 },
+                '艺术题材.艺术流派': { enabled: false, weight: 1, count: 1 },
+                '艺术题材.技法形式': { enabled: true, weight: 2, count: 1 },
+                '艺术题材.媒介与效果': { enabled: true, weight: 2, count: 1 },
+                '艺术题材.装饰图案': { enabled: true, weight: 1, count: 1 },
+                '艺术题材.色彩与质感': { enabled: true, weight: 2, count: 1 },
+                '人物类.角色.动漫角色': { enabled: true, weight: 3, count: 2 },
+                '人物类.角色.游戏角色': { enabled: false, weight: 1, count: 1 },
+                '人物类.角色.二次元虚拟偶像': { enabled: true, weight: 3, count: 1 },
+                '人物类.角色.3D动画角色': { enabled: true, weight: 1, count: 1 },
+                '人物类.外貌与特征': { enabled: true, weight: 2, count: 2 },
+                '人物类.人设.职业': { enabled: true, weight: 1, count: 1 },
+                '人物类.人设.性别/年龄': { enabled: true, weight: 2, count: 1 },
+                '人物类.人设.胸部': { enabled: true, weight: 1, count: 1 },
+                '人物类.人设.脸型': { enabled: true, weight: 2, count: 1 },
+                '人物类.人设.鼻子': { enabled: true, weight: 1, count: 1 },
+                '人物类.人设.嘴巴': { enabled: true, weight: 2, count: 1 },
+                '人物类.人设.皮肤': { enabled: true, weight: 1, count: 1 },
+                '人物类.人设.体型': { enabled: true, weight: 1, count: 1 },
+                '人物类.人设.眉毛': { enabled: true, weight: 2, count: 1 },
+                '人物类.人设.头发': { enabled: true, weight: 3, count: 1 },
+                '人物类.人设.眼睛': { enabled: true, weight: 3, count: 1 },
+                '人物类.人设.瞳孔': { enabled: true, weight: 2, count: 1 },
+                '人物类.服饰': { enabled: true, weight: 2, count: 2 },
+                '人物类.服饰.常服': { enabled: true, weight: 1, count: 1 },
+                '人物类.服饰.泳装': { enabled: true, weight: 1, count: 1 },
+                '人物类.服饰.运动装': { enabled: true, weight: 1, count: 1 },
+                '人物类.服饰.内衣': { enabled: false, weight: 1, count: 1 },
+                '人物类.服饰.配饰': { enabled: true, weight: 1, count: 1 },
+                '人物类.服饰.鞋类': { enabled: true, weight: 1, count: 1 },
+                '人物类.服饰.睡衣': { enabled: false, weight: 1, count: 1 },
+                '人物类.服饰.帽子': { enabled: true, weight: 1, count: 1 },
+                '人物类.服饰.制服COS': { enabled: true, weight: 2, count: 1 },
+                '人物类.服饰.传统服饰': { enabled: false, weight: 1, count: 1 },
+                '动作/表情.姿态动作': { enabled: true, weight: 2, count: 1 },
+                '动作/表情.多人互动': { enabled: false, weight: 1, count: 1 },
+                '动作/表情.手部': { enabled: true, weight: 1, count: 1 },
+                '动作/表情.腿部': { enabled: true, weight: 1, count: 1 },
+                '动作/表情.眼神': { enabled: true, weight: 2, count: 1 },
+                '动作/表情.表情': { enabled: true, weight: 3, count: 1 },
+                '动作/表情.嘴型': { enabled: true, weight: 2, count: 1 },
+                '道具.翅膀': { enabled: true, weight: 1, count: 1 },
+                '道具.尾巴': { enabled: true, weight: 1, count: 1 },
+                '道具.耳朵': { enabled: true, weight: 1, count: 1 },
+                '道具.角': { enabled: true, weight: 1, count: 1 },
+                '场景类.光线环境': { enabled: true, weight: 2, count: 1 },
+                '场景类.情感与氛围': { enabled: true, weight: 2, count: 1 },
+                '场景类.背景环境': { enabled: true, weight: 1, count: 1 },
+                '场景类.反射效果': { enabled: false, weight: 1, count: 1 },
+                '场景类.室外': { enabled: true, weight: 1, count: 1 },
+                '场景类.城市': { enabled: true, weight: 1, count: 1 },
+                '场景类.建筑': { enabled: true, weight: 1, count: 1 },
+                '场景类.室内装饰': { enabled: true, weight: 1, count: 1 },
+                '场景类.自然景观': { enabled: false, weight: 1, count: 1 },
+                '场景类.人造景观': { enabled: true, weight: 1, count: 1 },
+                '动物生物.动物': { enabled: false, weight: 1, count: 1 },
+                '动物生物.幻想生物': { enabled: true, weight: 1, count: 1 },
+                '动物生物.行为动态': { enabled: false, weight: 1, count: 1 }
+            },
+            adultCategories: {},
+            excludedCategories: ['自定义', '灵感套装'],
+            includeNSFW: false,
+            totalTagsRange: { min: 12, max: 20 }
+        }
+    },
+    '游戏角色': {
+        description: '专注于游戏角色、3D渲染风格，适合生成游戏人物和CG角色',
+        icon: '🎮',
+        color: '#6366f1',
+        settings: {
+            categories: {
+                '常规标签.画质': { enabled: true, weight: 3, count: 1 },
+                '常规标签.摄影': { enabled: true, weight: 3, count: 1 },
+                '常规标签.构图': { enabled: true, weight: 2, count: 1 },
+                '常规标签.光影': { enabled: true, weight: 3, count: 1 },
+                '艺术题材.艺术家风格': { enabled: true, weight: 1, count: 1 },
+                '艺术题材.艺术流派': { enabled: false, weight: 1, count: 1 },
+                '艺术题材.技法形式': { enabled: true, weight: 2, count: 1 },
+                '艺术题材.媒介与效果': { enabled: true, weight: 2, count: 1 },
+                '艺术题材.装饰图案': { enabled: false, weight: 1, count: 1 },
+                '艺术题材.色彩与质感': { enabled: true, weight: 3, count: 1 },
+                '人物类.角色.动漫角色': { enabled: false, weight: 1, count: 1 },
+                '人物类.角色.游戏角色': { enabled: true, weight: 3, count: 2 },
+                '人物类.角色.二次元虚拟偶像': { enabled: false, weight: 1, count: 1 },
+                '人物类.角色.3D动画角色': { enabled: true, weight: 2, count: 1 },
+                '人物类.外貌与特征': { enabled: true, weight: 2, count: 1 },
+                '人物类.人设.职业': { enabled: true, weight: 2, count: 1 },
+                '人物类.人设.性别/年龄': { enabled: true, weight: 2, count: 1 },
+                '人物类.人设.胸部': { enabled: true, weight: 1, count: 1 },
+                '人物类.人设.脸型': { enabled: true, weight: 2, count: 1 },
+                '人物类.人设.鼻子': { enabled: true, weight: 1, count: 1 },
+                '人物类.人设.嘴巴': { enabled: true, weight: 2, count: 1 },
+                '人物类.人设.皮肤': { enabled: true, weight: 2, count: 1 },
+                '人物类.人设.体型': { enabled: true, weight: 2, count: 1 },
+                '人物类.人设.眉毛': { enabled: true, weight: 1, count: 1 },
+                '人物类.人设.头发': { enabled: true, weight: 2, count: 1 },
+                '人物类.人设.眼睛': { enabled: true, weight: 3, count: 1 },
+                '人物类.人设.瞳孔': { enabled: true, weight: 2, count: 1 },
+                '人物类.服饰': { enabled: true, weight: 3, count: 2 },
+                '人物类.服饰.常服': { enabled: false, weight: 1, count: 1 },
+                '人物类.服饰.泳装': { enabled: false, weight: 1, count: 1 },
+                '人物类.服饰.运动装': { enabled: true, weight: 1, count: 1 },
+                '人物类.服饰.内衣': { enabled: false, weight: 1, count: 1 },
+                '人物类.服饰.配饰': { enabled: true, weight: 2, count: 1 },
+                '人物类.服饰.鞋类': { enabled: true, weight: 1, count: 1 },
+                '人物类.服饰.睡衣': { enabled: false, weight: 1, count: 1 },
+                '人物类.服饰.帽子': { enabled: true, weight: 1, count: 1 },
+                '人物类.服饰.制服COS': { enabled: true, weight: 2, count: 1 },
+                '人物类.服饰.传统服饰': { enabled: false, weight: 1, count: 1 },
+                '动作/表情.姿态动作': { enabled: true, weight: 3, count: 1 },
+                '动作/表情.多人互动': { enabled: true, weight: 1, count: 1 },
+                '动作/表情.手部': { enabled: true, weight: 2, count: 1 },
+                '动作/表情.腿部': { enabled: true, weight: 1, count: 1 },
+                '动作/表情.眼神': { enabled: true, weight: 2, count: 1 },
+                '动作/表情.表情': { enabled: true, weight: 2, count: 1 },
+                '动作/表情.嘴型': { enabled: true, weight: 1, count: 1 },
+                '道具.翅膀': { enabled: true, weight: 1, count: 1 },
+                '道具.尾巴': { enabled: true, weight: 1, count: 1 },
+                '道具.耳朵': { enabled: true, weight: 1, count: 1 },
+                '道具.角': { enabled: true, weight: 1, count: 1 },
+                '场景类.光线环境': { enabled: true, weight: 3, count: 1 },
+                '场景类.情感与氛围': { enabled: true, weight: 2, count: 1 },
+                '场景类.背景环境': { enabled: true, weight: 2, count: 1 },
+                '场景类.反射效果': { enabled: true, weight: 2, count: 1 },
+                '场景类.室外': { enabled: true, weight: 2, count: 1 },
+                '场景类.城市': { enabled: true, weight: 1, count: 1 },
+                '场景类.建筑': { enabled: true, weight: 1, count: 1 },
+                '场景类.室内装饰': { enabled: true, weight: 1, count: 1 },
+                '场景类.自然景观': { enabled: false, weight: 1, count: 1 },
+                '场景类.人造景观': { enabled: true, weight: 2, count: 1 },
+                '动物生物.动物': { enabled: false, weight: 1, count: 1 },
+                '动物生物.幻想生物': { enabled: true, weight: 1, count: 1 },
+                '动物生物.行为动态': { enabled: false, weight: 1, count: 1 }
+            },
+            adultCategories: {},
+            excludedCategories: ['自定义', '灵感套装'],
+            includeNSFW: false,
+            totalTagsRange: { min: 14, max: 22 }
+        }
+    },
+    '玄幻修仙': {
+        description: '专注于东方玄幻、修仙、仙侠主题，仙气飘渺，精美玄幻插画',
+        icon: '🗡️',
+        color: '#e11d48',
+        settings: {
+            categories: {
+                '常规标签.画质': { enabled: true, weight: 4, count: 2 },
+                '常规标签.摄影': { enabled: true, weight: 3, count: 1 },
+                '常规标签.构图': { enabled: true, weight: 3, count: 1 },
+                '常规标签.光影': { enabled: true, weight: 4, count: 1 },
+                '艺术题材.艺术家风格': { enabled: true, weight: 2, count: 1 },
+                '艺术题材.艺术流派': { enabled: true, weight: 3, count: 1 },
+                '艺术题材.技法形式': { enabled: true, weight: 3, count: 1 },
+                '艺术题材.媒介与效果': { enabled: true, weight: 2, count: 1 },
+                '艺术题材.装饰图案': { enabled: true, weight: 3, count: 1 },
+                '艺术题材.色彩与质感': { enabled: true, weight: 3, count: 1 },
+                '人物类.角色.动漫角色': { enabled: false, weight: 1, count: 1 },
+                '人物类.角色.游戏角色': { enabled: false, weight: 1, count: 1 },
+                '人物类.角色.二次元虚拟偶像': { enabled: false, weight: 1, count: 1 },
+                '人物类.角色.3D动画角色': { enabled: false, weight: 1, count: 1 },
+                '人物类.外貌与特征': { enabled: true, weight: 3, count: 2 },
+                '人物类.人设.职业': { enabled: true, weight: 3, count: 1 },
+                '人物类.人设.性别/年龄': { enabled: true, weight: 3, count: 1 },
+                '人物类.人设.胸部': { enabled: true, weight: 2, count: 1 },
+                '人物类.人设.脸型': { enabled: true, weight: 3, count: 1 },
+                '人物类.人设.鼻子': { enabled: true, weight: 2, count: 1 },
+                '人物类.人设.嘴巴': { enabled: true, weight: 2, count: 1 },
+                '人物类.人设.皮肤': { enabled: true, weight: 2, count: 1 },
+                '人物类.人设.体型': { enabled: true, weight: 2, count: 1 },
+                '人物类.人设.眉毛': { enabled: true, weight: 3, count: 1 },
+                '人物类.人设.头发': { enabled: true, weight: 4, count: 1 },
+                '人物类.人设.眼睛': { enabled: true, weight: 3, count: 1 },
+                '人物类.人设.瞳孔': { enabled: true, weight: 2, count: 1 },
+                '人物类.服饰': { enabled: true, weight: 4, count: 2 },
+                '人物类.服饰.常服': { enabled: false, weight: 1, count: 1 },
+                '人物类.服饰.泳装': { enabled: false, weight: 1, count: 1 },
+                '人物类.服饰.运动装': { enabled: false, weight: 1, count: 1 },
+                '人物类.服饰.内衣': { enabled: false, weight: 1, count: 1 },
+                '人物类.服饰.配饰': { enabled: true, weight: 3, count: 1 },
+                '人物类.服饰.鞋类': { enabled: true, weight: 2, count: 1 },
+                '人物类.服饰.睡衣': { enabled: false, weight: 1, count: 1 },
+                '人物类.服饰.帽子': { enabled: true, weight: 2, count: 1 },
+                '人物类.服饰.制服COS': { enabled: false, weight: 1, count: 1 },
+                '人物类.服饰.传统服饰': { enabled: true, weight: 4, count: 2 },
+                '动作/表情.姿态动作': { enabled: true, weight: 4, count: 1 },
+                '动作/表情.多人互动': { enabled: false, weight: 1, count: 1 },
+                '动作/表情.手部': { enabled: true, weight: 3, count: 1 },
+                '动作/表情.腿部': { enabled: true, weight: 2, count: 1 },
+                '动作/表情.眼神': { enabled: true, weight: 3, count: 1 },
+                '动作/表情.表情': { enabled: true, weight: 3, count: 1 },
+                '动作/表情.嘴型': { enabled: true, weight: 2, count: 1 },
+                '道具.翅膀': { enabled: false, weight: 1, count: 1 },
+                '道具.尾巴': { enabled: false, weight: 1, count: 1 },
+                '道具.耳朵': { enabled: false, weight: 1, count: 1 },
+                '道具.角': { enabled: true, weight: 2, count: 1 },
+                '场景类.光线环境': { enabled: true, weight: 4, count: 1 },
+                '场景类.情感与氛围': { enabled: true, weight: 4, count: 1 },
+                '场景类.背景环境': { enabled: true, weight: 3, count: 1 },
+                '场景类.反射效果': { enabled: true, weight: 2, count: 1 },
+                '场景类.室外': { enabled: true, weight: 4, count: 1 },
+                '场景类.城市': { enabled: false, weight: 1, count: 1 },
+                '场景类.建筑': { enabled: true, weight: 3, count: 1 },
+                '场景类.室内装饰': { enabled: true, weight: 2, count: 1 },
+                '场景类.自然景观': { enabled: true, weight: 3, count: 1 },
+                '场景类.人造景观': { enabled: true, weight: 3, count: 1 },
+                '动物生物.动物': { enabled: false, weight: 1, count: 1 },
+                '动物生物.幻想生物': { enabled: true, weight: 3, count: 1 },
+                '动物生物.行为动态': { enabled: true, weight: 2, count: 1 }
+            },
+            adultCategories: {},
+            excludedCategories: ['自定义', '灵感套装'],
+            includeNSFW: false,
+            totalTagsRange: { min: 16, max: 26 }
+        }
+    },
+    '艺术写真': {
+        description: '专注于商业摄影风格，高质量艺术写真，精致光影与质感',
+        icon: '📸',
+        color: '#1d4ed8',
+        settings: {
+            categories: {
+                '常规标签.画质': { enabled: true, weight: 4, count: 2 },
+                '常规标签.摄影': { enabled: true, weight: 4, count: 1 },
+                '常规标签.构图': { enabled: true, weight: 4, count: 1 },
+                '常规标签.光影': { enabled: true, weight: 4, count: 1 },
+                '艺术题材.艺术家风格': { enabled: true, weight: 2, count: 1 },
+                '艺术题材.艺术流派': { enabled: false, weight: 1, count: 1 },
+                '艺术题材.技法形式': { enabled: true, weight: 2, count: 1 },
+                '艺术题材.媒介与效果': { enabled: true, weight: 2, count: 1 },
+                '艺术题材.装饰图案': { enabled: false, weight: 1, count: 1 },
+                '艺术题材.色彩与质感': { enabled: true, weight: 3, count: 1 },
+                '人物类.角色.动漫角色': { enabled: false, weight: 1, count: 1 },
+                '人物类.角色.游戏角色': { enabled: false, weight: 1, count: 1 },
+                '人物类.角色.二次元虚拟偶像': { enabled: false, weight: 1, count: 1 },
+                '人物类.角色.3D动画角色': { enabled: false, weight: 1, count: 1 },
+                '人物类.外貌与特征': { enabled: true, weight: 4, count: 2 },
+                '人物类.人设.职业': { enabled: true, weight: 2, count: 1 },
+                '人物类.人设.性别/年龄': { enabled: true, weight: 3, count: 1 },
+                '人物类.人设.胸部': { enabled: true, weight: 2, count: 1 },
+                '人物类.人设.脸型': { enabled: true, weight: 3, count: 1 },
+                '人物类.人设.鼻子': { enabled: true, weight: 2, count: 1 },
+                '人物类.人设.嘴巴': { enabled: true, weight: 3, count: 1 },
+                '人物类.人设.皮肤': { enabled: true, weight: 3, count: 1 },
+                '人物类.人设.体型': { enabled: true, weight: 2, count: 1 },
+                '人物类.人设.眉毛': { enabled: true, weight: 3, count: 1 },
+                '人物类.人设.头发': { enabled: true, weight: 4, count: 1 },
+                '人物类.人设.眼睛': { enabled: true, weight: 4, count: 1 },
+                '人物类.人设.瞳孔': { enabled: true, weight: 3, count: 1 },
+                '人物类.服饰': { enabled: true, weight: 4, count: 2 },
+                '人物类.服饰.常服': { enabled: true, weight: 3, count: 1 },
+                '人物类.服饰.泳装': { enabled: true, weight: 2, count: 1 },
+                '人物类.服饰.运动装': { enabled: true, weight: 2, count: 1 },
+                '人物类.服饰.内衣': { enabled: false, weight: 1, count: 1 },
+                '人物类.服饰.配饰': { enabled: true, weight: 3, count: 1 },
+                '人物类.服饰.鞋类': { enabled: true, weight: 2, count: 1 },
+                '人物类.服饰.睡衣': { enabled: false, weight: 1, count: 1 },
+                '人物类.服饰.帽子': { enabled: true, weight: 2, count: 1 },
+                '人物类.服饰.制服COS': { enabled: true, weight: 2, count: 1 },
+                '人物类.服饰.传统服饰': { enabled: true, weight: 2, count: 1 },
+                '动作/表情.姿态动作': { enabled: true, weight: 4, count: 1 },
+                '动作/表情.多人互动': { enabled: false, weight: 1, count: 1 },
+                '动作/表情.手部': { enabled: true, weight: 3, count: 1 },
+                '动作/表情.腿部': { enabled: true, weight: 2, count: 1 },
+                '动作/表情.眼神': { enabled: true, weight: 3, count: 1 },
+                '动作/表情.表情': { enabled: true, weight: 4, count: 1 },
+                '动作/表情.嘴型': { enabled: true, weight: 3, count: 1 },
+                '道具.翅膀': { enabled: false, weight: 1, count: 1 },
+                '道具.尾巴': { enabled: false, weight: 1, count: 1 },
+                '道具.耳朵': { enabled: false, weight: 1, count: 1 },
+                '道具.角': { enabled: false, weight: 1, count: 1 },
+                '场景类.光线环境': { enabled: true, weight: 4, count: 1 },
+                '场景类.情感与氛围': { enabled: true, weight: 3, count: 1 },
+                '场景类.背景环境': { enabled: true, weight: 3, count: 1 },
+                '场景类.反射效果': { enabled: true, weight: 3, count: 1 },
+                '场景类.室外': { enabled: true, weight: 3, count: 1 },
+                '场景类.城市': { enabled: true, weight: 2, count: 1 },
+                '场景类.建筑': { enabled: true, weight: 2, count: 1 },
+                '场景类.室内装饰': { enabled: true, weight: 3, count: 1 },
+                '场景类.自然景观': { enabled: true, weight: 2, count: 1 },
+                '场景类.人造景观': { enabled: true, weight: 2, count: 1 },
+                '动物生物.动物': { enabled: false, weight: 1, count: 1 },
+                '动物生物.幻想生物': { enabled: false, weight: 1, count: 1 },
+                '动物生物.行为动态': { enabled: false, weight: 1, count: 1 }
+            },
+            adultCategories: {},
+            excludedCategories: ['自定义', '灵感套装'],
+            includeNSFW: false,
+            totalTagsRange: { min: 16, max: 24 }
+        }
+    },
+    '电影海报': {
+        description: '专注于电影级构图、戏剧性光影、叙事感，适合影视海报和剧照风格，震撼视觉冲击',
+        icon: '🎬',
+        color: '#64748b',
+        settings: {
+            categories: {
+                '常规标签.画质': { enabled: true, weight: 4, count: 2 },
+                '常规标签.摄影': { enabled: true, weight: 4, count: 1 },
+                '常规标签.构图': { enabled: true, weight: 4, count: 1 },
+                '常规标签.光影': { enabled: true, weight: 4, count: 1 },
+                '艺术题材.艺术家风格': { enabled: true, weight: 3, count: 1 },
+                '艺术题材.艺术流派': { enabled: true, weight: 2, count: 1 },
+                '艺术题材.技法形式': { enabled: true, weight: 3, count: 1 },
+                '艺术题材.媒介与效果': { enabled: true, weight: 3, count: 1 },
+                '艺术题材.装饰图案': { enabled: false, weight: 1, count: 1 },
+                '艺术题材.色彩与质感': { enabled: true, weight: 4, count: 1 },
+                '人物类.角色.动漫角色': { enabled: false, weight: 1, count: 1 },
+                '人物类.角色.游戏角色': { enabled: false, weight: 1, count: 1 },
+                '人物类.角色.二次元虚拟偶像': { enabled: false, weight: 1, count: 1 },
+                '人物类.角色.3D动画角色': { enabled: false, weight: 1, count: 1 },
+                '人物类.外貌与特征': { enabled: true, weight: 4, count: 1 },
+                '人物类.人设.职业': { enabled: true, weight: 3, count: 1 },
+                '人物类.人设.性别/年龄': { enabled: true, weight: 3, count: 1 },
+                '人物类.人设.胸部': { enabled: false, weight: 1, count: 1 },
+                '人物类.人设.脸型': { enabled: true, weight: 3, count: 1 },
+                '人物类.人设.鼻子': { enabled: true, weight: 2, count: 1 },
+                '人物类.人设.嘴巴': { enabled: true, weight: 3, count: 1 },
+                '人物类.人设.皮肤': { enabled: true, weight: 3, count: 1 },
+                '人物类.人设.体型': { enabled: true, weight: 3, count: 1 },
+                '人物类.人设.眉毛': { enabled: true, weight: 2, count: 1 },
+                '人物类.人设.头发': { enabled: true, weight: 3, count: 1 },
+                '人物类.人设.眼睛': { enabled: true, weight: 4, count: 1 },
+                '人物类.人设.瞳孔': { enabled: true, weight: 3, count: 1 },
+                '人物类.服饰': { enabled: true, weight: 4, count: 1 },
+                '人物类.服饰.常服': { enabled: true, weight: 3, count: 1 },
+                '人物类.服饰.泳装': { enabled: false, weight: 1, count: 1 },
+                '人物类.服饰.运动装': { enabled: true, weight: 2, count: 1 },
+                '人物类.服饰.内衣': { enabled: false, weight: 1, count: 1 },
+                '人物类.服饰.配饰': { enabled: true, weight: 3, count: 1 },
+                '人物类.服饰.鞋类': { enabled: true, weight: 2, count: 1 },
+                '人物类.服饰.睡衣': { enabled: false, weight: 1, count: 1 },
+                '人物类.服饰.帽子': { enabled: true, weight: 2, count: 1 },
+                '人物类.服饰.制服COS': { enabled: true, weight: 3, count: 1 },
+                '人物类.服饰.传统服饰': { enabled: true, weight: 3, count: 1 },
+                '动作/表情.姿态动作': { enabled: true, weight: 4, count: 1 },
+                '动作/表情.多人互动': { enabled: true, weight: 3, count: 1 },
+                '动作/表情.手部': { enabled: true, weight: 3, count: 1 },
+                '动作/表情.腿部': { enabled: true, weight: 2, count: 1 },
+                '动作/表情.眼神': { enabled: true, weight: 4, count: 1 },
+                '动作/表情.表情': { enabled: true, weight: 4, count: 1 },
+                '动作/表情.嘴型': { enabled: true, weight: 3, count: 1 },
+                '道具.翅膀': { enabled: false, weight: 1, count: 1 },
+                '道具.尾巴': { enabled: false, weight: 1, count: 1 },
+                '道具.耳朵': { enabled: false, weight: 1, count: 1 },
+                '道具.角': { enabled: false, weight: 1, count: 1 },
+                '场景类.光线环境': { enabled: true, weight: 4, count: 1 },
+                '场景类.情感与氛围': { enabled: true, weight: 4, count: 1 },
+                '场景类.背景环境': { enabled: true, weight: 4, count: 1 },
+                '场景类.反射效果': { enabled: true, weight: 3, count: 1 },
+                '场景类.室外': { enabled: true, weight: 4, count: 1 },
+                '场景类.城市': { enabled: true, weight: 3, count: 1 },
+                '场景类.建筑': { enabled: true, weight: 3, count: 1 },
+                '场景类.室内装饰': { enabled: true, weight: 3, count: 1 },
+                '场景类.自然景观': { enabled: true, weight: 3, count: 1 },
+                '场景类.人造景观': { enabled: true, weight: 3, count: 1 },
+                '动物生物.动物': { enabled: false, weight: 1, count: 1 },
+                '动物生物.幻想生物': { enabled: false, weight: 1, count: 1 },
+                '动物生物.行为动态': { enabled: false, weight: 1, count: 1 }
+            },
+            adultCategories: {},
+            excludedCategories: ['自定义', '灵感套装'],
+            includeNSFW: false,
+            totalTagsRange: { min: 18, max: 28 }
+        }
+    },
+    '电商产品': {
+        description: '专注于商品展示、白底图、产品细节，适合电商平台商品图生成',
+        icon: '🛒',
+        color: '#ca8a04',
+        settings: {
+            categories: {
+                '常规标签.画质': { enabled: true, weight: 3, count: 1 },
+                '常规标签.摄影': { enabled: true, weight: 3, count: 1 },
+                '常规标签.构图': { enabled: true, weight: 3, count: 1 },
+                '常规标签.光影': { enabled: true, weight: 2, count: 1 },
+                '艺术题材.艺术家风格': { enabled: false, weight: 1, count: 1 },
+                '艺术题材.艺术流派': { enabled: false, weight: 1, count: 1 },
+                '艺术题材.技法形式': { enabled: false, weight: 1, count: 1 },
+                '艺术题材.媒介与效果': { enabled: true, weight: 1, count: 1 },
+                '艺术题材.装饰图案': { enabled: false, weight: 1, count: 1 },
+                '艺术题材.色彩与质感': { enabled: true, weight: 2, count: 1 },
+                '人物类.角色.动漫角色': { enabled: false, weight: 1, count: 1 },
+                '人物类.角色.游戏角色': { enabled: false, weight: 1, count: 1 },
+                '人物类.角色.二次元虚拟偶像': { enabled: false, weight: 1, count: 1 },
+                '人物类.角色.3D动画角色': { enabled: false, weight: 1, count: 1 },
+                '人物类.外貌与特征': { enabled: false, weight: 1, count: 1 },
+                '人物类.人设.职业': { enabled: false, weight: 1, count: 1 },
+                '人物类.人设.性别/年龄': { enabled: false, weight: 1, count: 1 },
+                '人物类.人设.胸部': { enabled: false, weight: 1, count: 1 },
+                '人物类.人设.脸型': { enabled: false, weight: 1, count: 1 },
+                '人物类.人设.鼻子': { enabled: false, weight: 1, count: 1 },
+                '人物类.人设.嘴巴': { enabled: false, weight: 1, count: 1 },
+                '人物类.人设.皮肤': { enabled: false, weight: 1, count: 1 },
+                '人物类.人设.体型': { enabled: false, weight: 1, count: 1 },
+                '人物类.人设.眉毛': { enabled: false, weight: 1, count: 1 },
+                '人物类.人设.头发': { enabled: false, weight: 1, count: 1 },
+                '人物类.人设.眼睛': { enabled: false, weight: 1, count: 1 },
+                '人物类.人设.瞳孔': { enabled: false, weight: 1, count: 1 },
+                '人物类.服饰': { enabled: true, weight: 2, count: 1 },
+                '人物类.服饰.常服': { enabled: true, weight: 1, count: 1 },
+                '人物类.服饰.泳装': { enabled: false, weight: 1, count: 1 },
+                '人物类.服饰.运动装': { enabled: true, weight: 1, count: 1 },
+                '人物类.服饰.内衣': { enabled: false, weight: 1, count: 1 },
+                '人物类.服饰.配饰': { enabled: true, weight: 2, count: 1 },
+                '人物类.服饰.鞋类': { enabled: true, weight: 1, count: 1 },
+                '人物类.服饰.睡衣': { enabled: false, weight: 1, count: 1 },
+                '人物类.服饰.帽子': { enabled: true, weight: 1, count: 1 },
+                '人物类.服饰.制服COS': { enabled: false, weight: 1, count: 1 },
+                '人物类.服饰.传统服饰': { enabled: false, weight: 1, count: 1 },
+                '动作/表情.姿态动作': { enabled: true, weight: 1, count: 1 },
+                '动作/表情.多人互动': { enabled: false, weight: 1, count: 1 },
+                '动作/表情.手部': { enabled: true, weight: 1, count: 1 },
+                '动作/表情.腿部': { enabled: false, weight: 1, count: 1 },
+                '动作/表情.眼神': { enabled: false, weight: 1, count: 1 },
+                '动作/表情.表情': { enabled: false, weight: 1, count: 1 },
+                '动作/表情.嘴型': { enabled: false, weight: 1, count: 1 },
+                '道具.翅膀': { enabled: false, weight: 1, count: 1 },
+                '道具.尾巴': { enabled: false, weight: 1, count: 1 },
+                '道具.耳朵': { enabled: false, weight: 1, count: 1 },
+                '道具.角': { enabled: false, weight: 1, count: 1 },
+                '场景类.光线环境': { enabled: true, weight: 2, count: 1 },
+                '场景类.情感与氛围': { enabled: false, weight: 1, count: 1 },
+                '场景类.背景环境': { enabled: true, weight: 2, count: 1 },
+                '场景类.反射效果': { enabled: true, weight: 2, count: 1 },
+                '场景类.室外': { enabled: false, weight: 1, count: 1 },
+                '场景类.城市': { enabled: false, weight: 1, count: 1 },
+                '场景类.建筑': { enabled: false, weight: 1, count: 1 },
+                '场景类.室内装饰': { enabled: true, weight: 2, count: 1 },
+                '场景类.自然景观': { enabled: false, weight: 1, count: 1 },
+                '场景类.人造景观': { enabled: false, weight: 1, count: 1 },
+                '动物生物.动物': { enabled: false, weight: 1, count: 1 },
+                '动物生物.幻想生物': { enabled: false, weight: 1, count: 1 },
+                '动物生物.行为动态': { enabled: false, weight: 1, count: 1 }
+            },
+            adultCategories: {},
+            excludedCategories: ['自定义', '灵感套装'],
+            includeNSFW: false,
+            totalTagsRange: { min: 10, max: 18 }
+        }
+    },
+    '萌宠': {
+        description: '专注于可爱宠物、动物表情、温馨互动，适合生成萌宠照片',
+        icon: '🐾',
+        color: '#be185d',
+        settings: {
+            categories: {
+                '常规标签.画质': { enabled: true, weight: 3, count: 1 },
+                '常规标签.摄影': { enabled: true, weight: 3, count: 1 },
+                '常规标签.构图': { enabled: true, weight: 2, count: 1 },
+                '常规标签.光影': { enabled: true, weight: 2, count: 1 },
+                '艺术题材.艺术家风格': { enabled: false, weight: 1, count: 1 },
+                '艺术题材.艺术流派': { enabled: false, weight: 1, count: 1 },
+                '艺术题材.技法形式': { enabled: false, weight: 1, count: 1 },
+                '艺术题材.媒介与效果': { enabled: true, weight: 1, count: 1 },
+                '艺术题材.装饰图案': { enabled: false, weight: 1, count: 1 },
+                '艺术题材.色彩与质感': { enabled: true, weight: 2, count: 1 },
+                '人物类.角色.动漫角色': { enabled: false, weight: 1, count: 1 },
+                '人物类.角色.游戏角色': { enabled: false, weight: 1, count: 1 },
+                '人物类.角色.二次元虚拟偶像': { enabled: false, weight: 1, count: 1 },
+                '人物类.角色.3D动画角色': { enabled: false, weight: 1, count: 1 },
+                '人物类.外貌与特征': { enabled: false, weight: 1, count: 1 },
+                '人物类.人设.职业': { enabled: false, weight: 1, count: 1 },
+                '人物类.人设.性别/年龄': { enabled: false, weight: 1, count: 1 },
+                '人物类.人设.胸部': { enabled: false, weight: 1, count: 1 },
+                '人物类.人设.脸型': { enabled: false, weight: 1, count: 1 },
+                '人物类.人设.鼻子': { enabled: false, weight: 1, count: 1 },
+                '人物类.人设.嘴巴': { enabled: false, weight: 1, count: 1 },
+                '人物类.人设.皮肤': { enabled: false, weight: 1, count: 1 },
+                '人物类.人设.体型': { enabled: false, weight: 1, count: 1 },
+                '人物类.人设.眉毛': { enabled: false, weight: 1, count: 1 },
+                '人物类.人设.头发': { enabled: false, weight: 1, count: 1 },
+                '人物类.人设.眼睛': { enabled: false, weight: 1, count: 1 },
+                '人物类.人设.瞳孔': { enabled: false, weight: 1, count: 1 },
+                '人物类.服饰': { enabled: false, weight: 1, count: 1 },
+                '人物类.服饰.常服': { enabled: false, weight: 1, count: 1 },
+                '人物类.服饰.泳装': { enabled: false, weight: 1, count: 1 },
+                '人物类.服饰.运动装': { enabled: false, weight: 1, count: 1 },
+                '人物类.服饰.内衣': { enabled: false, weight: 1, count: 1 },
+                '人物类.服饰.配饰': { enabled: false, weight: 1, count: 1 },
+                '人物类.服饰.鞋类': { enabled: false, weight: 1, count: 1 },
+                '人物类.服饰.睡衣': { enabled: false, weight: 1, count: 1 },
+                '人物类.服饰.帽子': { enabled: false, weight: 1, count: 1 },
+                '人物类.服饰.制服COS': { enabled: false, weight: 1, count: 1 },
+                '人物类.服饰.传统服饰': { enabled: false, weight: 1, count: 1 },
+                '动作/表情.姿态动作': { enabled: true, weight: 2, count: 1 },
+                '动作/表情.多人互动': { enabled: false, weight: 1, count: 1 },
+                '动作/表情.手部': { enabled: false, weight: 1, count: 1 },
+                '动作/表情.腿部': { enabled: false, weight: 1, count: 1 },
+                '动作/表情.眼神': { enabled: false, weight: 1, count: 1 },
+                '动作/表情.表情': { enabled: true, weight: 2, count: 1 },
+                '动作/表情.嘴型': { enabled: false, weight: 1, count: 1 },
+                '道具.翅膀': { enabled: false, weight: 1, count: 1 },
+                '道具.尾巴': { enabled: true, weight: 2, count: 1 },
+                '道具.耳朵': { enabled: true, weight: 2, count: 1 },
+                '道具.角': { enabled: false, weight: 1, count: 1 },
+                '场景类.光线环境': { enabled: true, weight: 2, count: 1 },
+                '场景类.情感与氛围': { enabled: true, weight: 3, count: 1 },
+                '场景类.背景环境': { enabled: true, weight: 2, count: 1 },
+                '场景类.反射效果': { enabled: true, weight: 1, count: 1 },
+                '场景类.室外': { enabled: true, weight: 2, count: 1 },
+                '场景类.城市': { enabled: false, weight: 1, count: 1 },
+                '场景类.建筑': { enabled: false, weight: 1, count: 1 },
+                '场景类.室内装饰': { enabled: true, weight: 2, count: 1 },
+                '场景类.自然景观': { enabled: true, weight: 2, count: 1 },
+                '场景类.人造景观': { enabled: false, weight: 1, count: 1 },
+                '动物生物.动物': { enabled: true, weight: 3, count: 2 },
+                '动物生物.幻想生物': { enabled: false, weight: 1, count: 1 },
+                '动物生物.行为动态': { enabled: true, weight: 2, count: 1 }
+            },
+            adultCategories: {},
+            excludedCategories: ['自定义', '灵感套装'],
+            includeNSFW: false,
+            totalTagsRange: { min: 12, max: 20 }
+        }
+    },
+    '成人色情': {
+        description: '专注于成人内容，包含NSFW标签',
+        icon: '🔞',
+        color: '#7c3aed',
+        settings: {
+            categories: {
+                '常规标签.画质': { enabled: true, weight: 3, count: 1 },
+                '常规标签.摄影': { enabled: true, weight: 2, count: 1 },
+                '常规标签.构图': { enabled: true, weight: 2, count: 1 },
+                '常规标签.光影': { enabled: true, weight: 2, count: 1 },
+                '艺术题材.艺术家风格': { enabled: true, weight: 1, count: 1 },
+                '艺术题材.艺术流派': { enabled: false, weight: 1, count: 1 },
+                '艺术题材.技法形式': { enabled: true, weight: 1, count: 1 },
+                '艺术题材.媒介与效果': { enabled: true, weight: 1, count: 1 },
+                '艺术题材.装饰图案': { enabled: false, weight: 1, count: 1 },
+                '艺术题材.色彩与质感': { enabled: true, weight: 1, count: 1 },
+                '人物类.角色.动漫角色': { enabled: false, weight: 1, count: 1 },
+                '人物类.角色.游戏角色': { enabled: false, weight: 1, count: 1 },
+                '人物类.角色.二次元虚拟偶像': { enabled: false, weight: 1, count: 1 },
+                '人物类.角色.3D动画角色': { enabled: false, weight: 1, count: 1 },
+                '人物类.外貌与特征': { enabled: true, weight: 3, count: 2 },
+                '人物类.人设.职业': { enabled: true, weight: 1, count: 1 },
+                '人物类.人设.性别/年龄': { enabled: true, weight: 2, count: 1 },
+                '人物类.人设.胸部': { enabled: true, weight: 3, count: 1 },
+                '人物类.人设.脸型': { enabled: true, weight: 1, count: 1 },
+                '人物类.人设.鼻子': { enabled: true, weight: 1, count: 1 },
+                '人物类.人设.嘴巴': { enabled: true, weight: 2, count: 1 },
+                '人物类.人设.皮肤': { enabled: true, weight: 1, count: 1 },
+                '人物类.人设.体型': { enabled: true, weight: 2, count: 1 },
+                '人物类.人设.眉毛': { enabled: true, weight: 1, count: 1 },
+                '人物类.人设.头发': { enabled: true, weight: 2, count: 1 },
+                '人物类.人设.眼睛': { enabled: true, weight: 2, count: 1 },
+                '人物类.人设.瞳孔': { enabled: true, weight: 1, count: 1 },
+                '人物类.服饰': { enabled: true, weight: 2, count: 1 },
+                '人物类.服饰.常服': { enabled: true, weight: 1, count: 1 },
+                '人物类.服饰.泳装': { enabled: true, weight: 2, count: 1 },
+                '人物类.服饰.运动装': { enabled: true, weight: 1, count: 1 },
+                '人物类.服饰.内衣': { enabled: true, weight: 3, count: 1 },
+                '人物类.服饰.配饰': { enabled: true, weight: 1, count: 1 },
+                '人物类.服饰.鞋类': { enabled: true, weight: 1, count: 1 },
+                '人物类.服饰.睡衣': { enabled: true, weight: 2, count: 1 },
+                '人物类.服饰.帽子': { enabled: false, weight: 1, count: 1 },
+                '人物类.服饰.制服COS': { enabled: true, weight: 2, count: 1 },
+                '人物类.服饰.传统服饰': { enabled: false, weight: 1, count: 1 },
+                '动作/表情.姿态动作': { enabled: true, weight: 3, count: 1 },
+                '动作/表情.多人互动': { enabled: true, weight: 2, count: 1 },
+                '动作/表情.手部': { enabled: true, weight: 2, count: 1 },
+                '动作/表情.腿部': { enabled: true, weight: 2, count: 1 },
+                '动作/表情.眼神': { enabled: true, weight: 2, count: 1 },
+                '动作/表情.表情': { enabled: true, weight: 3, count: 1 },
+                '动作/表情.嘴型': { enabled: true, weight: 2, count: 1 },
+                '道具.翅膀': { enabled: false, weight: 1, count: 1 },
+                '道具.尾巴': { enabled: false, weight: 1, count: 1 },
+                '道具.耳朵': { enabled: false, weight: 1, count: 1 },
+                '道具.角': { enabled: false, weight: 1, count: 1 },
+                '场景类.光线环境': { enabled: true, weight: 2, count: 1 },
+                '场景类.情感与氛围': { enabled: true, weight: 2, count: 1 },
+                '场景类.背景环境': { enabled: true, weight: 1, count: 1 },
+                '场景类.反射效果': { enabled: false, weight: 1, count: 1 },
+                '场景类.室外': { enabled: false, weight: 1, count: 1 },
+                '场景类.城市': { enabled: false, weight: 1, count: 1 },
+                '场景类.建筑': { enabled: false, weight: 1, count: 1 },
+                '场景类.室内装饰': { enabled: true, weight: 2, count: 1 },
+                '场景类.自然景观': { enabled: false, weight: 1, count: 1 },
+                '场景类.人造景观': { enabled: false, weight: 1, count: 1 },
+                '动物生物.动物': { enabled: false, weight: 1, count: 1 },
+                '动物生物.幻想生物': { enabled: false, weight: 1, count: 1 },
+                '动物生物.行为动态': { enabled: false, weight: 1, count: 1 }
+            },
+            adultCategories: {
+                '涩影湿.性暗示': { enabled: true, weight: 2, count: 1 },
+                '涩影湿.性行为.性行为类型': { enabled: true, weight: 3, count: 2 },
+                '涩影湿.性行为.身体部位': { enabled: true, weight: 2, count: 1 },
+                '涩影湿.性行为.道具与玩具': { enabled: true, weight: 1, count: 1 },
+                '涩影湿.性行为.束缚与调教': { enabled: true, weight: 1, count: 1 },
+                '涩影湿.性行为.特殊癖好与情境': { enabled: true, weight: 1, count: 1 },
+                '涩影湿.性行为.视觉风格与特定元素': { enabled: true, weight: 1, count: 1 },
+                '涩影湿.性行为.欲望表情': { enabled: true, weight: 2, count: 1 }
+            },
+            excludedCategories: ['自定义', '灵感套装'],
+            includeNSFW: true,
+            totalTagsRange: { min: 15, max: 25 }
+        }
+    }
+};
+
 let randomSettings = {
     categories: {
         '常规标签.画质': { enabled: true, weight: 2, count: 1 },
@@ -65,17 +1287,18 @@ let randomSettings = {
         '动物生物.行为动态': { enabled: true, weight: 1, count: 1 }
     },
     adultCategories: {
-        '轻度内容.涩影湿.擦边': { enabled: true, weight: 2, count: 1 },
-        '性行为.涩影湿.NSFW.性行为类型': { enabled: true, weight: 3, count: 2 },
-        '身体部位.涩影湿.NSFW.身体部位': { enabled: true, weight: 2, count: 1 },
-        '道具玩具.涩影湿.NSFW.道具与玩具': { enabled: true, weight: 1, count: 1 },
-        '束缚调教.涩影湿.NSFW.束缚与调教': { enabled: true, weight: 1, count: 1 },
-        '特殊癖好.涩影湿.NSFW.特殊癖好与情境': { enabled: true, weight: 1, count: 1 },
-        '视觉效果.涩影湿.NSFW.视觉风格与特定元素': { enabled: true, weight: 1, count: 1 },
-        '欲望表情.涩影湿.NSFW.欲望表情': { enabled: true, weight: 2, count: 1 }
+        '涩影湿.性暗示': { enabled: true, weight: 2, count: 1 },
+        '涩影湿.性行为.性行为类型': { enabled: true, weight: 3, count: 2 },
+        '涩影湿.性行为.身体部位': { enabled: true, weight: 2, count: 1 },
+        '涩影湿.性行为.道具与玩具': { enabled: true, weight: 1, count: 1 },
+        '涩影湿.性行为.束缚与调教': { enabled: true, weight: 1, count: 1 },
+        '涩影湿.性行为.特殊癖好与情境': { enabled: true, weight: 1, count: 1 },
+        '涩影湿.性行为.视觉风格与特定元素': { enabled: true, weight: 1, count: 1 },
+        '涩影湿.性行为.欲望表情': { enabled: true, weight: 2, count: 1 }
     },
     excludedCategories: ['自定义', '灵感套装'],
     includeNSFW: false,
+    limitTotalTags: true,
     totalTagsRange: { min: 12, max: 20 }
 };
 
@@ -85,6 +1308,21 @@ async function loadRandomSettings() {
         if (response.ok) {
             const settings = await response.json();
             randomSettings = settings;
+            if (!randomSettings.adultCategories || Object.keys(randomSettings.adultCategories).length === 0) {
+                randomSettings.adultCategories = {
+                    '涩影湿.性暗示': { enabled: true, weight: 2, count: 1 },
+                    '涩影湿.性行为.性行为类型': { enabled: true, weight: 3, count: 2 },
+                    '涩影湿.性行为.身体部位': { enabled: true, weight: 2, count: 1 },
+                    '涩影湿.性行为.道具与玩具': { enabled: true, weight: 1, count: 1 },
+                    '涩影湿.性行为.束缚与调教': { enabled: true, weight: 1, count: 1 },
+                    '涩影湿.性行为.特殊癖好与情境': { enabled: true, weight: 1, count: 1 },
+                    '涩影湿.性行为.视觉风格与特定元素': { enabled: true, weight: 1, count: 1 },
+                    '涩影湿.性行为.欲望表情': { enabled: true, weight: 2, count: 1 }
+                };
+            }
+            if (randomSettings.limitTotalTags === undefined) {
+                randomSettings.limitTotalTags = true;
+            }
             console.log('随机设置加载成功');
         } else {
             console.warn('无法从服务器加载随机设置，使用默认设置');
@@ -120,118 +1358,23 @@ async function saveRandomSettings() {
 
 document.addEventListener('DOMContentLoaded', loadRandomSettings);
 
-function closeRandomGeneratorDialog() {
-    if (randomGeneratorDialog) {
-        randomGeneratorDialog.style.display = 'none';
-    }
-}
-
-function createRandomGeneratorDialog() {
-    const overlay = document.createElement('div');
-    overlay.style.cssText = `
-        position: fixed;
-        top: 0;
-        left: 0;
-        width: 100%;
-        height: 100%;
-        background: rgba(0, 0, 0, 0.6);
-        z-index: 10002;
-        display: none;
-        backdrop-filter: blur(10px);
-        -webkit-backdrop-filter: blur(10px);
-    `;
-
-    const dialog = document.createElement('div');
-    dialog.style.cssText = `
-        position: fixed;
-        top: 50%;
-        left: 50%;
-        transform: translate(-50%, -50%);
-        width: 1200px;
-        max-width: 95vw;
-        height: 850px;
-        max-height: 95vh;
-        background: linear-gradient(135deg, #1e293b 0%, #0f172a 100%);
-        border: 2px solid rgb(19, 101, 201);
-        border-radius: 16px;
-        box-shadow: 0 0 20px rgba(96, 165, 250, 0.7), 0 0 40px rgba(96, 165, 250, 0.4);
-        z-index: 10003;
-        display: flex;
-        flex-direction: column;
-        font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
-        overflow: hidden;
-    `;
-
-    const header = document.createElement('div');
-    header.style.cssText = `
-        background: rgb(34, 77, 141);
-        padding: 12px 16px;
-        display: flex;
-        align-items: center;
-        justify-content: space-between;
-        border-radius: 16px 16px 0 0;
-        user-select: none;
-    `;
-
-    const title = document.createElement('span');
-    title.innerHTML = '随机规则设置';
-    title.style.cssText = `
-        color: #f1f5f9;
-        font-size: 18px;
-        font-weight: 600;
-        letter-spacing: -0.025em;
-        display: flex;
-        align-items: center;
-        gap: 8px;
-    `;
-
-    const closeBtn = document.createElement('button');
-    closeBtn.textContent = '×';
-    closeBtn.style.cssText = `
-        background: linear-gradient(135deg, #dc2626 0%, #b91c1c 100%);
-        border: 1px solid rgba(220, 38, 38, 0.8);
-        color: #ffffff;
-        padding: 0;
-        width: 24px;
-        height: 24px;
-        font-size: 18px;
-        font-weight: 700;
-        border-radius: 6px;
-        cursor: pointer;
-        transition: all 0.2s ease;
-        outline: none;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-    `;
-    closeBtn.addEventListener('mouseenter', () => {
-        closeBtn.style.background = 'linear-gradient(135deg, #f87171 0%, #ef4444 100%)';
-        closeBtn.style.boxShadow = '0 2px 8px rgba(239, 68, 68, 0.4)';
-        closeBtn.style.borderColor = 'rgba(248, 113, 113, 0.8)';
-    });
-    closeBtn.addEventListener('mouseleave', () => {
-        closeBtn.style.background = 'linear-gradient(135deg, #dc2626 0%, #b91c1c 100%)';
-        closeBtn.style.boxShadow = 'none';
-        closeBtn.style.borderColor = 'rgba(220, 38, 38, 0.8)';
-    });
-    closeBtn.onclick = () => {
-        closeRandomGeneratorDialog();
-    };
-
-    header.appendChild(title);
-    header.appendChild(closeBtn);
-
+function createRandomGeneratorContent() {
     const content = document.createElement('div');
+    content.className = 'random-generator-content';
     content.style.cssText = `
-        flex: 1;
-        padding: 20px;
+        padding: 16px;
         overflow-y: auto;
         display: flex;
         flex-direction: column;
-        gap: 20px;
+        gap: 16px;
+        height: 100%;
     `;
 
     const rulesSection = createRulesSection();
+    rulesSection.classList.add('rules-section');
+
+    const presetsSection = createPresetsSection();
+    presetsSection.classList.add('presets-section');
     
     const categoriesSection = createCategoriesSection();
     categoriesSection.classList.add('categories-section');
@@ -239,101 +1382,307 @@ function createRandomGeneratorDialog() {
     const globalSection = createGlobalSection();
     globalSection.classList.add('global-section');
 
-    content.appendChild(rulesSection);
-    content.appendChild(categoriesSection);
-    content.appendChild(globalSection);
-
-    const footer = document.createElement('div');
-    footer.style.cssText = `
-        background: linear-gradient(135deg, #334155 0%, #1e293b 100%);
-        padding: 16px;
+    const topRow = document.createElement('div');
+    topRow.style.cssText = `
         display: flex;
-        justify-content: space-between;
-        align-items: center;
-        border-radius: 0 0 16px 16px;
+        gap: 16px;
+    `;
+    rulesSection.style.flex = '1';
+    globalSection.style.flex = '1';
+    topRow.appendChild(rulesSection);
+    topRow.appendChild(globalSection);
+    topRow.classList.add('top-row-section');
+
+    content.appendChild(topRow);
+    content.appendChild(presetsSection);
+    content.appendChild(categoriesSection);
+
+    return content;
+}
+
+function updateRandomGeneratorContent() {
+    if (!currentTagSelectorDialog) return;
+    
+    const tagContent = currentTagSelectorDialog.tagContent;
+    if (!tagContent) return;
+    
+    const existingContent = tagContent.querySelector('.random-generator-content');
+    if (existingContent) {
+        const topRow = existingContent.querySelector('.top-row-section');
+        if (topRow) {
+            const rulesSection = topRow.querySelector('.rules-section');
+            if (rulesSection) {
+                const newRulesSection = createRulesSection();
+                newRulesSection.classList.add('rules-section');
+                newRulesSection.style.flex = '1';
+                rulesSection.parentNode.replaceChild(newRulesSection, rulesSection);
+            }
+            
+            const globalSection = topRow.querySelector('.global-section');
+            if (globalSection) {
+                const newGlobalSection = createGlobalSection();
+                newGlobalSection.classList.add('global-section');
+                newGlobalSection.style.flex = '1';
+                globalSection.parentNode.replaceChild(newGlobalSection, globalSection);
+            }
+        }
+        
+        const presetsSection = existingContent.querySelector('.presets-section');
+        if (presetsSection) {
+            const newPresetsSection = createPresetsSection();
+            newPresetsSection.classList.add('presets-section');
+            presetsSection.parentNode.replaceChild(newPresetsSection, presetsSection);
+        }
+        
+        const categoriesSection = existingContent.querySelector('.categories-section');
+        if (categoriesSection) {
+            const newCategoriesSection = createCategoriesSection();
+            newCategoriesSection.classList.add('categories-section');
+            categoriesSection.parentNode.replaceChild(newCategoriesSection, categoriesSection);
+        }
+    }
+}
+
+async function openRandomGeneratorDialog(tagSelectorDlg) {
+    await loadRandomSettings();
+    
+    currentTagSelectorDialog = tagSelectorDlg;
+    
+    if (tagSelectorDlg.subCategoryTabs) {
+        tagSelectorDlg.subCategoryTabs.style.display = 'none';
+    }
+    if (tagSelectorDlg.subSubCategoryTabs) {
+        tagSelectorDlg.subSubCategoryTabs.style.display = 'none';
+    }
+    if (tagSelectorDlg.subSubSubCategoryTabs) {
+        tagSelectorDlg.subSubSubCategoryTabs.style.display = 'none';
+    }
+    
+    if (tagSelectorDlg.clearButtonContainer) {
+        tagSelectorDlg.clearButtonContainer.style.display = 'flex';
+    }
+    if (tagSelectorDlg.quickRandomBtn) {
+        tagSelectorDlg.quickRandomBtn.style.display = 'block';
+    }
+    if (tagSelectorDlg.restoreBtn) {
+        tagSelectorDlg.restoreBtn.style.display = 'block';
+    }
+    if (tagSelectorDlg.clearBtn) {
+        tagSelectorDlg.clearBtn.style.display = 'block';
+    }
+    
+    const tagContent = tagSelectorDlg.tagContent;
+    if (!tagContent) return;
+    
+    tagContent.innerHTML = '';
+    
+    const content = createRandomGeneratorContent();
+    tagContent.appendChild(content);
+}
+
+function closeRandomGeneratorDialog() {
+    if (currentTagSelectorDialog) {
+        const tagContent = currentTagSelectorDialog.tagContent;
+        if (tagContent) {
+            const existingContent = tagContent.querySelector('.random-generator-content');
+            if (existingContent) {
+                existingContent.remove();
+            }
+        }
+    }
+}
+
+function createRandomGeneratorDialog() {
+}
+
+function applyPreset(presetName) {
+    const preset = randomPresets[presetName];
+    if (!preset) return;
+    
+    const defaultAdultCategories = {
+        '涩影湿.性暗示': { enabled: true, weight: 2, count: 1 },
+        '涩影湿.性行为.性行为类型': { enabled: true, weight: 3, count: 2 },
+        '涩影湿.性行为.身体部位': { enabled: true, weight: 2, count: 1 },
+        '涩影湿.性行为.道具与玩具': { enabled: true, weight: 1, count: 1 },
+        '涩影湿.性行为.束缚与调教': { enabled: true, weight: 1, count: 1 },
+        '涩影湿.性行为.特殊癖好与情境': { enabled: true, weight: 1, count: 1 },
+        '涩影湿.性行为.视觉风格与特定元素': { enabled: true, weight: 1, count: 1 },
+        '涩影湿.性行为.欲望表情': { enabled: true, weight: 2, count: 1 }
+    };
+    
+    randomSettings = JSON.parse(JSON.stringify(preset.settings));
+    
+    if (!randomSettings.adultCategories || Object.keys(randomSettings.adultCategories).length === 0) {
+        randomSettings.adultCategories = defaultAdultCategories;
+    }
+    
+    if (randomSettings.limitTotalTags === undefined) {
+        randomSettings.limitTotalTags = true;
+    }
+    
+    saveRandomSettings();
+    
+    if (!currentTagSelectorDialog) return;
+    
+    const tagContent = currentTagSelectorDialog.tagContent;
+    if (!tagContent) return;
+    
+    const existingContent = tagContent.querySelector('.random-generator-content');
+    if (existingContent) {
+        const categoriesSection = existingContent.querySelector('.categories-section');
+        if (categoriesSection) {
+            const newCategoriesSection = createCategoriesSection();
+            newCategoriesSection.classList.add('categories-section');
+            categoriesSection.parentNode.replaceChild(newCategoriesSection, categoriesSection);
+        }
+        
+        const globalSection = existingContent.querySelector('.global-section');
+        if (globalSection) {
+            const newGlobalSection = createGlobalSection();
+            newGlobalSection.classList.add('global-section');
+            newGlobalSection.style.flex = '1';
+            globalSection.parentNode.replaceChild(newGlobalSection, globalSection);
+        }
+    }
+}
+
+let currentSelectedPreset = null;
+
+function createPresetsSection() {
+    const section = document.createElement('div');
+    section.style.cssText = `
+        background: rgba(15, 23, 42, 0.5);
+        border: 1px solid rgba(59, 130, 246, 0.3);
+        border-radius: 8px;
+        padding: 16px;
+    `;
+
+    const title = document.createElement('h3');
+    title.textContent = '🎯 随机权重方案';
+    title.style.cssText = `
+        color: #60a5fa;
+        font-size: 16px;
+        font-weight: 600;
+        margin: 0 0 16px 0;
+    `;
+    section.appendChild(title);
+
+    const presetsContainer = document.createElement('div');
+    presetsContainer.style.cssText = `
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
         gap: 12px;
+        align-items: start;
     `;
 
-    const resetBtn = document.createElement('button');
-    resetBtn.innerHTML = '🔄 重置默认';
-    resetBtn.style.cssText = `
-        background: linear-gradient(135deg, #3b82f6 0%, #2563eb 100%);
-        border: 1px solid rgba(59, 130, 246, 0.8);
-        color: #ffffff;
-        padding: 8px 16px;
-        border-radius: 6px;
-        cursor: pointer;
-        font-size: 14px;
-        font-weight: 500;
-        transition: all 0.3s ease;
-        outline: none;
-        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
-    `;
-    
-    resetBtn.addEventListener('mouseenter', () => {
-        resetBtn.style.background = 'linear-gradient(135deg, #60a5fa 0%, #3b82f6 100%)';
-        resetBtn.style.transform = 'translateY(-2px)';
-        resetBtn.style.boxShadow = '0 4px 8px rgba(0, 0, 0, 0.3)';
-    });
-    
-    resetBtn.addEventListener('mouseleave', () => {
-        resetBtn.style.background = 'linear-gradient(135deg, #3b82f6 0%, #2563eb 100%)';
-        resetBtn.style.transform = 'translateY(0)';
-        resetBtn.style.boxShadow = '0 2px 4px rgba(0, 0, 0, 0.2)';
-    });
-    
-    resetBtn.addEventListener('mousedown', () => {
-        resetBtn.style.transform = 'translateY(1px)';
-        resetBtn.style.boxShadow = '0 1px 2px rgba(0, 0, 0, 0.2)';
-    });
-    
-    resetBtn.addEventListener('mouseup', () => {
-        resetBtn.style.transform = 'translateY(-2px)';
-        resetBtn.style.boxShadow = '0 4px 8px rgba(0, 0, 0, 0.3)';
-    });
-    
-    resetBtn.onclick = async () => {
-        resetBtn.style.transform = 'scale(0.95)';
-        setTimeout(() => {
-            resetBtn.style.transform = '';
-        }, 100);
-        
-        resetRandomSettings();
-        await saveRandomSettings();
-        
-        overlay.style.display = 'none';
-        createRandomGeneratorDialog();
-        randomGeneratorDialog.style.display = 'block';
-    };
-
-    footer.appendChild(resetBtn);
-
-    dialog.appendChild(header);
-    dialog.appendChild(content);
-    dialog.appendChild(footer);
-    overlay.appendChild(dialog);
-
-    document.body.appendChild(overlay);
-    randomGeneratorDialog = overlay;
-
-    const escapeHandler = (e) => {
-        if (randomGeneratorDialog && randomGeneratorDialog.style.display === 'block' && e.key === 'Escape') {
-            e.preventDefault();
-            e.stopPropagation();
-            e.stopImmediatePropagation();
-            closeRandomGeneratorDialog();
+    Object.entries(randomPresets).forEach(([presetName, preset]) => {
+        if (presetName === '成人色情' && !window.adultContentUnlocked) {
+            return;
         }
-    };
-    
-    document.addEventListener('keydown', escapeHandler, true);
-    
-    const originalCloseFunction = closeRandomGeneratorDialog;
-    closeRandomGeneratorDialog = function() {
-        document.removeEventListener('keydown', escapeHandler);
-        if (randomGeneratorDialog) {
-            randomGeneratorDialog.style.display = 'none';
-        }
-    };
+
+        const presetCard = document.createElement('div');
+        presetCard.className = 'preset-card';
+        presetCard.dataset.presetName = presetName;
+        const isSelected = currentSelectedPreset === presetName;
+        
+        presetCard.style.cssText = `
+            background: linear-gradient(135deg, rgba(30, 41, 59, 0.9) 0%, rgba(15, 23, 42, 0.95) 100%);
+            border: 2px solid ${isSelected ? preset.color : preset.color + '40'};
+            border-radius: 12px;
+            padding: 14px;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            position: relative;
+            overflow: hidden;
+            min-width: 0;
+            height: 100px;
+            display: flex;
+            flex-direction: column;
+            cursor: pointer;
+            ${isSelected ? `box-shadow: 0 0 16px ${preset.color}50, inset 0 0 20px ${preset.color}15;` : ''}
+        `;
+
+        const header = document.createElement('div');
+        header.style.cssText = `
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            margin-bottom: 8px;
+        `;
+
+        const icon = document.createElement('span');
+        icon.style.cssText = `
+            font-size: 20px;
+        `;
+        icon.textContent = preset.icon;
+
+        const name = document.createElement('span');
+        name.style.cssText = `
+            color: #f1f5f9;
+            font-size: 14px;
+            font-weight: 600;
+        `;
+        name.textContent = presetName;
+
+        header.appendChild(icon);
+        header.appendChild(name);
+
+        const description = document.createElement('div');
+        description.style.cssText = `
+            color: #94a3b8;
+            font-size: 12px;
+            line-height: 1.4;
+            flex: 1;
+            overflow: hidden;
+            display: -webkit-box;
+            -webkit-line-clamp: 2;
+            -webkit-box-orient: vertical;
+        `;
+        description.textContent = preset.description;
+
+        presetCard.appendChild(header);
+        presetCard.appendChild(description);
+
+        presetCard.addEventListener('mouseenter', () => {
+            if (currentSelectedPreset !== presetName) {
+                presetCard.style.borderColor = preset.color;
+                presetCard.style.boxShadow = `0 4px 12px ${preset.color}30`;
+                presetCard.style.transform = 'translateY(-2px)';
+            }
+        });
+
+        presetCard.addEventListener('mouseleave', () => {
+            if (currentSelectedPreset !== presetName) {
+                presetCard.style.borderColor = `${preset.color}40`;
+                presetCard.style.boxShadow = 'none';
+                presetCard.style.transform = 'translateY(0)';
+            }
+        });
+
+        presetCard.onclick = () => {
+            currentSelectedPreset = presetName;
+            
+            const allCards = presetsContainer.querySelectorAll('.preset-card');
+            allCards.forEach(card => {
+                const cardPresetName = card.dataset.presetName;
+                const cardPreset = randomPresets[cardPresetName];
+                const isCardSelected = currentSelectedPreset === cardPresetName;
+                
+                card.style.border = `2px solid ${isCardSelected ? cardPreset.color : cardPreset.color + '40'}`;
+                card.style.boxShadow = isCardSelected ? `0 0 16px ${cardPreset.color}50, inset 0 0 20px ${cardPreset.color}15` : 'none';
+                card.style.transform = isCardSelected ? 'translateY(-2px)' : 'translateY(0)';
+            });
+            
+            applyPreset(presetName);
+            if (window.showToast) {
+                window.showToast(`已应用预设: ${presetName}`, 'success');
+            }
+        };
+
+        presetsContainer.appendChild(presetCard);
+    });
+
+    section.appendChild(presetsContainer);
+    return section;
 }
 
 function createRulesSection() {
@@ -357,10 +1706,10 @@ function createRulesSection() {
     const description = document.createElement('div');
     description.innerHTML = `
         <div style="color: #e2e8f0; font-size: 14px; line-height: 1.6;">
-            <p style="margin: 0 0 8px 0;"><strong>生成公式：</strong>[画质风格] + [主体] + [动作] + [构图视角] + [技术参数] + [光线氛围] + [场景]</p>
-            <p style="margin: 0 0 8px 0;"><strong>权重机制：</strong>权重越高的分类被选中的概率越大，建议核心分类权重2，辅助分类权重1</p>
-            <p style="margin: 0 0 8px 0;"><strong>数量控制：</strong>每个分类可设置抽取的标签数量，主体和服饰建议2个，其他建议1个</p>
-            <p style="margin: 0;"><strong>排除分类：</strong>自定义、灵感套装等分类将被自动排除。</p>
+            <p style="margin: 0 0 8px 0;"><strong>生成逻辑：</strong>从每个启用的分类中，按权重概率随机抽取指定数量的标签，组合成最终提示词</p>
+            <p style="margin: 0 0 8px 0;"><strong>权重说明：</strong>权重越高，该分类被选中的概率越大。<span style="color:#fcd34d;">建议核心分类设2-3，辅助分类设1</span></p>
+            <p style="margin: 0 0 8px 0;"><strong>数量建议：</strong>画质/光影建议1-2个，服饰建议2个，其他分类建议1个。总数控制在15-25个效果最佳</p>
+            <p style="margin: 0;"><strong>自动排除：</strong>「自定义」「灵感套装」等分类不参与随机生成</p>
         </div>
     `;
 
@@ -391,37 +1740,37 @@ function createCategoriesSection() {
 
     const formulaGroups = {
         '常规标签': {
-            title: '🎨 [常规标签] - 画质、摄影、构图、光影',
+            title: '[常规标签] - 画质、摄影、构图、光影',
             color: '#f59e0b',
             categories: []
         },
         '艺术题材': {
-            title: '🎭 [艺术题材] - 艺术风格、技法形式',
+            title: '[艺术题材] - 艺术风格、技法形式',
             color: '#ef4444',
             categories: []
         },
         '人物类': {
-            title: '👤 [人物类] - 角色、外貌、人设、服饰',
+            title: '[人物类] - 角色、外貌、人设、服饰',
             color: '#8b5cf6',
             categories: []
         },
         '动作/表情': {
-            title: '🎭 [动作/表情] - 姿态、表情、手部腿部',
+            title: '[动作/表情] - 姿态、表情、手部腿部',
             color: '#06b6d4',
             categories: []
         },
         '道具': {
-            title: '⚡ [道具] - 翅膀、尾巴、耳朵、角',
+            title: '[道具] - 翅膀、尾巴、耳朵、角',
             color: '#10b981',
             categories: []
         },
         '场景类': {
-            title: '🌟 [场景类] - 光线环境、室外、建筑、自然景观',
+            title: '[场景类] - 光线环境、室外、建筑、自然景观',
             color: '#f97316',
             categories: []
         },
         '动物生物': {
-            title: '🏞️ [动物生物] - 动物、幻想生物、行为动态',
+            title: '[动物生物] - 动物、幻想生物、行为动态',
             color: '#84cc16',
             categories: []
         }
@@ -440,50 +1789,7 @@ function createCategoriesSection() {
             const groupSection = createFormulaGroupSection(group);
             section.appendChild(groupSection);
             
-            if (groupKey === '动物生物') {
-                const nsfwContainer = document.createElement('div');
-                nsfwContainer.style.cssText = `
-                    display: flex;
-                    align-items: center;
-                    gap: 8px;
-                    margin-top: 12px;
-                    margin-left: 10px;
-                `;
-
-                const nsfwCheckbox = document.createElement('input');
-                nsfwCheckbox.type = 'checkbox';
-                nsfwCheckbox.id = 'nsfw-checkbox-categories';
-                nsfwCheckbox.checked = randomSettings.includeNSFW;
-                nsfwCheckbox.style.cssText = `
-                    width: 16px;
-                    height: 16px;
-                    cursor: pointer;
-                `;
-                nsfwCheckbox.onchange = () => {
-                    randomSettings.includeNSFW = nsfwCheckbox.checked;
-                    const globalNsfwCheckbox = document.getElementById('nsfw-checkbox');
-                    if (globalNsfwCheckbox) {
-                        globalNsfwCheckbox.checked = nsfwCheckbox.checked;
-                    }
-                    adultSettingsContainer.style.display = nsfwCheckbox.checked ? 'block' : 'none';
-                    saveRandomSettings();
-                };
-
-                const nsfwLabel = document.createElement('label');
-                nsfwLabel.htmlFor = 'nsfw-checkbox-categories';
-                nsfwLabel.textContent = '🔞 R18成人内容';
-                nsfwLabel.style.cssText = `
-                    color: #f87171;
-                    font-size: 14px;
-                    font-weight: 500;
-                    cursor: pointer;
-                    user-select: none;
-                `;
-
-                nsfwContainer.appendChild(nsfwCheckbox);
-                nsfwContainer.appendChild(nsfwLabel);
-                section.appendChild(nsfwContainer);
-                
+            if (groupKey === '动物生物' && window.adultContentUnlocked) {
                 const adultSettingsContainer = document.createElement('div');
                 adultSettingsContainer.id = 'adult-settings-container-categories';
                 adultSettingsContainer.style.cssText = `
@@ -492,77 +1798,91 @@ function createCategoriesSection() {
                     background: rgba(248, 113, 113, 0.1);
                     border: 1px solid rgba(248, 113, 113, 0.3);
                     border-radius: 8px;
-                    display: ${randomSettings.includeNSFW ? 'block' : 'none'};
-                `;
-
-                const adultTitle = document.createElement('h4');
-                adultTitle.textContent = '🔞 R18成人内容详细设置';
-                adultTitle.style.cssText = `
-                    color: #f87171;
-                    font-size: 16px;
-                    font-weight: 600;
-                    margin: 0 0 12px 0;
-                    text-shadow: 0 0 10px rgba(248, 113, 113, 0.5);
+                    display: block;
                 `;
 
                 const adultCategoriesContainer = document.createElement('div');
                 adultCategoriesContainer.style.cssText = `
-                    margin-top: 12px;
+                    margin-top: 0;
                 `;
 
                 const categoryGroups = {
-                    '轻度内容': { color: '#fbbf24', icon: '💋', categories: [] },
-                    '性行为': { color: '#f87171', icon: '🔥', categories: [] },
-                    '身体部位': { color: '#fb7185', icon: '👤', categories: [] },
-                    '道具玩具': { color: '#a78bfa', icon: '🎯', categories: [] },
-                    '束缚调教': { color: '#ef4444', icon: '⛓️', categories: [] },
-                    '特殊癖好': { color: '#f59e0b', icon: '🎭', categories: [] },
-                    '视觉效果': { color: '#06b6d4', icon: '🎨', categories: [] },
-                    '欲望表情': { color: '#ec4899', icon: '😍', categories: [] }
+                    '涩影湿': {
+                        subGroups: {
+                            '性暗示': { categories: [] },
+                            '性行为': { categories: [] }
+                        }
+                    }
                 };
 
                 Object.keys(randomSettings.adultCategories).forEach(categoryPath => {
                     const setting = randomSettings.adultCategories[categoryPath];
-                    const groupName = categoryPath.split('.')[0];
-                    if (categoryGroups[groupName]) {
-                        categoryGroups[groupName].categories.push({ path: categoryPath, setting: setting });
-                    }
-                });
+                    const parts = categoryPath.split('.');
+                    const mainGroup = parts[0];
+                    const subGroup = parts[1];
+                    const itemName = parts.slice(2).join('.');
 
-                Object.keys(categoryGroups).forEach(groupName => {
-                    const group = categoryGroups[groupName];
-                    if (group.categories.length > 0) {
-                        const groupTitle = document.createElement('div');
-                        groupTitle.textContent = `${group.icon} ${groupName}`;
-                        groupTitle.style.cssText = `
-                            color: ${group.color};
-                            font-size: 14px;
-                            font-weight: 600;
-                            margin: 16px 0 8px 0;
-                            text-shadow: 0 0 8px ${group.color}40;
-                            border-bottom: 1px solid ${group.color}40;
-                            padding-bottom: 4px;
-                        `;
-
-                        const groupGrid = document.createElement('div');
-                        groupGrid.style.cssText = `
-                            display: grid;
-                            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
-                            gap: 8px;
-                            margin-bottom: 12px;
-                        `;
-
-                        group.categories.forEach(({ path, setting }) => {
-                            const categoryItem = createCategorySettingItem(path, setting, group.color);
-                            groupGrid.appendChild(categoryItem);
+                    if (categoryGroups[mainGroup] && categoryGroups[mainGroup].subGroups[subGroup]) {
+                        categoryGroups[mainGroup].subGroups[subGroup].categories.push({
+                            path: categoryPath,
+                            setting: setting,
+                            displayName: itemName || subGroup
                         });
-
-                        adultCategoriesContainer.appendChild(groupTitle);
-                        adultCategoriesContainer.appendChild(groupGrid);
                     }
                 });
 
-                adultSettingsContainer.appendChild(adultTitle);
+                const mainGroup = categoryGroups['涩影湿'];
+                const xinganShiCategories = mainGroup.subGroups['性暗示'].categories;
+                const xingxingweiCategories = mainGroup.subGroups['性行为'].categories;
+
+                if (xinganShiCategories.length > 0 || xingxingweiCategories.length > 0) {
+                    const allItemNames = [];
+
+                    if (xinganShiCategories.length > 0) {
+                        allItemNames.push('性暗示');
+                    }
+
+                    xingxingweiCategories.forEach(cat => {
+                        allItemNames.push(cat.displayName);
+                    });
+
+                    const limitedItemNames = allItemNames.slice(0, 4);
+
+                    const subGroupTitle = document.createElement('div');
+                    subGroupTitle.textContent = `[涩影湿] - 性行为、${limitedItemNames.join('、')}`;
+                    subGroupTitle.style.cssText = `
+                        color: #f87171;
+                        font-size: 14px;
+                        font-weight: 600;
+                        margin: 0 0 8px 0;
+                        text-shadow: 0 0 8px #f8717140;
+                        border-bottom: 1px solid #f8717140;
+                        padding-bottom: 4px;
+                    `;
+                    adultCategoriesContainer.appendChild(subGroupTitle);
+
+                    const groupGrid = document.createElement('div');
+                    groupGrid.style.cssText = `
+                        display: grid;
+                        grid-template-columns: repeat(4, 1fr);
+                        grid-template-rows: repeat(2, auto);
+                        gap: 8px;
+                        margin-bottom: 12px;
+                    `;
+
+                    xinganShiCategories.forEach(({ path, setting }) => {
+                        const categoryItem = createCategorySettingItem(path, setting, '#f87171');
+                        groupGrid.appendChild(categoryItem);
+                    });
+
+                    xingxingweiCategories.forEach(({ path, setting }) => {
+                        const categoryItem = createCategorySettingItem(path, setting, '#f87171');
+                        groupGrid.appendChild(categoryItem);
+                    });
+
+                    adultCategoriesContainer.appendChild(groupGrid);
+                }
+
                 adultSettingsContainer.appendChild(adultCategoriesContainer);
                 section.appendChild(adultSettingsContainer);
             }
@@ -728,6 +2048,96 @@ function createGlobalSection() {
         margin: 0 0 16px 0;
     `;
 
+    const toggleContainer = document.createElement('div');
+    toggleContainer.style.cssText = `
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        margin-bottom: 12px;
+    `;
+
+    const toggleLabel = document.createElement('span');
+    toggleLabel.textContent = '限制总数:';
+    toggleLabel.style.cssText = `
+        color: #e2e8f0;
+        font-size: 14px;
+    `;
+
+    const toggleSwitch = document.createElement('label');
+    toggleSwitch.style.cssText = `
+        position: relative;
+        display: inline-block;
+        width: 44px;
+        height: 24px;
+        cursor: pointer;
+    `;
+
+    const toggleInput = document.createElement('input');
+    toggleInput.type = 'checkbox';
+    toggleInput.checked = randomSettings.limitTotalTags !== false;
+    toggleInput.style.cssText = `
+        opacity: 0;
+        width: 0;
+        height: 0;
+    `;
+
+    const toggleSlider = document.createElement('span');
+    toggleSlider.style.cssText = `
+        position: absolute;
+        cursor: pointer;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        background-color: ${randomSettings.limitTotalTags !== false ? '#3b82f6' : '#475569'};
+        transition: 0.3s;
+        border-radius: 24px;
+    `;
+
+    const toggleDot = document.createElement('span');
+    toggleDot.style.cssText = `
+        position: absolute;
+        content: "";
+        height: 18px;
+        width: 18px;
+        left: ${randomSettings.limitTotalTags !== false ? '23px' : '3px'};
+        bottom: 3px;
+        background-color: white;
+        transition: 0.3s;
+        border-radius: 50%;
+    `;
+
+    toggleSlider.appendChild(toggleDot);
+    toggleSwitch.appendChild(toggleInput);
+    toggleSwitch.appendChild(toggleSlider);
+
+    const toggleDesc = document.createElement('span');
+    toggleDesc.textContent = randomSettings.limitTotalTags !== false ? '启用' : '禁用';
+    toggleDesc.style.cssText = `
+        color: ${randomSettings.limitTotalTags !== false ? '#22c55e' : '#94a3b8'};
+        font-size: 12px;
+        font-weight: 500;
+    `;
+
+    toggleInput.onchange = () => {
+        randomSettings.limitTotalTags = toggleInput.checked;
+        toggleSlider.style.backgroundColor = toggleInput.checked ? '#3b82f6' : '#475569';
+        toggleDot.style.left = toggleInput.checked ? '23px' : '3px';
+        toggleDesc.textContent = toggleInput.checked ? '启用' : '禁用';
+        toggleDesc.style.color = toggleInput.checked ? '#22c55e' : '#94a3b8';
+        
+        minInput.disabled = !toggleInput.checked;
+        maxInput.disabled = !toggleInput.checked;
+        minInput.style.opacity = toggleInput.checked ? '1' : '0.5';
+        maxInput.style.opacity = toggleInput.checked ? '1' : '0.5';
+        
+        saveRandomSettings();
+    };
+
+    toggleContainer.appendChild(toggleLabel);
+    toggleContainer.appendChild(toggleSwitch);
+    toggleContainer.appendChild(toggleDesc);
+
     const rangeContainer = document.createElement('div');
     rangeContainer.style.cssText = `
         display: flex;
@@ -748,6 +2158,7 @@ function createGlobalSection() {
     minInput.min = '1';
     minInput.max = '50';
     minInput.value = randomSettings.totalTagsRange.min;
+    minInput.disabled = randomSettings.limitTotalTags === false;
     minInput.style.cssText = `
         width: 60px;
         padding: 6px 8px;
@@ -756,6 +2167,7 @@ function createGlobalSection() {
         background: rgba(15, 23, 42, 0.3);
         color: #e2e8f0;
         font-size: 14px;
+        opacity: ${randomSettings.limitTotalTags !== false ? '1' : '0.5'};
     `;
     minInput.onchange = () => {
         randomSettings.totalTagsRange.min = parseInt(minInput.value) || 1;
@@ -774,6 +2186,7 @@ function createGlobalSection() {
     maxInput.min = '1';
     maxInput.max = '50';
     maxInput.value = randomSettings.totalTagsRange.max;
+    maxInput.disabled = randomSettings.limitTotalTags === false;
     maxInput.style.cssText = `
         width: 60px;
         padding: 6px 8px;
@@ -782,6 +2195,7 @@ function createGlobalSection() {
         background: rgba(15, 23, 42, 0.3);
         color: #e2e8f0;
         font-size: 14px;
+        opacity: ${randomSettings.limitTotalTags !== false ? '1' : '0.5'};
     `;
     maxInput.onchange = () => {
         randomSettings.totalTagsRange.max = parseInt(maxInput.value) || 1;
@@ -793,8 +2207,28 @@ function createGlobalSection() {
     rangeContainer.appendChild(separator);
     rangeContainer.appendChild(maxInput);
 
+    const descContainer = document.createElement('div');
+    descContainer.style.cssText = `
+        margin-top: 12px;
+        padding-top: 12px;
+        border-top: 1px solid rgba(59, 130, 246, 0.2);
+    `;
+
+    const descText = document.createElement('p');
+    descText.innerHTML = `
+        <span style="color: #94a3b8; font-size: 12px; line-height: 1.5;">
+            <strong style="color: #fcd34d;">启用：</strong>按设置范围智能调整标签总数，不足时从其他分类补充<br>
+            <strong style="color: #94a3b8;">禁用：</strong>完全按各分类设置累加，不限制总数
+        </span>
+    `;
+    descText.style.margin = '0';
+
+    descContainer.appendChild(descText);
+
     section.appendChild(title);
+    section.appendChild(toggleContainer);
     section.appendChild(rangeContainer);
+    section.appendChild(descContainer);
     return section;
 }
 
@@ -865,17 +2299,18 @@ function resetRandomSettings() {
             '动物生物.行为动态': { enabled: false, weight: 1, count: 1 }
         },
         adultCategories: {
-            '轻度内容.涩影湿.擦边': { enabled: true, weight: 2, count: 1 },
-            '性行为.涩影湿.NSFW.性行为类型': { enabled: true, weight: 3, count: 2 },
-            '身体部位.涩影湿.NSFW.身体部位': { enabled: true, weight: 2, count: 1 },
-            '道具玩具.涩影湿.NSFW.道具与玩具': { enabled: true, weight: 1, count: 1 },
-            '束缚调教.涩影湿.NSFW.束缚与调教': { enabled: true, weight: 1, count: 1 },
-            '特殊癖好.涩影湿.NSFW.特殊癖好与情境': { enabled: true, weight: 1, count: 1 },
-            '视觉效果.涩影湿.NSFW.视觉风格与特定元素': { enabled: true, weight: 1, count: 1 },
-            '欲望表情.涩影湿.NSFW.欲望表情': { enabled: true, weight: 2, count: 1 }
+            '涩影湿.性暗示': { enabled: true, weight: 2, count: 1 },
+            '涩影湿.性行为.性行为类型': { enabled: true, weight: 3, count: 2 },
+            '涩影湿.性行为.身体部位': { enabled: true, weight: 2, count: 1 },
+            '涩影湿.性行为.道具与玩具': { enabled: true, weight: 1, count: 1 },
+            '涩影湿.性行为.束缚与调教': { enabled: true, weight: 1, count: 1 },
+            '涩影湿.性行为.特殊癖好与情境': { enabled: true, weight: 1, count: 1 },
+            '涩影湿.性行为.视觉风格与特定元素': { enabled: true, weight: 1, count: 1 },
+            '涩影湿.性行为.欲望表情': { enabled: true, weight: 2, count: 1 }
         },
         excludedCategories: ['自定义', '灵感套装'],
         includeNSFW: false,
+        limitTotalTags: true,
         totalTagsRange: { min: 12, max: 20 }
     };
 }
@@ -924,25 +2359,27 @@ function generateRandomCombination() {
         }
     });
 
-    const targetCount = Math.floor(
-        Math.random() * (randomSettings.totalTagsRange.max - randomSettings.totalTagsRange.min + 1)
-    ) + randomSettings.totalTagsRange.min;
+    if (randomSettings.limitTotalTags !== false) {
+        const targetCount = Math.floor(
+            Math.random() * (randomSettings.totalTagsRange.max - randomSettings.totalTagsRange.min + 1)
+        ) + randomSettings.totalTagsRange.min;
 
-    if (generatedTags.length < targetCount) {
-        const allAvailableTags = getAllAvailableTags();
-        const remainingTags = allAvailableTags.filter(tag => {
-            const tagKey = tag.value || tag.display;
-            return !usedTags.has(tagKey);
-        });
-        
-        const additionalCount = Math.min(targetCount - generatedTags.length, remainingTags.length);
-        const additionalTags = getRandomTagsFromArray(remainingTags, additionalCount);
-        
-        additionalTags.forEach(tag => {
-            const tagKey = tag.value || tag.display;
-            usedTags.add(tagKey);
-            generatedTags.push(tag);
-        });
+        if (generatedTags.length < targetCount) {
+            const allAvailableTags = getAllAvailableTags();
+            const remainingTags = allAvailableTags.filter(tag => {
+                const tagKey = tag.value || tag.display;
+                return !usedTags.has(tagKey);
+            });
+            
+            const additionalCount = Math.min(targetCount - generatedTags.length, remainingTags.length);
+            const additionalTags = getRandomTagsFromArray(remainingTags, additionalCount);
+            
+            additionalTags.forEach(tag => {
+                const tagKey = tag.value || tag.display;
+                usedTags.add(tagKey);
+                generatedTags.push(tag);
+            });
+        }
     }
 
     if (generatedTags.length > 0) {
@@ -953,7 +2390,7 @@ function generateRandomCombination() {
         generatedTags.forEach(tag => {
             const tagValue = tag.value || tag.display;
             if (window.selectedTags) {
-                window.selectedTags.add(tagValue);
+                window.selectedTags.set(tagValue, 1.0);
             }
         });
         
@@ -1070,33 +2507,6 @@ function getRandomTagsFromArray(tags, count) {
     
     const shuffled = [...tags].sort(() => 0.5 - Math.random());
     return shuffled.slice(0, Math.min(count, tags.length));
-}
-
-function updateRandomGeneratorDialogContent() {
-    if (!randomGeneratorDialog) return;
-    
-    const categoriesSection = randomGeneratorDialog.querySelector('.categories-section');
-    if (categoriesSection) {
-        const newCategoriesSection = createCategoriesSection();
-        categoriesSection.parentNode.replaceChild(newCategoriesSection, categoriesSection);
-    }
-    
-    const globalSection = randomGeneratorDialog.querySelector('.global-section');
-    if (globalSection) {
-        const newGlobalSection = createGlobalSection();
-        globalSection.parentNode.replaceChild(newGlobalSection, globalSection);
-    }
-}
-
-async function openRandomGeneratorDialog() {
-    await loadRandomSettings();
-    
-    if (!randomGeneratorDialog) {
-        createRandomGeneratorDialog();
-    } else {
-        updateRandomGeneratorDialogContent();
-    }
-    randomGeneratorDialog.style.display = 'block';
 }
 
 window.openRandomGeneratorDialog = openRandomGeneratorDialog;

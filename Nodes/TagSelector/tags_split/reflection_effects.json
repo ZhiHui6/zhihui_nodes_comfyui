@@ -1,0 +1,12 @@
+{
+  "水面反射": "water reflection",
+  "镜面反射": "mirror reflection",
+  "玻璃反射": "glass reflection",
+  "金属反射": "metal reflection",
+  "地面反射": "ground reflection",
+  "天空反射": "sky reflection",
+  "光线反射": "light reflection",
+  "色彩反射": "color reflection",
+  "部分反射": "partial reflection",
+  "完全反射": "total reflection"
+}
