@@ -121,8 +121,10 @@ def _fetch_models(endpoint: str) -> list:
                 ids = [m.get("id", "") for m in data.get("data", []) if m.get("id")]
                 if ids:
                     return ids
-    except Exception:
-        pass
+    except urllib.error.URLError as e:
+        print(f"[LMStudio] OpenAI endpoint /v1/models connection failed: {e.reason}")
+    except Exception as e:
+        print(f"[LMStudio] OpenAI endpoint /v1/models error: {e}")
 
     try:
         req = urllib.request.Request(
@@ -136,21 +138,34 @@ def _fetch_models(endpoint: str) -> list:
                 ]
                 if keys:
                     return keys
-    except Exception:
-        pass
+    except urllib.error.URLError as e:
+        print(f"[LMStudio] Native API /api/v1/models connection failed: {e.reason}")
+    except Exception as e:
+        print(f"[LMStudio] Native API /api/v1/models error: {e}")
 
+    print(f"[LMStudio] Could not fetch models from {base}. Make sure LM Studio server is running.")
     return ["(no models found)"]
 
 
-_cached_endpoint: str = "http://localhost:1234"
-_cached_models: list = _fetch_models("http://localhost:1234")
+_cached_endpoint: str = ""
+_cached_models: list = ["(no models found)"]
+_last_refresh_time: float = 0
+_refresh_interval: float = 5.0
 
 
-def _maybe_refresh(endpoint: str) -> list:
-    global _cached_endpoint, _cached_models
-    if endpoint != _cached_endpoint:
+def _maybe_refresh(endpoint: str, force: bool = False) -> list:
+    global _cached_endpoint, _cached_models, _last_refresh_time
+    current_time = time.time()
+    should_refresh = (
+        force
+        or endpoint != _cached_endpoint
+        or _cached_models == ["(no models found)"]
+        or (current_time - _last_refresh_time) > _refresh_interval
+    )
+    if should_refresh:
         _cached_endpoint = endpoint
         _cached_models = _fetch_models(endpoint)
+        _last_refresh_time = current_time
     return _cached_models
 
 
@@ -164,8 +179,9 @@ class LMStudioNode:
 
     @classmethod
     def INPUT_TYPES(cls):
-        models = list(_cached_models)
         config = _load_config()
+        endpoint = config.get("endpoint", "http://localhost:1234")
+        models = list(_maybe_refresh(endpoint))
         prompt_version = config.get("prompt_version", "new")
         presets = LMSTUDIO_PROMPT_PRESETS.get(prompt_version, LMSTUDIO_PROMPT_PRESETS.get("new", {}))
         preset_keys = list(presets.keys())
@@ -351,7 +367,7 @@ class LMStudioNode:
 
     @classmethod
     def IS_CHANGED(cls, endpoint: str, **kwargs):
-        _maybe_refresh(endpoint)
+        _maybe_refresh(endpoint, force=True)
         return str(time.time())
 
     @staticmethod
