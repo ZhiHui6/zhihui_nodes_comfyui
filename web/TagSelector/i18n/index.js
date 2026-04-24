@@ -223,7 +223,7 @@ export const i18n = {
         descAdult: "聚焦成人内容，包含NSFW标签",
         randomGenerator: "🎲 随机生成",
         confirmCloseAdultTitle: "⚠️ 关闭成人内容确认",
-        confirmCloseAdultMessage: "确定要关闭成人内容显示吗？关闭后「涩影湿」分类将被隐藏。",
+        confirmCloseAdultMessage: "确定要关闭成人内容显示吗？关闭后「涩影湿」分类和随机标签中的成人内容将被隐藏。",
         confirmCloseAdultConfirm: "确认关闭",
         confirmCloseAdultCancel: "取消"
     },
@@ -450,7 +450,7 @@ export const i18n = {
         descAdult: "Focus on adult content with NSFW tags",
         randomGenerator: "🎲 Random Generator",
         confirmCloseAdultTitle: "⚠️ Confirm Close Adult Content",
-        confirmCloseAdultMessage: "Are you sure you want to disable adult content display? The 'NSFW' category will be hidden after closing.",
+        confirmCloseAdultMessage: "Are you sure you want to disable adult content display? The 'NSFW' category and adult content in random tags will be hidden after closing.",
         confirmCloseAdultConfirm: "Confirm Close",
         confirmCloseAdultCancel: "Cancel"
     }
