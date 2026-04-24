@@ -918,12 +918,14 @@ A new generation of intelligent tag management system, integrating massive prese
 - <b>Real-time Selection Statistics:</b> Dynamically displays the count and detailed list of selected tags
 - <b>Random Tag Generation:</b> Intelligent random tag generation function, supporting automatic generation of diverse tag combinations based on category weights and quantity configuration
 - <b>Built-in AI Expansion</b>: One-click intelligent expansion function, supporting both tag-style and natural language-style expansion modes
+
 <br>
 <div align="left">
-<a href="images/TAG标签选择器2.jpg" target="_blank">
-<img src="images/TAG标签选择器2.jpg" alt="TAG Selector2" width="45%"/>
-<a href="images/TAG标签选择器.jpg" target="_blank">
-<img src="images/TAG标签选择器.jpg" alt="TAG Selector" width="45%"/>
+<a href="images/Tag Selector1.jpg" target="_blank">
+<img src="images/Tag Selector1.jpg" alt="Tag Selector1" width="45%"/>
+</a>
+<a href="images/Tag Selector2.jpg" target="_blank">
+<img src="images/Tag Selector2.jpg" alt="Tag Selector2" width="45%"/>
 </a>
 </div>
 </td>

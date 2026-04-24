@@ -3,9 +3,66 @@ import json
 import requests
 import base64
 import random
-from typing import Dict, Any
+from typing import Dict, Any, Optional, List, Set
 from aiohttp import web
 from server import PromptServer
+from functools import lru_cache
+import time
+
+
+class TagSelectorCache:
+    _instance = None
+    _config_cache = None
+    _config_cache_time = 0
+    _api_keys_cache = None
+    _api_keys_cache_time = 0
+    _tags_data_cache = None
+    _tags_data_cache_time = 0
+    _random_settings_cache = None
+    _random_settings_cache_time = 0
+    CACHE_TTL = 5
+
+    @classmethod
+    def get_instance(cls):
+        if cls._instance is None:
+            cls._instance = cls()
+        return cls._instance
+
+    def get_config(self, config_path: str) -> dict:
+        current_time = time.time()
+        if (self._config_cache is not None and 
+            current_time - self._config_cache_time < self.CACHE_TTL):
+            return self._config_cache
+        
+        try:
+            with open(config_path, "r", encoding="utf-8") as f:
+                self._config_cache = json.load(f)
+                self._config_cache_time = current_time
+                return self._config_cache
+        except Exception:
+            return {"platforms": {}, "default_platform": "auto"}
+
+    def get_api_keys(self, keys_path: str) -> dict:
+        current_time = time.time()
+        if (self._api_keys_cache is not None and 
+            current_time - self._api_keys_cache_time < self.CACHE_TTL):
+            return self._api_keys_cache
+        
+        try:
+            with open(keys_path, "r", encoding="utf-8") as f:
+                self._api_keys_cache = json.load(f)
+                self._api_keys_cache_time = current_time
+                return self._api_keys_cache
+        except Exception:
+            return {}
+
+    def invalidate_config_cache(self):
+        self._config_cache = None
+        self._config_cache_time = 0
+
+    def invalidate_api_keys_cache(self):
+        self._api_keys_cache = None
+        self._api_keys_cache_time = 0
 
 
 class TagSelector:
@@ -21,8 +78,9 @@ class TagSelector:
             os.path.dirname(os.path.dirname(os.path.dirname(__file__))),
             "zhiai_api_keys.json",
         )
-        self.config = self.load_config()
-        self.api_keys = self.load_api_keys()
+        self._cache = TagSelectorCache.get_instance()
+        self.config = self._cache.get_config(self.config_path)
+        self.api_keys = self._cache.get_api_keys(self.keys_path)
 
     def load_config(self):
         try:

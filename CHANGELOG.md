@@ -1,5 +1,14 @@
 # 更新日志 / Changelog
 
+## 1.0.32 2026-4-24
+- 标签选择器节点(TagSelector):
+  - 新增可根据系统语言自动切换界面语言的功能（中文或英文）。
+  - 优化代码执行效率和运行逻辑。
+  <br>
+- TagSelector node: 
+  - Added automatic interface language switching based on system language (Chinese or English).
+  - Optimized code execution efficiency and runtime logic.
+
 ## 1.0.31 2026-4-19
 - 标签选择器节点(TagSelector):
   - 主节点界面添加帮助按钮，可显示节点信息
@@ -9,7 +18,7 @@
   - 标签选择界面更改为只能通过关闭按钮退出
   - 新增扩写风格选项"结构化JSON"
   <br> 
-  - TagSelector node:
+- TagSelector node:
   - Added help button to main node interface to display node information
   - Added tag weight adjustment feature
   - Added "Random Weight Presets" with 16 preset options

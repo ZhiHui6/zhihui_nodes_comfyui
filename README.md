@@ -17,7 +17,7 @@
 
 ### **核心功能特色**
 
-- 🔄 **多引擎翻译节点**：集成百度、腾讯、有道、谷歌、免费在线等5大翻平台，支持中英互译，可自动识别输入语言，自由切换翻译平台。
+- 🔄 **多引擎翻译节点**：集成百度、腾讯、有道、谷歌在线等5大翻平台，支持中英互译，可自动识别输入语言，自由切换翻译平台。
 
 - 📝 **全面文本处理**：提供多行文本编辑、文本合并分离、内容提取修改、语言过滤等文本操作节点。
 
@@ -916,13 +916,14 @@
 - <b>实时选择统计：</b>动态显示已选标签数量和详细列表
 - <b>随机标签生成：</b>智能随机标签生成功能，支持按分类权重和数量配置自动生成多样化标签组合
 - <b>内置AI扩写</b>：一键智能扩写功能，支持标签式和自然语言式两种扩写模式
+
 <br>
 <div align="left">
-<a href="images/TAG标签选择器2.jpg" target="_blank">
-<img src="images/TAG标签选择器2.jpg" alt="TAG标签选择器2" width="45%"/>
-<a href="images/TAG标签选择器.jpg" target="_blank">
-<img src="images/TAG标签选择器.jpg" alt="TAG标签选择器" width="45%"/>
+<a href="images/Tag Selector1.jpg" target="_blank">
+<img src="images/Tag Selector1.jpg" alt="Tag Selector1" width="45%"/>
 </a>
+<a href="images/Tag Selector2.jpg" target="_blank">
+<img src="images/Tag Selector2.jpg" alt="Tag Selector2" width="45%"/>
 </a>
 </div>
 </td>
