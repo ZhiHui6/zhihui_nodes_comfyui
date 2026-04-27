@@ -1411,8 +1411,8 @@ function showLMStudioSettings(node) {
             }
             #${uniqueId} #page-settings,
             #${uniqueId} #page-templates {
-                min-height: 920px;
-                max-height: 920px;
+                min-height: 840px;
+                max-height: 840px;
                 overflow-y: auto;
                 overflow-x: hidden;
             }
