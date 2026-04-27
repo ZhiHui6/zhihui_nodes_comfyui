@@ -1,5 +1,27 @@
 # 更新日志 / Changelog
 
+## 1.0.33 2026-4-27
+- Qwen3-VL在线版(Qwen3VLAPI)
+  - 新增"显示状态栏"选项，默认显示
+  - 系统提示词输入框新增模板选择和清空按钮
+  - 新增模板管理功能
+  - 调整界面关闭按钮
+- LM Studio节点
+  - 添加运行前检查机制，失败时弹出错误提示
+  - 日志栏优化为简洁状态栏样式，采用纤细滚动条设计
+  - 参数组预设新增三个预设："Qwen3.6 思考(通用)"、"Qwen3.6 思考(编程)"、"Qwen3.6指令"
+  <br>
+  - Qwen3-VL Online (Qwen3VLAPI)
+    - Added "Show Status Bar" option, enabled by default
+    - Added template selection and clear buttons to system prompt input
+    - Added template management feature
+    - Adjusted interface close button
+    - 
+- LM Studio node
+  - Added pre-run check mechanism with error popup on failure
+  - Optimized log panel to concise status bar style with slim scrollbar design
+  - Added three preset parameter groups: "Qwen3.6 Thinking (General)", "Qwen3.6 Thinking (Programming)", "Qwen3.6 Instruction"
+
 ## 1.0.32 2026-4-24
 - 标签选择器节点(TagSelector):
   - 新增可根据系统语言自动切换界面语言的功能（中文或英文）。

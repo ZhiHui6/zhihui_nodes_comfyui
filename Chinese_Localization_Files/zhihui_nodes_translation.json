@@ -145,7 +145,7 @@
             "tags": "标签"
         },
         "widgets": {
-            "auto_random_tags": "自动随机标签",
+            "random_logic": "随机逻辑",
             "expand_mode": "扩写模式",
             "output_language": "输出语言",
             "platform": "API平台",
@@ -626,6 +626,7 @@
             "top_p": "Top-P采样",
             "num_beams": "束搜索数量",
             "repetition_penalty": "重复惩罚",
+            "presence_penalty": "存在惩罚",
             "frame_count": "帧数",
             "max_new_tokens": "最大新令牌数",
             "seed": "随机种子",
@@ -810,6 +811,7 @@
             "max_tokens": "最大令牌数",
             "temperature": "温度",
             "repetition_penalty": "重复惩罚",
+            "presence_penalty": "存在惩罚",
             "top_k": "Top K采样",
             "min_p": "最小P采样",
             "top_p": "Top P采样",
@@ -819,8 +821,7 @@
             "batch_folder_path": "批处理文件夹路径"
         },
         "outputs": {
-            "result": "结果",
-            "status": "状态"
+            "result": "结果"
         }
     },
     "Sa2VAAdvanced": {
@@ -1093,6 +1094,7 @@
             "top_p": "Top P",
             "top_k": "Top K",
             "repetition_penalty": "重复惩罚",
+            "presence_penalty": "存在惩罚",
             "seed": "种子",
             "frame_count": "视频帧数",
             "batch_folder_path": "批量文件夹路径",

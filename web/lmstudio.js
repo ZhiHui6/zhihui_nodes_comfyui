@@ -70,7 +70,7 @@ const i18n = {
         resetFailed: "保存默认设置失败",
         ignore: "默认预设",
         ignoreDesc: "使用当前节点设置的参数值，不进行预设参数替换。",
-        custom: "用户自设",
+        custom: "自定义参数",
         customDesc: "维持用户当前在节点中的参数不做任何修改。",
         precise: "精确模式",
         balanced: "平衡模式",
@@ -78,11 +78,18 @@ const i18n = {
         preciseDesc: "适合需要精确回答的场景：较低的temperature减少随机性，适合代码、数学、逻辑推理等任务。",
         balancedDesc: "适合大多数日常对话场景：平衡的参数设置，在准确性和创造性之间取得良好平衡。",
         creativeDesc: "适合创意写作：较高的temperature增加创造性输出，适合故事、诗歌等创作。",
+        qwenThinkingGeneral: "Qwen3.6 思考(通用)",
+        qwenThinkingCoding: "Qwen3.6 思考(编程)",
+        qwenInstruct: "Qwen3.6 指令",
+        qwenThinkingGeneralDesc: "Qwen3.6官方推荐：适用于通用任务，让模型有更多创造性，适合推理、创意写作等。",
+        qwenThinkingCodingDesc: "Qwen3.6官方推荐：适用于精确编程/Web开发，让输出更精确稳定。",
+        qwenInstructDesc: "Qwen3.6官方推荐：非思考模式，控制模型不要过度思考，适合直接回答。",
         maxTokens: "Max Tokens",
         temperature: "Temperature",
         topP: "Top P",
         topK: "Top K",
         repetition: "Repetition",
+        presencePenalty: "Presence Penalty",
         seed: "Seed",
         showLogPanel: "日志信息栏管理",
         enableLogPanel: "开启日志信息栏",
@@ -211,11 +218,18 @@ const i18n = {
         preciseDesc: "For scenarios requiring precise answers: lower temperature reduces randomness, suitable for code, math, logic reasoning tasks.",
         balancedDesc: "For most daily conversation scenarios: balanced parameters for good accuracy and creativity balance.",
         creativeDesc: "For creative writing: higher temperature increases creative output, suitable for stories, poetry, etc.",
+        qwenThinkingGeneral: "Qwen3.6 Thinking (General)",
+        qwenThinkingCoding: "Qwen3.6 Thinking (Coding)",
+        qwenInstruct: "Qwen3.6 Instruct",
+        qwenThinkingGeneralDesc: "Qwen3.6 official: For general tasks, allowing more creativity, suitable for reasoning and creative writing.",
+        qwenThinkingCodingDesc: "Qwen3.6 official: For precise coding/WebDev, providing more stable and precise output.",
+        qwenInstructDesc: "Qwen3.6 official: Non-thinking mode, controls the model from over-thinking, suitable for direct answers.",
         maxTokens: "Max Tokens",
         temperature: "Temperature",
         topP: "Top P",
         topK: "Top K",
         repetition: "Repetition",
+        presencePenalty: "Presence Penalty",
         seed: "Seed",
         showLogPanel: "Log Panel Management",
         enableLogPanel: "Enable Log Panel",
@@ -1278,12 +1292,12 @@ function showLMStudioSettings(node) {
     animStyle.id = "lmstudio-dialog-anim";
     animStyle.textContent = `
         @keyframes lmstudioDialogIn {
-            from { opacity: 0; transform: scale(0.95); }
-            to { opacity: 1; transform: scale(1); }
+            from { opacity: 0; transform: translate(-50%, -50%) scale(0.95); }
+            to { opacity: 1; transform: translate(-50%, -50%) scale(1); }
         }
         @keyframes lmstudioDialogOut {
-            from { opacity: 1; transform: scale(1); }
-            to { opacity: 0; transform: scale(0.95); }
+            from { opacity: 1; transform: translate(-50%, -50%) scale(1); }
+            to { opacity: 0; transform: translate(-50%, -50%) scale(0.95); }
         }
         @keyframes lmstudioOverlayIn {
             from { opacity: 0; }
@@ -1295,7 +1309,7 @@ function showLMStudioSettings(node) {
         }
     `;
     document.head.appendChild(animStyle);
-    
+
     const overlay = document.createElement("div");
     overlay.className = "comfy-modal-overlay";
     overlay.style.cssText = `
@@ -1308,16 +1322,16 @@ function showLMStudioSettings(node) {
         backdrop-filter: blur(3px);
         -webkit-backdrop-filter: blur(3px);
         z-index: 10001;
-        display: flex;
-        align-items: center;
-        justify-content: center;
         opacity: 0;
         animation: lmstudioOverlayIn 0.2s ease forwards;
     `;
-    
+
     const dialog = document.createElement("div");
     dialog.className = "comfy-modal";
     dialog.style.cssText = `
+        position: fixed;
+        left: 50%;
+        top: 50%;
         width: 1188px;
         height: auto;
         max-height: 90vh;
@@ -1332,8 +1346,6 @@ function showLMStudioSettings(node) {
         z-index: 10002;
         display: flex;
         flex-direction: column;
-        position: relative;
-        margin: auto;
     `;
     
     const uniqueId = `lmstudio-settings-${Math.random().toString(36).substring(2, 9)}`;
@@ -1631,10 +1643,10 @@ function showLMStudioSettings(node) {
             }
             #${uniqueId} .preset-section {
                 flex: 0 0 650px;
-                height: 230px;
-                min-height: 230px;
-                max-height: 230px;
-                padding: 16px;
+                height: auto;
+                min-height: auto;
+                max-height: none;
+                padding: 12px 16px;
                 background: linear-gradient(145deg, #1a202c, #2d3748);
                 border: 1px solid rgba(255, 255, 255, 0.1);
                 border-radius: 8px;
@@ -1657,8 +1669,8 @@ function showLMStudioSettings(node) {
             }
             #${uniqueId} .preset-select {
                 width: auto;
-                min-width: 100px;
-                max-width: 130px;
+                min-width: 140px;
+                max-width: 200px;
                 padding: 8px 12px;
                 background: #1f2937;
                 border: 1px solid rgba(255, 255, 255, 0.15);
@@ -2108,40 +2120,14 @@ function showLMStudioSettings(node) {
                 border-radius: 6px;
                 border-left: 3px solid #667eea;
             }
-            #${uniqueId} .preset-params {
-                display: grid;
-                grid-template-columns: 1.2fr 1fr 0.7fr 0.7fr 1.2fr;
-                gap: 8px;
-                margin-top: 10px;
-            }
-            #${uniqueId} .preset-param-item {
-                background: rgba(0, 0, 0, 0.2);
-                padding: 8px 10px;
-                border-radius: 4px;
-                font-size: 13px;
-                display: flex;
-                flex-direction: column;
-                align-items: center;
-                text-align: center;
-            }
-            #${uniqueId} .preset-param-item.narrow {
-                padding: 8px 4px;
-                min-width: 0;
-                max-width: 80px;
-            }
-            #${uniqueId} .preset-param-item.wide {
-                padding: 8px 16px;
-                min-width: 0;
-                max-width: 220px;
-            }
-            #${uniqueId} .preset-param-label {
-                color: #667eea;
-                font-weight: 600;
-                line-height: 1.3;
-            }
-            #${uniqueId} .preset-param-value {
-                color: #e8e8e8;
-                margin-top: 2px;
+            #${uniqueId} .preset-params-inline {
+                display: block;
+                margin-top: 6px;
+                padding-top: 6px;
+                border-top: 1px solid rgba(102, 126, 234, 0.3);
+                font-size: 12px;
+                color: #a8b2ff;
+                line-height: 1.4;
             }
             #${uniqueId} .cors-notice {
                 margin-top: 12px;
@@ -2243,13 +2229,15 @@ function showLMStudioSettings(node) {
                             <option value="Precise">${$t('precise')}</option>
                             <option value="Balanced">${$t('balanced')}</option>
                             <option value="Creative">${$t('creative')}</option>
+                            <option value="Qwen3.6 Thinking (General)">${$t('qwenThinkingGeneral')}</option>
+                            <option value="Qwen3.6 Thinking (Coding)">${$t('qwenThinkingCoding')}</option>
+                            <option value="Qwen3.6 Instruct">${$t('qwenInstruct')}</option>
                             <option value="Custom">${$t('custom')}</option>
                         </select>
                     </div>
                     <div class="preset-info" id="lmstudio-preset-info">
                         ${$t('presetDescription')}
                     </div>
-                    <div class="preset-params" id="lmstudio-preset-params" style="display: none;"></div>
                 </div>
                 <div class="timeout-section">
                     <h4 class="timeout-title">
@@ -2372,7 +2360,6 @@ function showLMStudioSettings(node) {
             document.removeEventListener("keyup", keyupHandler, true);
             document.removeEventListener("keypress", keypressHandler, true);
             if (overlay.parentNode) document.body.removeChild(overlay);
-            if (dialog.parentNode) document.body.removeChild(dialog);
             const animStyleEl = document.getElementById("lmstudio-dialog-anim");
             if (animStyleEl) animStyleEl.remove();
         }, 150);
@@ -2547,12 +2534,44 @@ function showLMStudioSettings(node) {
                 repetition_penalty: 1.05
             },
             description: $t('creativeDesc')
+        },
+        "Qwen3.6 Thinking (General)": {
+            params: {
+                max_tokens: 8192,
+                temperature: 1.0,
+                top_p: 0.95,
+                top_k: 20,
+                repetition_penalty: 1.0,
+                presence_penalty: 0.0
+            },
+            description: $t('qwenThinkingGeneralDesc')
+        },
+        "Qwen3.6 Thinking (Coding)": {
+            params: {
+                max_tokens: 8192,
+                temperature: 0.6,
+                top_p: 0.95,
+                top_k: 20,
+                repetition_penalty: 1.0,
+                presence_penalty: 0.0
+            },
+            description: $t('qwenThinkingCodingDesc')
+        },
+        "Qwen3.6 Instruct": {
+            params: {
+                max_tokens: 4096,
+                temperature: 0.7,
+                top_p: 0.80,
+                top_k: 20,
+                repetition_penalty: 1.0,
+                presence_penalty: 1.5
+            },
+            description: $t('qwenInstructDesc')
         }
     };
     
     const presetSelect = dialog.querySelector("#lmstudio-preset-select");
     const presetInfo = dialog.querySelector("#lmstudio-preset-info");
-    const presetParams = dialog.querySelector("#lmstudio-preset-params");
     const saveAllBtn = dialog.querySelector("#lmstudio-save-all");
     const resetDefaultBtn = dialog.querySelector("#lmstudio-reset-default");
     const timeoutFetchInput = dialog.querySelector("#lmstudio-timeout-fetch");
@@ -2877,36 +2896,29 @@ function showLMStudioSettings(node) {
         const selectedPreset = presetSelect.value;
         const preset = paramPresets[selectedPreset];
         
-        presetInfo.textContent = preset.description;
-        
-        if (selectedPreset === "Custom") {
-            presetParams.style.display = "none";
+        if (selectedPreset === "Custom" || selectedPreset === "Ignore") {
+            presetInfo.textContent = preset.description;
             return;
         }
         
-        presetParams.style.display = "grid";
         const paramsToShow = preset.params;
+        const labelMap = {
+            max_tokens: $t('maxTokens'),
+            temperature: $t('temperature'),
+            top_p: $t('topP'),
+            top_k: $t('topK'),
+            repetition_penalty: $t('repetition'),
+            presence_penalty: $t('presencePenalty'),
+            seed: $t('seed')
+        };
         
-        presetParams.innerHTML = Object.entries(paramsToShow).map(([key, value]) => {
-            const labelMap = {
-                max_tokens: $t('maxTokens'),
-                temperature: $t('temperature'),
-                top_p: $t('topP'),
-                top_k: $t('topK'),
-                repetition_penalty: $t('repetition'),
-                seed: $t('seed')
-            };
-            let widthClass = 'preset-param-item';
-            if (key === 'top_p' || key === 'top_k') {
-                widthClass = 'preset-param-item narrow';
-            } else if (key === 'max_tokens') {
-                widthClass = 'preset-param-item wide';
-            }
-            return `<div class="${widthClass}">
-                <span class="preset-param-label">${labelMap[key] || key}:</span>
-                <span class="preset-param-value">${value}</span>
-            </div>`;
-        }).join("");
+        const paramTexts = Object.entries(paramsToShow).map(([key, value]) => {
+            const label = labelMap[key] || key;
+            return `${label}: ${value}`;
+        });
+        
+        const paramsStr = paramTexts.join("，");
+        presetInfo.innerHTML = `${preset.description}<br><span class="preset-params-inline">${paramsStr}</span>`;
     };
     
     presetSelect.addEventListener("change", () => {
@@ -3069,6 +3081,6 @@ function showLMStudioSettings(node) {
     
     refreshDashboard();
 
+    overlay.appendChild(dialog);
     document.body.appendChild(overlay);
-    document.body.appendChild(dialog);
 }

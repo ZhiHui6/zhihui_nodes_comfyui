@@ -6,7 +6,6 @@ import os
 import re
 import time
 from io import BytesIO
-
 import numpy as np
 from PIL import Image
 import requests
@@ -14,7 +13,6 @@ import requests
 CONFIG_DIR = os.path.dirname(__file__)
 CONFIG_FILE = os.path.join(CONFIG_DIR, "lmstudio_config.json")
 PROMPT_PRESETS_FILE = os.path.join(CONFIG_DIR, "lmstudio_prompt_presets.json")
-
 
 def _load_config():
     if os.path.exists(CONFIG_FILE):
@@ -25,7 +23,6 @@ def _load_config():
             pass
     return {}
 
-
 def _save_config(config):
     try:
         os.makedirs(CONFIG_DIR, exist_ok=True)
@@ -35,22 +32,18 @@ def _save_config(config):
     except Exception:
         return False
 
-
 def _get_timeout(key, default):
     config = _load_config()
     return config.get("timeouts", {}).get(key, default)
-
 
 def _get_folder_read_mode():
     config = _load_config()
     return config.get("folder_read_mode", "recursive")
 
-
 def _save_batch_progress(progress_data):
     config = _load_config()
     config["batch_progress"] = progress_data
     _save_config(config)
-
 
 def _get_batch_progress():
     config = _load_config()
@@ -61,7 +54,6 @@ def _get_batch_progress():
         "current_folder_index": 0
     })
 
-
 def _load_prompt_presets():
     if os.path.exists(PROMPT_PRESETS_FILE):
         try:
@@ -71,9 +63,7 @@ def _load_prompt_presets():
             pass
     return {}
 
-
 LMSTUDIO_PROMPT_PRESETS = _load_prompt_presets()
-
 LMSTUDIO_PARAM_PRESETS = {
     "Ignore": {},
     "Image Analysis": {
@@ -82,6 +72,7 @@ LMSTUDIO_PARAM_PRESETS = {
         "top_p": 0.9,
         "top_k": 40,
         "repetition_penalty": 1.1,
+        "presence_penalty": 0.0,
     },
     "Text Generation": {
         "max_tokens": 2048,
@@ -89,6 +80,7 @@ LMSTUDIO_PARAM_PRESETS = {
         "top_p": 0.95,
         "top_k": 50,
         "repetition_penalty": 1.0,
+        "presence_penalty": 0.0,
     },
     "Creative Writing": {
         "max_tokens": 4096,
@@ -96,16 +88,39 @@ LMSTUDIO_PARAM_PRESETS = {
         "top_p": 0.95,
         "top_k": 60,
         "repetition_penalty": 1.05,
+        "presence_penalty": 0.0,
+    },
+    "Qwen3.6 Thinking (General)": {
+        "max_tokens": 8192,
+        "temperature": 1.0,
+        "top_p": 0.95,
+        "top_k": 20,
+        "repetition_penalty": 1.0,
+        "presence_penalty": 0.0,
+    },
+    "Qwen3.6 Thinking (Coding)": {
+        "max_tokens": 8192,
+        "temperature": 0.6,
+        "top_p": 0.95,
+        "top_k": 20,
+        "repetition_penalty": 1.0,
+        "presence_penalty": 0.0,
+    },
+    "Qwen3.6 Instruct": {
+        "max_tokens": 4096,
+        "temperature": 0.7,
+        "top_p": 0.80,
+        "top_k": 20,
+        "repetition_penalty": 1.0,
+        "presence_penalty": 1.5,
     },
 }
-
 
 def _normalise_base(endpoint: str) -> str:
     base = endpoint.rstrip("/")
     if base.endswith("/v1"):
         base = base[:-3]
     return base
-
 
 def _check_server_connection(endpoint: str) -> tuple:
     """检查LM Studio服务器连接状态，返回 (是否成功, 错误信息)"""
@@ -130,7 +145,6 @@ def _check_server_connection(endpoint: str) -> tuple:
     except Exception as e:
         return False, f"连接服务器时发生错误: {str(e)}"
     
-    # 尝试原生API
     try:
         req = urllib.request.Request(
             f"{base}/api/v1/models", headers={"Accept": "application/json"}, method="GET"
@@ -143,7 +157,6 @@ def _check_server_connection(endpoint: str) -> tuple:
     
     return False, f"无法连接到LM Studio服务器 ({endpoint})。请确认服务器已启动并启用了API服务"
 
-
 def _check_model_available(endpoint: str, model: str) -> tuple:
     """检查指定模型是否可用，返回 (是否成功, 错误信息)"""
     if not model or model == "(no models found)" or model == "未找到模型":
@@ -155,7 +168,6 @@ def _check_model_available(endpoint: str, model: str) -> tuple:
         return False, f"模型 '{model}' 不在可用模型列表中。\n当前可用模型: {available_models}{'...' if len(models) > 5 else ''}"
     
     return True, None
-
 
 def _fetch_models(endpoint: str) -> list:
     base = _normalise_base(endpoint)
@@ -196,12 +208,10 @@ def _fetch_models(endpoint: str) -> list:
     print(f"[LMStudio] Could not fetch models from {base}. Make sure LM Studio server is running.")
     return ["(no models found)"]
 
-
 _cached_endpoint: str = ""
 _cached_models: list = ["(no models found)"]
 _last_refresh_time: float = 0
 _refresh_interval: float = 5.0
-
 
 def _maybe_refresh(endpoint: str, force: bool = False) -> list:
     global _cached_endpoint, _cached_models, _last_refresh_time
@@ -217,7 +227,6 @@ def _maybe_refresh(endpoint: str, force: bool = False) -> list:
         _cached_models = _fetch_models(endpoint)
         _last_refresh_time = current_time
     return _cached_models
-
 
 class LMStudioNode:
     CATEGORY = "Zhi.AI/LM Studio"
@@ -287,7 +296,7 @@ class LMStudioNode:
                         "default": 1024,
                         "min": 0,
                         "max": 2500,
-                        "step": 64,
+                        "step": 1,
                         "tooltip": "Image size limitation (long edge), 0 means no limit",
                     },
                 ),
@@ -296,8 +305,8 @@ class LMStudioNode:
                     {
                         "default": 4096,
                         "min": 1,
-                        "max": 32768,
-                        "step": 64,
+                        "max": 32769,
+                        "step": 1,
                         "tooltip": "Maximum tokens to generate. 4096 recommended for detailed image descriptions",
                     },
                 ),
@@ -307,7 +316,7 @@ class LMStudioNode:
                         "default": 0.4,
                         "min": 0.0,
                         "max": 2.0,
-                        "step": 0.05,
+                        "step": 0.1,
                         "tooltip": "Sampling temperature. 0.4 balances accuracy and natural expression for vision tasks",
                     },
                 ),
@@ -317,7 +326,7 @@ class LMStudioNode:
                         "default": 0.9,
                         "min": 0.0,
                         "max": 1.0,
-                        "step": 0.05,
+                        "step": 0.1,
                         "tooltip": "Nucleus sampling. 0.9 is optimal for filtering low-quality tokens while preserving diversity",
                     },
                 ),
@@ -337,8 +346,18 @@ class LMStudioNode:
                         "default": 1.1,
                         "min": 0.1,
                         "max": 2.0,
-                        "step": 0.05,
+                        "step": 0.1,
                         "tooltip": "Repetition penalty. 1.1 effectively reduces redundancy without over-penalizing",
+                    },
+                ),
+                "presence_penalty": (
+                    "FLOAT",
+                    {
+                        "default": 0.0,
+                        "min": -2.0,
+                        "max": 2.0,
+                        "step": 0.1,
+                        "tooltip": "Presence penalty. Positive values penalize new tokens based on whether they appear in the text so far, increasing the model's likelihood to talk about new topics",
                     },
                 ),
                 "seed": (
@@ -597,6 +616,7 @@ class LMStudioNode:
         top_p,
         top_k,
         repetition_penalty,
+        presence_penalty,
         seed=None,
     ):
         payload = {
@@ -607,6 +627,7 @@ class LMStudioNode:
             "top_p": top_p,
             "top_k": top_k,
             "repetition_penalty": repetition_penalty,
+            "presence_penalty": presence_penalty,
         }
         if model.strip() and not model.startswith("("):
             payload["model"] = model.strip()
@@ -706,6 +727,7 @@ class LMStudioNode:
         top_p: float,
         top_k: int,
         repetition_penalty: float,
+        presence_penalty: float,
         seed: int,
         size_limitation: int,
         batch_mode: bool,
@@ -775,6 +797,7 @@ class LMStudioNode:
         top_p: float,
         top_k: int,
         repetition_penalty: float,
+        presence_penalty: float,
         seed: int,
         unload_model: bool,
         batch_mode: bool,
@@ -786,13 +809,11 @@ class LMStudioNode:
         image_3=None,
         image_4=None,
     ):
-        # 前置条件检查
-        # 1. 检查服务器连接
+
         server_ok, server_error = _check_server_connection(endpoint)
         if not server_ok:
             raise Exception(f"[LM Studio] {server_error}")
         
-        # 2. 检查模型可用性
         model_ok, model_error = _check_model_available(endpoint, model)
         if not model_ok:
             raise Exception(f"[LM Studio] {model_error}")
@@ -846,6 +867,7 @@ class LMStudioNode:
                         top_p,
                         top_k,
                         repetition_penalty,
+                        presence_penalty,
                         seed,
                     )
                     duration = time.time() - start_time
@@ -859,6 +881,7 @@ class LMStudioNode:
                         top_p=top_p,
                         top_k=top_k,
                         repetition_penalty=repetition_penalty,
+                        presence_penalty=presence_penalty,
                         seed=seed,
                         size_limitation=size_limitation,
                         batch_mode=batch_mode,
@@ -926,6 +949,7 @@ class LMStudioNode:
                     top_p,
                     top_k,
                     repetition_penalty,
+                    presence_penalty,
                     seed,
                 )
                 duration = time.time() - start_time
@@ -939,6 +963,7 @@ class LMStudioNode:
                     top_p=top_p,
                     top_k=top_k,
                     repetition_penalty=repetition_penalty,
+                    presence_penalty=presence_penalty,
                     seed=seed,
                     size_limitation=size_limitation,
                     batch_mode=batch_mode,
@@ -1089,6 +1114,7 @@ class LMStudioNode:
                                         top_p,
                                         top_k,
                                         repetition_penalty,
+                                        presence_penalty,
                                         seed,
                                     )
                                     self._save_description(image_path, result)
@@ -1228,6 +1254,7 @@ class LMStudioNode:
                                     top_p,
                                     top_k,
                                     repetition_penalty,
+                                    presence_penalty,
                                     seed,
                                 )
                                 self._save_description(image_path, result)
@@ -1356,6 +1383,7 @@ class LMStudioNode:
                             top_p,
                             top_k,
                             repetition_penalty,
+                            presence_penalty,
                             seed,
                         )
                         results.append(f"Image {i + 1}/{total_images}:\n{result}")

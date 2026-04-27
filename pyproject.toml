@@ -1,7 +1,7 @@
 [project]
 name = "zhihui_nodes_comfyui"
 description = "ComfyUI custom nodes collection with 55+ nodes: multi-engine translation, text processing, prompt generators, image tools, Qwen3-VL vision understanding, LM Studio integration, and more."
-version = "1.0.32"
+version = "1.0.33"
 license = {file = "LICENSE"}
 classifiers = [
     "Operating System :: OS Independent",
