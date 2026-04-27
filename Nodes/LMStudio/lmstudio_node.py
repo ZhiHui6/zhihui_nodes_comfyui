@@ -107,6 +107,56 @@ def _normalise_base(endpoint: str) -> str:
     return base
 
 
+def _check_server_connection(endpoint: str) -> tuple:
+    """检查LM Studio服务器连接状态，返回 (是否成功, 错误信息)"""
+    base = _normalise_base(endpoint)
+    timeout = _get_timeout("fetch_models", 5)
+    
+    try:
+        req = urllib.request.Request(
+            f"{base}/v1/models", headers={"Accept": "application/json"}, method="GET"
+        )
+        with urllib.request.urlopen(req, timeout=timeout) as resp:
+            if resp.status == 200:
+                return True, None
+    except urllib.error.URLError as e:
+        error_msg = str(e.reason) if hasattr(e, 'reason') else str(e)
+        if "Connection refused" in error_msg or "拒绝连接" in error_msg:
+            return False, f"无法连接到LM Studio服务器 ({endpoint})。请检查：\n1. LM Studio是否已启动\n2. Local Server是否已开启\n3. 端口号是否正确"
+        elif "timed out" in error_msg.lower() or "超时" in error_msg:
+            return False, f"连接LM Studio服务器超时 ({endpoint})。请检查服务器是否响应"
+        else:
+            return False, f"连接服务器失败: {error_msg}"
+    except Exception as e:
+        return False, f"连接服务器时发生错误: {str(e)}"
+    
+    # 尝试原生API
+    try:
+        req = urllib.request.Request(
+            f"{base}/api/v1/models", headers={"Accept": "application/json"}, method="GET"
+        )
+        with urllib.request.urlopen(req, timeout=timeout) as resp:
+            if resp.status == 200:
+                return True, None
+    except Exception as e:
+        pass
+    
+    return False, f"无法连接到LM Studio服务器 ({endpoint})。请确认服务器已启动并启用了API服务"
+
+
+def _check_model_available(endpoint: str, model: str) -> tuple:
+    """检查指定模型是否可用，返回 (是否成功, 错误信息)"""
+    if not model or model == "(no models found)" or model == "未找到模型":
+        return False, "未选择有效的模型。请先在节点设置中刷新模型列表并选择一个模型"
+    
+    models = _fetch_models(endpoint)
+    if model not in models:
+        available_models = ", ".join(models[:5]) if models else "无"
+        return False, f"模型 '{model}' 不在可用模型列表中。\n当前可用模型: {available_models}{'...' if len(models) > 5 else ''}"
+    
+    return True, None
+
+
 def _fetch_models(endpoint: str) -> list:
     base = _normalise_base(endpoint)
     timeout = _get_timeout("fetch_models", 5)
@@ -736,6 +786,17 @@ class LMStudioNode:
         image_3=None,
         image_4=None,
     ):
+        # 前置条件检查
+        # 1. 检查服务器连接
+        server_ok, server_error = _check_server_connection(endpoint)
+        if not server_ok:
+            raise Exception(f"[LM Studio] {server_error}")
+        
+        # 2. 检查模型可用性
+        model_ok, model_error = _check_model_available(endpoint, model)
+        if not model_ok:
+            raise Exception(f"[LM Studio] {model_error}")
+        
         _maybe_refresh(endpoint)
         start_time = time.time()
         

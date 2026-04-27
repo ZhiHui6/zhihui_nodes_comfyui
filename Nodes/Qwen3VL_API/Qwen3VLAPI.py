@@ -3,6 +3,8 @@ import sys
 import torch
 import numpy as np
 import json
+import uuid
+import time
 import requests
 import base64
 from io import BytesIO
@@ -30,8 +32,9 @@ except ImportError:
 current_dir = os.path.dirname(os.path.abspath(__file__))
 
 class Qwen3VLAPI:
-    RETURN_TYPES = ("STRING", "STRING")
-    RETURN_NAMES = ("result", "status")
+    RETURN_TYPES = ("STRING",)
+    RETURN_NAMES = ("result",)
+    OUTPUT_NODE = True
     FUNCTION = "analyze_image"
     CATEGORY = "Zhi.AI/Qwen3VL"
     
@@ -1019,6 +1022,10 @@ class Qwen3VLAPI:
                 "images": ("IMAGE", {
                     "tooltip": "用于分析的图像输入。"
                 }),
+            },
+            "hidden": {
+                "unique_id": "UNIQUE_ID",
+                "extra_pnginfo": "EXTRA_PNGINFO",
             }
         }
     
@@ -1070,7 +1077,10 @@ class Qwen3VLAPI:
         else:
             return user_prompt.strip()
 
-    def analyze_image(self, user_prompt, system_prompt, llm_mode, aggressive_creative, size_limitation, max_tokens, temperature, top_k, repetition_penalty, min_p, top_p, seed, remove_think_tags, skip_exists, batch_mode, batch_folder_path, source_path=None, images=None):
+    def _make_result(self, result, status_messages):
+        return {"ui": {"status": status_messages}, "result": (result,)}
+
+    def analyze_image(self, user_prompt, system_prompt, llm_mode, aggressive_creative, size_limitation, max_tokens, temperature, top_k, repetition_penalty, min_p, top_p, seed, remove_think_tags, skip_exists, batch_mode, batch_folder_path, source_path=None, images=None, unique_id=None, extra_pnginfo=None):
         import random
         import time
         
@@ -1112,15 +1122,15 @@ class Qwen3VLAPI:
                 if not custom_api_key:
                     error_msg = "自定义配置下必须在通讯配置界面中设置API密钥"
                     status_messages.append(f"❌ 错误: {error_msg}")
-                    return ("", "\n".join(status_messages))
+                    return self._make_result("", status_messages)
                 if not custom_api_base:
                     error_msg = "自定义配置下必须在通讯配置界面中设置API基础地址"
                     status_messages.append(f"❌ 错误: {error_msg}")
-                    return ("", "\n".join(status_messages))
+                    return self._make_result("", status_messages)
                 if not custom_model_name:
                     error_msg = "自定义配置下必须在通讯配置界面中设置模型名称"
                     status_messages.append(f"❌ 错误: {error_msg}")
-                    return ("", "\n".join(status_messages))
+                    return self._make_result("", status_messages)
 
                 api_key = custom_api_key
                 api_base = custom_api_base
@@ -1139,13 +1149,13 @@ class Qwen3VLAPI:
                 if not api_key:
                     error_msg = f"请在配置文件中设置{selected_platform}平台的API密钥，或点击'打开通讯配置界面'按钮进行配置"
                     status_messages.append(f"❌ 错误: {error_msg}")
-                    return ("", "\n".join(status_messages))
+                    return self._make_result("", status_messages)
 
                 platform_config = self.get_platform_config(selected_platform)
                 if not platform_config:
                     error_msg = f"不支持的平台: {selected_platform}"
                     status_messages.append(f"❌ 错误: {error_msg}")
-                    return ("", "\n".join(status_messages))
+                    return self._make_result("", status_messages)
 
                 api_base = platform_config.get("api_base", "")
                 api_model_name = self.get_model_api_name(selected_platform, selected_model)
@@ -1170,11 +1180,11 @@ class Qwen3VLAPI:
                     if remove_think_tags:
                         result = self._remove_think_content(result)
                     status_messages.append("✅ 文本对话完成")
-                    return (result, "\n".join(status_messages))
+                    return self._make_result(result, status_messages)
                 except Exception as e:
                     error_msg = f"文本对话失败: {str(e)}"
                     status_messages.append(f"❌ 错误: {error_msg}")
-                    return ("", "\n".join(status_messages))
+                    return self._make_result("", status_messages)
 
             if not batch_mode:
                 status_messages.append("🔄 正在处理图片...")
@@ -1203,11 +1213,11 @@ class Qwen3VLAPI:
                         if remove_think_tags:
                             result = self._remove_think_content(result)
                         status_messages.append("✅ 多图内容分析完成")
-                        return (result, "\n".join(status_messages))
+                        return self._make_result(result, status_messages)
                     except Exception as e:
                         error_msg = f"源路径多图处理失败: {str(e)}"
                         status_messages.append(f"❌ 错误: {error_msg}")
-                        return ("", "\n".join(status_messages))
+                        return self._make_result("", status_messages)
 
                 if images is None:
 
@@ -1223,11 +1233,11 @@ class Qwen3VLAPI:
                         if remove_think_tags:
                             result = self._remove_think_content(result)
                         status_messages.append("✅ 文本对话完成")
-                        return (result, "\n".join(status_messages))
+                        return self._make_result(result, status_messages)
                     except Exception as e:
                         error_msg = f"文本对话失败: {str(e)}"
                         status_messages.append(f"❌ 错误: {error_msg}")
-                        return ("", "\n".join(status_messages))
+                        return self._make_result("", status_messages)
                 
                 if len(images.shape) == 4 and images.shape[0] > 0:
                     image_tensor = images[0:1]
@@ -1242,11 +1252,11 @@ class Qwen3VLAPI:
                     if remove_think_tags:
                         result = self._remove_think_content(result)
                     status_messages.append("✅ 图片分析完成")
-                    return (result, "\n".join(status_messages))
+                    return self._make_result(result, status_messages)
                 except Exception as e:
                     error_msg = f"图片分析失败: {str(e)}"
                     status_messages.append(f"❌ 错误: {error_msg}")
-                    return ("", "\n".join(status_messages))
+                    return self._make_result("", status_messages)
             
             else:
                 results = []
@@ -1259,7 +1269,7 @@ class Qwen3VLAPI:
                         if not image_paths:
                             error_msg = f"在文件夹 '{batch_folder_path}' 中未找到支持的图片文件"
                             status_messages.append(f"❌ 错误: {error_msg}")
-                            return ("", "\n".join(status_messages))
+                            return self._make_result("", status_messages)
                         
                         total_images = len(image_paths)
                         processed_count = 0
@@ -1298,13 +1308,13 @@ class Qwen3VLAPI:
                     except Exception as e:
                         error_msg = f"文件夹遍历失败: {str(e)}"
                         status_messages.append(f"❌ 错误: {error_msg}")
-                        return ("", "\n".join(status_messages))
+                        return self._make_result("", status_messages)
                         
                 else:
                     if images is None:
                         error_msg = "批量模式下必须提供图片输入或文件夹路径"
                         status_messages.append(f"❌ 错误: {error_msg}")
-                        return ("", "\n".join(status_messages))
+                        return self._make_result("", status_messages)
                     
                     total_images = images.shape[0] if len(images.shape) == 4 else 1
                     processed_count = 0
@@ -1344,15 +1354,15 @@ class Qwen3VLAPI:
                 
                 if batch_folder_path and batch_folder_path.strip():
                     log_message = f"批量处理完成！\n总计: {total_images} 张图片\n成功: {processed_count}\n失败: {error_count}"
-                    return (log_message, "\n".join(status_messages))
+                    return self._make_result(log_message, status_messages)
                 else:
                     combined_result = "\n\n" + "="*50 + "\n\n".join(results)
-                    return (combined_result, "\n".join(status_messages))
+                    return self._make_result(combined_result, status_messages)
                 
         except Exception as e:
             error_msg = f"图片分析失败: {str(e)}"
             status_messages.append(f"❌ 严重错误: {error_msg}")
-            return ("", "\n".join(status_messages))
+            return self._make_result("", status_messages)
     
     def _process_single_image(self, platform_name, api_key, image_tensor, prompt, model, max_tokens, temperature, timeout, api_base=None, sampling_params=None, size_limitation=None):
         try:
@@ -1459,3 +1469,90 @@ if PROMPT_SERVER_AVAILABLE:
                 {"error": f"保存通讯配置失败: {str(e)}"}, 
                 status=500
             )
+
+    QWEN3VL_TEMPLATES_FILE = os.path.join(current_dir, "qwen3vl_system_prompt_templates.json")
+
+    def _load_qwen3vl_templates():
+        if os.path.exists(QWEN3VL_TEMPLATES_FILE):
+            try:
+                with open(QWEN3VL_TEMPLATES_FILE, 'r', encoding='utf-8') as f:
+                    data = json.load(f)
+                    return data.get("templates", [])
+            except Exception:
+                pass
+        return []
+
+    def _save_qwen3vl_templates(templates):
+        try:
+            with open(QWEN3VL_TEMPLATES_FILE, 'w', encoding='utf-8') as f:
+                json.dump({"templates": templates}, f, indent=2, ensure_ascii=False)
+            return True
+        except Exception:
+            return False
+
+    @PromptServer.instance.routes.get("/zhihui_nodes/qwen3vl/templates")
+    async def get_qwen3vl_templates(request):
+        templates = _load_qwen3vl_templates()
+        return web.json_response({"templates": templates})
+
+    @PromptServer.instance.routes.post("/zhihui_nodes/qwen3vl/templates")
+    async def create_qwen3vl_template(request):
+        try:
+            data = await request.json()
+            name = data.get("name", "").strip()
+            content = data.get("content", "").strip()
+            if not name:
+                return web.json_response({"status": "error", "message": "Template name is required"}, status=400)
+            templates = _load_qwen3vl_templates()
+            new_template = {
+                "id": str(uuid.uuid4()),
+                "name": name,
+                "content": content,
+                "created_at": int(time.time()),
+                "updated_at": int(time.time())
+            }
+            templates.append(new_template)
+            if _save_qwen3vl_templates(templates):
+                return web.json_response({"status": "success", "template": new_template})
+            else:
+                return web.json_response({"status": "error", "message": "Failed to save template"}, status=500)
+        except Exception as e:
+            return web.json_response({"status": "error", "message": str(e)}, status=500)
+
+    @PromptServer.instance.routes.put("/zhihui_nodes/qwen3vl/templates/{template_id}")
+    async def update_qwen3vl_template(request):
+        try:
+            template_id = request.match_info.get("template_id")
+            data = await request.json()
+            name = data.get("name", "").strip()
+            content = data.get("content", "").strip()
+            if not name:
+                return web.json_response({"status": "error", "message": "Template name is required"}, status=400)
+            templates = _load_qwen3vl_templates()
+            for i, template in enumerate(templates):
+                if template["id"] == template_id:
+                    templates[i]["name"] = name
+                    templates[i]["content"] = content
+                    templates[i]["updated_at"] = int(time.time())
+                    if _save_qwen3vl_templates(templates):
+                        return web.json_response({"status": "success", "template": templates[i]})
+                    else:
+                        return web.json_response({"status": "error", "message": "Failed to save template"}, status=500)
+            return web.json_response({"status": "error", "message": "Template not found"}, status=404)
+        except Exception as e:
+            return web.json_response({"status": "error", "message": str(e)}, status=500)
+
+    @PromptServer.instance.routes.delete("/zhihui_nodes/qwen3vl/templates/{template_id}")
+    async def delete_qwen3vl_template(request):
+        try:
+            template_id = request.match_info.get("template_id")
+            templates = _load_qwen3vl_templates()
+            new_templates = [t for t in templates if t["id"] != template_id]
+            if len(new_templates) == len(templates):
+                return web.json_response({"status": "error", "message": "Template not found"}, status=404)
+            if _save_qwen3vl_templates(new_templates):
+                return web.json_response({"status": "success"})
+            else:
+                return web.json_response({"status": "error", "message": "Failed to save templates"}, status=500)
+        except Exception as e:
+            return web.json_response({"status": "error", "message": str(e)}, status=500)

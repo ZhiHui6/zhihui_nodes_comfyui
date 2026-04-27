@@ -3,12 +3,15 @@ import { api } from "/scripts/api.js";
 
 const i18n = {
     zh: {
-        nodeSettings: "⚙️ 节点设置",
+        nodeSettings: "⚙️ 设置",
         settings: "设置",
+        settingsTitle: "Qwen3-VL API设置",
         configApiKeys: "配置各个平台的API密钥。配置后，节点将自动使用这些密钥，无需每次手动输入。",
-        advancedParams: "高级参数设置",
+        advancedParams: "高级设置",
         enableAdvancedParams: "高级参数",
         advancedParamsDesc: "勾选后显示Top K采样、重复惩罚、最小P采样、Top P采样参数",
+        showStatusBar: "显示状态栏",
+        showStatusBarDesc: "勾选后在节点底部显示运行状态信息",
         platformConfigs: "平台服务配置",
         restoreDefault: "恢复默认",
         exportConfig: "导出配置",
@@ -68,15 +71,63 @@ const i18n = {
         exportSuccess: "配置导出成功！",
         exportFailed: "导出配置失败，请重试。",
         confirmImportConfig: "确定要导入配置文件吗？这将覆盖当前的所有设置。",
-        importError: "导入失败：{error}"
+        importError: "导入失败：{error}",
+        templateTooltip: "点击选择系统提示词模板",
+        clearTooltip: "点击清空当前输入框内容",
+        restoreTooltip: "点击恢复上次清空的内容",
+        clearContent: "已清空内容",
+        restoreContent: "已恢复内容",
+        selectTemplate: "选择模板",
+        searchTemplates: "搜索模板...",
+        noTemplates: "暂无模板，请在设置界面中管理模板",
+        templateApplied: "模板已应用",
+        checking: "加载中...",
+        navSettings: "节点设置",
+        navTemplates: "模板管理",
+        templateManagement: "快捷系统提示词模板管理",
+        createTemplate: "新建模板",
+        editTemplate: "编辑系统提示词模板",
+        templateName: "模板名称",
+        templateContent: "模板内容",
+        templateNamePlaceholder: "请输入模板名称",
+        templateContentPlaceholder: "请输入系统提示词内容",
+        templateCreated: "模板创建成功",
+        templateUpdated: "模板更新成功",
+        templateDeleted: "模板删除成功",
+        templateCreateFailed: "模板创建失败",
+        templateUpdateFailed: "模板更新失败",
+        templateDeleteFailed: "模板删除失败",
+        templateNameRequired: "模板名称不能为空",
+        sortByName: "按名称排序",
+        sortByTime: "按时间排序",
+        edit: "编辑",
+        confirmDelete: "确定要删除此模板吗？",
+        helpTitle: "Qwen3-VL 在线版节点",
+        helpDescription: "通过API调用Qwen3-VL多模态大模型，支持图像理解和对话。",
+        helpFeatures: "功能特性",
+        helpFeature1: "支持多种平台：硅基流动、魔搭社区、阿里云等",
+        helpFeature2: "支持自定义API配置",
+        helpFeature3: "支持系统提示词模板管理",
+        helpFeature4: "支持图像输入和多轮对话",
+        helpUsage: "使用说明",
+        helpUsage1: "在节点设置中配置API密钥",
+        helpUsage2: "选择要使用的平台",
+        helpUsage3: "输入提示词和图像进行对话",
+        helpInput: "输入",
+        helpInputDesc: "支持文本提示词和图像输入",
+        helpOutput: "输出",
+        helpOutputDesc: "返回模型生成的文本回复"
     },
     en: {
-        nodeSettings: "⚙️ Node Settings",
+        nodeSettings: "⚙️ Settings",
         settings: "Settings",
+        settingsTitle: "Qwen3-VL API Settings",
         configApiKeys: "Configure API keys for each platform. After configuration, nodes will automatically use these keys without manual input each time.",
-        advancedParams: "Advanced Parameters",
+        advancedParams: "Advanced Settings",
         enableAdvancedParams: "Advanced Parameters",
         advancedParamsDesc: "Check to display Top K sampling, repetition penalty, min P sampling, Top P sampling parameters",
+        showStatusBar: "Show Status Bar",
+        showStatusBarDesc: "Check to display running status information at the bottom of the node",
         platformConfigs: "Platform Service Configuration",
         restoreDefault: "Restore Default",
         exportConfig: "Export Config",
@@ -136,7 +187,52 @@ const i18n = {
         exportSuccess: "Configuration exported successfully!",
         exportFailed: "Failed to export configuration, please try again.",
         confirmImportConfig: "Are you sure you want to import the configuration file? This will overwrite all current settings.",
-        importError: "Import failed: {error}"
+        importError: "Import failed: {error}",
+        templateTooltip: "Click to select a system prompt template",
+        clearTooltip: "Click to clear the current input content",
+        restoreTooltip: "Click to restore the last cleared content",
+        clearContent: "Content cleared",
+        restoreContent: "Content restored",
+        selectTemplate: "Select Template",
+        searchTemplates: "Search templates...",
+        noTemplates: "No templates yet. Manage templates in the settings interface",
+        templateApplied: "Template applied",
+        checking: "Loading...",
+        navSettings: "Node Settings",
+        navTemplates: "Template Manager",
+        templateManagement: "Quick System Prompt Template Management",
+        createTemplate: "Create Template",
+        editTemplate: "Edit System Prompt Template",
+        templateName: "Template Name",
+        templateContent: "Template Content",
+        templateNamePlaceholder: "Enter template name",
+        templateContentPlaceholder: "Enter system prompt content",
+        templateCreated: "Template created successfully",
+        templateUpdated: "Template updated successfully",
+        templateDeleted: "Template deleted successfully",
+        templateCreateFailed: "Failed to create template",
+        templateUpdateFailed: "Failed to update template",
+        templateDeleteFailed: "Failed to delete template",
+        templateNameRequired: "Template name is required",
+        sortByName: "Sort by Name",
+        sortByTime: "Sort by Time",
+        edit: "Edit",
+        confirmDelete: "Are you sure you want to delete this template?",
+        helpTitle: "Qwen3-VL Online Node",
+        helpDescription: "Call Qwen3-VL multimodal model via API, supporting image understanding and conversation.",
+        helpFeatures: "Features",
+        helpFeature1: "Support multiple platforms: SiliconFlow, ModelScope, Aliyun, etc.",
+        helpFeature2: "Support custom API configuration",
+        helpFeature3: "Support system prompt template management",
+        helpFeature4: "Support image input and multi-turn conversation",
+        helpUsage: "Usage",
+        helpUsage1: "Configure API key in node settings",
+        helpUsage2: "Select the platform to use",
+        helpUsage3: "Enter prompt and image for conversation",
+        helpInput: "Input",
+        helpInputDesc: "Support text prompt and image input",
+        helpOutput: "Output",
+        helpOutputDesc: "Return text response generated by the model"
     }
 };
 
@@ -149,6 +245,75 @@ function getLocale() {
 function $t(key) {
     const locale = getLocale();
     return i18n[locale][key] || i18n['en'][key] || key;
+}
+
+function getQwen3VLHelpHTML() {
+    return `<h3 style="margin:0 0 12px 0;color:#60a5fa;font-size:18px;font-weight:600;padding-bottom:8px;border-bottom:1px solid rgba(96, 165, 250, 0.2);letter-spacing:0.2px;">${$t('helpTitle')}</h3>
+<p style="margin:0 0 16px 0;color:#e2e8f0;">${$t('helpDescription')}</p>
+<h4 style="margin:12px 0 8px 0;color:#38bdf8;font-size:14px;font-weight:600;text-transform:uppercase;letter-spacing:0.5px;">${$t('helpFeatures')}</h4>
+<ul style="margin:0;padding:0;">
+<li style="margin:4px 0;padding-left:6px;list-style:none;position:relative;color:#e2e8f0;">${$t('helpFeature1')}</li>
+<li style="margin:4px 0;padding-left:6px;list-style:none;position:relative;color:#e2e8f0;">${$t('helpFeature2')}</li>
+<li style="margin:4px 0;padding-left:6px;list-style:none;position:relative;color:#e2e8f0;">${$t('helpFeature3')}</li>
+<li style="margin:4px 0;padding-left:6px;list-style:none;position:relative;color:#e2e8f0;">${$t('helpFeature4')}</li>
+</ul>
+<h4 style="margin:12px 0 8px 0;color:#38bdf8;font-size:14px;font-weight:600;text-transform:uppercase;letter-spacing:0.5px;">${$t('helpUsage')}</h4>
+<ul style="margin:0;padding:0;">
+<li style="margin:4px 0;padding-left:6px;list-style:none;position:relative;color:#e2e8f0;">${$t('helpUsage1')}</li>
+<li style="margin:4px 0;padding-left:6px;list-style:none;position:relative;color:#e2e8f0;">${$t('helpUsage2')}</li>
+<li style="margin:4px 0;padding-left:6px;list-style:none;position:relative;color:#e2e8f0;">${$t('helpUsage3')}</li>
+</ul>
+<h4 style="margin:12px 0 8px 0;color:#38bdf8;font-size:14px;font-weight:600;text-transform:uppercase;letter-spacing:0.5px;">${$t('helpInput')}</h4>
+<ul style="margin:0;padding:0;">
+<li style="margin:4px 0;padding-left:6px;list-style:none;position:relative;color:#e2e8f0;">${$t('helpInputDesc')}</li>
+</ul>
+<h4 style="margin:12px 0 8px 0;color:#38bdf8;font-size:14px;font-weight:600;text-transform:uppercase;letter-spacing:0.5px;">${$t('helpOutput')}</h4>
+<ul style="margin:0;padding:0;">
+<li style="margin:4px 0;padding-left:6px;list-style:none;position:relative;color:#e2e8f0;">${$t('helpOutputDesc')}</li>
+</ul>`;
+}
+
+function createQwen3VLHelpPopup(description) {
+    const docElement = document.createElement('div');
+    docElement.style.cssText = `
+        background: linear-gradient(135deg, rgba(15, 23, 42, 0.98) 0%, rgba(30, 41, 59, 0.98) 100%);
+        backdrop-filter: blur(16px);
+        -webkit-backdrop-filter: blur(16px);
+        position: absolute;
+        color: #e2e8f0;
+        font: 13px 'Segoe UI', system-ui, -apple-system, sans-serif;
+        line-height: 1.6;
+        padding: 20px 24px 24px 24px;
+        border-radius: 16px;
+        border: 1px solid rgba(99, 179, 237, 0.3);
+        z-index: 1000;
+        overflow: hidden;
+        max-width: 560px;
+        max-height: 600px;
+        min-width: 400px;
+        box-shadow: 
+            0 0 40px rgba(59, 130, 246, 0.15),
+            0 20px 60px rgba(0, 0, 0, 0.4),
+            inset 0 1px 0 rgba(255, 255, 255, 0.08);
+    `;
+
+    docElement.innerHTML = `<div style="overflow-y:auto;max-height:540px;padding-right:8px;scrollbar-width:thin;scrollbar-color:rgba(96,165,250,0.3) transparent;">${description}</div>`;
+
+    const accent = document.createElement('div');
+    accent.style.cssText = `
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        height: 3px;
+        background: linear-gradient(90deg, #3b82f6, #06b6d4, #3b82f6);
+        border-radius: 16px 16px 0 0;
+        opacity: 0.8;
+    `;
+    docElement.insertBefore(accent, docElement.firstChild);
+
+    document.body.appendChild(docElement);
+    return docElement;
 }
 
 class APIConfigManager {
@@ -177,6 +342,9 @@ class APIConfigManager {
             ],
             
             "Aliyun": [
+                "qwen3.6-plus",
+                "qwen3.6-27b",
+                "qwen3.6-35b-a3b",
                 "qwen3.5-plus",
                 "qwen3.5-flash",
                 "qwen3.5-27b",
@@ -231,6 +399,9 @@ class APIConfigManager {
                 }
                 if (fileConfig.advanced_params_enabled !== undefined) {
                     this.config.advanced_params_enabled = fileConfig.advanced_params_enabled;
+                }
+                if (fileConfig.show_status_bar !== undefined) {
+                    this.config.show_status_bar = fileConfig.show_status_bar;
                 }
             } else {
                 this.config = defaultConfig;
@@ -305,7 +476,8 @@ class APIConfigManager {
                 }
             },
             active_target: "SiliconFlow",
-            advanced_params_enabled: false
+            advanced_params_enabled: false,
+            show_status_bar: false
         };
     }
 
@@ -317,6 +489,29 @@ class APIConfigManager {
         this.isDialogOpen = true;
         
         const config = await this.loadConfig();
+        
+        const animStyle = document.createElement("style");
+        animStyle.id = "qwen3vl-dialog-anim";
+        animStyle.textContent = `
+            @keyframes qwen3vlDialogIn {
+                from { opacity: 0; transform: translate(-50%, -50%) scale(0.95); }
+                to { opacity: 1; transform: translate(-50%, -50%) scale(1); }
+            }
+            @keyframes qwen3vlDialogOut {
+                from { opacity: 1; transform: translate(-50%, -50%) scale(1); }
+                to { opacity: 0; transform: translate(-50%, -50%) scale(0.95); }
+            }
+            @keyframes qwen3vlOverlayIn {
+                from { opacity: 0; }
+                to { opacity: 1; }
+            }
+            @keyframes qwen3vlOverlayOut {
+                from { opacity: 1; }
+                to { opacity: 0; }
+            }
+        `;
+        document.head.appendChild(animStyle);
+        
         const overlay = document.createElement("div");
         overlay.className = "comfy-modal-overlay";
         overlay.style.cssText = `
@@ -326,8 +521,12 @@ class APIConfigManager {
             width: 100%;
             height: 100%;
             background: rgba(0, 0, 0, 0.5);
+            backdrop-filter: blur(3px);
+            -webkit-backdrop-filter: blur(3px);
             z-index: 9999;
             display: block;
+            opacity: 0;
+            animation: qwen3vlOverlayIn 0.2s ease forwards;
         `;
 
         const dialog = document.createElement("div");
@@ -335,20 +534,21 @@ class APIConfigManager {
         dialog.style.cssText = `
             position: fixed;
             width: 800px;
-            height: auto;
             background: var(--comfy-menu-bg);
             border: 1px solid var(--border-color);
             border-radius: 8px;
             padding: 20px;
-            max-height: 95vh;
-            overflow-y: auto;
+            max-height: 90vh;
             color: var(--input-text);
-            display: block;
+            display: flex;
+            flex-direction: column;
             z-index: 10000;
             box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
             left: 50%;
             top: 50%;
             transform: translate(-50%, -50%);
+            opacity: 0;
+            animation: qwen3vlDialogIn 0.25s cubic-bezier(0.16, 1, 0.3, 1) forwards;
         `;
 
         dialog.innerHTML = `
@@ -356,112 +556,153 @@ class APIConfigManager {
                 margin-top: 0; 
                 color: var(--input-text);
                 user-select: none;
-                padding: 8px;
+                padding: 8px 15px;
                 margin: -20px -20px 15px -20px;
                 background: var(--comfy-input-bg);
                 border-bottom: 1px solid var(--border-color);
                 border-radius: 8px 8px 0 0;
                 text-align: center;
                 font-size: 16px;
-            ">${$t('settings')}</h2>
-            <div id="api-config-content">
-                <div style="margin-bottom: 15px;">
-                    <p style="color: var(--descrip-text); font-size: 13px; margin: 0;">
-                        ${$t('configApiKeys')}
-                    </p>
+                display: flex;
+                justify-content: center;
+                align-items: center;
+                position: relative;
+            ">${$t('settingsTitle')}
+                <button id="exit-dialog" style="
+                    position: absolute;
+                    right: 10px;
+                    top: 50%;
+                    transform: translateY(-50%);
+                    background: linear-gradient(135deg, #ef4444, #dc2626);
+                    border: none;
+                    color: white;
+                    font-size: 12px;
+                    font-weight: 600;
+                    cursor: pointer;
+                    padding: 0;
+                    width: 22px;
+                    height: 22px;
+                    line-height: 22px;
+                    transition: all 0.2s ease;
+                    border-radius: 6px;
+                " onmouseover="this.style.background='linear-gradient(135deg, #f87171, #ef4444)'; this.style.boxShadow='0 2px 8px rgba(239,68,68,0.4)';" 
+                  onmouseout="this.style.background='linear-gradient(135deg, #ef4444, #dc2626)'; this.style.boxShadow='none';" title="${$t('cancel')}">&times;</button>
+            </h2>
+            <div style="display:flex;gap:4px;margin-bottom:15px;padding:4px;background:var(--comfy-input-bg);border-radius:8px;border:1px solid var(--border-color);">
+                <button class="qwen3vl-nav-tab" data-page="settings" style="flex:1;padding:8px 16px;background:linear-gradient(135deg,#667eea,#5b67c8);border:none;border-radius:6px;color:white;font-size:13px;font-weight:500;cursor:pointer;transition:all 0.2s ease;display:flex;align-items:center;justify-content:center;gap:6px;">
+                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"></circle><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"></path></svg>
+                    ${$t('navSettings')}
+                </button>
+                <button class="qwen3vl-nav-tab" data-page="templates" style="flex:1;padding:8px 16px;background:transparent;border:none;border-radius:6px;color:var(--descrip-text);font-size:13px;font-weight:500;cursor:pointer;transition:all 0.2s ease;display:flex;align-items:center;justify-content:center;gap:6px;">
+                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect><line x1="3" y1="9" x2="21" y2="9"></line><line x1="9" y1="21" x2="9" y2="9"></line></svg>
+                    ${$t('navTemplates')}
+                </button>
+            </div>
+            <div id="page-settings" class="qwen3vl-page-content" style="display:block;overflow-y:auto;overflow-x:hidden;">
+                <div id="api-config-content">
+                    <div style="margin-bottom: 15px;">
+                        <p style="color: var(--descrip-text); font-size: 13px; margin: 0;">
+                            ${$t('configApiKeys')}
+                        </p>
+                    </div>
+                    
+                    <div style="display: flex; flex-direction: column; gap: 20px;">
+                        <div style="flex: 1;">
+                            <h3 style="
+                                margin: 0 0 10px 0; 
+                                color: var(--input-text); 
+                                font-size: 14px; 
+                                font-weight: bold;
+                                border-bottom: 1px solid var(--border-color);
+                                padding-bottom: 5px;
+                            ">${$t('advancedParams')}</h3>
+                            <label style="display: flex; align-items: center; gap: 8px; cursor: pointer; padding: 10px; background: var(--comfy-input-bg); border: 1px solid var(--border-color); border-radius: 6px;">
+                                <input type="checkbox" id="advanced-params-checkbox" style="margin: 0; accent-color: #22c55e; width: 18px; height: 18px;">
+                                <span style="color: var(--input-text); font-size: 14px; font-weight: bold;">${$t('enableAdvancedParams')}</span>
+                                <span style="color: var(--descrip-text); font-size: 12px; margin-left: auto;">${$t('advancedParamsDesc')}</span>
+                            </label>
+                            <label style="display: flex; align-items: center; gap: 8px; cursor: pointer; padding: 10px; margin-top: 8px; background: var(--comfy-input-bg); border: 1px solid var(--border-color); border-radius: 6px;">
+                                <input type="checkbox" id="show-status-bar-checkbox" style="margin: 0; accent-color: #22c55e; width: 18px; height: 18px;">
+                                <span style="color: var(--input-text); font-size: 14px; font-weight: bold;">${$t('showStatusBar')}</span>
+                                <span style="color: var(--descrip-text); font-size: 12px; margin-left: auto;">${$t('showStatusBarDesc')}</span>
+                            </label>
+                        </div>
+                        
+                        <div style="flex: 1;">
+                            <h3 style="
+                                margin: 0 0 10px 0; 
+                                color: var(--input-text); 
+                                font-size: 14px; 
+                                font-weight: bold;
+                                border-bottom: 1px solid var(--border-color);
+                                padding-bottom: 5px;
+                            ">${$t('platformConfigs')}</h3>
+                            <div id="platform-configs"></div>
+                        </div>
+                    </div>
+                    
+                    <div style="margin-top: 15px; display: flex; gap: 15px; justify-content: space-between; align-items: center;">
+                        <div style="display: flex; gap: 12px; align-items: center;">
+                            <button id="restore-default" style="
+                                background: #d97706;
+                                border: 1px solid #d97706;
+                                color: white;
+                                padding: 8px 16px;
+                                border-radius: 6px;
+                                cursor: pointer;
+                                font-size: 13px;
+                                font-weight: bold;
+                                transition: all 0.2s ease;
+                                box-shadow: 0 2px 4px rgba(217, 119, 6, 0.2);
+                            " onmouseover="this.style.background='#b45309'; this.style.borderColor='#b45309'; this.style.boxShadow='0 2px 12px rgba(217, 119, 6, 0.6)'; this.style.transform='translateY(-1px)';" 
+                              onmouseout="this.style.background='#d97706'; this.style.borderColor='#d97706'; this.style.boxShadow='0 2px 4px rgba(217, 119, 6, 0.2)'; this.style.transform='translateY(0)';">${$t('restoreDefault')}</button>
+                        </div>
+                        
+                        <div style="display: flex; gap: 8px; padding: 4px 8px; background: var(--comfy-panel-bg, #2a2a2a); border-radius: 6px; border: 1px solid var(--border-color, #404040); margin-left: auto;">
+                            <button id="export-config" style="
+                                background: #3b82f6;
+                                border: 1px solid #3b82f6;
+                                color: white;
+                                padding: 6px 14px;
+                                border-radius: 4px;
+                                cursor: pointer;
+                                font-size: 13px;
+                                transition: all 0.2s ease;
+                                font-weight: 500;
+                            " onmouseover="this.style.background='#2563eb'; this.style.borderColor='#2563eb'; this.style.boxShadow='0 4px 16px rgba(59, 130, 246, 0.6)'; this.style.transform='translateY(-2px)';" 
+                              onmouseout="this.style.background='#3b82f6'; this.style.borderColor='#3b82f6'; this.style.boxShadow='none'; this.style.transform='translateY(0)';">${$t('exportConfig')}</button>
+                            <button id="import-config" style="
+                                background: #3b82f6;
+                                border: 1px solid #3b82f6;
+                                color: white;
+                                padding: 6px 14px;
+                                border-radius: 4px;
+                                cursor: pointer;
+                                font-size: 13px;
+                                transition: all 0.2s ease;
+                                font-weight: 500;
+                            " onmouseover="this.style.background='#2563eb'; this.style.borderColor='#2563eb'; this.style.boxShadow='0 4px 16px rgba(59, 130, 246, 0.6)'; this.style.transform='translateY(-2px)';" 
+                              onmouseout="this.style.background='#3b82f6'; this.style.borderColor='#3b82f6'; this.style.boxShadow='none'; this.style.transform='translateY(0)';">${$t('importConfig')}</button>
+                        </div>
+                    </div>
                 </div>
-                
-                <!-- 主配置区域 - 两行布局 -->
-                <div style="display: flex; flex-direction: column; gap: 20px;">
-                    <!-- 高级参数复选框 -->
-                    <div style="flex: 1;">
-                        <h3 style="
-                            margin: 0 0 10px 0; 
-                            color: var(--input-text); 
-                            font-size: 14px; 
-                            font-weight: bold;
-                            border-bottom: 1px solid var(--border-color);
-                            padding-bottom: 5px;
-                        ">${$t('advancedParams')}</h3>
-                        <label style="display: flex; align-items: center; gap: 8px; cursor: pointer; padding: 10px; background: var(--comfy-input-bg); border: 1px solid var(--border-color); border-radius: 6px;">
-                            <input type="checkbox" id="advanced-params-checkbox" style="margin: 0; accent-color: #22c55e; width: 18px; height: 18px;">
-                            <span style="color: var(--input-text); font-size: 14px; font-weight: bold;">${$t('enableAdvancedParams')}</span>
-                            <span style="color: var(--descrip-text); font-size: 12px; margin-left: auto;">${$t('advancedParamsDesc')}</span>
-                        </label>
+            </div>
+            <div id="page-templates" class="qwen3vl-page-content" style="display:none;overflow-y:auto;overflow-x:hidden;">
+                <div style="margin-bottom:15px;">
+                    <h3 style="margin:0 0 10px 0;color:var(--input-text);font-size:14px;font-weight:bold;border-bottom:1px solid var(--border-color);padding-bottom:5px;display:flex;align-items:center;gap:6px;">
+                        <span>📋</span>
+                        <span>${$t('templateManagement')}</span>
+                    </h3>
+                    <div style="display:flex;gap:8px;margin-bottom:10px;align-items:center;">
+                        <input type="text" id="qwen3vl-template-search" placeholder="${$t('searchTemplates')}" style="flex:1;padding:6px 10px;background:var(--comfy-input-bg);border:1px solid var(--border-color);border-radius:6px;color:var(--input-text);font-size:12px;">
+                        <select id="qwen3vl-template-sort" style="padding:6px 10px;background:var(--comfy-input-bg);border:1px solid var(--border-color);border-radius:6px;color:var(--input-text);font-size:12px;">
+                            <option value="name">${$t('sortByName')}</option>
+                            <option value="time">${$t('sortByTime')}</option>
+                        </select>
+                        <button id="qwen3vl-template-create" style="padding:6px 14px;background:linear-gradient(135deg,#22c55e,#16a34a);color:white;border:none;border-radius:6px;cursor:pointer;font-size:12px;font-weight:500;transition:all 0.2s ease;white-space:nowrap;">${$t('createTemplate')}</button>
                     </div>
-                    
-                    <!-- 平台服务配置（包含自定义配置） -->
-                    <div style="flex: 1;">
-                        <h3 style="
-                            margin: 0 0 10px 0; 
-                            color: var(--input-text); 
-                            font-size: 14px; 
-                            font-weight: bold;
-                            border-bottom: 1px solid var(--border-color);
-                            padding-bottom: 5px;
-                        ">${$t('platformConfigs')}</h3>
-                        <div id="platform-configs"></div>
-                    </div>
-                </div>
-                
-                <div style="margin-top: 15px; display: flex; gap: 15px; justify-content: space-between; align-items: center;">
-                    <div style="display: flex; gap: 12px; align-items: center;">
-                        <button id="restore-default" style="
-                            background: #d97706;
-                            border: 1px solid #d97706;
-                            color: white;
-                            padding: 8px 16px;
-                            border-radius: 6px;
-                            cursor: pointer;
-                            font-size: 13px;
-                            font-weight: bold;
-                            transition: all 0.2s ease;
-                            box-shadow: 0 2px 4px rgba(217, 119, 6, 0.2);
-                        " onmouseover="this.style.background='#b45309'; this.style.borderColor='#b45309'; this.style.boxShadow='0 2px 12px rgba(217, 119, 6, 0.6)'; this.style.transform='translateY(-1px)';" 
-                          onmouseout="this.style.background='#d97706'; this.style.borderColor='#d97706'; this.style.boxShadow='0 2px 4px rgba(217, 119, 6, 0.2)'; this.style.transform='translateY(0)';">${$t('restoreDefault')}</button>
-                    </div>
-                    
-                    <div style="display: flex; gap: 8px; padding: 4px 8px; background: var(--comfy-panel-bg, #2a2a2a); border-radius: 6px; border: 1px solid var(--border-color, #404040); margin-left: -280px;">
-                        <button id="export-config" style="
-                            background: #3b82f6;
-                            border: 1px solid #3b82f6;
-                            color: white;
-                            padding: 6px 14px;
-                            border-radius: 4px;
-                            cursor: pointer;
-                            font-size: 13px;
-                            transition: all 0.2s ease;
-                            font-weight: 500;
-                        " onmouseover="this.style.background='#2563eb'; this.style.borderColor='#2563eb'; this.style.boxShadow='0 4px 16px rgba(59, 130, 246, 0.6)'; this.style.transform='translateY(-2px)';" 
-                          onmouseout="this.style.background='#3b82f6'; this.style.borderColor='#3b82f6'; this.style.boxShadow='none'; this.style.transform='translateY(0)';">${$t('exportConfig')}</button>
-                        <button id="import-config" style="
-                            background: #3b82f6;
-                            border: 1px solid #3b82f6;
-                            color: white;
-                            padding: 6px 14px;
-                            border-radius: 4px;
-                            cursor: pointer;
-                            font-size: 13px;
-                            transition: all 0.2s ease;
-                            font-weight: 500;
-                        " onmouseover="this.style.background='#2563eb'; this.style.borderColor='#2563eb'; this.style.boxShadow='0 4px 16px rgba(59, 130, 246, 0.6)'; this.style.transform='translateY(-2px)';" 
-                          onmouseout="this.style.background='#3b82f6'; this.style.borderColor='#3b82f6'; this.style.boxShadow='none'; this.style.transform='translateY(0)';">${$t('importConfig')}</button>
-                    </div>
-                    
-                    <div>
-                        <button id="exit-dialog" style="
-                            background: #ff0000;
-                            border: 1px solid #ff0000;
-                            color: white;
-                            padding: 6px 14px;
-                            border-radius: 4px;
-                            cursor: pointer;
-                            font-size: 16px;
-                            font-weight: bold;
-                            transition: all 0.2s ease;
-                            line-height: 1;
-                        " onmouseover="this.style.background='#e60000'; this.style.borderColor='#e60000'; this.style.boxShadow='0 4px 16px rgba(255, 0, 0, 0.6)'; this.style.transform='translateY(-2px)';" 
-                          onmouseout="this.style.background='#ff0000'; this.style.borderColor='#ff0000'; this.style.boxShadow='none'; this.style.transform='translateY(0)';" title="${$t('cancel')}">&times;</button>
+                    <div id="qwen3vl-template-list" style="overflow-y:auto;border:1px solid var(--border-color);border-radius:6px;background:var(--comfy-input-bg);">
+                        <div style="padding:20px;text-align:center;color:var(--descrip-text);font-size:12px;">${$t('checking')}</div>
                     </div>
                 </div>
             </div>
@@ -470,8 +711,193 @@ class APIConfigManager {
         document.body.appendChild(overlay);
         document.body.appendChild(dialog);
         
+        const navTabs = dialog.querySelectorAll(".qwen3vl-nav-tab");
+        const settingsPage = dialog.querySelector("#page-settings");
+        const templatesPage = dialog.querySelector("#page-templates");
+        
+        const syncPageHeight = () => {
+            settingsPage.style.display = "block";
+            templatesPage.style.display = "block";
+            const h1 = settingsPage.scrollHeight;
+            const h2 = templatesPage.scrollHeight;
+            const maxH = Math.max(h1, h2);
+            settingsPage.style.minHeight = maxH + "px";
+            templatesPage.style.minHeight = maxH + "px";
+            templatesPage.style.display = "none";
+        };
+        
+        const switchPage = (pageName) => {
+            navTabs.forEach(tab => {
+                if (tab.dataset.page === pageName) {
+                    tab.style.background = "linear-gradient(135deg,#667eea,#5b67c8)";
+                    tab.style.color = "white";
+                    tab.classList.add("active");
+                } else {
+                    tab.style.background = "transparent";
+                    tab.style.color = "var(--descrip-text)";
+                    tab.classList.remove("active");
+                }
+            });
+            if (pageName === "settings") {
+                settingsPage.style.display = "block";
+                templatesPage.style.display = "none";
+            } else {
+                settingsPage.style.display = "none";
+                templatesPage.style.display = "block";
+            }
+        };
+        navTabs.forEach(tab => { tab.onclick = () => switchPage(tab.dataset.page); });
+        
+        let qwen3vlTemplates = [];
+        const templateSearchInput = dialog.querySelector("#qwen3vl-template-search");
+        const templateSortSelect = dialog.querySelector("#qwen3vl-template-sort");
+        const templateListEl = dialog.querySelector("#qwen3vl-template-list");
+        const templateCreateBtn = dialog.querySelector("#qwen3vl-template-create");
+        
+        const loadTemplates = async () => {
+            try {
+                const response = await fetch("/zhihui_nodes/qwen3vl/templates");
+                if (response.ok) {
+                    const data = await response.json();
+                    qwen3vlTemplates = data.templates || [];
+                    renderTemplateList();
+                }
+            } catch (e) {
+                qwen3vlTemplates = [];
+                renderTemplateList();
+            }
+            setTimeout(() => { syncPageHeight(); }, 50);
+        };
+        
+        const formatTime = (timestamp) => {
+            const date = new Date(timestamp * 1000);
+            return date.toLocaleDateString() + " " + date.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+        };
+        
+        const renderTemplateList = () => {
+            let filtered = [...qwen3vlTemplates];
+            const searchTerm = templateSearchInput.value.toLowerCase().trim();
+            if (searchTerm) {
+                filtered = filtered.filter(t => t.name.toLowerCase().includes(searchTerm) || t.content.toLowerCase().includes(searchTerm));
+            }
+            const sortBy = templateSortSelect.value;
+            if (sortBy === "name") {
+                filtered.sort((a, b) => a.name.localeCompare(b.name));
+            } else {
+                filtered.sort((a, b) => b.updated_at - a.updated_at);
+            }
+            if (filtered.length === 0) {
+                templateListEl.innerHTML = `<div style="padding:20px;text-align:center;color:var(--descrip-text);font-size:12px;">${$t('noTemplates')}</div>`;
+                return;
+            }
+            templateListEl.innerHTML = filtered.map(template => `
+                <div data-id="${template.id}" style="display:flex;align-items:center;padding:10px 12px;border-bottom:1px solid var(--border-color);transition:background 0.15s ease;">
+                    <span style="flex:1;font-size:13px;font-weight:500;color:var(--input-text);overflow:hidden;text-overflow:ellipsis;white-space:nowrap;" title="${template.name}">${template.name}</span>
+                    <span style="font-size:11px;color:var(--descrip-text);margin:0 12px;white-space:nowrap;">${formatTime(template.updated_at)}</span>
+                    <div style="display:flex;gap:6px;">
+                        <button class="qwen3vl-template-edit-btn" data-id="${template.id}" style="padding:4px 10px;background:transparent;border:1px solid var(--border-color);border-radius:4px;color:var(--input-text);cursor:pointer;font-size:11px;transition:all 0.2s ease;">${$t('edit')}</button>
+                        <button class="qwen3vl-template-delete-btn" data-id="${template.id}" style="padding:4px 10px;background:transparent;border:1px solid #ef4444;border-radius:4px;color:#ef4444;cursor:pointer;font-size:11px;transition:all 0.2s ease;">${$t('delete')}</button>
+                    </div>
+                </div>
+            `).join("");
+            templateListEl.querySelectorAll("[data-id]").forEach(item => {
+                item.onmouseover = () => { item.style.background = "rgba(102,126,234,0.1)"; };
+                item.onmouseout = () => { item.style.background = "transparent"; };
+            });
+            templateListEl.querySelectorAll(".qwen3vl-template-edit-btn").forEach(btn => {
+                btn.onmouseover = () => { btn.style.background = "rgba(102,126,234,0.2)"; };
+                btn.onmouseout = () => { btn.style.background = "transparent"; };
+                btn.onclick = () => showTemplateEditor(btn.dataset.id);
+            });
+            templateListEl.querySelectorAll(".qwen3vl-template-delete-btn").forEach(btn => {
+                btn.onmouseover = () => { btn.style.background = "rgba(239,68,68,0.2)"; };
+                btn.onmouseout = () => { btn.style.background = "transparent"; };
+                btn.onclick = () => deleteTemplate(btn.dataset.id);
+            });
+        };
+        
+        const showTemplateEditor = (templateId = null) => {
+            const template = templateId ? qwen3vlTemplates.find(t => t.id === templateId) : null;
+            const isEdit = !!template;
+            
+            const editorOverlay = document.createElement("div");
+            editorOverlay.style.cssText = "position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(0,0,0,0.5);z-index:10005;display:flex;align-items:center;justify-content:center;";
+            
+            const editorDialog = document.createElement("div");
+            editorDialog.style.cssText = "width:600px;max-width:90vw;height:85vh;max-height:800px;background:var(--comfy-menu-bg);border:1px solid var(--border-color);border-radius:12px;padding:24px;color:var(--input-text);box-shadow:0 20px 60px rgba(0,0,0,0.5);display:flex;flex-direction:column;";
+            
+            editorDialog.innerHTML = `
+                <h3 style="margin:0 0 20px 0;font-size:18px;font-weight:600;">${isEdit ? $t('editTemplate') : $t('createTemplate')}</h3>
+                <div style="margin-bottom:16px;">
+                    <label style="display:block;margin-bottom:8px;font-size:13px;color:var(--descrip-text);">${$t('templateName')}</label>
+                    <input type="text" id="qwen3vl-template-name-input" value="${template ? template.name : ''}" placeholder="${$t('templateNamePlaceholder')}" style="width:100%;padding:10px 12px;background:var(--comfy-input-bg);border:1px solid var(--border-color);border-radius:6px;color:var(--input-text);font-size:14px;box-sizing:border-box;">
+                </div>
+                <div style="margin-bottom:20px;flex:1;display:flex;flex-direction:column;">
+                    <label style="display:block;margin-bottom:8px;font-size:13px;color:var(--descrip-text);">${$t('templateContent')}</label>
+                    <textarea id="qwen3vl-template-content-input" placeholder="${$t('templateContentPlaceholder')}" style="width:100%;flex:1;min-height:300px;padding:10px 12px;background:var(--comfy-input-bg);border:1px solid var(--border-color);border-radius:6px;color:var(--input-text);font-size:13px;resize:none;box-sizing:border-box;font-family:inherit;">${template ? template.content : ''}</textarea>
+                </div>
+                <div style="display:flex;gap:12px;justify-content:flex-end;">
+                    <button id="qwen3vl-template-cancel-btn" style="padding:10px 24px;background:linear-gradient(135deg,#ef4444,#dc2626);color:white;border:none;border-radius:6px;cursor:pointer;font-size:14px;font-weight:600;transition:all 0.2s ease;">${$t('cancel')}</button>
+                    <button id="qwen3vl-template-save-btn" style="padding:10px 24px;background:linear-gradient(135deg,#22c55e,#16a34a);color:white;border:none;border-radius:6px;cursor:pointer;font-size:14px;font-weight:600;transition:all 0.2s ease;">${$t('save')}</button>
+                </div>
+            `;
+            
+            const closeEditor = () => { editorOverlay.remove(); };
+            editorDialog.querySelector("#qwen3vl-template-cancel-btn").onclick = closeEditor;
+            editorDialog.querySelector("#qwen3vl-template-save-btn").onclick = async () => {
+                const name = editorDialog.querySelector("#qwen3vl-template-name-input").value.trim();
+                const content = editorDialog.querySelector("#qwen3vl-template-content-input").value.trim();
+                if (!name) { showQwen3VLToast($t('templateNameRequired'), "error"); return; }
+                try {
+                    let response;
+                    if (isEdit) {
+                        response = await fetch(`/zhihui_nodes/qwen3vl/templates/${templateId}`, { method: "PUT", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ name, content }) });
+                    } else {
+                        response = await fetch("/zhihui_nodes/qwen3vl/templates", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ name, content }) });
+                    }
+                    const result = await response.json();
+                    if (result.status === "success") {
+                        showQwen3VLToast(isEdit ? $t('templateUpdated') : $t('templateCreated'), "success");
+                        closeEditor();
+                        await loadTemplates();
+                    } else {
+                        showQwen3VLToast(isEdit ? $t('templateUpdateFailed') : $t('templateCreateFailed'), "error");
+                    }
+                } catch (e) {
+                    showQwen3VLToast(isEdit ? $t('templateUpdateFailed') : $t('templateCreateFailed'), "error");
+                }
+            };
+            
+            editorOverlay.appendChild(editorDialog);
+            document.body.appendChild(editorOverlay);
+            editorDialog.querySelector("#qwen3vl-template-name-input").focus();
+        };
+        
+        const deleteTemplate = async (templateId) => {
+            if (!confirm($t('confirmDelete'))) return;
+            try {
+                const response = await fetch(`/zhihui_nodes/qwen3vl/templates/${templateId}`, { method: "DELETE" });
+                const result = await response.json();
+                if (result.status === "success") {
+                    showQwen3VLToast($t('templateDeleted'), "success");
+                    await loadTemplates();
+                } else {
+                    showQwen3VLToast($t('templateDeleteFailed'), "error");
+                }
+            } catch (e) {
+                showQwen3VLToast($t('templateDeleteFailed'), "error");
+            }
+        };
+        
+        templateSearchInput.addEventListener("input", renderTemplateList);
+        templateSortSelect.addEventListener("change", renderTemplateList);
+        templateCreateBtn.onclick = () => showTemplateEditor();
+        loadTemplates();
+        
         this.renderPlatformConfigs(config);
         this.attachActiveTargetHandlers(dialog);
+        
+        setTimeout(() => { syncPageHeight(); }, 50);
 
         const advancedParamsCheckbox = dialog.querySelector("#advanced-params-checkbox");
         if (advancedParamsCheckbox) {
@@ -494,14 +920,41 @@ class APIConfigManager {
             this.updateAdvancedParamsVisibility(advancedParamsCheckbox.checked);
         }
 
+        const showStatusBarCheckbox = dialog.querySelector("#show-status-bar-checkbox");
+        if (showStatusBarCheckbox) {
+            showStatusBarCheckbox.checked = config.show_status_bar || false;
+            showStatusBarCheckbox.onchange = async () => {
+                const previousValue = config.show_status_bar || false;
+                const currentValue = showStatusBarCheckbox.checked;
+                config.show_status_bar = currentValue;
+                this.updateStatusBarVisibility(currentValue);
+                const ok = await this.saveConfig(config);
+                if (ok) {
+                    this.config = { ...config };
+                } else {
+                    config.show_status_bar = previousValue;
+                    showStatusBarCheckbox.checked = previousValue;
+                    this.updateStatusBarVisibility(previousValue);
+                    alert($t('saveFailedAdvanced'));
+                }
+            };
+            this.updateStatusBarVisibility(showStatusBarCheckbox.checked);
+        }
+
         const closeDialog = () => {
-            if (overlay && overlay.parentNode) {
-                document.body.removeChild(overlay);
-            }
-            if (dialog && dialog.parentNode) {
-                document.body.removeChild(dialog);
-            }
-            this.isDialogOpen = false;
+            overlay.style.animation = "qwen3vlOverlayOut 0.15s ease forwards";
+            dialog.style.animation = "qwen3vlDialogOut 0.15s ease forwards";
+            setTimeout(() => {
+                if (overlay && overlay.parentNode) {
+                    document.body.removeChild(overlay);
+                }
+                if (dialog && dialog.parentNode) {
+                    document.body.removeChild(dialog);
+                }
+                const animStyleEl = document.getElementById("qwen3vl-dialog-anim");
+                if (animStyleEl) animStyleEl.remove();
+                this.isDialogOpen = false;
+            }, 150);
         };
 
         dialog.querySelector("#restore-default").onclick = () => {
@@ -1269,6 +1722,59 @@ class APIConfigManager {
         app.graph.setDirtyCanvas(true, true);
     }
 
+    applyStatusBarToNode(node, show) {
+        if (!node) return;
+        if (show && !node._statusBarWidget) {
+            const host = document.createElement("div");
+            host.style.cssText = "width:100%;min-height:40px;max-height:120px;overflow-y:auto;background:var(--comfy-input-bg,#1f2430);border:1px solid var(--border-color,#404040);border-radius:6px;padding:6px 8px;font-size:11px;line-height:1.5;color:var(--input-text,#e5e7eb);box-sizing:border-box;white-space:pre-wrap;word-break:break-all;";
+            host.textContent = "";
+            const domWidget = node.addDOMWidget("status_bar", "div", host, {});
+            domWidget.serialize = false;
+            node._statusBarWidget = domWidget;
+            node._statusBarHost = host;
+            if (typeof node.computeSize === "function") {
+                const currentSize = node.size;
+                const computedSize = node.computeSize();
+                if (currentSize && currentSize.length > 0) {
+                    node.size = [currentSize[0], computedSize[1]];
+                } else {
+                    node.size = computedSize;
+                }
+            }
+            app.graph.setDirtyCanvas(true, true);
+        } else if (!show && node._statusBarWidget) {
+            const idx = node.widgets.indexOf(node._statusBarWidget);
+            if (idx !== -1) {
+                node.widgets.splice(idx, 1);
+            }
+            if (node._statusBarWidget.element && node._statusBarWidget.element.parentNode) {
+                node._statusBarWidget.element.parentNode.removeChild(node._statusBarWidget.element);
+            }
+            node._statusBarWidget = null;
+            node._statusBarHost = null;
+            if (typeof node.computeSize === "function") {
+                const currentSize = node.size;
+                const computedSize = node.computeSize();
+                if (currentSize && currentSize.length > 0) {
+                    node.size = [currentSize[0], computedSize[1]];
+                } else {
+                    node.size = computedSize;
+                }
+            }
+            app.graph.setDirtyCanvas(true, true);
+        }
+    }
+
+    updateStatusBarVisibility(show) {
+        const nodes = app.graph._nodes;
+        nodes.forEach(node => {
+            if (node.type === 'Qwen3VLAPI') {
+                this.applyStatusBarToNode(node, show);
+            }
+        });
+        app.graph.setDirtyCanvas(true, true);
+    }
+
     async saveSingleCardConfig(cardElement) {
         const type = cardElement?.dataset?.cardType;
         const key = cardElement?.dataset?.cardKey;
@@ -1497,6 +2003,253 @@ class APIConfigManager {
 
 const apiConfigManager = new APIConfigManager();
 
+let qwen3vlTemplateTooltipEl = null;
+let qwen3vlClearTooltipEl = null;
+
+function showQwen3VLTemplateTooltip(btnEl) {
+    hideQwen3VLTemplateTooltip();
+    qwen3vlTemplateTooltipEl = document.createElement("div");
+    qwen3vlTemplateTooltipEl.style.cssText = "position:fixed;background:rgba(30,41,59,0.95);color:#e2e8f0;padding:6px 10px;border-radius:4px;font-size:11px;z-index:10004;box-shadow:0 4px 12px rgba(0,0,0,0.3);pointer-events:none;white-space:nowrap;border:1px solid rgba(255,255,255,0.1);";
+    qwen3vlTemplateTooltipEl.textContent = $t('templateTooltip');
+    document.body.appendChild(qwen3vlTemplateTooltipEl);
+    const btnRect = btnEl.getBoundingClientRect();
+    const tooltipRect = qwen3vlTemplateTooltipEl.getBoundingClientRect();
+    let left = btnRect.left + (btnRect.width / 2) - (tooltipRect.width / 2);
+    let top = btnRect.bottom + 6;
+    if (left < 5) left = 5;
+    if (left + tooltipRect.width > window.innerWidth - 5) left = window.innerWidth - tooltipRect.width - 5;
+    if (top + tooltipRect.height > window.innerHeight - 5) top = btnRect.top - tooltipRect.height - 6;
+    qwen3vlTemplateTooltipEl.style.left = left + "px";
+    qwen3vlTemplateTooltipEl.style.top = top + "px";
+}
+
+function hideQwen3VLTemplateTooltip() {
+    if (qwen3vlTemplateTooltipEl) { qwen3vlTemplateTooltipEl.remove(); qwen3vlTemplateTooltipEl = null; }
+}
+
+function showQwen3VLClearTooltip(btnEl, key) {
+    hideQwen3VLClearTooltip();
+    qwen3vlClearTooltipEl = document.createElement("div");
+    qwen3vlClearTooltipEl.style.cssText = "position:fixed;background:rgba(30,41,59,0.95);color:#e2e8f0;padding:6px 10px;border-radius:4px;font-size:11px;z-index:10004;box-shadow:0 4px 12px rgba(0,0,0,0.3);pointer-events:none;white-space:nowrap;border:1px solid rgba(255,255,255,0.1);";
+    qwen3vlClearTooltipEl.textContent = $t(key);
+    document.body.appendChild(qwen3vlClearTooltipEl);
+    const btnRect = btnEl.getBoundingClientRect();
+    const tooltipRect = qwen3vlClearTooltipEl.getBoundingClientRect();
+    let left = btnRect.left + (btnRect.width / 2) - (tooltipRect.width / 2);
+    let top = btnRect.bottom + 6;
+    if (left < 5) left = 5;
+    if (left + tooltipRect.width > window.innerWidth - 5) left = window.innerWidth - tooltipRect.width - 5;
+    if (top + tooltipRect.height > window.innerHeight - 5) top = btnRect.top - tooltipRect.height - 6;
+    qwen3vlClearTooltipEl.style.left = left + "px";
+    qwen3vlClearTooltipEl.style.top = top + "px";
+}
+
+function hideQwen3VLClearTooltip() {
+    if (qwen3vlClearTooltipEl) { qwen3vlClearTooltipEl.remove(); qwen3vlClearTooltipEl = null; }
+}
+
+function showQwen3VLToast(message, type = "info") {
+    const toast = document.createElement("div");
+    const bgColor = type === "success" ? "#22c55e" : type === "error" ? "#ef4444" : "#667eea";
+    toast.style.cssText = `position:fixed;top:50%;left:50%;transform:translate(-50%,-50%);background:${bgColor};color:white;padding:16px 32px;border-radius:8px;font-size:14px;font-weight:500;z-index:10003;box-shadow:0 8px 24px rgba(0,0,0,0.4);text-align:center;min-width:240px;`;
+    toast.textContent = message;
+    document.body.appendChild(toast);
+    setTimeout(() => { toast.remove(); }, 1500);
+}
+
+async function showQwen3VLTemplateSelector(node, btnRect) {
+    const existingOverlay = document.getElementById("qwen3vl-template-selector");
+    if (existingOverlay) {
+        existingOverlay.remove();
+        const existingStyle = document.querySelector("style[data-qwen3vl-template-style]");
+        if (existingStyle) existingStyle.remove();
+    }
+    
+    const overlay = document.createElement("div");
+    overlay.id = "qwen3vl-template-selector";
+    overlay.style.cssText = "position:fixed;z-index:10001;animation:qwen3vlDropdownIn 0.2s cubic-bezier(0.16,1,0.3,1);transform-origin:top center;";
+    
+    const style = document.createElement("style");
+    style.setAttribute("data-qwen3vl-template-style", "");
+    style.textContent = `@keyframes qwen3vlDropdownIn{from{transform:translateY(-8px) scale(0.95);opacity:0}to{transform:translateY(0) scale(1);opacity:1}}@keyframes qwen3vlDropdownOut{from{transform:translateY(0) scale(1);opacity:1}to{transform:translateY(-8px) scale(0.95);opacity:0}}`;
+    document.head.appendChild(style);
+
+    const dialog = document.createElement("div");
+    dialog.style.cssText = "width:320px;max-width:90vw;max-height:350px;background:#1f2937;border:1px solid rgba(255,255,255,0.15);border-radius:8px;padding:12px;color:#e8e8e8;box-shadow:0 8px 32px rgba(0,0,0,0.4);display:flex;flex-direction:column;";
+    
+    const header = document.createElement("div");
+    header.style.cssText = "display:flex;align-items:center;justify-content:space-between;margin-bottom:10px;";
+    
+    const title = document.createElement("h3");
+    title.style.cssText = "margin:0;font-size:15px;font-weight:600;background:linear-gradient(90deg,#667eea,#764ba2);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;";
+    title.textContent = $t('selectTemplate');
+    
+    const closeBtn = document.createElement("button");
+    closeBtn.style.cssText = "width:20px;height:20px;border-radius:50%;border:1px solid rgba(255,255,255,0.25);background:transparent;cursor:pointer;display:inline-flex;align-items:center;justify-content:center;color:#9ca3af;font-size:12px;transition:all 0.2s ease;";
+    closeBtn.innerHTML = "×";
+    closeBtn.onmouseover = () => { closeBtn.style.background = "#b91c1c"; closeBtn.style.borderColor = "#ef4444"; closeBtn.style.color = "#fff"; };
+    closeBtn.onmouseout = () => { closeBtn.style.background = "transparent"; closeBtn.style.borderColor = "rgba(255,255,255,0.25)"; closeBtn.style.color = "#9ca3af"; };
+    
+    header.appendChild(title);
+    header.appendChild(closeBtn);
+    
+    const searchInput = document.createElement("input");
+    searchInput.type = "text";
+    searchInput.placeholder = $t('searchTemplates');
+    searchInput.style.cssText = "width:100%;padding:6px 10px;background:#111827;border:1px solid rgba(255,255,255,0.15);border-radius:6px;color:#e8e8e8;font-size:12px;margin-bottom:8px;box-sizing:border-box;";
+    
+    const listContainer = document.createElement("div");
+    listContainer.style.cssText = "flex:1;overflow-y:auto;border:1px solid rgba(255,255,255,0.1);border-radius:6px;min-height:60px;max-height:380px;scrollbar-width:thin;scrollbar-color:rgba(102,126,234,0.5) rgba(255,255,255,0.05);";
+    
+    const loadingEl = document.createElement("div");
+    loadingEl.style.cssText = "padding:20px;text-align:center;color:#9ca3af;font-size:12px;";
+    loadingEl.textContent = $t('checking');
+    listContainer.appendChild(loadingEl);
+    
+    dialog.appendChild(header);
+    dialog.appendChild(searchInput);
+    dialog.appendChild(listContainer);
+    overlay.appendChild(dialog);
+    
+    const close = () => {
+        overlay.style.animation = "qwen3vlDropdownOut 0.15s ease forwards";
+        setTimeout(() => { if (overlay.parentNode) overlay.remove(); style.remove(); }, 150);
+    };
+    
+    closeBtn.onclick = close;
+    
+    const handleClickOutside = (e) => {
+        if (!overlay.contains(e.target)) { close(); document.removeEventListener("mousedown", handleClickOutside); }
+    };
+    setTimeout(() => { document.addEventListener("mousedown", handleClickOutside); }, 10);
+    
+    const renderList = (templates, searchTerm = "") => {
+        let filtered = templates;
+        if (searchTerm) {
+            const term = searchTerm.toLowerCase();
+            filtered = templates.filter(t => t.name.toLowerCase().includes(term) || t.content.toLowerCase().includes(term));
+        }
+        if (filtered.length === 0) {
+            listContainer.innerHTML = `<div style="padding:20px;text-align:center;color:#9ca3af;font-size:12px;">${$t('noTemplates')}</div>`;
+            return;
+        }
+        listContainer.innerHTML = filtered.map(template => `<div data-id="${template.id}" style="padding:10px 12px;border-bottom:1px solid rgba(255,255,255,0.05);cursor:pointer;transition:background 0.15s ease;"><div style="font-size:14px;font-weight:500;color:#e8e8e8;">${template.name}</div></div>`).join("");
+        listContainer.querySelectorAll("[data-id]").forEach(item => {
+            item.onmouseover = () => { item.style.background = "rgba(102,126,234,0.15)"; };
+            item.onmouseout = () => { item.style.background = "transparent"; };
+            item.onclick = () => {
+                const template = templates.find(t => t.id === item.dataset.id);
+                if (template) {
+                    const systemPromptWidget = node.widgets?.find(w => w.name === "system_prompt");
+                    if (systemPromptWidget) {
+                        systemPromptWidget.value = template.content;
+                        if (systemPromptWidget.callback) systemPromptWidget.callback(template.content);
+                        node.setDirtyCanvas(true, true);
+                        showQwen3VLToast($t('templateApplied'), "success");
+                    }
+                }
+                close();
+            };
+        });
+    };
+    
+    searchInput.addEventListener("input", (e) => { renderList(currentTemplates, e.target.value); });
+    
+    let currentTemplates = [];
+    try {
+        const response = await fetch("/zhihui_nodes/qwen3vl/templates");
+        if (response.ok) {
+            const data = await response.json();
+            currentTemplates = data.templates || [];
+            renderList(currentTemplates);
+        } else {
+            listContainer.innerHTML = `<div style="padding:20px;text-align:center;color:#ef4444;font-size:12px;">${$t('noTemplates')}</div>`;
+        }
+    } catch (e) {
+        listContainer.innerHTML = `<div style="padding:20px;text-align:center;color:#ef4444;font-size:12px;">${$t('noTemplates')}</div>`;
+    }
+    
+    document.body.appendChild(overlay);
+    
+    const dialogRect = dialog.getBoundingClientRect();
+    let left = btnRect.left;
+    let top = btnRect.bottom + 4;
+    if (left + dialogRect.width > window.innerWidth - 10) left = window.innerWidth - dialogRect.width - 10;
+    if (top + dialogRect.height > window.innerHeight - 10) top = btnRect.top - dialogRect.height - 4;
+    if (top < 10) top = 10;
+    if (left < 10) left = 10;
+    overlay.style.left = left + "px";
+    overlay.style.top = top + "px";
+    
+    searchInput.focus();
+}
+
+function addQwen3VLInputButtons(node) {
+    const systemPromptWidget = node.widgets?.find(w => w.name === "system_prompt");
+    if (!systemPromptWidget || !systemPromptWidget.inputEl) return;
+    
+    const inputEl = systemPromptWidget.inputEl;
+    const parentEl = inputEl.parentElement;
+    if (!parentEl) return;
+    
+    parentEl.style.position = "relative";
+    
+    const templateBtn = document.createElement("button");
+    templateBtn.type = "button";
+    templateBtn.innerHTML = `<svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="display:block;"><rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect><line x1="3" y1="9" x2="21" y2="9"></line><line x1="9" y1="21" x2="9" y2="9"></line></svg>`;
+    templateBtn.style.cssText = "position:absolute;right:3px;top:3px;width:18px;height:18px;padding:0;background:rgba(102,126,234,0.35);border:none;border-radius:3px;cursor:pointer;display:none;align-items:center;justify-content:center;z-index:10;transition:all 0.2s ease;opacity:0;color:rgba(102,126,234,0.9);";
+    
+    templateBtn.onmouseenter = () => { templateBtn.style.background = "rgba(102,126,234,0.6)"; templateBtn.style.color = "rgba(102,126,234,1)"; templateBtn.style.transform = "scale(1.1)"; showQwen3VLTemplateTooltip(templateBtn); };
+    templateBtn.onmouseleave = () => { templateBtn.style.background = "rgba(102,126,234,0.35)"; templateBtn.style.color = "rgba(102,126,234,0.9)"; templateBtn.style.transform = "scale(1)"; hideQwen3VLTemplateTooltip(); };
+    templateBtn.onclick = (e) => { e.preventDefault(); e.stopPropagation(); const rect = templateBtn.getBoundingClientRect(); showQwen3VLTemplateSelector(node, rect); };
+    
+    parentEl.appendChild(templateBtn);
+    
+    const clearBtn = document.createElement("button");
+    clearBtn.type = "button";
+    clearBtn.innerHTML = `<svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="display:block;"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>`;
+    clearBtn.style.cssText = "position:absolute;right:24px;top:3px;width:18px;height:18px;padding:0;background:rgba(239,68,68,0.35);border:none;border-radius:3px;cursor:pointer;display:none;align-items:center;justify-content:center;z-index:10;transition:all 0.2s ease;opacity:0;color:rgba(239,68,68,0.9);";
+    
+    clearBtn.onmouseenter = () => { clearBtn.style.background = "rgba(239,68,68,0.6)"; clearBtn.style.color = "rgba(239,68,68,1)"; clearBtn.style.transform = "scale(1.1)"; showQwen3VLClearTooltip(clearBtn, node._lastClearedContent !== undefined ? 'restoreTooltip' : 'clearTooltip'); };
+    clearBtn.onmouseleave = () => { clearBtn.style.background = node._lastClearedContent !== undefined ? "rgba(34,197,94,0.35)" : "rgba(239,68,68,0.35)"; clearBtn.style.color = node._lastClearedContent !== undefined ? "rgba(34,197,94,0.9)" : "rgba(239,68,68,0.9)"; clearBtn.style.transform = "scale(1)"; hideQwen3VLClearTooltip(); };
+    clearBtn.onclick = (e) => {
+        e.preventDefault();
+        e.stopPropagation();
+        if (node._lastClearedContent !== undefined) {
+            inputEl.value = node._lastClearedContent;
+            systemPromptWidget.value = node._lastClearedContent;
+            node._lastClearedContent = undefined;
+            clearBtn.innerHTML = `<svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="display:block;"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>`;
+            clearBtn.style.background = "rgba(239,68,68,0.35)";
+            clearBtn.style.color = "rgba(239,68,68,0.9)";
+            showQwen3VLToast($t('restoreContent'), "success");
+        } else {
+            node._lastClearedContent = inputEl.value;
+            inputEl.value = "";
+            systemPromptWidget.value = "";
+            clearBtn.innerHTML = `<svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="display:block;"><polyline points="1 4 1 10 7 10"></polyline><polyline points="23 4 23 10 17 10"></polyline><path d="M20.49 15a9 9 0 1 1-2.12-9.36L23 10"></path></svg>`;
+            clearBtn.style.background = "rgba(34,197,94,0.35)";
+            clearBtn.style.color = "rgba(34,197,94,0.9)";
+            showQwen3VLToast($t('clearContent'), "success");
+        }
+        inputEl.dispatchEvent(new Event('input', { bubbles: true }));
+    };
+    
+    parentEl.appendChild(clearBtn);
+    
+    inputEl.addEventListener("focus", () => {
+        templateBtn.style.display = "flex";
+        clearBtn.style.display = "flex";
+        setTimeout(() => { templateBtn.style.opacity = "1"; clearBtn.style.opacity = "1"; }, 10);
+    });
+    
+    inputEl.addEventListener("blur", () => {
+        templateBtn.style.opacity = "0";
+        clearBtn.style.opacity = "0";
+        setTimeout(() => { templateBtn.style.display = "none"; clearBtn.style.display = "none"; }, 200);
+    });
+}
+
 app.registerExtension({
     name: "Comfyui_Qwen3VL.APIConfig",
     async beforeRegisterNodeDef(nodeType, nodeData, app) {
@@ -1511,7 +2264,16 @@ app.registerExtension({
                 nodeType.prototype.onNodeCreated = function () {
                     const r = onNodeCreated ? onNodeCreated.apply(this, arguments) : undefined;
                     
+                    this._qwen3vlHelp = false;
+                    this._qwen3vlHelpLocale = getLocale();
+                    
                     const configButton = this.addWidget("button", $t('nodeSettings'), null, () => {
+                        const existingOverlay = document.getElementById("qwen3vl-template-selector");
+                        if (existingOverlay) {
+                            existingOverlay.remove();
+                            const existingStyle = document.querySelector("style[data-qwen3vl-template-style]");
+                            if (existingStyle) existingStyle.remove();
+                        }
                         const buttonElement = document.querySelector('.comfy-widget-value[value="Settings·设置"]');
                         apiConfigManager.showConfigDialog(buttonElement);
                     });
@@ -1520,9 +2282,126 @@ app.registerExtension({
                         const config = await apiConfigManager.loadConfig();
                         const advancedParamsEnabled = config.advanced_params_enabled || false;
                         apiConfigManager.applyAdvancedParamsToNode(this, advancedParamsEnabled);
+                        const showStatusBar = config.show_status_bar || false;
+                        apiConfigManager.applyStatusBarToNode(this, showStatusBar);
+                        addQwen3VLInputButtons(this);
                         app.graph.setDirtyCanvas(true, true);
                     }, 100);
                     
+                    return r;
+                };
+
+                const onExecuted = nodeType.prototype.onExecuted;
+                nodeType.prototype.onExecuted = function (message) {
+                    onExecuted?.apply(this, arguments);
+                    if (this._statusBarHost && message?.status) {
+                        const statusText = Array.isArray(message.status) 
+                            ? message.status.join("\n") 
+                            : String(message.status);
+                        this._statusBarHost.textContent = statusText;
+                        this._statusBarHost.scrollTop = this._statusBarHost.scrollHeight;
+                        app.graph.setDirtyCanvas(true, false);
+                    }
+                };
+
+                const iconSize = 24;
+                const iconMargin = 4;
+                let helpElement = null;
+                let currentHelpLocale = null;
+
+                const drawFg = nodeType.prototype.onDrawForeground;
+                nodeType.prototype.onDrawForeground = function (ctx) {
+                    const currentLocale = getLocale();
+                    if (this._qwen3vlHelpLocale !== currentLocale) {
+                        this._qwen3vlHelpLocale = currentLocale;
+                    }
+                    
+                    const r = drawFg ? drawFg.apply(this, arguments) : undefined;
+                    if (this.flags.collapsed) return r;
+
+                    const x = this.size[0] - iconSize - iconMargin;
+                    const y = -LiteGraph.NODE_TITLE_HEIGHT + (LiteGraph.NODE_TITLE_HEIGHT - iconSize) / 2;
+
+                    if (this._qwen3vlHelp && helpElement === null) {
+                        currentHelpLocale = currentLocale;
+                        helpElement = createQwen3VLHelpPopup(getQwen3VLHelpHTML());
+                    }
+                    else if (!this._qwen3vlHelp && helpElement !== null) {
+                        helpElement.remove();
+                        helpElement = null;
+                        currentHelpLocale = null;
+                    }
+                    else if (this._qwen3vlHelp && helpElement !== null && currentHelpLocale !== currentLocale) {
+                        helpElement.querySelector('div').innerHTML = getQwen3VLHelpHTML();
+                        currentHelpLocale = currentLocale;
+                    }
+
+                    if (this._qwen3vlHelp && helpElement !== null) {
+                        const rect = ctx.canvas.getBoundingClientRect();
+                        const scaleX = rect.width / ctx.canvas.width;
+                        const scaleY = rect.height / ctx.canvas.height;
+
+                        const transform = new DOMMatrix()
+                            .scaleSelf(scaleX, scaleY)
+                            .multiplySelf(ctx.getTransform())
+                            .translateSelf(this.size[0] * scaleX * Math.max(1.0, window.devicePixelRatio), 0)
+                            .translateSelf(10, -32);
+
+                        const bcr = app.canvas.canvas.getBoundingClientRect();
+                        helpElement.style.left = `${transform.e + bcr.x}px`;
+                        helpElement.style.top = `${transform.f + bcr.y}px`;
+                    }
+
+                    ctx.save();
+                    ctx.translate(x, y);
+                    ctx.scale(iconSize / 32, iconSize / 32);
+                    
+                    ctx.beginPath();
+                    ctx.arc(16, 16, 14, 0, Math.PI * 2);
+                    ctx.fillStyle = this._qwen3vlHelp ? 'rgba(59, 130, 246, 0.3)' : 'rgba(59, 130, 246, 0.15)';
+                    ctx.fill();
+                    
+                    ctx.beginPath();
+                    ctx.arc(16, 16, 14, 0, Math.PI * 2);
+                    ctx.strokeStyle = this._qwen3vlHelp ? '#60a5fa' : 'rgba(96, 165, 250, 0.6)';
+                    ctx.lineWidth = 2;
+                    ctx.stroke();
+                    
+                    ctx.font = 'bold 24px system-ui';
+                    ctx.textAlign = 'center';
+                    ctx.textBaseline = 'middle';
+                    ctx.fillStyle = this._qwen3vlHelp ? '#93c5fd' : '#60a5fa';
+                    ctx.fillText('?', 16, 19);
+                    
+                    ctx.restore();
+                    return r;
+                };
+
+                const mouseDown = nodeType.prototype.onMouseDown;
+                nodeType.prototype.onMouseDown = function (e, localPos, canvas) {
+                    const r = mouseDown ? mouseDown.apply(this, arguments) : undefined;
+                    const iconX = this.size[0] - iconSize - iconMargin;
+                    const iconY = -LiteGraph.NODE_TITLE_HEIGHT + (LiteGraph.NODE_TITLE_HEIGHT - iconSize) / 2;
+                    if (
+                        localPos[0] > iconX &&
+                        localPos[0] < iconX + iconSize &&
+                        localPos[1] > iconY &&
+                        localPos[1] < iconY + iconSize
+                    ) {
+                        this._qwen3vlHelp = !this._qwen3vlHelp;
+                        return true;
+                    }
+                    return r;
+                };
+
+                const onRemoved = nodeType.prototype.onRemoved;
+                nodeType.prototype.onRemoved = function () {
+                    const r = onRemoved ? onRemoved.apply(this, []) : undefined;
+                    if (helpElement) {
+                        helpElement.remove();
+                        helpElement = null;
+                        currentHelpLocale = null;
+                    }
                     return r;
                 };
                 break;
