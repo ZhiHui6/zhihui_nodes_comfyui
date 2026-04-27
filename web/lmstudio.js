@@ -79,10 +79,8 @@ const i18n = {
         balancedDesc: "适合大多数日常对话场景：平衡的参数设置，在准确性和创造性之间取得良好平衡。",
         creativeDesc: "适合创意写作：较高的temperature增加创造性输出，适合故事、诗歌等创作。",
         qwenThinkingGeneral: "Qwen3.6 思考(通用)",
-        qwenThinkingCoding: "Qwen3.6 思考(编程)",
         qwenInstruct: "Qwen3.6 指令",
         qwenThinkingGeneralDesc: "Qwen3.6官方推荐：适用于通用任务，让模型有更多创造性，适合推理、创意写作等。",
-        qwenThinkingCodingDesc: "Qwen3.6官方推荐：适用于精确编程/Web开发，让输出更精确稳定。",
         qwenInstructDesc: "Qwen3.6官方推荐：非思考模式，控制模型不要过度思考，适合直接回答。",
         maxTokens: "Max Tokens",
         temperature: "Temperature",
@@ -219,10 +217,8 @@ const i18n = {
         balancedDesc: "For most daily conversation scenarios: balanced parameters for good accuracy and creativity balance.",
         creativeDesc: "For creative writing: higher temperature increases creative output, suitable for stories, poetry, etc.",
         qwenThinkingGeneral: "Qwen3.6 Thinking (General)",
-        qwenThinkingCoding: "Qwen3.6 Thinking (Coding)",
         qwenInstruct: "Qwen3.6 Instruct",
         qwenThinkingGeneralDesc: "Qwen3.6 official: For general tasks, allowing more creativity, suitable for reasoning and creative writing.",
-        qwenThinkingCodingDesc: "Qwen3.6 official: For precise coding/WebDev, providing more stable and precise output.",
         qwenInstructDesc: "Qwen3.6 official: Non-thinking mode, controls the model from over-thinking, suitable for direct answers.",
         maxTokens: "Max Tokens",
         temperature: "Temperature",
@@ -2230,7 +2226,6 @@ function showLMStudioSettings(node) {
                             <option value="Balanced">${$t('balanced')}</option>
                             <option value="Creative">${$t('creative')}</option>
                             <option value="Qwen3.6 Thinking (General)">${$t('qwenThinkingGeneral')}</option>
-                            <option value="Qwen3.6 Thinking (Coding)">${$t('qwenThinkingCoding')}</option>
                             <option value="Qwen3.6 Instruct">${$t('qwenInstruct')}</option>
                             <option value="Custom">${$t('custom')}</option>
                         </select>
@@ -2545,17 +2540,6 @@ function showLMStudioSettings(node) {
                 presence_penalty: 0.0
             },
             description: $t('qwenThinkingGeneralDesc')
-        },
-        "Qwen3.6 Thinking (Coding)": {
-            params: {
-                max_tokens: 8192,
-                temperature: 0.6,
-                top_p: 0.95,
-                top_k: 20,
-                repetition_penalty: 1.0,
-                presence_penalty: 0.0
-            },
-            description: $t('qwenThinkingCodingDesc')
         },
         "Qwen3.6 Instruct": {
             params: {

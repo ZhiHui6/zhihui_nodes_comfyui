@@ -98,14 +98,6 @@ LMSTUDIO_PARAM_PRESETS = {
         "repetition_penalty": 1.0,
         "presence_penalty": 0.0,
     },
-    "Qwen3.6 Thinking (Coding)": {
-        "max_tokens": 8192,
-        "temperature": 0.6,
-        "top_p": 0.95,
-        "top_k": 20,
-        "repetition_penalty": 1.0,
-        "presence_penalty": 0.0,
-    },
     "Qwen3.6 Instruct": {
         "max_tokens": 4096,
         "temperature": 0.7,
