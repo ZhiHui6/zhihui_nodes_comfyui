@@ -1,5 +1,16 @@
 # 更新日志 / Changelog
 
+## 1.0.34 2026-4-29
+- 标签选择器节点(TagSelector):
+  - 新增"角色提取器"功能界面，支持历史记录功能，可保存和查看提取结果
+  - 优化界面操作体验，支持记住最后退出时的状态和位置
+  - 重构"随机标签"开关，升级为"随机逻辑"，支持从两种随机源获取提示词。
+  <br>
+- TagSelector node:
+  - Added "Character Extractor" feature interface with history support, allowing saving and viewing extraction results
+  - Optimized UI operation experience, supporting remembering the last exit state and position
+  - Reconstructed "Random Tags" switch to "Random Logic", supporting fetching prompts from from two random sources.
+  
 ## 1.0.33 2026-4-27
 - Qwen3-VL在线版(Qwen3VLAPI)
   - 新增"显示状态栏"选项，默认显示
@@ -9,18 +20,19 @@
 - LM Studio节点
   - 添加运行前检查机制，失败时弹出错误提示
   - 日志栏优化为简洁状态栏样式，采用纤细滚动条设计
-  - 参数组预设新增三个预设："Qwen3.6 思考(通用)"、"Qwen3.6 思考(编程)"、"Qwen3.6指令"
+  - 参数组预设新增两个预设："Qwen3.6 思考(通用)"、"Qwen3.6指令"
+  - 新增存在惩罚参数
   <br>
-  - Qwen3-VL Online (Qwen3VLAPI)
-    - Added "Show Status Bar" option, enabled by default
-    - Added template selection and clear buttons to system prompt input
-    - Added template management feature
-    - Adjusted interface close button
-    - 
+- Qwen3-VL Online (Qwen3VLAPI)
+  - Added "Show Status Bar" option, enabled by default
+  - Added template selection and clear buttons to system prompt input box
+  - Added template management feature
+  - Adjusted interface close button
 - LM Studio node
   - Added pre-run check mechanism with error popup on failure
-  - Optimized log panel to concise status bar style with slim scrollbar design
-  - Added three preset parameter groups: "Qwen3.6 Thinking (General)", "Qwen3.6 Thinking (Programming)", "Qwen3.6 Instruction"
+  - Optimized log bar to concise status bar style with slim scrollbar design
+  - Added two new parameter presets: "Qwen3.6 Thinking (General)" and "Qwen3.6 Instruction"
+  - Added presence penalty parameter
 
 ## 1.0.32 2026-4-24
 - 标签选择器节点(TagSelector):

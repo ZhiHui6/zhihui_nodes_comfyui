@@ -8,6 +8,10 @@ from aiohttp import web
 from server import PromptServer
 from functools import lru_cache
 import time
+import urllib.parse
+from cryptography.fernet import Fernet
+import urllib3
+urllib3.disable_warnings(urllib3.exceptions.InsecureRequestWarning)
 
 
 class TagSelectorCache:
@@ -142,13 +146,11 @@ class TagSelector:
                         "placeholder": "选择的标签将显示在这里。\nSelected tags will be displayed here.",
                     },
                 ),
-                "auto_random_tags": (
-                    "BOOLEAN",
+                "random_logic": (
+                    ["Disabled", "Random Tags", "Character Extractor"],
                     {
-                        "default": False,
-                        "label_on": "On",
-                        "label_off": "Off",
-                        "tooltip": "启用后将自动生成随机标签。需要先在标签选择器界面中配置随机标签生成设置，包括启用分类、设置权重和数量等参数。",
+                        "default": "Disabled",
+                        "tooltip": "Select random tag generation logic: Disabled - disable random function; Random Tags - generate tags using rules configured in the random tags interface; Character Extractor - use the character extractor feature to get tags",
                     },
                 ),
                 "expand_mode": (
@@ -194,7 +196,7 @@ class TagSelector:
     def process_tags(
         self,
         tag_edit,
-        auto_random_tags,
+        random_logic,
         expand_mode,
         output_language,
         platform="auto",
@@ -202,10 +204,16 @@ class TagSelector:
         unique_id=None,
         extra_pnginfo=None,
     ):
-        if auto_random_tags:
+        if random_logic == "Random Tags":
             random_tags = self._generate_random_tags()
             if random_tags:
                 processed_tags = self.clean_tags(random_tags)
+            else:
+                processed_tags = self.clean_tags(tag_edit)
+        elif random_logic == "Character Extractor":
+            extractor_tags = self._generate_extractor_tags()
+            if extractor_tags:
+                processed_tags = self.clean_tags(extractor_tags)
             else:
                 processed_tags = self.clean_tags(tag_edit)
         else:
@@ -223,9 +231,11 @@ class TagSelector:
         try:
             tags_data = self.get_tags_config()
             if not tags_data:
+                print("[Zhihui] Random Tags: No tags data available")
                 return ""
 
             random_settings = self.get_random_settings()
+            print(f"[Zhihui] Random Tags: loaded settings, categories count={len(random_settings.get('categories', {}))}")
 
             generated_tags = []
             used_tags = set()
@@ -235,6 +245,7 @@ class TagSelector:
                 for path, setting in random_settings["categories"].items()
                 if setting["enabled"]
             ]
+            print(f"[Zhihui] Random Tags: enabled_categories count={len(enabled_categories)}")
 
             if random_settings.get("adultCategories"):
                 enabled_adult_categories = [
@@ -245,6 +256,7 @@ class TagSelector:
                 enabled_categories.extend(enabled_adult_categories)
 
             if not enabled_categories:
+                print("[Zhihui] Random Tags: No enabled categories, returning empty")
                 return ""
 
             for category_path in enabled_categories:
@@ -294,11 +306,106 @@ class TagSelector:
                     additional_tags = random.sample(remaining_tags, additional_count)
                     generated_tags.extend(additional_tags)
 
-            return ", ".join(generated_tags)
+            result = ", ".join(generated_tags)
+            print(f"[Zhihui] Random Tags: generated {len(generated_tags)} tags, result length={len(result)}")
+            return result
 
         except Exception as e:
-            print(f"Error generating random tags: {e}")
+            print(f"[Zhihui] Error generating random tags: {e}")
+            import traceback
+            traceback.print_exc()
             return ""
+
+    def _generate_extractor_tags(self):
+        try:
+            extractor_settings = self.get_extractor_settings()
+
+            seed = extractor_settings.get("seed", -1) if extractor_settings else -1
+            excluded = extractor_settings.get("excluded", "") if extractor_settings else ""
+            custom_prompt = extractor_settings.get("customPrompt", "") if extractor_settings else ""
+
+            if seed == -1:
+                seed = random.randint(0, 0xffffffffffffffff)
+
+            print(f"[Zhihui] Character Extractor: seed={seed}, excluded={excluded}, custom_prompt={custom_prompt}")
+            prompt_data = fetch_cosplay_prompt(seed, excluded, custom_prompt)
+            print(f"[Zhihui] Character Extractor: prompt_data type={type(prompt_data).__name__}")
+
+            if isinstance(prompt_data, str):
+                print(f"[Zhihui] Character Extractor error: {prompt_data}")
+                return ""
+
+            original_prompt = prompt_data.get("prompt", "")
+            print(f"[Zhihui] Character Extractor: original_prompt length={len(original_prompt)}")
+            if not original_prompt:
+                return ""
+
+            filtered_prompt = filter_prompt_by_excluded(original_prompt, excluded)
+            print(f"[Zhihui] Character Extractor: filtered_prompt length={len(filtered_prompt)}")
+            return filtered_prompt
+
+        except Exception as e:
+            print(f"[Zhihui] Error generating extractor tags: {e}")
+            import traceback
+            traceback.print_exc()
+            return ""
+
+    def _fetch_character_tags(self, seed, excluded, custom_prompt):
+        try:
+            tags_data = self.get_tags_config()
+            if not tags_data:
+                return ""
+
+            cosplay_data = tags_data.get("cosplay", {})
+            if not cosplay_data:
+                return ""
+
+            random.seed(seed)
+
+            all_cosplay_tags = []
+            for category, items in cosplay_data.items():
+                if isinstance(items, list):
+                    for item in items:
+                        if isinstance(item, dict) and "value" in item:
+                            all_cosplay_tags.append(item["value"])
+                        elif isinstance(item, str):
+                            all_cosplay_tags.append(item)
+
+            if not all_cosplay_tags:
+                return ""
+
+            excluded_list = [e.strip() for e in excluded.split(",") if e.strip()]
+            filtered_tags = [t for t in all_cosplay_tags if not any(e in t for e in excluded_list)]
+
+            if not filtered_tags:
+                filtered_tags = all_cosplay_tags
+
+            count = random.randint(3, 8)
+            selected_tags = random.sample(filtered_tags, min(count, len(filtered_tags)))
+
+            if custom_prompt:
+                selected_tags.append(custom_prompt)
+
+            return ", ".join(selected_tags)
+
+        except Exception as e:
+            print(f"Error fetching character tags: {e}")
+            return ""
+
+    def get_extractor_settings(self):
+        try:
+            settings_path = os.path.join(
+                os.path.dirname(os.path.dirname(os.path.dirname(__file__))),
+                "Nodes",
+                "TagSelector",
+                "extractor_settings.json"
+            )
+            if os.path.exists(settings_path):
+                with open(settings_path, "r", encoding="utf-8") as f:
+                    return json.load(f)
+            return {"enabled": False, "seed": -1, "excluded": "", "customPrompt": ""}
+        except Exception:
+            return {"enabled": False, "seed": -1, "excluded": "", "customPrompt": ""}
 
     def _get_tags_from_category_path(self, tags_data, category_path):
         path_parts = category_path.split(".")
@@ -1110,7 +1217,7 @@ Requirements:
     def IS_CHANGED(
         cls,
         tag_edit,
-        auto_random_tags,
+        random_logic,
         expand_mode,
         output_language,
         platform=None,
@@ -1118,10 +1225,10 @@ Requirements:
         unique_id=None,
         extra_pnginfo=None,
     ):
-        if auto_random_tags:
+        if random_logic != "Disabled":
             import time
 
-            return f"{tag_edit}_{time.time()}"
+            return f"{tag_edit}_{random_logic}_{time.time()}"
         return tag_edit
 
     @classmethod
@@ -1646,5 +1753,110 @@ async def restore_user_tags(request):
                             dest_file.write(source_file.read())
 
         return web.json_response({"success": True, "message": "恢复成功"})
+    except Exception as e:
+        return web.json_response({"error": str(e)}, status=500)
+
+
+COSPLAY_ENCRYPT_KEY = b'TFh-VuLIr0qLLl6prDw06LSrxrYWk00wo2r-Z2IpJ_M='
+cosplay_fernet = Fernet(COSPLAY_ENCRYPT_KEY)
+
+
+def decrypt_cosplay_data(encrypted_str):
+    try:
+        decrypted_bytes = cosplay_fernet.decrypt(encrypted_str.encode('utf-8'))
+        return json.loads(decrypted_bytes.decode('utf-8'))
+    except Exception as e:
+        return f"解密失败：{str(e)}"
+
+
+def fetch_cosplay_prompt(seed, excluded="", custom_prompt=""):
+    api_url = f"https://prompt.fxxkcar.com/getCosplayImagePrompt?hash=1&seed={seed}"
+    if custom_prompt and custom_prompt.strip():
+        encoded_prompt = urllib.parse.quote(custom_prompt.strip(), safe='')
+        api_url += f"&prompt={encoded_prompt}"
+    try:
+        response = requests.get(api_url, timeout=30, verify=False)
+        response.raise_for_status()
+        data = response.json()
+        if "encrypted_data" in data:
+            return decrypt_cosplay_data(data["encrypted_data"])
+        else:
+            return data
+    except requests.exceptions.RequestException as e:
+        return f"获取提示词失败：{str(e)}"
+    except Exception as e:
+        return f"处理返回数据失败：{str(e)}"
+
+
+def filter_prompt_by_excluded(original_prompt, excluded_str):
+    if not excluded_str or excluded_str.strip() == "":
+        return original_prompt
+    excluded_keywords = excluded_str.replace('，', ',').split(',')
+    excluded_keywords = list(set([kw.strip() for kw in excluded_keywords if kw.strip()]))
+    prompt_segments = original_prompt.replace('，', ',').split(',')
+    prompt_segments = [seg.strip() for seg in prompt_segments if seg.strip()]
+    filtered_segments = []
+    for seg in prompt_segments:
+        contains_excluded = False
+        for kw in excluded_keywords:
+            if kw in seg:
+                contains_excluded = True
+                break
+        if not contains_excluded:
+            filtered_segments.append(seg)
+    return '，'.join(filtered_segments)
+
+
+@PromptServer.instance.routes.post("/zhihui/cosplay-prompt")
+async def get_cosplay_prompt(request):
+    try:
+        data = await request.json()
+        seed = data.get("seed", -1)
+        max_side = data.get("max_side", 1600)
+        excluded = data.get("excluded", "")
+        custom_prompt = data.get("custom_prompt", "")
+
+        if seed == -1:
+            seed = random.randint(0, 0xffffffffffffffff)
+
+        prompt_data = fetch_cosplay_prompt(seed, excluded, custom_prompt)
+
+        if isinstance(prompt_data, str):
+            return web.json_response({"success": False, "error": prompt_data})
+
+        original_prompt = prompt_data.get("prompt", "一块鸡排")
+        filtered_prompt = filter_prompt_by_excluded(original_prompt, excluded)
+
+        return web.json_response({
+            "success": True,
+            "prompt": filtered_prompt,
+            "seed": seed
+        })
+    except Exception as e:
+        return web.json_response({"success": False, "error": str(e)}, status=500)
+
+
+@PromptServer.instance.routes.get("/zhihui/extractor_settings")
+async def get_extractor_settings_api(request):
+    try:
+        settings = TagSelector.get_extractor_settings()
+        return web.json_response(settings)
+    except Exception as e:
+        return web.json_response({"error": str(e)}, status=500)
+
+
+@PromptServer.instance.routes.post("/zhihui/extractor_settings")
+async def save_extractor_settings_api(request):
+    try:
+        data = await request.json()
+        settings_path = os.path.join(
+            os.path.dirname(os.path.dirname(os.path.dirname(__file__))),
+            "Nodes",
+            "TagSelector",
+            "extractor_settings.json"
+        )
+        with open(settings_path, "w", encoding="utf-8") as f:
+            json.dump(data, f, ensure_ascii=False, indent=2)
+        return web.json_response({"success": True})
     except Exception as e:
         return web.json_response({"error": str(e)}, status=500)
