@@ -1,45 +1,222 @@
 import { app } from "../../../scripts/app.js";
 
+let marked = null;
+let markedLoading = false;
+
+async function loadMarked() {
+    if (marked) return true;
+    if (markedLoading) return false;
+    markedLoading = true;
+    
+    try {
+        if (window.marked) {
+            marked = window.marked;
+            return true;
+        }
+        
+        const script = document.createElement('script');
+        script.src = 'https://cdn.jsdelivr.net/npm/marked/marked.min.js';
+        script.crossOrigin = 'anonymous';
+        
+        await new Promise((resolve, reject) => {
+            script.onload = resolve;
+            script.onerror = reject;
+            document.head.appendChild(script);
+        });
+        
+        if (window.marked) {
+            marked = window.marked;
+            return true;
+        }
+        return false;
+    } catch (e) {
+        console.warn("ShowAny: Could not load marked library", e);
+        return false;
+    }
+}
+
+function createStyledRenderer() {
+    const renderer = new marked.Renderer();
+    
+    renderer.heading = function(data) {
+        const { tokens, depth } = data;
+        const text = this.parser.parseInline(tokens);
+        const sizes = { 1: '24px', 2: '20px', 3: '16px', 4: '14px', 5: '13px', 6: '12px' };
+        const margins = { 1: '20px 0 12px 0', 2: '16px 0 10px 0', 3: '14px 0 8px 0', 4: '12px 0 6px 0', 5: '10px 0 4px 0', 6: '8px 0 4px 0' };
+        return `<h${depth} style="color:#60a5fa;font-size:${sizes[depth] || '12px'};font-weight:${depth <= 2 ? '700' : '600'};margin:${margins[depth] || '8px 0 4px 0'};line-height:1.3;">${text}</h${depth}>`;
+    };
+    
+    renderer.paragraph = function(data) {
+        const { tokens } = data;
+        return `<p style="margin:8px 0;line-height:1.7;color:#e2e8f0;">${this.parser.parseInline(tokens)}</p>`;
+    };
+    
+    renderer.list = function(data) {
+        const { ordered, items, start } = data;
+        const tag = ordered ? 'ol' : 'ul';
+        const startAttr = ordered && start !== 1 ? ` start="${start}"` : '';
+        let body = '';
+        for (const item of items) {
+            body += renderer.listitem(item);
+        }
+        return `<${tag}${startAttr} style="margin:8px 0;padding-left:20px;list-style:${ordered ? 'decimal' : 'disc'};color:#e2e8f0;">${body}</${tag}>`;
+    };
+    
+    renderer.listitem = function(data) {
+        const { tokens, task, checked } = data;
+        let item = '';
+        if (task) {
+            item += `<input type="checkbox" ${checked ? 'checked' : ''} disabled style="margin-right:4px;">`;
+        }
+        item += renderer.parser.parse(tokens, true);
+        return `<li style="margin:4px 0;line-height:1.6;color:#e2e8f0;">${item}</li>`;
+    };
+    
+    renderer.code = function(data) {
+        const { text, lang } = data;
+        const langClass = lang ? ` class="language-${lang}"` : '';
+        return `<pre style="background:rgba(15,23,42,0.8);color:#e2e8f0;padding:12px;border-radius:8px;overflow-x:auto;font-family:monospace;font-size:11px;line-height:1.5;margin:8px 0;border:1px solid rgba(96,165,250,0.2);"><code${langClass}>${text}</code></pre>`;
+    };
+    
+    renderer.codespan = function(data) {
+        const { text } = data;
+        return `<code style="background:rgba(96,165,250,0.15);color:#60a5fa;padding:2px 6px;border-radius:4px;font-family:monospace;font-size:11px;">${text}</code>`;
+    };
+    
+    renderer.strong = function(data) {
+        const { tokens } = data;
+        return `<strong style="color:#f1f5f9;font-weight:600;">${this.parser.parseInline(tokens)}</strong>`;
+    };
+    
+    renderer.em = function(data) {
+        const { tokens } = data;
+        return `<em style="color:#cbd5e1;">${this.parser.parseInline(tokens)}</em>`;
+    };
+    
+    renderer.link = function(data) {
+        const { href, title, tokens } = data;
+        const text = this.parser.parseInline(tokens);
+        const titleAttr = title ? ` title="${title}"` : '';
+        return `<a href="${href}"${titleAttr} target="_blank" style="color:#60a5fa;text-decoration:none;border-bottom:1px solid rgba(96,165,250,0.4);">${text}</a>`;
+    };
+    
+    renderer.blockquote = function(data) {
+        const { tokens } = data;
+        const body = this.parser.parse(tokens);
+        return `<blockquote style="margin:8px 0;padding:8px 16px;border-left:4px solid #60a5fa;background:rgba(96,165,250,0.1);color:#e2e8f0;">${body}</blockquote>`;
+    };
+    
+    renderer.hr = function() {
+        return `<hr style="border:none;border-top:1px solid rgba(96,165,250,0.3);margin:16px 0;">`;
+    };
+    
+    renderer.br = function() {
+        return '<br>';
+    };
+    
+    renderer.del = function(data) {
+        const { tokens } = data;
+        return `<del style="color:#94a3b8;text-decoration:line-through;">${this.parser.parseInline(tokens)}</del>`;
+    };
+    
+    renderer.table = function(data) {
+        const { header, rows } = data;
+        let head = '<thead><tr>';
+        for (const cell of header) {
+            head += renderer.tablecell(cell);
+        }
+        head += '</tr></thead>';
+        let body = '<tbody>';
+        for (const row of rows) {
+            body += '<tr>';
+            for (const cell of row) {
+                body += renderer.tablecell(cell);
+            }
+            body += '</tr>';
+        }
+        body += '</tbody>';
+        return `<table style="width:100%;border-collapse:collapse;margin:8px 0;color:#e2e8f0;">${head}${body}</table>`;
+    };
+    
+    renderer.tablecell = function(data) {
+        const { tokens, header, align } = data;
+        const content = this.parser.parseInline(tokens);
+        const tag = header ? 'th' : 'td';
+        const alignStyle = align ? `text-align:${align};` : '';
+        return `<${tag} style="border:1px solid rgba(96,165,250,0.3);padding:8px;${alignStyle}">${content}</${tag}>`;
+    };
+    
+    return renderer;
+}
+
+function parseMarkdownSync(text) {
+    if (!marked || !text || typeof text !== 'string') return '';
+    
+    try {
+        const renderer = createStyledRenderer();
+        return marked.parse(text, { 
+            renderer, 
+            gfm: true,
+            breaks: true
+        });
+    } catch (e) {
+        console.warn('ShowAny: Markdown parse error', e);
+        return escapeHtml(text);
+    }
+}
+
+function escapeHtml(text) {
+    const div = document.createElement('div');
+    div.textContent = text;
+    return div.innerHTML;
+}
+
 const i18n = {
     zh: {
         nodeTitle: "ShowAny 节点",
         description: "用于显示任意类型的数据内容。",
         featuresTitle: "功能",
         feature1: "支持显示字符串、数字、数组等多种数据类型",
-        feature2: "提供标准模式和排错模式两种预览模式",
+        feature2: "提供标准模式、排错模式和Markdown模式三种预览模式",
         feature3: "自动处理编码问题",
         usageTitle: "使用说明",
         standardMode: "标准模式",
         standardModeDesc: "直接显示原始内容",
         debugMode: "排错模式",
         debugModeDesc: "自动修复编码问题，适合处理乱码",
+        markdownMode: "Markdown模式",
+        markdownModeDesc: "解析并渲染Markdown格式的文本",
         inputTitle: "输入",
         inputDesc: "接受任意类型的输入数据",
         outputTitle: "输出",
         outputDesc: "在节点内显示格式化后的内容",
         previewMode: "预览模式：",
         standard: "标准",
-        debug: "排错"
+        debug: "排错",
+        markdown: "Markdown"
     },
     en: {
         nodeTitle: "ShowAny Node",
         description: "Used to display any type of data content.",
         featuresTitle: "Features",
         feature1: "Supports displaying various data types such as strings, numbers, arrays, etc.",
-        feature2: "Provides two preview modes: Standard and Debug",
+        feature2: "Provides three preview modes: Standard, Debug and Markdown",
         feature3: "Automatically handles encoding issues",
         usageTitle: "Usage",
         standardMode: "Standard Mode",
         standardModeDesc: "Displays raw content directly",
         debugMode: "Debug Mode",
         debugModeDesc: "Automatically fixes encoding issues, suitable for handling garbled text",
+        markdownMode: "Markdown Mode",
+        markdownModeDesc: "Parses and renders Markdown formatted text",
         inputTitle: "Input",
         inputDesc: "Accepts any type of input data",
         outputTitle: "Output",
         outputDesc: "Displays formatted content within the node",
         previewMode: "Preview Mode:",
         standard: "Standard",
-        debug: "Debug"
+        debug: "Debug",
+        markdown: "Markdown"
     }
 };
 
@@ -66,6 +243,7 @@ function getDescriptionHTML() {
 <ul style="margin:0;padding:0;">
 <li style="margin:4px 0;padding-left:6px;list-style:none;position:relative;"><strong style="color:#f1f5f9;font-weight:500;">${t('standardMode')}</strong>: <span style="color:#e2e8f0;">${t('standardModeDesc')}</span></li>
 <li style="margin:4px 0;padding-left:6px;list-style:none;position:relative;"><strong style="color:#f1f5f9;font-weight:500;">${t('debugMode')}</strong>: <span style="color:#e2e8f0;">${t('debugModeDesc')}</span></li>
+<li style="margin:4px 0;padding-left:6px;list-style:none;position:relative;"><strong style="color:#f1f5f9;font-weight:500;">${t('markdownMode')}</strong>: <span style="color:#e2e8f0;">${t('markdownModeDesc')}</span></li>
 </ul>
 <h4 style="margin:12px 0 8px 0;color:#38bdf8;font-size:14px;font-weight:600;text-transform:uppercase;letter-spacing:0.5px;">${t('inputTitle')}</h4>
 <ul style="margin:0;padding:0;">
@@ -156,6 +334,26 @@ app.registerExtension({
                 return { container, textarea };
             }
 
+            function createMarkdownContainer(text) {
+                const container = document.createElement("div");
+                container.style.cssText = "display:flex;flex-direction:column;gap:4px;width:100%;box-sizing:border-box;";
+
+                const contentDiv = document.createElement("div");
+                contentDiv.style.cssText = "width:100%;background:#1f2430;color:#e5e7eb;border:1px solid rgba(255,255,255,0.12);border-radius:8px;padding:10px;font-size:12px;line-height:1.6;box-sizing:border-box;overflow:auto;";
+                
+                if (marked) {
+                    contentDiv.innerHTML = parseMarkdownSync(text);
+                } else {
+                    loadMarked().then(() => {
+                        contentDiv.innerHTML = parseMarkdownSync(text);
+                    });
+                    contentDiv.innerHTML = escapeHtml(text).replace(/\n/g, '<br>');
+                }
+
+                container.appendChild(contentDiv);
+                return { container, contentDiv };
+            }
+
             function ensurePreviewUI(node) {
                 if (node.__showAnyPreview) {
                     return;
@@ -196,9 +394,11 @@ app.registerExtension({
 
                 const radioStandard = mkRadio("Standard", t("standard"));
                 const radioDebug = mkRadio("Debug", t("debug"));
+                const radioMarkdown = mkRadio("Markdown", t("markdown"));
 
                 modeWrap.appendChild(radioStandard.label);
                 modeWrap.appendChild(radioDebug.label);
+                modeWrap.appendChild(radioMarkdown.label);
 
                 footer.appendChild(modeLabel);
                 footer.appendChild(modeWrap);
@@ -214,9 +414,11 @@ app.registerExtension({
                     itemsContainer,
                     radioStandard,
                     radioDebug,
+                    radioMarkdown,
                     modeLabel,
                     radioStandardLabel: radioStandard.label.querySelector('span'),
-                    radioDebugLabel: radioDebug.label.querySelector('span')
+                    radioDebugLabel: radioDebug.label.querySelector('span'),
+                    radioMarkdownLabel: radioMarkdown.label.querySelector('span')
                 };
 
                 if (!node.properties) {
@@ -224,17 +426,25 @@ app.registerExtension({
                 }
 
                 const savedMode = node.properties.showAnyMode || node.properties.showtextMode;
-                const initialMode = savedMode === "Debug" ? "Debug" : "Standard";
+                const initialMode = savedMode === "Debug" ? "Debug" : savedMode === "Markdown" ? "Markdown" : "Standard";
+                node.properties.showAnyMode = initialMode;
                 node.__showAnyPreview.radioStandard.input.checked = initialMode === "Standard";
                 node.__showAnyPreview.radioDebug.input.checked = initialMode === "Debug";
+                node.__showAnyPreview.radioMarkdown.input.checked = initialMode === "Markdown";
 
                 const onModeChange = () => {
-                    const mode = node.__showAnyPreview.radioDebug.input.checked ? "Debug" : "Standard";
+                    let mode = "Standard";
+                    if (node.__showAnyPreview.radioDebug.input.checked) {
+                        mode = "Debug";
+                    } else if (node.__showAnyPreview.radioMarkdown.input.checked) {
+                        mode = "Markdown";
+                    }
                     node.properties.showAnyMode = mode;
                     updatePreview(node, node.__showAnyRawData);
                 };
                 node.__showAnyPreview.radioStandard.input.addEventListener("change", onModeChange);
                 node.__showAnyPreview.radioDebug.input.addEventListener("change", onModeChange);
+                node.__showAnyPreview.radioMarkdown.input.addEventListener("change", onModeChange);
 
                 if (!node.size || node.size.length < 2) {
                     node.size = [520, 300];
@@ -246,7 +456,9 @@ app.registerExtension({
             function updatePreview(node, data) {
                 ensurePreviewUI(node);
                 node.__showAnyRawData = data;
-                const isDebugMode = node.properties.showAnyMode === "Debug";
+                const mode = node.properties.showAnyMode || "Standard";
+                const isDebugMode = mode === "Debug";
+                const isMarkdownMode = mode === "Markdown";
                 const itemsContainer = node.__showAnyPreview.itemsContainer;
 
                 itemsContainer.innerHTML = "";
@@ -270,17 +482,31 @@ app.registerExtension({
                     } else {
                         text = String(item);
                     }
-                    const { container, textarea } = createItemContainer(text, isDebugMode);
-                    itemsContainer.appendChild(container);
-                    if (isSingleItem) {
-                        container.style.height = "100%";
-                        container.style.flex = "1";
-                        container.style.minHeight = "0";
-                        textarea.style.height = "100%";
-                        textarea.style.overflow = "auto";
+                    
+                    if (isMarkdownMode) {
+                        const { container, contentDiv } = createMarkdownContainer(text);
+                        itemsContainer.appendChild(container);
+                        if (isSingleItem) {
+                            container.style.height = "100%";
+                            container.style.flex = "1";
+                            container.style.minHeight = "0";
+                            contentDiv.style.height = "100%";
+                        } else {
+                            contentDiv.style.maxHeight = "200px";
+                        }
                     } else {
-                        textarea.style.height = "80px";
-                        textarea.style.overflow = "auto";
+                        const { container, textarea } = createItemContainer(text, isDebugMode);
+                        itemsContainer.appendChild(container);
+                        if (isSingleItem) {
+                            container.style.height = "100%";
+                            container.style.flex = "1";
+                            container.style.minHeight = "0";
+                            textarea.style.height = "100%";
+                            textarea.style.overflow = "auto";
+                        } else {
+                            textarea.style.height = "80px";
+                            textarea.style.overflow = "auto";
+                        }
                     }
                 });
 
@@ -293,6 +519,7 @@ app.registerExtension({
                 node.__showAnyPreview.modeLabel.textContent = t("previewMode");
                 node.__showAnyPreview.radioStandardLabel.textContent = t("standard");
                 node.__showAnyPreview.radioDebugLabel.textContent = t("debug");
+                node.__showAnyPreview.radioMarkdownLabel.textContent = t("markdown");
             }
 
             const onNodeCreated = nodeType.prototype.onNodeCreated;
@@ -301,6 +528,8 @@ app.registerExtension({
                 ensurePreviewUI(this);
                 this._showAnyHelp = false;
                 this._showAnyLocale = getLocale();
+                updatePreview(this, [""]);
+                loadMarked();
                 return r;
             };
 

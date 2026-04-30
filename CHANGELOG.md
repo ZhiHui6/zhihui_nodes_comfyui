@@ -1,5 +1,14 @@
 # 更新日志 / Changelog
 
+## 1.0.35 2026-4-30
+- 标签选择器 节点(TagSelector)：修复题材锁定问题并优化角色提取器功能
+- 显示任何 节点(Show Any)：添加Markdown渲染支持并优化UI显示
+- 组开关管理器 节点(Group Switch Manager)：优化状态显示。开关关闭时，组名称颜色会变暗。
+  <br>
+- TagSelector node: Fixed genre locking issue and optimized character extractor functionality
+- Show Any node: Added Markdown rendering support and optimized UI display
+- Group Switch Manager node: Optimized status display. When the switch is off, the group name color will turn darker. 
+
 ## 1.0.34 2026-4-29
 - 标签选择器节点(TagSelector):
   - 新增"角色提取器"功能界面，支持历史记录功能，可保存和查看提取结果

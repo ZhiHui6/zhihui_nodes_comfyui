@@ -268,7 +268,20 @@ export const i18n = {
         characterAddedSuccess: "已添加到选中标签",
         characterResult: "提取结果",
         characterEmptyState: "点击提取按钮获取角色数据",
-        resetDefaults: "恢复默认"
+        resetDefaults: "恢复默认",
+        inspirationSource: "灵感来源于",
+        thanksToAuthor: "感谢原作者的开源贡献",
+        historyTitle: "历史记录",
+        clearAllHistory: "全部删除",
+        confirmClearHistoryTitle: "清除全部历史记录",
+        confirmClearHistoryMessage: "确定要清除所有历史记录吗？此操作不可恢复。",
+        saveToCustom: "保存到自定义",
+        saveToCustomTitle: "保存到自定义标签",
+        tagNameLabel: "标签名称：",
+        tagNameInputPlaceholder: "请输入标签名称",
+        save: "保存",
+        saveSuccess: "保存成功",
+        saveFailed: "保存失败"
     },
     en: {
         openTagSelector: "🔖 Open Tag Selector",
@@ -537,6 +550,19 @@ export const i18n = {
         characterAddedSuccess: "Added to selected tags",
         characterResult: "Result",
         characterEmptyState: "Click the extract button to get character data",
-        resetDefaults: "Reset Defaults"
+        resetDefaults: "Reset Defaults",
+        inspirationSource: "Inspired by",
+        thanksToAuthor: "Thanks to the original author for the open source contribution",
+        historyTitle: "History",
+        clearAllHistory: "Clear All",
+        confirmClearHistoryTitle: "Clear All History",
+        confirmClearHistoryMessage: "Are you sure you want to clear all history? This action cannot be undone.",
+        saveToCustom: "Save to Custom",
+        saveToCustomTitle: "Save to Custom Tags",
+        tagNameLabel: "Tag Name:",
+        tagNameInputPlaceholder: "Enter tag name",
+        save: "Save",
+        saveSuccess: "Save successful",
+        saveFailed: "Save failed"
     }
 };

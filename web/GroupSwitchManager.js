@@ -378,7 +378,7 @@ app.registerExtension({
             this.properties.selectedColorFilter = this.properties.selectedColorFilter || 'red';
             this.properties.groupOrder = this.properties.groupOrder || [];
             this.properties.groupStatesCache = this.properties.groupStatesCache || {};
-            this.properties.switchMode = this.properties.switchMode || 'ignore';
+            this.properties.switchMode = this.properties.switchMode || 'bypass';
             this.properties.matchMode = this.properties.matchMode || 'none';
             this.properties.titleKeywords = this.properties.titleKeywords || '';
             this.properties.toggleRestriction = this.properties.toggleRestriction || 'unlimited';
@@ -437,7 +437,7 @@ app.registerExtension({
                 <div class="gmm-content">
                     <div class="gmm-groups-header">
                         <div class="gmm-header-controls">
-                            <span class="gmm-mode-indicator" id="gmm-mode-indicator">${t('modeDisableShort')}</span>
+                            <span class="gmm-mode-indicator" id="gmm-mode-indicator">${t('modeDisable')}</span>
                             <button class="gmm-settings-button" id="gmm-settings-btn">
                                 <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                                     <path d="M14.7 6.3a1 1 0 0 0 0 1.4l1.6 1.6a1 1 0 0 0 1.4 0l3.77-3.77a6 6 0 0 1-7.94 7.94l-6.91 6.91a2.12 2.12 0 0 1-3-3l6.91-6.91a6 6 0 0 1 7.94-7.94l-3.76 3.76z"></path>
@@ -849,6 +849,11 @@ app.registerExtension({
                     text-overflow: ellipsis;
                     white-space: nowrap;
                     min-width: 0;
+                    transition: color 0.3s ease;
+                }
+
+                .gmm-group-name.disabled {
+                    color: #666666;
                 }
 
                 .gmm-switch {
@@ -1716,23 +1721,25 @@ app.registerExtension({
                     groupItem = newItem;
                     isDirty = true;
                 } else {
-                    const toggleBtn = groupItem.querySelector('.gmm-group-toggle');
-                    if (toggleBtn) {
-                        const isEnabled = toggleBtn.classList.contains('enabled');
+                    const switchBtn = groupItem.querySelector('.gmm-switch');
+                    if (switchBtn) {
+                        const isEnabled = switchBtn.classList.contains('active');
                         if (isEnabled !== currentEnabled) {
-                            toggleBtn.classList.toggle('enabled', currentEnabled);
-                            toggleBtn.textContent = currentEnabled ? t('disable') : t('enable');
-                            toggleBtn.style.background = currentEnabled
-                                ? 'linear-gradient(135deg, #e74c3c 0%, #c0392b 100%)'
-                                : 'linear-gradient(135deg, #27ae60 0%, #229954 100%)';
+                            switchBtn.classList.toggle('active', currentEnabled);
                             isDirty = true;
                         }
                     }
 
                     const nameEl = groupItem.querySelector('.gmm-group-name');
-                    if (nameEl && nameEl.textContent !== group.title) {
-                        nameEl.textContent = group.title;
-                        isDirty = true;
+                    if (nameEl) {
+                        if (nameEl.textContent !== group.title) {
+                            nameEl.textContent = group.title;
+                            isDirty = true;
+                        }
+                        if (nameEl.classList.contains('disabled') !== !currentEnabled) {
+                            nameEl.classList.toggle('disabled', !currentEnabled);
+                            isDirty = true;
+                        }
                     }
 
                     const colorIndicator = groupItem.querySelector('.gmm-group-color-indicator');
@@ -1880,7 +1887,7 @@ app.registerExtension({
                         </svg>
                     </div>
                     <div class="gmm-group-color-indicator" style="background-color: ${groupColor};"></div>
-                    <span class="gmm-group-name">${displayName}</span>
+                    <span class="gmm-group-name ${!groupConfig.enabled ? 'disabled' : ''}">${displayName}</span>
                     <div class="gmm-switch ${groupConfig.enabled ? 'active' : ''}">
                         <svg viewBox="0 0 24 24" fill="none" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
                             <path d="M18.36 6.64a9 9 0 1 1-12.73 0"></path>
@@ -2120,7 +2127,7 @@ app.registerExtension({
             if (enable) {
                 mode = 0;
             } else {
-                mode = switchMode === 'bypass' ? 4 : 2;
+                mode = switchMode === 'ignore' ? 2 : 4;
             }
             changeModeOfNodes(nodes, mode);
 
@@ -2728,7 +2735,7 @@ app.registerExtension({
             info.groups = this.properties.groups || [];
             info.selectedColorFilter = this.properties.selectedColorFilter || 'red';
             info.groupOrder = this.properties.groupOrder || [];
-            info.switchMode = this.properties.switchMode || 'ignore';
+            info.switchMode = this.properties.switchMode || 'bypass';
             info.showNavigateIndicator = this.properties.showNavigateIndicator !== undefined ? this.properties.showNavigateIndicator : true;
 
             return data;
@@ -2757,7 +2764,7 @@ app.registerExtension({
             if (info.switchMode !== undefined && (info.switchMode === 'ignore' || info.switchMode === 'bypass')) {
                 this.properties.switchMode = info.switchMode;
             } else {
-                this.properties.switchMode = 'ignore';
+                this.properties.switchMode = 'bypass';
             }
 
             if (info.showNavigateIndicator !== undefined) {
@@ -2789,7 +2796,7 @@ app.registerExtension({
 
                     const modeDropdown = this.customUI.querySelector('#gmm-mode-dropdown');
                     if (modeDropdown) {
-                        const modeValue = this.properties.switchMode || 'ignore';
+                        const modeValue = this.properties.switchMode || 'bypass';
                         modeDropdown.setAttribute('data-value', modeValue);
                         const modeItems = modeDropdown.querySelectorAll('.gmm-dropdown-item');
                         modeItems.forEach(item => {

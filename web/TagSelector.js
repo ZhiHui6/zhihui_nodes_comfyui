@@ -698,6 +698,7 @@ const categoryTranslations = {
         '自定义': '自定义',
         '标签管理': '标签管理',
         '我的标签': '我的标签',
+        '角色提取器': '角色提取器',
         '人设': '人设',
         '服饰': '服饰',
         '国籍': '国籍',
@@ -742,6 +743,7 @@ const categoryTranslations = {
         '自定义': 'Custom',
         '标签管理': 'Tag Management',
         '我的标签': 'My Tags',
+        '角色提取器': 'Character Extractor',
         '人设': 'Character Design',
         '服饰': 'Clothing',
         '国籍': 'Nationality',
@@ -4394,9 +4396,9 @@ async function showCharacterExtractor() {
         white-space: nowrap;
     `;
     creditSection.innerHTML = `
-        <div>灵感来源于</div>
+        <div>${$t('inspirationSource')}</div>
         <a href="https://github.com/ComfyuiGY/CosplayPromptNode" target="_blank" style="color: #60a5fa; text-decoration: none; font-weight: 500; transition: color 0.2s ease;" onmouseover="this.style.color='#3b82f6'" onmouseout="this.style.color='#60a5fa'">CosplayPromptNode</a>
-        <div style="font-size: 12px;">感谢原作者的开源贡献</div>
+        <div style="font-size: 12px;">${$t('thanksToAuthor')}</div>
     `;
 
     headerSection.appendChild(icon);
@@ -4594,10 +4596,10 @@ async function showCharacterExtractor() {
 
     const historyTitle = document.createElement('div');
     historyTitle.style.cssText = 'color: #94a3b8; font-size: 12px; font-weight: 500;';
-    historyTitle.textContent = '历史记录';
+    historyTitle.textContent = $t('historyTitle');
 
     const clearAllBtn = document.createElement('button');
-    clearAllBtn.textContent = '全部删除';
+    clearAllBtn.textContent = $t('clearAllHistory');
     clearAllBtn.style.cssText = `
         background: #991b1b;
         border: 1px solid #991b1b;
@@ -4627,7 +4629,7 @@ async function showCharacterExtractor() {
     };
     clearAllBtn.onclick = () => {
         if (tagSelectorDialog.characterHistory && tagSelectorDialog.characterHistory.length > 0) {
-            showConfirmDialog('清除全部历史记录', '确定要清除所有历史记录吗？此操作不可恢复。', () => {
+            showConfirmDialog($t('confirmClearHistoryTitle'), $t('confirmClearHistoryMessage'), () => {
                 tagSelectorDialog.characterHistory = [];
                 localStorage.removeItem('zhihui_character_history');
                 updateCharacterHistoryList();
@@ -4787,7 +4789,7 @@ function updateCharacterHistoryList() {
         `;
 
         const tooltip = document.createElement('div');
-        tooltip.textContent = '保存到自定义';
+        tooltip.textContent = $t('saveToCustom');
         tooltip.style.cssText = `
             position: fixed;
             background: linear-gradient(135deg, #1e293b 0%, #0f172a 100%);
@@ -4862,6 +4864,9 @@ function updateCharacterHistoryList() {
             showSaveToCustomDialog(item.prompt);
         };
 
+        const deleteBtnContainer = document.createElement('div');
+        deleteBtnContainer.style.cssText = 'position: relative; display: inline-block;';
+
         const deleteBtn = document.createElement('button');
         deleteBtn.innerHTML = '🗑️';
         deleteBtn.style.cssText = `
@@ -4880,17 +4885,85 @@ function updateCharacterHistoryList() {
             justify-content: center;
             padding: 0;
         `;
-        deleteBtn.title = '删除此条记录';
+
+        const deleteTooltip = document.createElement('div');
+        deleteTooltip.textContent = $t('delete');
+        deleteTooltip.style.cssText = `
+            position: fixed;
+            background: linear-gradient(135deg, #1e293b 0%, #0f172a 100%);
+            color: #e2e8f0;
+            font-size: 12px;
+            font-weight: 500;
+            padding: 6px 12px;
+            border-radius: 8px;
+            border: 1px solid rgba(59,130,246,0.4);
+            box-shadow: 0 4px 16px rgba(0,0,0,0.4), 0 0 0 1px rgba(59,130,246,0.1);
+            white-space: nowrap;
+            pointer-events: none;
+            opacity: 0;
+            transition: opacity 0.2s ease;
+            z-index: 99999;
+            visibility: hidden;
+        `;
+
+        const deleteTooltipArrow = document.createElement('div');
+        deleteTooltipArrow.style.cssText = `
+            position: absolute;
+            top: 100%;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 0;
+            height: 0;
+            border-left: 5px solid transparent;
+            border-right: 5px solid transparent;
+            border-top: 5px solid rgba(59,130,246,0.4);
+        `;
+        deleteTooltip.appendChild(deleteTooltipArrow);
+        document.body.appendChild(deleteTooltip);
+
+        const updateDeleteTooltipPosition = () => {
+            const rect = deleteBtn.getBoundingClientRect();
+            const tooltipHeight = deleteTooltip.offsetHeight;
+            deleteTooltip.style.left = `${rect.left + rect.width / 2}px`;
+            deleteTooltip.style.top = `${rect.top - tooltipHeight - 8}px`;
+            deleteTooltip.style.transform = 'translateX(-50%)';
+        };
+
+        deleteBtnContainer.appendChild(deleteBtn);
+
+        let deleteTooltipTimeout = null;
+
         deleteBtn.onmouseenter = () => {
             deleteBtn.style.background = 'rgba(239,68,68,0.4)';
             deleteBtn.style.borderColor = 'rgba(239,68,68,0.6)';
+            deleteTooltipTimeout = setTimeout(() => {
+                updateDeleteTooltipPosition();
+                deleteTooltip.style.visibility = 'visible';
+                deleteTooltip.style.opacity = '1';
+            }, 800);
         };
         deleteBtn.onmouseleave = () => {
             deleteBtn.style.background = 'rgba(239,68,68,0.2)';
             deleteBtn.style.borderColor = 'rgba(239,68,68,0.4)';
+            if (deleteTooltipTimeout) {
+                clearTimeout(deleteTooltipTimeout);
+                deleteTooltipTimeout = null;
+            }
+            deleteTooltip.style.opacity = '0';
+            setTimeout(() => {
+                if (deleteTooltip.style.opacity === '0') {
+                    deleteTooltip.style.visibility = 'hidden';
+                }
+            }, 200);
         };
         deleteBtn.onclick = (e) => {
             e.stopPropagation();
+            if (deleteTooltipTimeout) {
+                clearTimeout(deleteTooltipTimeout);
+                deleteTooltipTimeout = null;
+            }
+            deleteTooltip.style.opacity = '0';
+            deleteTooltip.style.visibility = 'hidden';
             tagSelectorDialog.characterHistory.splice(index, 1);
             localStorage.setItem('zhihui_character_history', JSON.stringify(tagSelectorDialog.characterHistory));
             updateCharacterHistoryList();
@@ -4899,7 +4972,7 @@ function updateCharacterHistoryList() {
         const btnContainer = document.createElement('div');
         btnContainer.style.cssText = 'display: flex; gap: 4px; flex-shrink: 0;';
         btnContainer.appendChild(saveBtnContainer);
-        btnContainer.appendChild(deleteBtn);
+        btnContainer.appendChild(deleteBtnContainer);
 
         historyItem.appendChild(timeLabel);
         historyItem.appendChild(promptPreview);
@@ -5194,6 +5267,610 @@ function restoreSubCategories(category, savedState) {
     let targetSubCategoryTab = null;
 
     subCategoryKeys.forEach((subCategory, index) => {
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+        if (category === '灵感套装' && subCategory === '成人题材' && !adultContentEnabled) {
+            return;
+        }
+
         const tab = document.createElement('div');
         tab.style.cssText = `padding: 10px 16px; color: #ccc; cursor: pointer; border-right: 1px solid rgb(112, 130, 155); white-space: normal; word-break: break-word; overflow-wrap: anywhere; transition: background-color 0.2s; min-width: 80px; text-align: center;`;
         tab.textContent = $tc(subCategory);
@@ -8675,14 +9352,14 @@ function showSaveToCustomDialog(prompt) {
     const dialog = DOM.div(`background: linear-gradient(135deg, #1e293b 0%, #0f172a 100%); border: 1px solid rgba(59,130,246,0.4); border-radius: 12px; padding: 24px; width: 400px; max-width: 90%; box-shadow: 0 25px 50px -12px rgba(0,0,0,0.5);`);
 
     const title = DOM.div(`color: #60a5fa; font-size: 18px; font-weight: 600; margin-bottom: 16px;`);
-    title.textContent = '保存到自定义标签';
+    title.textContent = $t('saveToCustomTitle');
 
     const nameLabel = DOM.div(`color: #94a3b8; font-size: 13px; margin-bottom: 8px;`);
-    nameLabel.textContent = '标签名称：';
+    nameLabel.textContent = $t('tagNameLabel');
 
     const nameInput = document.createElement('input');
     nameInput.type = 'text';
-    nameInput.placeholder = '请输入标签名称';
+    nameInput.placeholder = $t('tagNameInputPlaceholder');
     nameInput.style.cssText = `width: 100%; padding: 10px 12px; border: 1px solid rgba(59,130,246,0.4); border-radius: 6px; background: rgba(15,23,42,0.8); color: #e2e8f0; font-size: 14px; box-sizing: border-box; margin-bottom: 16px; outline: none; transition: all 0.2s;`;
     nameInput.onfocus = () => {
         nameInput.style.borderColor = '#3b82f6';
@@ -8723,7 +9400,7 @@ function showSaveToCustomDialog(prompt) {
         overlay.remove();
     };
 
-    const saveBtn = DOM.btn(`padding: 10px 24px; border: none; border-radius: 8px; background: linear-gradient(135deg, #22c55e 0%, #16a34a 100%); color: #ffffff; font-size: 14px; font-weight: 500; cursor: pointer; transition: all 0.2s;`, '保存');
+    const saveBtn = DOM.btn(`padding: 10px 24px; border: none; border-radius: 8px; background: linear-gradient(135deg, #22c55e 0%, #16a34a 100%); color: #ffffff; font-size: 14px; font-weight: 500; cursor: pointer; transition: all 0.2s;`, $t('save'));
     saveBtn.onmouseenter = () => {
         saveBtn.style.boxShadow = '0 4px 12px rgba(34,197,94,0.4)';
         saveBtn.style.transform = 'translateY(-1px)';
@@ -8757,14 +9434,14 @@ function showSaveToCustomDialog(prompt) {
             const result = await response.json();
             if (response.ok) {
                 await loadTagsData();
-                showToast('保存成功', 'success');
+                showToast($t('saveSuccess'), 'success');
                 overlay.remove();
             } else {
-                showToast(result.error || '保存失败', 'error');
+                showToast(result.error || $t('saveFailed'), 'error');
             }
         } catch (error) {
             console.error('Error saving to custom:', error);
-            showToast('保存失败', 'error');
+            showToast($t('saveFailed'), 'error');
         }
     };
 
