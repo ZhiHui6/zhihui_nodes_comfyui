@@ -1,5 +1,10 @@
 # 更新日志 / Changelog
 
+## 1.0.35 2026-5-1
+- 标签选择器 节点(TagSelector)：优化代码结构，改进渲染性能
+  <br>
+- TagSelector node: Optimized code structure, improved rendering performance
+
 ## 1.0.35 2026-4-30
 - 标签选择器 节点(TagSelector)：修复题材锁定问题并优化角色提取器功能
 - 显示任何 节点(Show Any)：添加Markdown渲染支持并优化UI显示

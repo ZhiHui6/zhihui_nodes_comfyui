@@ -2,6 +2,141 @@ import { app } from "/scripts/app.js";
 import { api } from "/scripts/api.js";
 import { i18n } from "./TagSelector/i18n/index.js";
 import { tagI18n } from "./TagSelector/i18n/tags.js";
+import { categoryTranslations } from "./TagSelector/i18n/categories.js";
+
+const CONFIG = {
+    ICON_SIZE: 24,
+    ICON_MARGIN: 4,
+    MAX_TAG_DISPLAY_LENGTH: 20,
+    TOAST_DURATION: 3000,
+    MAX_CACHE_SIZE: 100,
+    DEBOUNCE_DELAY: 300,
+    THROTTLE_DELAY: 50,
+    MAX_WEIGHT: 2.0,
+    MIN_WEIGHT: 0.1,
+    WEIGHT_STEP: 0.1
+};
+
+const COLORS = {
+    primary: '#3b82f6',
+    primaryHover: '#60a5fa',
+    success: '#22c55e',
+    danger: '#ef4444',
+    warning: '#f59e0b',
+    textPrimary: '#e2e8f0',
+    textSecondary: '#94a3b8',
+    background: 'rgba(15,23,42,0.98)',
+    backgroundLight: 'rgba(30,41,59,0.98)',
+    border: 'rgba(59,130,246,0.4)'
+};
+
+const GRADIENTS = {
+    primary: 'linear-gradient(135deg, #2563eb 0%, #1d4ed8 50%, #1e40af 100%)',
+    primaryHover: 'linear-gradient(135deg, #3b82f6 0%, #2563eb 50%, #1d4ed8 100%)',
+    success: 'linear-gradient(135deg, #22c55e 0%, #16a34a 100%)',
+    danger: 'linear-gradient(135deg, #dc2626 0%, #b91c1c 100%)',
+    warning: 'linear-gradient(135deg, #f59e0b 0%, #d97706 100%)',
+    info: 'linear-gradient(135deg, #3b82f6 0%, #2563eb 100%)',
+    background: 'linear-gradient(135deg, rgba(15,23,42,0.98) 0%, rgba(30,41,59,0.98) 100%)'
+};
+
+const TagSelectorState = {
+    currentNode: null,
+    tagsData: null,
+    dialog: null,
+    selectedTags: new Map(),
+    previousSelectedTags: new Map(),
+    adultContentEnabled: false,
+    adultContentUnlocked: false,
+    
+    reset() {
+        this.currentNode = null;
+        this.selectedTags.clear();
+        this.previousSelectedTags.clear();
+    },
+    
+    setSelectedTags(tags) {
+        this.selectedTags = tags;
+    },
+    
+    getSelectedTags() {
+        return this.selectedTags;
+    }
+};
+
+class EventManager {
+    constructor() {
+        this.listeners = new Map();
+        this.idCounter = 0;
+    }
+    
+    add(element, event, handler, options = {}) {
+        element.addEventListener(event, handler, options);
+        const id = ++this.idCounter;
+        this.listeners.set(id, { element, event, handler, options });
+        return id;
+    }
+    
+    remove(id) {
+        const listener = this.listeners.get(id);
+        if (listener) {
+            listener.element.removeEventListener(listener.event, listener.handler);
+            this.listeners.delete(id);
+        }
+    }
+    
+    clearAll() {
+        this.listeners.forEach((_, id) => this.remove(id));
+    }
+    
+    get size() {
+        return this.listeners.size;
+    }
+}
+
+class LRUCache {
+    constructor(maxSize = CONFIG.MAX_CACHE_SIZE) {
+        this.maxSize = maxSize;
+        this.cache = new Map();
+    }
+    
+    get(key) {
+        if (!this.cache.has(key)) return undefined;
+        const value = this.cache.get(key);
+        this.cache.delete(key);
+        this.cache.set(key, value);
+        return value;
+    }
+    
+    set(key, value) {
+        if (this.cache.has(key)) {
+            this.cache.delete(key);
+        } else if (this.cache.size >= this.maxSize) {
+            const firstKey = this.cache.keys().next().value;
+            this.cache.delete(firstKey);
+        }
+        this.cache.set(key, value);
+    }
+    
+    has(key) {
+        return this.cache.has(key);
+    }
+    
+    delete(key) {
+        return this.cache.delete(key);
+    }
+    
+    clear() {
+        this.cache.clear();
+    }
+    
+    get size() {
+        return this.cache.size;
+    }
+}
+
+const eventManager = new EventManager();
+const tagsCache = new LRUCache(CONFIG.MAX_CACHE_SIZE);
 
 const DOM = {
     el(tag, styles = '', text = '') {
@@ -244,61 +379,36 @@ const commonStyles = {
     }
 }
 
-function showToast(message, type = 'info', duration = 3000) {
+const TOAST_TYPE_STYLES = {
+    success: { background: GRADIENTS.success, borderColor: COLORS.success },
+    error: { background: GRADIENTS.danger, borderColor: COLORS.danger },
+    warning: { background: GRADIENTS.warning, borderColor: COLORS.warning },
+    info: { background: GRADIENTS.info, borderColor: COLORS.primary }
+};
+
+const TOAST_BASE_STYLE = 'position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%); color: white; padding: 12px 20px; border-radius: 8px; box-shadow: 0 4px 12px rgba(0,0,0,0.3); z-index: 10000; font-size: 14px; font-weight: 500; max-width: 400px; word-wrap: break-word; animation: slideInCenter 0.3s ease; pointer-events: none;';
+
+function showToast(message, type = 'info', duration = CONFIG.TOAST_DURATION) {
     const existingToast = document.getElementById('custom-toast');
-    if (existingToast) {
-        existingToast.remove();
-    }
+    if (existingToast) existingToast.remove();
 
     const toast = document.createElement('div');
     toast.id = 'custom-toast';
     
-    const typeStyles = {
-        success: {
-            background: 'linear-gradient(135deg, #10b981 0%, #059669 100%)',
-            borderColor: '#10b981'
-        },
-        error: {
-            background: 'linear-gradient(135deg, #ef4444 0%, #dc2626 100%)',
-            borderColor: '#ef4444'
-        },
-        warning: {
-            background: 'linear-gradient(135deg, #f59e0b 0%, #d97706 100%)',
-            borderColor: '#f59e0b'
-        },
-        info: {
-            background: 'linear-gradient(135deg, #3b82f6 0%, #2563eb 100%)',
-            borderColor: '#3b82f6'
-        }
-    };
-
-    const style = typeStyles[type] || typeStyles.info;
-    
-    toast.style.cssText = `position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%); background: ${style.background}; color: white; padding: 12px 20px; border-radius: 8px; border: 1px solid ${style.borderColor}; box-shadow: 0 4px 12px rgba(0,0,0,0.3); z-index: 10000; font-size: 14px; font-weight: 500; max-width: 400px; word-wrap: break-word; animation: slideInCenter 0.3s ease; pointer-events: none;`;
+    const style = TOAST_TYPE_STYLES[type] || TOAST_TYPE_STYLES.info;
+    toast.style.cssText = `${TOAST_BASE_STYLE} background: ${style.background}; border: 1px solid ${style.borderColor};`;
 
     if (!document.getElementById('toast-animations')) {
         const styleSheet = document.createElement('style');
         styleSheet.id = 'toast-animations';
         styleSheet.textContent = `
             @keyframes slideInCenter {
-                from {
-                    opacity: 0;
-                    transform: translate(-50%, -50%) scale(0.8);
-                }
-                to {
-                    opacity: 1;
-                    transform: translate(-50%, -50%) scale(1);
-                }
+                from { opacity: 0; transform: translate(-50%, -50%) scale(0.8); }
+                to { opacity: 1; transform: translate(-50%, -50%) scale(1); }
             }
             @keyframes slideOutCenter {
-                from {
-                    opacity: 1;
-                    transform: translate(-50%, -50%) scale(1);
-                }
-                to {
-                    opacity: 0;
-                    transform: translate(-50%, -50%) scale(0.8);
-                }
+                from { opacity: 1; transform: translate(-50%, -50%) scale(1); }
+                to { opacity: 0; transform: translate(-50%, -50%) scale(0.8); }
             }
         `;
         document.head.appendChild(styleSheet);
@@ -310,9 +420,7 @@ function showToast(message, type = 'info', duration = 3000) {
     setTimeout(() => {
         toast.style.animation = 'slideOutCenter 0.3s ease';
         setTimeout(() => {
-            if (toast.parentNode) {
-                toast.remove();
-            }
+            if (toast.parentNode) toast.remove();
         }, 300);
     }, duration);
 
@@ -526,6 +634,14 @@ const PerformanceUtils = {
         };
     },
 
+    debounce(fn, delay = CONFIG.DEBOUNCE_DELAY) {
+        let timeoutId = null;
+        return function(...args) {
+            clearTimeout(timeoutId);
+            timeoutId = setTimeout(() => fn.apply(this, args), delay);
+        };
+    },
+
     requestAnimationFrameThrottle(fn) {
         let ticking = false;
         let lastArgs = null;
@@ -682,173 +798,6 @@ function createTitle(text, level = 'h3') {
     title.style.cssText = level === 'h3' ? STYLES.titleH3 : STYLES.titleH4;
     return title;
 }
-
-const categoryTranslations = {
-    zh: {
-        '常规标签': '常规标签',
-        '艺术题材': '艺术题材',
-        '人物类': '人物类',
-        '动物生物': '动物生物',
-        '场景类': '场景类',
-        '涩影湿': '涩影湿',
-        '随机标签': '随机标签',
-        '灵感套装': '灵感套装',
-        '潪佳精选': '潪佳精选',
-        '成人题材': '成人题材',
-        '自定义': '自定义',
-        '标签管理': '标签管理',
-        '我的标签': '我的标签',
-        '角色提取器': '角色提取器',
-        '人设': '人设',
-        '服饰': '服饰',
-        '国籍': '国籍',
-        '情景': '情景',
-        '亚洲': '亚洲', '欧洲': '欧洲', '非洲': '非洲', '北美洲': '北美洲', '南美洲': '南美洲', '大洋洲': '大洋洲', '极地地区': '极地地区', '特殊地区': '特殊地区',
-        '东亚': '东亚', '东南亚': '东南亚', '南亚': '南亚', '西亚/中东': '西亚/中东', '中亚': '中亚',
-        '北欧': '北欧', '西欧': '西欧', '中欧': '中欧', '南欧': '南欧', '东欧': '东欧',
-        '北非': '北非', '西非': '西非', '中非': '中非', '东非': '东非', '南非': '南非',
-        '北美': '北美', '中美洲': '中美洲', '加勒比海地区': '加勒比海地区',
-        '南美': '南美',
-        '澳大利亚和新西兰': '澳大利亚和新西兰', '美拉尼西亚': '美拉尼西亚', '密克罗尼西亚': '密克罗尼西亚', '波利尼西亚': '波利尼西亚',
-        '北极地区': '北极地区', '南极地区': '南极地区',
-        '海外领地': '海外领地',
-        '动作/表情': '动作/表情',
-        '道具': '道具',
-        '性行为': '性行为',
-        '画质': '画质', '摄影': '摄影', '构图': '构图', '光影': '光影', '负面标签': '负面标签', '商业摄影': '商业摄影',
-        '艺术家风格': '艺术家风格', '艺术流派': '艺术流派', '技法形式': '技法形式', '媒介与效果': '媒介与效果', '装饰图案': '装饰图案', '色彩与质感': '色彩与质感', '国风': '国风',
-        '角色': '角色', '动漫角色': '动漫角色', '游戏角色': '游戏角色', '二次元虚拟偶像': '二次元虚拟偶像', '3D动画角色': '3D动画角色',
-        '外貌与特征': '外貌与特征', '职业': '职业', '性别/年龄': '性别/年龄', '胸部': '胸部', '脸型': '脸型', '鼻子': '鼻子', '嘴巴': '嘴巴', '皮肤': '皮肤', '体型': '体型', '眉毛': '眉毛', '头发': '头发', '眼睛': '眼睛', '瞳孔': '瞳孔',
-        '颜色': '颜色', '长度': '长度', '马尾': '马尾', '辫子': '辫子', '刘海': '刘海', '其他': '其他',
-        '常服': '常服', '上装': '上装', '下装': '下装', '泳装': '泳装', '运动装': '运动装', '内衣': '内衣', '配饰': '配饰', '鞋类': '鞋类', '睡衣': '睡衣', '帽子': '帽子', '连袜裤': '连袜裤', '围巾': '围巾', '丝袜': '丝袜', '深V': '深V', '包臀': '包臀', '蕾丝': '蕾丝', '裙子': '裙子', '制服COS': '制服COS', '传统服饰': '传统服饰',
-        '姿态动作': '姿态动作', '多人互动': '多人互动', '手部': '手部', '腿部': '腿部', '眼神': '眼神', '表情': '表情', '正面情绪': '正面情绪', '负面情绪': '负面情绪', '嘴型': '嘴型',
-        '翅膀': '翅膀', '尾巴': '尾巴', '耳朵': '耳朵', '角': '角',
-        '城市': '城市', '室外': '室外', '建筑': '建筑', '室内装饰': '室内装饰', '自然景观': '自然景观', '人造景观': '人造景观', '光线环境': '光线环境', '背景环境': '背景环境', '反射效果': '反射效果', '情感与氛围': '情感与氛围',
-        '动物': '动物', '哺乳动物': '哺乳动物', '鸟类': '鸟类', '爬行动物': '爬行动物', '两栖动物': '两栖动物', '鱼类': '鱼类', '昆虫': '昆虫', '家养动物': '家养动物',
-        '幻想生物': '幻想生物', '龙类': '龙类', '神话生物': '神话生物', '幻想动物': '幻想动物', '外星生物': '外星生物', '超自然生物': '超自然生物', '科幻生物': '科幻生物',
-        '行为动态': '行为动态', '动物行为': '动物行为', '幻想生物行为': '幻想生物行为',
-        '性暗示': '性暗示', '性行为': '性行为', '性行为类型': '性行为类型', '身体部位': '身体部位', '道具与玩具': '道具与玩具', '束缚与调教': '束缚与调教', '特殊癖好与情境': '特殊癖好与情境', '视觉风格与特定元素': '视觉风格与特定元素', '欲望表情': '欲望表情'
-    },
-    en: {
-        '常规标签': 'General Tags',
-        '艺术题材': 'Art Themes',
-        '人物类': 'Character',
-        '动物生物': 'Animals & Creatures',
-        '场景类': 'Scenes',
-        '涩影湿': 'Pornographer',
-        '随机标签': 'Random Tags',
-        '灵感套装': 'Inspiration',
-        '潪佳精选': 'ZhiAi Selection',
-        '成人题材': 'Adult Themes',
-        '自定义': 'Custom',
-        '标签管理': 'Tag Management',
-        '我的标签': 'My Tags',
-        '角色提取器': 'Character Extractor',
-        '人设': 'Character Design',
-        '服饰': 'Clothing',
-        '国籍': 'Nationality',
-        '情景': 'Scenarios',
-        '亚洲': 'Asia', '欧洲': 'Europe', '非洲': 'Africa', '北美洲': 'North America', '南美洲': 'South America', '大洋洲': 'Oceania', '极地地区': 'Polar Regions', '特殊地区': 'Special Regions',
-        '东亚': 'East Asia', '东南亚': 'Southeast Asia', '南亚': 'South Asia', '西亚/中东': 'West Asia/Middle East', '中亚': 'Central Asia',
-        '北欧': 'Northern Europe', '西欧': 'Western Europe', '中欧': 'Central Europe', '南欧': 'Southern Europe', '东欧': 'Eastern Europe',
-        '北非': 'North Africa', '西非': 'West Africa', '中非': 'Central Africa', '东非': 'East Africa', '南非': 'Southern Africa',
-        '北美': 'North America Region', '中美洲': 'Central America', '加勒比海地区': 'Caribbean',
-        '南美': 'South America Region',
-        '澳大利亚和新西兰': 'Australia & New Zealand', '美拉尼西亚': 'Melanesia', '密克罗尼西亚': 'Micronesia', '波利尼西亚': 'Polynesia',
-        '北极地区': 'Arctic', '南极地区': 'Antarctic',
-        '海外领地': 'Overseas Territories',
-        '动作/表情': 'Actions/Expressions',
-        '道具': 'Props',
-        '性行为': 'Sexual Acts',
-        '画质': 'Quality', '摄影': 'Photography', '构图': 'Composition', '光影': 'Lighting', '负面标签': 'Negative Tags', '商业摄影': 'Commercial Photography',
-        '艺术家风格': 'Artist Style', '艺术流派': 'Art Movement', '技法形式': 'Technique', '媒介与效果': 'Medium & Effects', '装饰图案': 'Decorative', '色彩与质感': 'Color & Texture', '国风': 'Chinese Style',
-        '角色': 'Role', '动漫角色': 'Anime Characters', '游戏角色': 'Game Characters', '二次元虚拟偶像': 'Virtual Idols', '3D动画角色': '3D Characters',
-        '外貌与特征': 'Appearance', '职业': 'Occupation', '性别/年龄': 'Gender/Age', '胸部': 'Chest', '脸型': 'Face Shape', '鼻子': 'Nose', '嘴巴': 'Mouth', '皮肤': 'Skin', '体型': 'Body Type', '眉毛': 'Eyebrows', '头发': 'Hair', '眼睛': 'Eyes', '瞳孔': 'Pupils',
-        '颜色': 'Color', '长度': 'Length', '马尾': 'Ponytail', '辫子': 'Braids', '刘海': 'Bangs', '其他': 'Other',
-        '常服': 'Casual', '上装': 'Tops', '下装': 'Bottoms', '泳装': 'Swimwear', '运动装': 'Sportswear', '内衣': 'Underwear', '配饰': 'Accessories', '鞋类': 'Footwear', '睡衣': 'Sleepwear', '帽子': 'Hats', '连袜裤': 'Tights', '围巾': 'Scarves', '丝袜': 'Stockings', '深V': 'Deep V', '包臀': 'Bodycon', '蕾丝': 'Lace', '裙子': 'Dresses', '制服COS': 'Uniform/Cosplay', '传统服饰': 'Traditional',
-        '姿态动作': 'Poses', '多人互动': 'Multi-person', '手部': 'Hands', '腿部': 'Legs', '眼神': 'Eye Contact', '表情': 'Expressions', '正面情绪': 'Positive', '负面情绪': 'Negative', '嘴型': 'Mouth Shapes',
-        '翅膀': 'Wings', '尾巴': 'Tails', '耳朵': 'Ears', '角': 'Horns',
-        '城市': 'City', '室外': 'Outdoor', '建筑': 'Architecture', '室内装饰': 'Interior Decor', '自然景观': 'Nature', '人造景观': 'Man-made Scenery', '光线环境': 'Lighting Env', '背景环境': 'Background Environment', '反射效果': 'Reflection Effects', '情感与氛围': 'Emotion & Atmosphere',
-        '动物': 'Animals', '哺乳动物': 'Mammals', '鸟类': 'Birds', '爬行动物': 'Reptiles', '两栖动物': 'Amphibians', '鱼类': 'Fish', '昆虫': 'Insects', '家养动物': 'Domestic Animals',
-        '幻想生物': 'Fantasy Creatures', '龙类': 'Dragons', '神话生物': 'Mythical Creatures', '幻想动物': 'Fantasy Animals', '外星生物': 'Alien Creatures', '超自然生物': 'Supernatural Creatures', '科幻生物': 'Sci-Fi Creatures',
-        '行为动态': 'Behavior', '动物行为': 'Animal Behavior', '幻想生物行为': 'Fantasy Creature Behavior',
-        '性暗示': 'Suggestive', '性行为': 'Sexual Acts', '性行为类型': 'Types', '身体部位': 'Body Parts', '道具与玩具': 'Toys', '束缚与调教': 'Bondage', '特殊癖好与情境': 'Fetishes', '视觉风格与特定元素': 'Visual Style', '欲望表情': 'Lustful Expressions',
-        '《原神》': 'Genshin Impact',
-        '《崩坏：星穹铁道》': 'Honkai: Star Rail',
-        '《崩坏3》': 'Honkai Impact 3rd',
-        '《Fate》': 'Fate Series',
-        '《火影忍者》': 'Naruto',
-        '《海贼王》': 'One Piece',
-        '《鬼灭之刃》': 'Demon Slayer',
-        '《咒术回战》': 'Jujutsu Kaisen',
-        '《进击的巨人》': 'Attack on Titan',
-        '《我的英雄学院》': 'My Hero Academia',
-        '《刀剑神域》': 'Sword Art Online',
-        '《Re:从零开始的异世界生活》': 'Re:Zero',
-        '《约会大作战》': 'Date A Live',
-        '《魔法少女小圆》': 'Puella Magi Madoka Magica',
-        '《EVA》': 'Neon Genesis Evangelion',
-        '《凉宫春日的忧郁》': 'The Melancholy of Haruhi Suzumiya',
-        '《美少女战士》': 'Sailor Moon',
-        '《龙珠》': 'Dragon Ball',
-        '《名侦探柯南》': 'Detective Conan',
-        '《哆啦A梦》': 'Doraemon',
-        '《宝可梦》': 'Pokemon',
-        '《钢之炼金术师》': 'Fullmetal Alchemist',
-        '《死亡笔记》': 'Death Note',
-        '《银魂》': 'Gintama',
-        '《家庭教师》': 'Reborn!',
-        '《妖精的尾巴》': 'Fairy Tail',
-        '《最终幻想》': 'Final Fantasy',
-        '《尼尔：机械纪元》': 'Nier: Automata',
-        '《生化危机》': 'Resident Evil',
-        '《巫师3：狂猎》': 'The Witcher 3',
-        '《黑暗之魂》': 'Dark Souls',
-        '《只狼：影逝二度》': 'Sekiro',
-        '《艾尔登法环》': 'Elden Ring',
-        '《赛博朋克2077》': 'Cyberpunk 2077',
-        '《守望先锋》': 'Overwatch',
-        '《英雄联盟》': 'League of Legends',
-        '《王者荣耀》': 'Honor of Kings',
-        '《明日方舟》': 'Arknights',
-        '《碧蓝航线》': 'Azur Lane',
-        '《少女前线》': "Girls' Frontline",
-        '《街头霸王》': 'Street Fighter',
-        '《拳皇》': 'The King of Fighters',
-        '《铁拳》': 'Tekken',
-        '《死或生》': 'Dead or Alive',
-        '《罪恶装备》': 'Guilty Gear',
-        '《月姬格斗》': 'Melty Blood',
-        '《苍翼默示录》': 'BlazBlue',
-        '《第五人格》': 'Identity V',
-        '《RWBY》': 'RWBY',
-        '《爱死机》': 'Love, Death & Robots',
-        '《蜘蛛侠：平行宇宙》': 'Spider-Verse',
-        '《冰雪奇缘》': 'Frozen',
-        '《疯狂动物城》': 'Zootopia',
-        '《寻梦环游记》': 'Coco',
-        '《玩具总动员》': 'Toy Story',
-        '《怪物公司》': 'Monsters, Inc.',
-        '《超人总动员》': 'The Incredibles',
-        '《料理鼠王》': 'Ratatouille',
-        '《飞屋环游记》': 'Up',
-        '《头脑特工队》': 'Inside Out',
-        '《疯狂原始人》': 'The Croods',
-        '《驯龙高手》': 'How to Train Your Dragon',
-        '《功夫熊猫》': 'Kung Fu Panda',
-        '《马达加斯加》': 'Madagascar',
-        '《怪物史莱克》': 'Shrek',
-        '《卑鄙的我》': 'Despicable Me',
-        '《无敌破坏王》': 'Wreck-It Ralph',
-        '《海洋奇缘》': 'Moana',
-        '《魔发奇缘》': 'Tangled',
-        '《勇敢传说》': 'Brave',
-        '《小美人鱼》': 'The Little Mermaid',
-        '《美女与野兽》': 'Beauty and the Beast',
-        '《阿拉丁》': 'Aladdin',
-        '《狮子王》': 'The Lion King'
-    }
-};
 
 function $tc(categoryName) {
     const locale = getLocale();
@@ -2549,8 +2498,6 @@ function generateRandomCombination() {
     }
 }
 
-const tagsCache = new Map();
-
 function getTagsFromCategoryPath(categoryPath) {
     if (!window.tagsData) return [];
     
@@ -2574,9 +2521,7 @@ function getTagsFromCategoryPath(categoryPath) {
     return tags;
 }
 
-function clearTagsCache() {
-    tagsCache.clear();
-}
+const clearTagsCache = () => tagsCache.clear();
 
 function extractAllTagsFromObject(obj) {
     const tags = [];
@@ -3602,9 +3547,7 @@ function createTagSelectorDialog() {
     tagSelectorDialog.activeSubCategory = null;
     tagSelectorDialog.activeSubSubCategory = null;
     tagSelectorDialog.activeSubSubSubCategory = null;
-    tagSelectorDialog.selectedCount = selectedCount;
-    tagSelectorDialog.selectedTagsList = selectedTagsList;
-    tagSelectorDialog.hintText = hintText;
+    tagSelectorDialog.overviewTitleText = overviewTitleText;
 
     initializeCategoryList();
 
@@ -4441,8 +4384,9 @@ async function showCharacterExtractor() {
         label.style.cssText = 'color: #e2e8f0; font-size: 13px; font-weight: 500;';
         row.appendChild(label);
         
+        let tipText = null;
         if (tipKey) {
-            const tipText = document.createElement('div');
+            tipText = document.createElement('div');
             tipText.textContent = $t(tipKey);
             tipText.style.cssText = 'color: #60a5fa; font-size: 12px; line-height: 1.4; font-weight: 500;';
             row.appendChild(tipText);
@@ -4484,12 +4428,24 @@ async function showCharacterExtractor() {
         });
         
         row.appendChild(input);
+        
+        row._label = label;
+        row._input = input;
+        row._tipText = tipText;
+        row._labelKey = labelKey;
+        row._placeholderKey = placeholderKey;
+        row._tipKey = tipKey;
+        
         return row;
     };
 
     const seedRow = createInputRow('characterSeed', 'character-seed-input', 'characterSeedPlaceholder', 'number', String(extractorSettings.seed), 'characterSeedTip');
     const excludedRow = createInputRow('characterExcluded', 'character-excluded-input', 'characterExcludedPlaceholder', 'text', extractorSettings.excluded, 'characterExcludedTip');
     const customPromptRow = createInputRow('characterCustomPrompt', 'character-custom-input', 'characterCustomPromptPlaceholder', 'text', extractorSettings.customPrompt, 'characterCustomPromptTip');
+    
+    tagSelectorDialog.characterExtractorSeedRow = seedRow;
+    tagSelectorDialog.characterExtractorExcludedRow = excludedRow;
+    tagSelectorDialog.characterExtractorCustomRow = customPromptRow;
 
     form.appendChild(seedRow);
     form.appendChild(excludedRow);
@@ -4710,6 +4666,13 @@ async function showCharacterExtractor() {
     tagSelectorDialog.characterEmptyState = emptyState;
     tagSelectorDialog.characterResultContainer = resultContainer;
     tagSelectorDialog.characterHistoryList = historyList;
+    tagSelectorDialog.characterExtractorTitle = title;
+    tagSelectorDialog.characterExtractorDesc = desc;
+    tagSelectorDialog.characterExtractorSettingsTitle = settingsTitle;
+    tagSelectorDialog.characterExtractorPreviewTitle = previewTitle;
+    tagSelectorDialog.characterExtractorHistoryTitle = historyTitle;
+    tagSelectorDialog.characterExtractorClearAllBtn = clearAllBtn;
+    tagSelectorDialog.characterExtractorResetBtn = resetBtn;
     
     if (!tagSelectorDialog.characterHistory) {
         const savedHistory = localStorage.getItem('zhihui_character_history');
@@ -6294,13 +6257,70 @@ function refreshAllTagDisplays() {
         tagSelectorDialog.clearBtn.innerHTML = `<span style="font-size: 14px; font-weight: 600; display: block;">${$t('clearSelection')}</span>`;
     }
     
+    if (tagSelectorDialog.characterFetchBtn) {
+        tagSelectorDialog.characterFetchBtn.innerHTML = `<span style="font-size: 14px; font-weight: 600; display: block;">${$t('characterFetchBtn')}</span>`;
+    }
+
+    if (tagSelectorDialog.overviewTitleText) {
+        tagSelectorDialog.overviewTitleText.innerHTML = $t('selectedTags');
+    }
+
+    if (tagSelectorDialog.hintText) {
+        tagSelectorDialog.hintText.textContent = $t('noTagsSelected');
+    }
+    
+    if (tagSelectorDialog.characterExtractorHint) {
+        const spans = tagSelectorDialog.characterExtractorHint.querySelectorAll('span');
+        if (spans.length >= 2) {
+            spans[0].innerHTML = $t('selectedTags');
+            spans[1].textContent = $t('characterExtractorHint');
+        }
+    }
+    
+    if (tagSelectorDialog.characterExtractorTitle) {
+        tagSelectorDialog.characterExtractorTitle.textContent = $t('characterExtractor');
+    }
+    if (tagSelectorDialog.characterExtractorDesc) {
+        tagSelectorDialog.characterExtractorDesc.textContent = $t('characterExtractorDesc');
+    }
+    if (tagSelectorDialog.characterExtractorSettingsTitle) {
+        tagSelectorDialog.characterExtractorSettingsTitle.innerHTML = `<span>⚙️</span> ${$t('extractorSettings')}`;
+    }
+    if (tagSelectorDialog.characterExtractorPreviewTitle) {
+        tagSelectorDialog.characterExtractorPreviewTitle.innerHTML = `<span>📄</span> ${$t('characterResult')}`;
+    }
+    if (tagSelectorDialog.characterExtractorHistoryTitle) {
+        tagSelectorDialog.characterExtractorHistoryTitle.textContent = $t('historyTitle');
+    }
+    if (tagSelectorDialog.characterExtractorClearAllBtn) {
+        tagSelectorDialog.characterExtractorClearAllBtn.textContent = $t('clearAllHistory');
+    }
+    if (tagSelectorDialog.characterExtractorResetBtn) {
+        tagSelectorDialog.characterExtractorResetBtn.textContent = $t('resetDefaults');
+    }
+    if (tagSelectorDialog.characterEmptyState) {
+        const emptyStateDiv = tagSelectorDialog.characterEmptyState.querySelector('div:last-child');
+        if (emptyStateDiv) emptyStateDiv.textContent = $t('characterEmptyState');
+    }
+    
+    const inputRows = [
+        tagSelectorDialog.characterExtractorSeedRow,
+        tagSelectorDialog.characterExtractorExcludedRow,
+        tagSelectorDialog.characterExtractorCustomRow
+    ];
+    inputRows.forEach(row => {
+        if (row && row._label) row._label.textContent = $t(row._labelKey);
+        if (row && row._input) row._input.placeholder = $t(row._placeholderKey);
+        if (row && row._tipText && row._tipKey) row._tipText.textContent = $t(row._tipKey);
+    });
+    
     const tagElements = tagSelectorDialog.tagContent.querySelectorAll('span[data-original-display]');
     tagElements.forEach(tagElement => {
         const originalDisplay = tagElement.dataset.originalDisplay;
         const value = tagElement.dataset.value;
         if (originalDisplay && value) {
             const translatedDisplay = $tag(originalDisplay, value);
-            const displayText = translatedDisplay.length > 20 ? translatedDisplay.substring(0, 20) + '...' : translatedDisplay;
+            const displayText = translatedDisplay.length > CONFIG.MAX_TAG_DISPLAY_LENGTH ? translatedDisplay.substring(0, CONFIG.MAX_TAG_DISPLAY_LENGTH) + '...' : translatedDisplay;
             tagElement.textContent = displayText;
         }
     });
@@ -6312,7 +6332,7 @@ function refreshAllTagDisplays() {
             const value = tagElement.dataset.value;
             if (originalDisplay && value) {
                 const translatedDisplay = $tag(originalDisplay, value);
-                const displayText = translatedDisplay.length > 20 ? translatedDisplay.substring(0, 20) + '...' : translatedDisplay;
+                const displayText = translatedDisplay.length > CONFIG.MAX_TAG_DISPLAY_LENGTH ? translatedDisplay.substring(0, CONFIG.MAX_TAG_DISPLAY_LENGTH) + '...' : translatedDisplay;
                 tagElement.textContent = displayText;
             }
         });
@@ -8223,14 +8243,219 @@ function updateSelectedTags() {
 
 window.updateSelectedTags = updateSelectedTags;
 
+const SELECTED_TAG_STYLES = {
+    container: 'display: flex; flex-direction: column; align-items: center; margin: 0 4px; background: transparent; position: relative;',
+    tagElement: 'background: linear-gradient(135deg, #4a9eff 0%, #1e88e5 100%); color: #fff; padding: 3px 8px; border-radius: 6px; font-size: 14px; display: inline-flex; align-items: center; gap: 4px; cursor: pointer; max-width: 200px; min-width: 90px; justify-content: space-between; margin: 0 0 2px 0; box-shadow: 0 2px 4px rgba(74,158,255,0.4), 0 1px 2px rgba(74,158,255,0.2); border: 1px solid rgba(30,136,229,0.8); transition: all 0.3s ease;',
+    tagText: 'flex: 1; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; min-width: 0;',
+    weightDisplay: 'font-size: 10px; background: rgba(255,255,255,0.2); padding: 1px 4px; border-radius: 3px; min-width: 10px; text-align: center; cursor: pointer; user-select: none;',
+    removeBtn: 'font-size: 8px; font-family: "SimHei", "黑体", sans-serif; font-weight: bold; cursor: pointer; opacity: 0.8; background-color: #3b7ddd; color: white; border-radius: 50%; width: 14px; height: 14px; min-width: 14px; min-height: 14px; display: flex; align-items: center; justify-content: center; transition: background-color 0.2s; line-height: 1; text-align: center; padding: 0; margin: 0; transform: translate(0, 0); flex-shrink: 0; box-sizing: border-box;',
+    weightControl: 'display: none; position: absolute; top: 0; left: 0; right: 26px; height: 100%; align-items: center; justify-content: center; background: rgba(74,158,255,0.95); border-radius: 6px; z-index: 10; opacity: 0; transition: opacity 0.2s ease;',
+    weightEditor: 'display: flex; align-items: center; background: linear-gradient(135deg, #1e3a5f 0%, #0f172a 100%); border: 1px solid #4a9eff; border-radius: 4px; overflow: hidden; height: 15px; box-shadow: 0 2px 8px rgba(74,158,255,0.4);',
+    weightBtn: 'font-size: 11px; font-weight: bold; cursor: pointer; color: #fff; width: 15px; height: 15px; display: flex; align-items: center; justify-content: center; flex-shrink: 0; transition: all 0.15s;',
+    weightValueDisplay: 'font-size: 11px; font-weight: 700; color: #fff; min-width: 26px; text-align: center; cursor: pointer; user-select: none; height: 100%; display: flex; align-items: center; justify-content: center; text-shadow: 0 0 6px rgba(0,0,0,0.8), 0 0 2px rgba(0,0,0,1);',
+    chineseName: 'font-size: 10px; color: #22c55e; text-align: center; white-space: normal; word-break: break-word; overflow-wrap: anywhere; border: 1px solid #22c55e; width: 100%; max-height: 64px; overflow-y: auto; box-sizing: border-box; border-radius: 4px; padding: 0px 4px;'
+};
+
+function findChineseNameForTag(tag, data) {
+    if (!data) return tag;
+    
+    const findInNode = (node) => {
+        if (Array.isArray(node)) {
+            for (const t of node) {
+                if (t.value === tag && t.display) return t.display;
+            }
+        } else if (node && typeof node === 'object') {
+            for (const [, value] of Object.entries(node)) {
+                const result = findInNode(value);
+                if (result) return result;
+            }
+        }
+        return null;
+    };
+    
+    for (const [, subCategories] of Object.entries(data)) {
+        const result = findInNode(subCategories);
+        if (result) return result;
+    }
+    return tag;
+}
+
+function createWeightEditor(tag, updateWeightDisplay, updateWeightValueDisplay) {
+    const weightEditor = DOM.div(SELECTED_TAG_STYLES.weightEditor);
+    
+    const decreaseBtn = DOM.span(SELECTED_TAG_STYLES.weightBtn + ' background: #ff6b6b; border-right: 1px solid rgba(255,255,255,0.3);', '−');
+    const weightValueDisplay = DOM.span(SELECTED_TAG_STYLES.weightValueDisplay);
+    const increaseBtn = DOM.span(SELECTED_TAG_STYLES.weightBtn + ' background: #51cf66; border-left: 1px solid rgba(255,255,255,0.3);', '+');
+    
+    const updateWeightValue = (w) => {
+        weightValueDisplay.textContent = w.toFixed(1);
+    };
+    
+    decreaseBtn.onmouseenter = () => {
+        decreaseBtn.style.background = '#ff5252';
+        decreaseBtn.style.transform = 'scale(1.1)';
+    };
+    decreaseBtn.onmouseleave = () => {
+        decreaseBtn.style.background = '#ff6b6b';
+        decreaseBtn.style.transform = 'scale(1)';
+    };
+    
+    increaseBtn.onmouseenter = () => {
+        increaseBtn.style.background = '#40c057';
+        increaseBtn.style.transform = 'scale(1.1)';
+    };
+    increaseBtn.onmouseleave = () => {
+        increaseBtn.style.background = '#51cf66';
+        increaseBtn.style.transform = 'scale(1)';
+    };
+    
+    const adjustWeight = (delta) => {
+        const currentWeight = selectedTags.get(tag) || 1.0;
+        const newWeight = Math.max(CONFIG.MIN_WEIGHT, Math.min(CONFIG.MAX_WEIGHT, Math.round((currentWeight + delta) * 10) / 10));
+        selectedTags.set(tag, newWeight);
+        updateWeightDisplay(newWeight);
+        updateWeightValue(newWeight);
+        updateSelectedTags();
+    };
+    
+    decreaseBtn.onclick = (e) => {
+        e.stopPropagation();
+        adjustWeight(-CONFIG.WEIGHT_STEP);
+    };
+    
+    increaseBtn.onclick = (e) => {
+        e.stopPropagation();
+        adjustWeight(CONFIG.WEIGHT_STEP);
+    };
+    
+    weightValueDisplay.onclick = (e) => {
+        e.stopPropagation();
+        const input = document.createElement('input');
+        input.type = 'text';
+        input.value = selectedTags.get(tag) || 1.0;
+        input.style.cssText = 'width: 26px; font-size: 11px; padding: 0; border: none; background: transparent; color: #4a9eff; text-align: center; outline: none; font-weight: 500;';
+        weightValueDisplay.replaceWith(input);
+        input.focus();
+        input.select();
+        
+        const applyValue = () => {
+            let newWeight = parseFloat(input.value);
+            if (!isNaN(newWeight)) {
+                newWeight = Math.max(CONFIG.MIN_WEIGHT, Math.min(CONFIG.MAX_WEIGHT, Math.round(newWeight * 10) / 10));
+                selectedTags.set(tag, newWeight);
+                updateWeightDisplay(newWeight);
+                updateWeightValue(newWeight);
+                updateSelectedTags();
+            }
+            input.replaceWith(weightValueDisplay);
+        };
+        
+        input.onblur = applyValue;
+        input.onkeydown = (ev) => {
+            if (ev.key === 'Enter') applyValue();
+            else if (ev.key === 'Escape') input.replaceWith(weightValueDisplay);
+        };
+    };
+    
+    weightEditor.appendChild(decreaseBtn);
+    weightEditor.appendChild(weightValueDisplay);
+    weightEditor.appendChild(increaseBtn);
+    
+    return { weightEditor, weightValueDisplay, updateWeightValue };
+}
+
+function createSelectedTagElement(tag, weight) {
+    const tagContainer = DOM.div(SELECTED_TAG_STYLES.container);
+    const tagElement = DOM.span(SELECTED_TAG_STYLES.tagElement);
+    const tagText = DOM.span(SELECTED_TAG_STYLES.tagText, tag);
+    tagText.title = tag;
+    
+    const weightDisplay = DOM.span(SELECTED_TAG_STYLES.weightDisplay);
+    const updateWeightDisplay = (w) => {
+        if (w === 1.0) {
+            weightDisplay.style.display = 'none';
+        } else {
+            weightDisplay.style.display = 'inline-flex';
+            weightDisplay.textContent = w.toFixed(1);
+        }
+    };
+    updateWeightDisplay(weight);
+    
+    weightDisplay.ondblclick = (e) => {
+        e.stopPropagation();
+        const input = document.createElement('input');
+        input.type = 'text';
+        input.value = selectedTags.get(tag) || 1.0;
+        input.style.cssText = 'width: 40px; font-size: 10px; padding: 1px 2px; border: 1px solid #4a9eff; border-radius: 3px; background: #1e293b; color: #fff; text-align: center; outline: none;';
+        weightDisplay.replaceWith(input);
+        input.focus();
+        input.select();
+        
+        const applyValue = () => {
+            let newWeight = parseFloat(input.value);
+            if (!isNaN(newWeight)) {
+                newWeight = Math.max(CONFIG.MIN_WEIGHT, Math.min(CONFIG.MAX_WEIGHT, Math.round(newWeight * 10) / 10));
+                selectedTags.set(tag, newWeight);
+                updateWeightDisplay(newWeight);
+                updateSelectedTags();
+            }
+            input.replaceWith(weightDisplay);
+        };
+        
+        input.onblur = applyValue;
+        input.onkeydown = (ev) => {
+            if (ev.key === 'Enter') applyValue();
+            else if (ev.key === 'Escape') input.replaceWith(weightDisplay);
+        };
+    };
+    
+    const removeBtn = DOM.span(SELECTED_TAG_STYLES.removeBtn, '×');
+    removeBtn.onmouseenter = () => { removeBtn.style.backgroundColor = '#ff4444'; };
+    removeBtn.onmouseleave = () => { removeBtn.style.backgroundColor = '#3b7ddd'; };
+    removeBtn.onclick = (e) => {
+        e.stopPropagation();
+        removeSelectedTag(tag);
+    };
+    
+    tagElement.appendChild(tagText);
+    tagElement.appendChild(weightDisplay);
+    tagElement.appendChild(removeBtn);
+    
+    const weightControl = DOM.div(SELECTED_TAG_STYLES.weightControl);
+    const { weightEditor, weightValueDisplay, updateWeightValue } = createWeightEditor(tag, updateWeightDisplay, null);
+    weightControl.appendChild(weightEditor);
+    
+    tagElement.style.position = 'relative';
+    tagElement.appendChild(weightControl);
+    
+    tagElement.addEventListener('mouseenter', (e) => {
+        e.stopPropagation();
+        weightControl.style.display = 'flex';
+        requestAnimationFrame(() => { weightControl.style.opacity = '1'; });
+    });
+    
+    tagElement.addEventListener('mouseleave', (e) => {
+        e.stopPropagation();
+        weightControl.style.opacity = '0';
+        setTimeout(() => { weightControl.style.display = 'none'; }, 200);
+    });
+    
+    const chineseNameElement = DOM.span(SELECTED_TAG_STYLES.chineseName);
+    chineseNameElement.textContent = findChineseNameForTag(tag, tagsData);
+    
+    tagContainer.appendChild(tagElement);
+    tagContainer.appendChild(chineseNameElement);
+    
+    updateWeightValue(weight);
+    
+    return tagContainer;
+}
+
 function updateSelectedTagsOverview() {
     if (!tagSelectorDialog) return;
 
-    const selectedCount = tagSelectorDialog.selectedCount;
-    const selectedTagsList = tagSelectorDialog.selectedTagsList;
-    const selectedOverview = tagSelectorDialog.selectedOverview;
-    const hintText = tagSelectorDialog.hintText;
-
+    const { selectedCount, selectedTagsList, hintText } = tagSelectorDialog;
+    
     selectedCount.textContent = selectedTags.size;
     selectedTagsList.innerHTML = '';
 
@@ -8238,234 +8463,12 @@ function updateSelectedTagsOverview() {
         hintText.style.display = 'none';
         selectedCount.style.display = 'inline-block';
         selectedTagsList.style.display = 'flex';
-
+        
+        const fragment = document.createDocumentFragment();
         selectedTags.forEach((weight, tag) => {
-            const tagContainer = document.createElement('div');
-            tagContainer.style.cssText = `display: flex; flex-direction: column; align-items: center; margin: 0 4px; background: transparent; position: relative;`;
-
-            const tagElement = document.createElement('span');
-            tagElement.style.cssText = `background: linear-gradient(135deg, #4a9eff 0%, #1e88e5 100%); color: #fff; padding: 3px 8px; border-radius: 6px; font-size: 14px; display: inline-flex; align-items: center; gap: 4px; cursor: pointer; max-width: 200px; min-width: 90px; justify-content: space-between; margin: 0 0 2px 0; box-shadow: 0 2px 4px rgba(74,158,255,0.4), 0 1px 2px rgba(74,158,255,0.2); border: 1px solid rgba(30,136,229,0.8); transition: all 0.3s ease;`;
-
-            const tagText = document.createElement('span');
-            tagText.style.cssText = `flex: 1; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; min-width: 0;`;
-            tagText.textContent = tag;
-            tagText.title = tag;
-
-            const weightDisplay = document.createElement('span');
-            weightDisplay.style.cssText = `font-size: 10px; background: rgba(255,255,255,0.2); padding: 1px 4px; border-radius: 3px; min-width: 10px; text-align: center; cursor: pointer; user-select: none;`;
-            
-            const updateWeightDisplay = (w) => {
-                if (w === 1.0) {
-                    weightDisplay.style.display = 'none';
-                } else {
-                    weightDisplay.style.display = 'inline-flex';
-                    weightDisplay.textContent = w.toFixed(1);
-                }
-            };
-            updateWeightDisplay(weight);
-            
-            weightDisplay.ondblclick = (e) => {
-                e.stopPropagation();
-                const input = document.createElement('input');
-                input.type = 'text';
-                input.value = selectedTags.get(tag) || 1.0;
-                input.style.cssText = `width: 40px; font-size: 10px; padding: 1px 2px; border: 1px solid #4a9eff; border-radius: 3px; background: #1e293b; color: #fff; text-align: center; outline: none;`;
-                weightDisplay.replaceWith(input);
-                input.focus();
-                input.select();
-                
-                const applyValue = () => {
-                    let newWeight = parseFloat(input.value);
-                    if (!isNaN(newWeight)) {
-                        newWeight = Math.max(0.1, Math.min(2.0, Math.round(newWeight * 10) / 10));
-                        selectedTags.set(tag, newWeight);
-                        updateWeightDisplay(newWeight);
-                        updateSelectedTags();
-                    }
-                    input.replaceWith(weightDisplay);
-                };
-                
-                input.onblur = applyValue;
-                input.onkeydown = (ev) => {
-                    if (ev.key === 'Enter') {
-                        applyValue();
-                    } else if (ev.key === 'Escape') {
-                        input.replaceWith(weightDisplay);
-                    }
-                };
-            };
-
-            const removeBtn = document.createElement('span');
-            removeBtn.textContent = '×';
-            removeBtn.style.cssText = `font-size: 8px; font-family: 'SimHei', '黑体', sans-serif; font-weight: bold; cursor: pointer; opacity: 0.8; background-color: #3b7ddd; color: white; border-radius: 50%; width: 14px; height: 14px; min-width: 14px; min-height: 14px; display: flex; align-items: center; justify-content: center; transition: background-color 0.2s; line-height: 1; text-align: center; padding: 0; margin: 0; transform: translate(0, 0); flex-shrink: 0; box-sizing: border-box;`;
-            
-            removeBtn.onmouseenter = () => {
-                removeBtn.style.backgroundColor = '#ff4444';
-            };
-            
-            removeBtn.onmouseleave = () => {
-                removeBtn.style.backgroundColor = '#3b7ddd';
-            };
-            removeBtn.onclick = (e) => {
-                e.stopPropagation();
-                removeSelectedTag(tag);
-            };
-
-            tagElement.appendChild(tagText);
-            tagElement.appendChild(weightDisplay);
-            tagElement.appendChild(removeBtn);
-
-            const weightControl = document.createElement('div');
-            weightControl.style.cssText = `display: none; position: absolute; top: 0; left: 0; right: 26px; height: 100%; align-items: center; justify-content: center; background: rgba(74,158,255,0.95); border-radius: 6px; z-index: 10; opacity: 0; transition: opacity 0.2s ease;`;
-
-            const weightEditor = document.createElement('div');
-            weightEditor.style.cssText = `display: flex; align-items: center; background: linear-gradient(135deg, #1e3a5f 0%, #0f172a 100%); border: 1px solid #4a9eff; border-radius: 4px; overflow: hidden; height: 15px; box-shadow: 0 2px 8px rgba(74,158,255,0.4);`;
-
-            const decreaseBtn = document.createElement('span');
-            decreaseBtn.textContent = '−';
-            decreaseBtn.style.cssText = `font-size: 11px; font-weight: bold; cursor: pointer; background: #ff6b6b; color: #fff; width: 15px; height: 15px; display: flex; align-items: center; justify-content: center; flex-shrink: 0; transition: all 0.15s; border-right: 1px solid rgba(255,255,255,0.3);`;
-            decreaseBtn.onmouseenter = () => {
-                decreaseBtn.style.background = '#ff5252';
-                decreaseBtn.style.transform = 'scale(1.1)';
-            };
-            decreaseBtn.onmouseleave = () => {
-                decreaseBtn.style.background = '#ff6b6b';
-                decreaseBtn.style.transform = 'scale(1)';
-            };
-
-            const weightValueDisplay = document.createElement('span');
-            weightValueDisplay.style.cssText = `font-size: 11px; font-weight: 700; color: #fff; min-width: 26px; text-align: center; cursor: pointer; user-select: none; height: 100%; display: flex; align-items: center; justify-content: center; text-shadow: 0 0 6px rgba(0,0,0,0.8), 0 0 2px rgba(0,0,0,1);`;
-
-            const updateWeightValueDisplay = (w) => {
-                weightValueDisplay.textContent = w.toFixed(1);
-                weightValueDisplay.style.color = '#fff';
-            };
-            updateWeightValueDisplay(weight);
-
-            weightValueDisplay.onclick = (e) => {
-                e.stopPropagation();
-                const input = document.createElement('input');
-                input.type = 'text';
-                input.value = selectedTags.get(tag) || 1.0;
-                input.style.cssText = `width: 26px; font-size: 11px; padding: 0; border: none; background: transparent; color: #4a9eff; text-align: center; outline: none; font-weight: 500;`;
-                weightValueDisplay.replaceWith(input);
-                input.focus();
-                input.select();
-
-                const applyValue = () => {
-                    let newWeight = parseFloat(input.value);
-                    if (!isNaN(newWeight)) {
-                        newWeight = Math.max(0.1, Math.min(2.0, Math.round(newWeight * 10) / 10));
-                        selectedTags.set(tag, newWeight);
-                        updateWeightDisplay(newWeight);
-                        updateWeightValueDisplay(newWeight);
-                        updateSelectedTags();
-                    }
-                    input.replaceWith(weightValueDisplay);
-                };
-
-                input.onblur = applyValue;
-                input.onkeydown = (ev) => {
-                    if (ev.key === 'Enter') {
-                        applyValue();
-                    } else if (ev.key === 'Escape') {
-                        input.replaceWith(weightValueDisplay);
-                    }
-                };
-            };
-
-            const increaseBtn = document.createElement('span');
-            increaseBtn.textContent = '+';
-            increaseBtn.style.cssText = `font-size: 11px; font-weight: bold; cursor: pointer; background: #51cf66; color: #fff; width: 15px; height: 15px; display: flex; align-items: center; justify-content: center; flex-shrink: 0; transition: all 0.15s; border-left: 1px solid rgba(255,255,255,0.3);`;
-            increaseBtn.onmouseenter = () => {
-                increaseBtn.style.background = '#40c057';
-                increaseBtn.style.transform = 'scale(1.1)';
-            };
-            increaseBtn.onmouseleave = () => {
-                increaseBtn.style.background = '#51cf66';
-                increaseBtn.style.transform = 'scale(1)';
-            };
-
-            decreaseBtn.onclick = (e) => {
-                e.stopPropagation();
-                const currentWeight = selectedTags.get(tag) || 1.0;
-                const newWeight = Math.max(0.1, Math.round((currentWeight - 0.1) * 10) / 10);
-                selectedTags.set(tag, newWeight);
-                updateWeightDisplay(newWeight);
-                updateWeightValueDisplay(newWeight);
-                updateSelectedTags();
-            };
-
-            increaseBtn.onclick = (e) => {
-                e.stopPropagation();
-                const currentWeight = selectedTags.get(tag) || 1.0;
-                const newWeight = Math.min(2.0, Math.round((currentWeight + 0.1) * 10) / 10);
-                selectedTags.set(tag, newWeight);
-                updateWeightDisplay(newWeight);
-                updateWeightValueDisplay(newWeight);
-                updateSelectedTags();
-            };
-
-            weightEditor.appendChild(decreaseBtn);
-            weightEditor.appendChild(weightValueDisplay);
-            weightEditor.appendChild(increaseBtn);
-            weightControl.appendChild(weightEditor);
-
-            tagElement.style.position = 'relative';
-            tagElement.appendChild(weightControl);
-
-            tagElement.addEventListener('mouseenter', (e) => {
-                e.stopPropagation();
-                weightControl.style.display = 'flex';
-                requestAnimationFrame(() => {
-                    weightControl.style.opacity = '1';
-                });
-            });
-
-            tagElement.addEventListener('mouseleave', (e) => {
-                e.stopPropagation();
-                weightControl.style.opacity = '0';
-                setTimeout(() => {
-                    weightControl.style.display = 'none';
-                }, 200);
-            });
-
-            const chineseNameElement = document.createElement('span');
-            chineseNameElement.style.cssText = `font-size: 10px; color: #22c55e; text-align: center; white-space: normal; word-break: break-word; overflow-wrap: anywhere; border: 1px solid #22c55e; width: 100%; max-height: 64px; overflow-y: auto; box-sizing: border-box; border-radius: 4px; padding: 0px 4px;`;
-            
-            let chineseName = tag;
-            if (tagsData) {
-                const findChineseName = (node) => {
-                    if (Array.isArray(node)) {
-                        for (let t of node) {
-                            if (t.value === tag && t.display) {
-                                return t.display;
-                            }
-                        }
-                    } else if (node && typeof node === 'object') {
-                        for (let [key, value] of Object.entries(node)) {
-                            const result = findChineseName(value);
-                            if (result) return result;
-                        }
-                    }
-                    return null;
-                };
-                
-                for (let [category, subCategories] of Object.entries(tagsData)) {
-                    const result = findChineseName(subCategories);
-                    if (result) {
-                        chineseName = result;
-                        break;
-                    }
-                }
-            }
-            
-            chineseNameElement.textContent = chineseName;
-
-            tagContainer.appendChild(tagElement);
-            tagContainer.appendChild(chineseNameElement);
-            selectedTagsList.appendChild(tagContainer);
+            fragment.appendChild(createSelectedTagElement(tag, weight));
         });
+        selectedTagsList.appendChild(fragment);
     } else {
         hintText.style.display = 'inline-block';
         selectedCount.style.display = 'none';
@@ -8592,13 +8595,7 @@ function applySelectedTags() {
     }
 }
 
-function debounce(fn, wait) {
-    let t = null;
-    return function(...args) {
-        clearTimeout(t);
-        t = setTimeout(() => fn.apply(this, args), wait);
-    };
-}
+const debounce = PerformanceUtils.debounce;
 
 function handleSearch(query) {
     if (!tagSelectorDialog) return;
@@ -9371,7 +9368,7 @@ function showSaveToCustomDialog(prompt) {
     };
 
     const contentLabel = DOM.div(`color: #94a3b8; font-size: 13px; margin-bottom: 8px;`);
-    contentLabel.textContent = '标签内容：';
+    contentLabel.textContent = $t('tagContentLabel');
 
     const contentTextarea = document.createElement('textarea');
     contentTextarea.value = prompt;

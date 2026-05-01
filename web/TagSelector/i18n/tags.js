@@ -1,7 +1,5 @@
 export const tagI18n = {
     zh: {
-        "更真实": "更真实",
-        "电影光效": "电影光效"
     },
     en: {
         "更真实": "More realistic",
