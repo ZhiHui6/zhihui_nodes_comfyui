@@ -136,9 +136,17 @@ app.registerExtension({
                 this.initialized = true;
                 this._imageAspectRatioHelp = false;
                 this._imageAspectRatioLocale = getLocale();
+                this._lastModeWasCustom = null;
+                this._controlsRepositioned = false;
                 
                 this.lastCustomSize = { width: 1328, height: 1328 };
                 this.lastPresetSize = null;
+
+                for (const w of this.widgets || []) {
+                    if (w.name === "custom_width" || w.name === "custom_height" || w.name === "aspect_lock") {
+                        w.hidden = true;
+                    }
+                }
 
                 const PRESETS_DATA = {
                     "Qwen image": {
@@ -313,13 +321,34 @@ app.registerExtension({
                     } else {
                         if (categoryWidget && sizeWidget) {
                             const currentCategory = categoryWidget.value;
+                            const currentSizeValue = sizeWidget.value;
                             const swappedCategory = this.getSwappedRatio(currentCategory);
                             
                             if (swappedCategory && swappedCategory !== currentCategory) {
                                 const categories = getCategoriesByMode(modeWidget.value);
                                 if (categories.includes(swappedCategory)) {
                                     categoryWidget.value = swappedCategory;
+                                    
+                                    const sizeMatch = currentSizeValue.match(/(\d+)\s*[x×]\s*(\d+)/i);
+                                    let swappedSizeValue = null;
+                                    
+                                    if (sizeMatch) {
+                                        const width = parseInt(sizeMatch[1]);
+                                        const height = parseInt(sizeMatch[2]);
+                                        const swappedSizeStr = `${height}x${width}`;
+                                        
+                                        const newSizes = getSizesByCategory(modeWidget.value, swappedCategory);
+                                        swappedSizeValue = newSizes.find(s => {
+                                            const m = s.match(/(\d+)\s*[x×]\s*(\d+)/i);
+                                            return m && parseInt(m[1]) === height && parseInt(m[2]) === width;
+                                        });
+                                    }
+                                    
                                     applySizeOptionsByCategory(modeWidget.value, swappedCategory, sizeWidget);
+                                    
+                                    if (swappedSizeValue) {
+                                        sizeWidget.value = swappedSizeValue;
+                                    }
                                 }
                             }
                         }
@@ -354,7 +383,12 @@ app.registerExtension({
                 };
 
                 this.repositionCustomControls = function(isCustom) {
-                    const currentSize = { ...this.size };
+                    if (this._lastModeWasCustom === isCustom && this._controlsRepositioned) {
+                        return;
+                    }
+                    
+                    this._lastModeWasCustom = isCustom;
+                    this._controlsRepositioned = true;
                     
                     const widgets = this.widgets || [];
                     const modeIdx = widgets.findIndex(w => w && w.name === "preset_mode");
@@ -434,7 +468,6 @@ app.registerExtension({
                         }
                     }
                     
-                    this.size = currentSize;
                     app.graph.setDirtyCanvas(true, true);
                 };
 
@@ -483,6 +516,7 @@ app.registerExtension({
                     const sizeWidget = this.widgets.find(w => w.name === "aspect_size");
                     const lockWidget = this.widgets.find(w => w.name === "aspect_lock");
                     const modeWidget = this.widgets.find(w => w.name === "preset_mode");
+                    const batchWidget = this.widgets.find(w => w.name === "batch_size");
                     
                     if (widthWidget && heightWidget && categoryWidget && sizeWidget && lockWidget && modeWidget) {
                         if (widthWidget.value === '' || widthWidget.value === null || widthWidget.value === undefined) {
@@ -490,6 +524,9 @@ app.registerExtension({
                         }
                         if (heightWidget.value === '' || heightWidget.value === null || heightWidget.value === undefined) {
                             heightWidget.value = 1328;
+                        }
+                        if (batchWidget && (batchWidget.value === '' || batchWidget.value === null || batchWidget.value === undefined || batchWidget.value === 1328)) {
+                            batchWidget.value = 1;
                         }
                         
                         this.lastWidth = parseInt(widthWidget.value) || 1328;
@@ -539,6 +576,10 @@ app.registerExtension({
                             if (originalModeCallback) originalModeCallback.apply(modeWidget, arguments);
                             
                             const isCustom = modeWidget.value === "Custom Size";
+                            
+                            if (this._lastModeWasCustom !== isCustom) {
+                                this._controlsRepositioned = false;
+                            }
                             
                             if (!isCustom) {
                                 applyCategoryOptionsByMode(modeWidget.value, categoryWidget);
@@ -603,6 +644,31 @@ app.registerExtension({
                 }, 100);
                 
                 return r;
+            };
+
+            const onConfigure = nodeType.prototype.onConfigure;
+            nodeType.prototype.onConfigure = function() {
+                this._controlsRepositioned = false;
+                this._lastModeWasCustom = null;
+                
+                const modeWidget = this.widgets?.find(w => w.name === "preset_mode");
+                const isCustom = modeWidget?.value === "Custom Size";
+                
+                for (const w of this.widgets || []) {
+                    if (isCustom) {
+                        if (w.name === "aspect_category" || w.name === "aspect_size") {
+                            w.hidden = true;
+                        }
+                    } else {
+                        if (w.name === "custom_width" || w.name === "custom_height" || w.name === "aspect_lock") {
+                            w.hidden = true;
+                        }
+                    }
+                }
+                
+                if (onConfigure) {
+                    onConfigure.apply(this, arguments);
+                }
             };
 
             const iconSize = 24;
