@@ -2,6 +2,7 @@ from .Nodes.PromptPreset.PromptPresetOneChoice import PromptPresetOneChoice
 from .Nodes.PromptPreset.PromptPresetMultipleChoice import PromptPresetMultipleChoice
 from .Nodes.ImageEditingPresets.ImageEditingPresets import ImageEditingPresets
 from .Nodes.SystemPrompt.SystemPromptLoader import SystemPromptLoader
+from .Nodes.SystemPrompt import system_prompt_api
 from .Nodes.ExtraOptions import ExtraOptions
 from .Nodes.MultiLineTextNode import MultiLineTextNode
 from .Nodes.TextCombinerNode import TextCombinerNode

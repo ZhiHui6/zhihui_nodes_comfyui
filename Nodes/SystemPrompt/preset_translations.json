@@ -1,0 +1,206 @@
+{
+    "folders": {
+        "图片反推": {
+            "en": "Image Captioning"
+        },
+        "模型破限": {
+            "en": "Model Jailbreak"
+        },
+        "漫剧套件": {
+            "en": "Drama Suite"
+        },
+        "生图扩写": {
+            "en": "Image Generation"
+        },
+        "生视频扩写": {
+            "en": "Video Generation"
+        },
+        "视频反推": {
+            "en": "Video Analysis"
+        },
+        "音乐": {
+            "en": "Music"
+        }
+    },
+    "files": {
+        "图片反推": {
+            "NSFW Qwen3.5图像视频反推": {
+                "en": "NSFW Qwen3.5 Image/Video Captioning"
+            },
+            "图像反推提示词（JSON 格式）": {
+                "en": "Image Captioning (JSON Format)"
+            },
+            "图像提示词工程师智能体": {
+                "en": "Image Prompt Engineer Agent"
+            },
+            "图片信息提取转JSON 元指令": {
+                "en": "Image Info Extraction to JSON"
+            },
+            "少女写真分析师": {
+                "en": "Portrait Photo Analyst"
+            },
+            "提示词工程师智能体": {
+                "en": "Prompt Engineer Agent"
+            },
+            "神级反推_json格式": {
+                "en": "Ultimate Captioning (JSON)"
+            },
+            "通用中文反推提示词工程": {
+                "en": "General Chinese Captioning"
+            }
+        },
+        "模型破限": {
+            "NSFW破限": {
+                "en": "NSFW Jailbreak"
+            },
+            "NSFW越狱": {
+                "en": "NSFW Bypass"
+            },
+            "Qwen3-VL爆破": {
+                "en": "Qwen3-VL Jailbreak"
+            },
+            "Qwen通用爆破": {
+                "en": "Qwen General Jailbreak"
+            }
+        },
+        "漫剧套件": {
+            "15秒分镜脚本": {
+                "en": "15s Storyboard Script"
+            },
+            "小说改剧本": {
+                "en": "Novel to Script"
+            },
+            "电影级纯净场景设计专家": {
+                "en": "Cinematic Scene Designer"
+            },
+            "电影级角色建模专家": {
+                "en": "Cinematic Character Modeler"
+            }
+        },
+        "生图扩写": {
+            "AI提示词专家_英文": {
+                "en": "AI Prompt Expert (English)"
+            },
+            "AI绘画提示词架构师": {
+                "en": "AI Art Prompt Architect"
+            },
+            "Flux2提示词生成": {
+                "en": "Flux2 Prompt Generator"
+            },
+            "Kontext助理": {
+                "en": "Kontext Assistant"
+            },
+            "NSFW提示词优化师": {
+                "en": "NSFW Prompt Optimizer"
+            },
+            "SD助理": {
+                "en": "SD Assistant"
+            },
+            "[Zhi.AI]商业摄影大师": {
+                "en": "[Zhi.AI] Commercial Photography Master"
+            },
+            "专业AI图像生成提示词工程师": {
+                "en": "Professional AI Image Prompt Engineer"
+            },
+            "丝袜美女生成专家": {
+                "en": "Stockings Beauty Generator"
+            },
+            "全息场景生成": {
+                "en": "Holographic Scene Generator"
+            },
+            "图像提示指令集_英文": {
+                "en": "Image Prompt Instruction Set (English)"
+            },
+            "图像生成专家_三思法": {
+                "en": "Image Generation Expert (Three-Think)"
+            },
+            "幻想艺术家": {
+                "en": "Fantasy Artist"
+            },
+            "文生图提示词专家": {
+                "en": "Text-to-Image Prompt Expert"
+            },
+            "自然语言提示词_英文": {
+                "en": "Natural Language Prompt (English)"
+            }
+        },
+        "生视频扩写": {
+            "I2V_视频提示词撰写专家": {
+                "en": "I2V Video Prompt Writer"
+            },
+            "I2V_视频提示词改写专家": {
+                "en": "I2V Video Prompt Rewriter"
+            },
+            "T2V_电影导演": {
+                "en": "T2V Film Director"
+            },
+            "万相提示词优化": {
+                "en": "Wan Prompt Optimizer"
+            },
+            "万相提示词工程": {
+                "en": "Wan Prompt Engineering"
+            },
+            "万相美女专家": {
+                "en": "Wan Beauty Expert"
+            },
+            "图生视频_写实": {
+                "en": "I2V Realistic"
+            },
+            "图生视频_动漫": {
+                "en": "I2V Anime"
+            },
+            "图生视频_标准": {
+                "en": "I2V Standard"
+            },
+            "图生视频_电影": {
+                "en": "I2V Cinematic"
+            },
+            "文生视频_写实": {
+                "en": "T2V Realistic"
+            },
+            "文生视频_动漫": {
+                "en": "T2V Anime"
+            },
+            "文生视频_标准": {
+                "en": "T2V Standard"
+            },
+            "文生视频_电影": {
+                "en": "T2V Cinematic"
+            },
+            "智能分镜指令": {
+                "en": "Smart Storyboard"
+            }
+        },
+        "视频反推": {
+            "专业视频解构师": {
+                "en": "Professional Video Analyzer"
+            },
+            "影视拉片专家": {
+                "en": "Film Analysis Expert"
+            },
+            "摄影文生图分析师": {
+                "en": "Photography Analyst"
+            },
+            "电影叙事解构师": {
+                "en": "Film Narrative Analyzer"
+            },
+            "电影叙事解构师_结构化": {
+                "en": "Film Narrative Analyzer (Structured)"
+            },
+            "视频分析与复刻": {
+                "en": "Video Analysis & Replication"
+            },
+            "视频分析专家系统提示词": {
+                "en": "Video Analysis Expert System"
+            }
+        },
+        "音乐": {
+            "ACE-Step提示词工程师": {
+                "en": "ACE-Step Prompt Engineer"
+            },
+            "音乐分析": {
+                "en": "Music Analysis"
+            }
+        }
+    }
+}
