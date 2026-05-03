@@ -1,14 +1,15 @@
 # 更新日志 / Changelog
-## 1.0.36 2026-5-2
+## 1.0.36 2026-5-3
 - 图像比例节点(ImageAspectRatio)：修复自定义尺寸控件显示问题并优化尺寸切换逻辑
 - 系统提示词节点(SystemPrompt)：
   - 新增"漫剧套件"，包含4个模板
-  - 优化模板选择操作
+  - 重构选项选择界面，支持内容预览
 
   <br>
-- ImageAspectRatio node: Fixed custom size widget display issue and optimized size switch logic
-- SystemPrompt node: Added "Manga Suite" template pack, containing 4 templates.
-
+- ImageAspectRatio node: Fixed custom size control display issues and optimized size switching logic
+- SystemPrompt node:
+  - Added "Comic Drama Suite" with 4 templates
+  - Refactored option selection interface with content preview support
 
 ## 1.0.35 2026-5-1
 - 标签选择器 节点(TagSelector)：优化代码结构，改进渲染性能
