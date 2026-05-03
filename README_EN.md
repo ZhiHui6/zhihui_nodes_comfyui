@@ -1092,26 +1092,27 @@ Visual group switch management tool that automatically detects all groups in the
 
 ## 🚀 Installation Methods
 
-### 📦 Installation via ComfyUI Manager (Recommended)
+### 📦 Method 1: Install via ComfyUI Manager (Recommended)
 
 1. Install [ComfyUI Manager](https://github.com/ltdrdata/ComfyUI-Manager)
-
 2. Select "Install Custom Nodes" in the Manager menu
-3. Search for `zhihui_nodes_comfyui` (not yet supported), or install via Git URL:
-   ```
-   https://github.com/ZhiHui6/zhihui_nodes_comfyui.git
-   ```
-4. Click the "Install" button and wait for the installation to complete
-5. Restart ComfyUI, and you can find the newly added nodes in the node menu
+3. Search for `zhihui_nodes_comfyui` and click the "Install" button
+4. Restart ComfyUI after installation completes
 
-### 🔧 Manual Installation
+### 🔧 Method 2: Install via Git
 
-1. Download the ZIP file of this repository or clone via Git:
-   ```bash
-   git clone https://github.com/ZhiHui6/zhihui_nodes_comfyui.git
-   ```
-   
-2. Unzip or copy the entire `zhihui_nodes_comfyui` folder to the `custom_nodes` directory of ComfyUI
+Navigate to the `custom_nodes` directory of ComfyUI and run:
+
+```bash
+git clone https://github.com/ZhiHui6/zhihui_nodes_comfyui.git
+```
+
+Restart ComfyUI to use the nodes.
+
+### 📁 Method 3: Manual Installation
+
+1. Download the ZIP file of this repository and extract it
+2. Copy the entire `zhihui_nodes_comfyui` folder to the `custom_nodes` directory of ComfyUI
 3. Restart ComfyUI
 
 ---
