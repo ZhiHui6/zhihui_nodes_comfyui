@@ -1,10 +1,23 @@
 # 更新日志 / Changelog
+
+## 1.0.37 2026-5-10
+- 标签选择器节点(TagSelector)：
+  - 修复标签选择界面中出现的Bug
+  - 自定义标签界面新增"标签分类"功能，支持根据分类显示标签和管理
+  - 节点的文本输入框添加3个快捷功能按钮："清空\恢复内容"、"插入自定义标签"、"插入灵感套装内容"
+  - 设置界面布局全新调整，优化操作体验
+  <br>
+- TagSelector node:
+  - Fixed bugs in the tag selection interface
+  - Added "Tag Category" feature to custom tag interface, supporting tag display and management by category
+  - Added 3 shortcut function buttons to the node's text input box: "Clear\Restore Content", "Insert Custom Tag", "Insert Inspiration Set Content"
+  - Completely redesigned settings interface layout for optimized user experience
+
 ## 1.0.36 2026-5-3
 - 图像比例节点(ImageAspectRatio)：修复自定义尺寸控件显示问题并优化尺寸切换逻辑
 - 系统提示词节点(SystemPrompt)：
   - 新增"漫剧套件"，包含4个模板
   - 重构选项选择界面，支持内容预览
-
   <br>
 - ImageAspectRatio node: Fixed custom size control display issues and optimized size switching logic
 - SystemPrompt node:
@@ -12,14 +25,14 @@
   - Refactored option selection interface with content preview support
 
 ## 1.0.35 2026-5-1
-- 标签选择器 节点(TagSelector)：优化代码结构，改进渲染性能
+- 标签选择器节点(TagSelector)：优化代码结构，改进渲染性能
   <br>
 - TagSelector node: Optimized code structure, improved rendering performance
 
 ## 1.0.35 2026-4-30
-- 标签选择器 节点(TagSelector)：修复题材锁定问题并优化角色提取器功能
-- 显示任何 节点(Show Any)：添加Markdown渲染支持并优化UI显示
-- 组开关管理器 节点(Group Switch Manager)：优化状态显示。开关关闭时，组名称颜色会变暗。
+- 标签选择器节点(TagSelector)：修复题材锁定问题并优化角色提取器功能
+- 显示任何节点(Show Any)：添加Markdown渲染支持并优化UI显示
+- 组开关管理器节点(Group Switch Manager)：优化状态显示。开关关闭时，组名称颜色会变暗。
   <br>
 - TagSelector node: Fixed genre locking issue and optimized character extractor functionality
 - Show Any node: Added Markdown rendering support and optimized UI display

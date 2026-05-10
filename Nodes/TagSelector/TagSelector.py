@@ -1586,6 +1586,12 @@ async def save_user_tag(request):
         if not delete_image:
             user_tags[name]["preview"] = f"/zhihui/user_tags/preview/{name}"
 
+        category = data.get("category", "")
+        if category:
+            user_tags[name]["category"] = category
+        elif "category" in user_tags[name]:
+            del user_tags[name]["category"]
+
         if TagSelector.save_user_tags(user_tags):
             if preview_image:
                 TagSelector.save_preview_image(name, preview_image)
@@ -1674,6 +1680,83 @@ async def delete_all_user_tags_and_images(request):
         return web.json_response({"error": str(e)}, status=500)
 
 
+@PromptServer.instance.routes.get("/zhihui/user_tag_categories")
+async def get_user_tag_categories(request):
+    try:
+        categories_path = os.path.join(os.path.dirname(__file__), "user_tag_categories.json")
+        try:
+            with open(categories_path, "r", encoding="utf-8") as f:
+                categories = json.load(f)
+        except (FileNotFoundError, json.JSONDecodeError):
+            categories = []
+        return web.json_response(categories)
+    except Exception as e:
+        return web.json_response({"error": str(e)}, status=500)
+
+
+@PromptServer.instance.routes.post("/zhihui/user_tag_categories")
+async def save_user_tag_categories(request):
+    try:
+        data = await request.json()
+        categories = data.get("categories", [])
+        categories_path = os.path.join(os.path.dirname(__file__), "user_tag_categories.json")
+        os.makedirs(os.path.dirname(categories_path), exist_ok=True)
+        with open(categories_path, "w", encoding="utf-8") as f:
+            json.dump(categories, f, ensure_ascii=False, indent=2)
+        return web.json_response({"success": True, "message": "分类保存成功"})
+    except Exception as e:
+        return web.json_response({"error": str(e)}, status=500)
+
+
+@PromptServer.instance.routes.delete("/zhihui/user_tag_categories")
+async def delete_user_tag_category(request):
+    try:
+        data = await request.json()
+        category_name = data.get("name", "").strip()
+        if not category_name:
+            return web.json_response({"error": "分类名称不能为空"}, status=400)
+
+        categories_path = os.path.join(os.path.dirname(__file__), "user_tag_categories.json")
+        try:
+            with open(categories_path, "r", encoding="utf-8") as f:
+                categories = json.load(f)
+        except (FileNotFoundError, json.JSONDecodeError):
+            categories = []
+
+        if category_name in categories:
+            categories.remove(category_name)
+            with open(categories_path, "w", encoding="utf-8") as f:
+                json.dump(categories, f, ensure_ascii=False, indent=2)
+
+        user_tags = TagSelector.get_user_tags()
+        for name, tag_data in user_tags.items():
+            if isinstance(tag_data, dict) and tag_data.get("category") == category_name:
+                del tag_data["category"]
+        TagSelector.save_user_tags(user_tags)
+
+        return web.json_response({"success": True, "message": "分类删除成功"})
+    except Exception as e:
+        return web.json_response({"error": str(e)}, status=500)
+
+
+@PromptServer.instance.routes.delete("/zhihui/user_tag_categories/all")
+async def delete_all_user_tag_categories(request):
+    try:
+        categories_path = os.path.join(os.path.dirname(__file__), "user_tag_categories.json")
+        with open(categories_path, "w", encoding="utf-8") as f:
+            json.dump([], f, ensure_ascii=False, indent=2)
+
+        user_tags = TagSelector.get_user_tags()
+        for name, tag_data in user_tags.items():
+            if isinstance(tag_data, dict) and "category" in tag_data:
+                del tag_data["category"]
+        TagSelector.save_user_tags(user_tags)
+
+        return web.json_response({"success": True, "message": "所有分类删除成功"})
+    except Exception as e:
+        return web.json_response({"error": str(e)}, status=500)
+
+
 @PromptServer.instance.routes.get("/zhihui/user_tags/backup")
 async def backup_user_tags(request):
     try:
@@ -1681,6 +1764,7 @@ async def backup_user_tags(request):
         import io
 
         user_tags_path = os.path.join(os.path.dirname(__file__), "user_tags.json")
+        user_categories_path = os.path.join(os.path.dirname(__file__), "user_tag_categories.json")
         user_images_dir = os.path.join(os.path.dirname(__file__), "user_images")
 
         zip_buffer = io.BytesIO()
@@ -1690,6 +1774,9 @@ async def backup_user_tags(request):
         ) as zip_file:
             if os.path.exists(user_tags_path):
                 zip_file.write(user_tags_path, arcname="user_tags.json")
+
+            if os.path.exists(user_categories_path):
+                zip_file.write(user_categories_path, arcname="user_tag_categories.json")
 
             if os.path.exists(user_images_dir):
                 for root, dirs, files in os.walk(user_images_dir):
@@ -1731,12 +1818,19 @@ async def restore_user_tags(request):
 
         with zipfile.ZipFile(zip_buffer, "r") as zip_file:
             user_tags_path = os.path.join(os.path.dirname(__file__), "user_tags.json")
+            user_categories_path = os.path.join(os.path.dirname(__file__), "user_tag_categories.json")
             user_images_dir = os.path.join(os.path.dirname(__file__), "user_images")
 
             if "user_tags.json" in zip_file.namelist():
                 with zip_file.open("user_tags.json") as source_file:
                     content = source_file.read()
                     with open(user_tags_path, "wb") as dest_file:
+                        dest_file.write(content)
+
+            if "user_tag_categories.json" in zip_file.namelist():
+                with zip_file.open("user_tag_categories.json") as source_file:
+                    content = source_file.read()
+                    with open(user_categories_path, "wb") as dest_file:
                         dest_file.write(content)
 
             for file_info in zip_file.infolist():

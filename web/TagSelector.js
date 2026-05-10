@@ -598,6 +598,152 @@ app.registerExtension({
             }
             
             setTimeout(updateExpandWidgets, 100);
+            
+            setTimeout(() => {
+                const tagEditWidget = node.widgets?.find(w => w.name === "tag_edit");
+                if (!tagEditWidget || !tagEditWidget.inputEl) return;
+                
+                const inputEl = tagEditWidget.inputEl;
+                const parentEl = inputEl.parentElement;
+                if (!parentEl) return;
+                
+                parentEl.style.position = "relative";
+                
+                const insertBtn = document.createElement("button");
+                insertBtn.type = "button";
+                insertBtn.className = "tag-selector-insert-btn";
+                insertBtn.innerHTML = `<svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="display:block;"><path d="M20.59 13.41l-7.17 7.17a2 2 0 0 1-2.83 0L2 12V2h10l8.59 8.59a2 2 0 0 1 0 2.82z"></path><line x1="7" y1="7" x2="7.01" y2="7"></line></svg>`;
+                insertBtn.style.cssText = `position: absolute; right: 3px; top: 3px; width: 18px; height: 18px; padding: 0; background: rgba(59,130,246,0.35); border: none; border-radius: 3px; cursor: pointer; display: none; align-items: center; justify-content: center; z-index: 10; transition: all 0.2s ease; opacity: 0; color: rgba(59,130,246,0.9);`;
+                insertBtn.dataset.enabled = String(loadNodeSettings().showInsertBtn !== false);
+                
+                insertBtn.onmouseenter = () => {
+                    insertBtn.style.background = "rgba(59,130,246,0.6)";
+                    insertBtn.style.color = "rgba(59,130,246,1)";
+                    insertBtn.style.transform = "scale(1.1)";
+                    showInsertTagTooltip(insertBtn);
+                };
+                insertBtn.onmouseleave = () => {
+                    insertBtn.style.background = "rgba(59,130,246,0.35)";
+                    insertBtn.style.color = "rgba(59,130,246,0.9)";
+                    insertBtn.style.transform = "scale(1)";
+                    hideInsertTagTooltip();
+                };
+                insertBtn.onclick = (e) => {
+                    e.preventDefault();
+                    e.stopPropagation();
+                    showCustomTagInsertSelector(insertBtn, tagEditWidget, node);
+                };
+                
+                parentEl.appendChild(insertBtn);
+                
+                const inspirationBtn = document.createElement("button");
+                inspirationBtn.type = "button";
+                inspirationBtn.className = "tag-selector-inspiration-btn";
+                inspirationBtn.innerHTML = `<svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="display:block;"><path d="M12 6v6m0 0v6m0-6h6m-6 0H6"></path><circle cx="12" cy="12" r="3"></circle></svg>`;
+                inspirationBtn.style.cssText = `position: absolute; right: 24px; top: 3px; width: 18px; height: 18px; padding: 0; background: rgba(59,130,246,0.35); border: none; border-radius: 3px; cursor: pointer; display: none; align-items: center; justify-content: center; z-index: 10; transition: all 0.2s ease; opacity: 0; color: rgba(59,130,246,0.9);`;
+                inspirationBtn.dataset.enabled = String(loadNodeSettings().showInspirationBtn !== false);
+                
+                inspirationBtn.onmouseenter = () => {
+                    inspirationBtn.style.background = "rgba(59,130,246,0.6)";
+                    inspirationBtn.style.color = "rgba(59,130,246,1)";
+                    inspirationBtn.style.transform = "scale(1.1)";
+                    showInspirationTooltip(inspirationBtn);
+                };
+                inspirationBtn.onmouseleave = () => {
+                    inspirationBtn.style.background = "rgba(59,130,246,0.35)";
+                    inspirationBtn.style.color = "rgba(59,130,246,0.9)";
+                    inspirationBtn.style.transform = "scale(1)";
+                    hideInspirationTooltip();
+                };
+                inspirationBtn.onclick = (e) => {
+                    e.preventDefault();
+                    e.stopPropagation();
+                    showInspirationSelector(inspirationBtn, tagEditWidget);
+                };
+                
+                parentEl.appendChild(inspirationBtn);
+                
+                const clearBtn = document.createElement("button");
+                clearBtn.type = "button";
+                clearBtn.className = "tag-selector-clear-btn";
+                clearBtn.innerHTML = `<svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="display:block;"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>`;
+                clearBtn.style.cssText = `position: absolute; right: 45px; top: 3px; width: 18px; height: 18px; padding: 0; background: rgba(239,68,68,0.35); border: none; border-radius: 3px; cursor: pointer; display: none; align-items: center; justify-content: center; z-index: 10; transition: all 0.2s ease; opacity: 0; color: rgba(239,68,68,0.9);`;
+                clearBtn.dataset.enabled = String(loadNodeSettings().showClearBtn !== false);
+                
+                node._lastClearedTagEdit = undefined;
+                
+                clearBtn.onmouseenter = () => {
+                    if (node._lastClearedTagEdit !== undefined) {
+                        clearBtn.style.background = "rgba(34,197,94,0.6)";
+                        clearBtn.style.color = "rgba(34,197,94,1)";
+                    } else {
+                        clearBtn.style.background = "rgba(239,68,68,0.6)";
+                        clearBtn.style.color = "rgba(239,68,68,1)";
+                    }
+                    clearBtn.style.transform = "scale(1.1)";
+                    showClearInputTooltip(clearBtn, node._lastClearedTagEdit !== undefined ? 'restoreInputBtnTooltip' : 'clearInputBtnTooltip');
+                };
+                clearBtn.onmouseleave = () => {
+                    if (node._lastClearedTagEdit !== undefined) {
+                        clearBtn.style.background = "rgba(34,197,94,0.35)";
+                        clearBtn.style.color = "rgba(34,197,94,0.9)";
+                    } else {
+                        clearBtn.style.background = "rgba(239,68,68,0.35)";
+                        clearBtn.style.color = "rgba(239,68,68,0.9)";
+                    }
+                    clearBtn.style.transform = "scale(1)";
+                    hideClearInputTooltip();
+                };
+                clearBtn.onclick = (e) => {
+                    e.preventDefault();
+                    e.stopPropagation();
+                    if (node._lastClearedTagEdit !== undefined) {
+                        inputEl.value = node._lastClearedTagEdit;
+                        tagEditWidget.value = node._lastClearedTagEdit;
+                        node._lastClearedTagEdit = undefined;
+                        clearBtn.innerHTML = `<svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="display:block;"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>`;
+                        clearBtn.style.background = "rgba(239,68,68,0.35)";
+                        clearBtn.style.color = "rgba(239,68,68,0.9)";
+                        showToast($t('inputRestored'), 'success');
+                    } else {
+                        node._lastClearedTagEdit = inputEl.value;
+                        inputEl.value = "";
+                        tagEditWidget.value = "";
+                        clearBtn.innerHTML = `<svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="display:block;"><polyline points="1 4 1 10 7 10"></polyline><polyline points="23 4 23 10 17 10"></polyline><path d="M20.49 15a9 9 0 1 1-2.12-9.36L23 10"></path></svg>`;
+                        clearBtn.style.background = "rgba(34,197,94,0.35)";
+                        clearBtn.style.color = "rgba(34,197,94,0.9)";
+                        showToast($t('inputCleared'), 'success');
+                    }
+                    inputEl.dispatchEvent(new Event('input', { bubbles: true }));
+                };
+                
+                parentEl.appendChild(clearBtn);
+                
+                inputEl.addEventListener("focus", () => {
+                    if (insertBtn.dataset.enabled === 'true') {
+                        insertBtn.style.display = "flex";
+                        setTimeout(() => { insertBtn.style.opacity = "1"; }, 10);
+                    }
+                    if (inspirationBtn.dataset.enabled === 'true') {
+                        inspirationBtn.style.display = "flex";
+                        setTimeout(() => { inspirationBtn.style.opacity = "1"; }, 10);
+                    }
+                    if (clearBtn.dataset.enabled === 'true') {
+                        clearBtn.style.display = "flex";
+                        setTimeout(() => { clearBtn.style.opacity = "1"; }, 10);
+                    }
+                });
+                inputEl.addEventListener("blur", () => {
+                    insertBtn.style.opacity = "0";
+                    inspirationBtn.style.opacity = "0";
+                    clearBtn.style.opacity = "0";
+                    setTimeout(() => {
+                        insertBtn.style.display = "none";
+                        inspirationBtn.style.display = "none";
+                        clearBtn.style.display = "none";
+                    }, 200);
+                });
+            }, 100);
         }
     }
 });
@@ -605,6 +751,7 @@ app.registerExtension({
 let tagSelectorDialog = null;
 let currentNode = null;
 let tagsData = null;
+let customTagCategories = [];
 let currentPreviewImage = null;
 let currentPreviewImageName = null;
 
@@ -2222,6 +2369,7 @@ async function openTagSelector(node) {
 
     if (!tagsData) {
         await loadTagsData();
+        await loadCustomTagCategories();
     }
 
     if (!tagSelectorDialog) {
@@ -2271,6 +2419,38 @@ async function loadTagsData() {
     }
 }
 
+async function loadCustomTagCategories() {
+    try {
+        const response = await fetch('/zhihui/user_tag_categories');
+        if (response.ok) {
+            customTagCategories = await response.json();
+        } else {
+            customTagCategories = [];
+        }
+    } catch (error) {
+        console.error('Error loading custom tag categories:', error);
+        customTagCategories = [];
+    }
+}
+
+async function saveCustomTagCategories(categories) {
+    try {
+        const response = await fetch('/zhihui/user_tag_categories', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ categories })
+        });
+        if (response.ok) {
+            customTagCategories = categories;
+            return true;
+        }
+        return false;
+    } catch (error) {
+        console.error('Error saving custom tag categories:', error);
+        return false;
+    }
+}
+
 function convertTagsFormat(rawData) {
     const convertNode = (node, isCustomCategory = false) => {
         if (node && typeof node === 'object') {
@@ -2284,6 +2464,9 @@ function convertTagsFormat(rawData) {
                         display: tagName,
                         value: typeof tagData === 'string' ? tagData : (tagData.content || tagName)
                     };
+                    if (typeof tagData === 'object' && tagData.category) {
+                        result[tagName].category = tagData.category;
+                    }
                 }
                 return { '我的标签': Object.values(result) };
             }
@@ -2293,10 +2476,16 @@ function convertTagsFormat(rawData) {
             if (allString) {
                 if (isCustomCategory) {
                     
-                    return Object.entries(node).map(([tagName, tagData]) => ({
-                        display: tagName,
-                        value: typeof tagData === 'string' ? tagData : (tagData.content || tagName)
-                    }));
+                    return Object.entries(node).map(([tagName, tagData]) => {
+                        const tagObj = {
+                            display: tagName,
+                            value: typeof tagData === 'string' ? tagData : (tagData.content || tagName)
+                        };
+                        if (typeof tagData === 'object' && tagData.category) {
+                            tagObj.category = tagData.category;
+                        }
+                        return tagObj;
+                    });
                 }
                 return Object.entries(node).map(([chineseName, englishValue]) => ({ display: chineseName, value: englishValue }));
             }
@@ -2788,6 +2977,11 @@ function createTagSelectorDialog() {
 
             enableMainUIInteraction();
         }
+
+        const settingsPanel = document.getElementById('settings-dropdown-panel');
+        if (settingsPanel) {
+            settingsPanel.remove();
+        }
     };
     
     closeBtn.onclick = closeDialog;
@@ -2974,11 +3168,11 @@ function createTagSelectorDialog() {
 
     const rightPanel = DOM.div(`flex: 1; display: flex; flex-direction: column;`);
 
-    const subCategoryTabs = DOM.div(`background:linear-gradient(135deg,#334155 0%,#1e293b 100%); display: flex; flex-wrap: wrap; overflow-y: auto; max-height: 140px; min-height: 30px; backdrop-filter: blur(10px); border: none;`);
+    const subCategoryTabs = DOM.div(`background:linear-gradient(135deg,#334155 0%,#1e293b 100%); display: flex; flex-wrap: wrap; overflow: visible; min-height: 45px; backdrop-filter: blur(10px); border: none;`);
 
-    const subSubCategoryTabs = DOM.div(`background:linear-gradient(135deg,#475569 0%,#334155 100%); display: none; flex-wrap: wrap; overflow-y: auto; max-height: 180px; min-height: 0px; backdrop-filter: blur(10px); margin-top: 2px; border: none;`);
+    const subSubCategoryTabs = DOM.div(`background:linear-gradient(135deg,#475569 0%,#334155 100%); display: none; flex-wrap: wrap; overflow: visible; min-height: 40px; backdrop-filter: blur(10px); margin-top: 2px; border: none;`);
 
-    const subSubSubCategoryTabs = DOM.div(`background: linear-gradient(135deg, #64748b 0%, #475569 100%); display: none; flex-wrap: wrap; overflow-y: auto; max-height: 180px; min-height: 0px; backdrop-filter: blur(10px); margin-top: 2px; border: none;`);
+    const subSubSubCategoryTabs = DOM.div(`background: linear-gradient(135deg, #64748b 0%, #475569 100%); display: none; flex-wrap: wrap; overflow: visible; min-height: 35px; backdrop-filter: blur(10px); margin-top: 2px; border: none;`);
 
     const tagContent = DOM.div(`flex: 1; padding: 10px 10px; overflow-y: auto; background:linear-gradient(135deg,#1e293b 0%,#0f172a 100%); backdrop-filter: blur(10px);`);
 
@@ -3532,6 +3726,7 @@ function createTagSelectorDialog() {
     tagSelectorDialog.characterFetchBtn = characterFetchBtn;
     tagSelectorDialog.characterAddBtn = characterAddBtn;
     tagSelectorDialog.categoryList = categoryList;
+    tagSelectorDialog.rightPanel = rightPanel;
     tagSelectorDialog.subCategoryTabs = subCategoryTabs;
     tagSelectorDialog.subSubCategoryTabs = subSubCategoryTabs;
     tagSelectorDialog.subSubSubCategoryTabs = subSubSubCategoryTabs;
@@ -4098,6 +4293,672 @@ function showAdultCloseConfirmDialog(onConfirm) {
     document.body.appendChild(overlay);
 }
 
+function loadNodeSettings() {
+    try {
+        const saved = localStorage.getItem('zhihui_tag_selector_node_settings');
+        if (saved) {
+            const settings = JSON.parse(saved);
+            return {
+                showInsertBtn: settings.showInsertBtn !== false && settings.showInputBtns !== false,
+                showClearBtn: settings.showClearBtn !== false && settings.showInputBtns !== false,
+                showInspirationBtn: settings.showInspirationBtn !== false
+            };
+        }
+    } catch (e) {}
+    return { showInsertBtn: true, showClearBtn: true, showInspirationBtn: true };
+}
+
+function saveNodeSettings(settings) {
+    try {
+        localStorage.setItem('zhihui_tag_selector_node_settings', JSON.stringify(settings));
+    } catch (e) {}
+}
+
+function createSettingsToggle(initialEnabled, onChange) {
+    const toggle = DOM.div(`display: inline-flex; align-items: center; justify-content: center; cursor: pointer; padding: 4px 10px; border-radius: 5px; transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1); flex-shrink: 0;`);
+    let enabled = initialEnabled;
+
+    const updateStyle = () => {
+        toggle.style.background = enabled ? 'rgba(59,130,246,0.85)' : 'rgba(100,116,139,0.3)';
+        toggle.style.border = `1px solid ${enabled ? 'rgba(59,130,246,0.9)' : 'rgba(100,116,139,0.5)'}`;
+        toggleText.textContent = enabled ? $t('adultContentEnabled') : $t('adultContentDisabled');
+        toggleText.style.color = enabled ? '#ffffff' : '#94a3b8';
+    };
+
+    const toggleText = document.createElement('span');
+    toggleText.style.cssText = `font-size: 11px; font-weight: 500; transition: all 0.3s ease; white-space: nowrap;`;
+    toggle.appendChild(toggleText);
+    updateStyle();
+
+    toggle.onclick = () => {
+        enabled = !enabled;
+        updateStyle();
+        onChange(enabled);
+    };
+
+    toggle.onmouseenter = () => {
+        toggle.style.transform = 'scale(1.05)';
+        toggle.style.background = enabled ? 'rgba(37,99,235,0.95)' : 'rgba(100,116,139,0.45)';
+    };
+    toggle.onmouseleave = () => {
+        toggle.style.transform = 'scale(1)';
+        toggle.style.background = enabled ? 'rgba(59,130,246,0.85)' : 'rgba(100,116,139,0.3)';
+    };
+
+    return toggle;
+}
+
+function applyInputBtnVisibility() {
+    const settings = loadNodeSettings();
+    document.querySelectorAll('.tag-selector-insert-btn').forEach(btn => {
+        btn.dataset.enabled = String(settings.showInsertBtn !== false);
+    });
+    document.querySelectorAll('.tag-selector-inspiration-btn').forEach(btn => {
+        btn.dataset.enabled = String(settings.showInspirationBtn !== false);
+    });
+    document.querySelectorAll('.tag-selector-clear-btn').forEach(btn => {
+        btn.dataset.enabled = String(settings.showClearBtn !== false);
+    });
+}
+
+let insertTagTooltipEl = null;
+
+function showInsertTagTooltip(btnEl) {
+    hideInsertTagTooltip();
+    insertTagTooltipEl = document.createElement("div");
+    insertTagTooltipEl.style.cssText = `position: fixed; background: rgba(30,41,59,0.95); color: #e2e8f0; padding: 6px 10px; border-radius: 4px; font-size: 13px; z-index: 10004; box-shadow: 0 4px 12px rgba(0,0,0,0.3); pointer-events: none; white-space: nowrap; border: 1px solid rgba(255,255,255,0.1);`;
+    insertTagTooltipEl.textContent = $t('insertTagBtnTooltip');
+    document.body.appendChild(insertTagTooltipEl);
+    const btnRect = btnEl.getBoundingClientRect();
+    const tooltipRect = insertTagTooltipEl.getBoundingClientRect();
+    let left = btnRect.left + (btnRect.width / 2) - (tooltipRect.width / 2);
+    let top = btnRect.top - tooltipRect.height - 6;
+    if (left < 5) left = 5;
+    if (left + tooltipRect.width > window.innerWidth - 5) left = window.innerWidth - tooltipRect.width - 5;
+    if (top < 5) top = btnRect.bottom + 6;
+    insertTagTooltipEl.style.left = left + "px";
+    insertTagTooltipEl.style.top = top + "px";
+}
+
+function hideInsertTagTooltip() {
+    if (insertTagTooltipEl) {
+        insertTagTooltipEl.remove();
+        insertTagTooltipEl = null;
+    }
+}
+
+let clearInputTooltipEl = null;
+
+function showClearInputTooltip(btnEl, key) {
+    hideClearInputTooltip();
+    clearInputTooltipEl = document.createElement("div");
+    clearInputTooltipEl.style.cssText = `position: fixed; background: rgba(30,41,59,0.95); color: #e2e8f0; padding: 6px 10px; border-radius: 4px; font-size: 13px; z-index: 10004; box-shadow: 0 4px 12px rgba(0,0,0,0.3); pointer-events: none; white-space: nowrap; border: 1px solid rgba(255,255,255,0.1);`;
+    clearInputTooltipEl.textContent = $t(key);
+    document.body.appendChild(clearInputTooltipEl);
+    const btnRect = btnEl.getBoundingClientRect();
+    const tooltipRect = clearInputTooltipEl.getBoundingClientRect();
+    let left = btnRect.left + (btnRect.width / 2) - (tooltipRect.width / 2);
+    let top = btnRect.top - tooltipRect.height - 6;
+    if (left < 5) left = 5;
+    if (left + tooltipRect.width > window.innerWidth - 5) left = window.innerWidth - tooltipRect.width - 5;
+    if (top < 5) top = btnRect.bottom + 6;
+    clearInputTooltipEl.style.left = left + "px";
+    clearInputTooltipEl.style.top = top + "px";
+}
+
+function hideClearInputTooltip() {
+    if (clearInputTooltipEl) {
+        clearInputTooltipEl.remove();
+        clearInputTooltipEl = null;
+    }
+}
+
+let inspirationTooltipEl = null;
+
+function showInspirationTooltip(btnEl) {
+    hideInspirationTooltip();
+    inspirationTooltipEl = document.createElement("div");
+    inspirationTooltipEl.style.cssText = `position: fixed; background: rgba(30,41,59,0.95); color: #e2e8f0; padding: 6px 10px; border-radius: 4px; font-size: 13px; z-index: 10004; box-shadow: 0 4px 12px rgba(0,0,0,0.3); pointer-events: none; white-space: nowrap; border: 1px solid rgba(255,255,255,0.1);`;
+    inspirationTooltipEl.textContent = $t('inspirationBtnTooltip');
+    document.body.appendChild(inspirationTooltipEl);
+    const btnRect = btnEl.getBoundingClientRect();
+    const tooltipRect = inspirationTooltipEl.getBoundingClientRect();
+    let left = btnRect.left + (btnRect.width / 2) - (tooltipRect.width / 2);
+    let top = btnRect.top - tooltipRect.height - 6;
+    if (left < 5) left = 5;
+    if (left + tooltipRect.width > window.innerWidth - 5) left = window.innerWidth - tooltipRect.width - 5;
+    if (top < 5) top = btnRect.bottom + 6;
+    inspirationTooltipEl.style.left = left + "px";
+    inspirationTooltipEl.style.top = top + "px";
+}
+
+function hideInspirationTooltip() {
+    if (inspirationTooltipEl) {
+        inspirationTooltipEl.remove();
+        inspirationTooltipEl = null;
+    }
+}
+
+async function showInspirationSelector(anchorEl, tagEditWidget) {
+    const existing = document.getElementById('inspiration-selector-panel');
+    if (existing) {
+        existing.remove();
+        return;
+    }
+
+    if (!tagsData) {
+        await loadTagsData();
+    }
+
+    if (!tagsData) {
+        showToast($t('dataLoadFailed') || '数据加载失败', 'error');
+        return;
+    }
+
+    const inspirationCategories = tagsData['灵感套装'] || {};
+    const categoryNames = Object.keys(inspirationCategories);
+    
+    const inspirationSets = [];
+    categoryNames.forEach(cat => {
+        const subCategoryData = inspirationCategories[cat];
+        if (subCategoryData) {
+            Object.values(subCategoryData).forEach(tag => {
+                inspirationSets.push({
+                    name: tag.display || tag.name || tag.value,
+                    value: tag.value,
+                    category: cat
+                });
+            });
+        }
+    });
+
+    const panel = document.createElement('div');
+    panel.id = 'inspiration-selector-panel';
+    panel.style.cssText = `position: fixed; background: linear-gradient(135deg, #1e293b 0%, #0f172a 100%); border: 1px solid rgba(59,130,246,0.4); border-radius: 8px; padding: 8px; width: 360px; height: 360px; color: #e2e8f0; box-shadow: 0 12px 40px rgba(0,0,0,0.5); z-index: 10001; display: flex; flex-direction: column; overflow: hidden; gap: 6px;`;
+
+    const rect = anchorEl.getBoundingClientRect();
+    panel.style.top = (rect.bottom + 4) + 'px';
+    panel.style.right = (window.innerWidth - rect.right) + 'px';
+
+    const titleBar = DOM.div(`display: flex; align-items: center; justify-content: space-between; padding: 0px 4px 0px 10px; font-size: 12px; font-weight: 700; color: #38bdf8; border-radius: 6px; flex-shrink: 0; letter-spacing: 0.5px; line-height: 1.1;`);
+    const titleText = DOM.span(`text-align: center; flex: 1;`);
+    titleText.textContent = $t('insertInspirationSet');
+    titleBar.appendChild(titleText);
+    const closeBtn = document.createElement('button');
+    closeBtn.type = 'button';
+    closeBtn.innerHTML = `<svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>`;
+    closeBtn.style.cssText = `background: none; border: none; color: #64748b; cursor: pointer; padding: 2px; border-radius: 3px; display: flex; align-items: center; justify-content: center; transition: all 0.15s ease;`;
+    closeBtn.onmouseenter = () => { closeBtn.style.color = '#e2e8f0'; closeBtn.style.background = 'rgba(239,68,68,0.2)'; };
+    closeBtn.onmouseleave = () => { closeBtn.style.color = '#64748b'; closeBtn.style.background = 'none'; };
+    closeBtn.onclick = () => { panel.remove(); };
+    titleBar.appendChild(closeBtn);
+    panel.appendChild(titleBar);
+
+    const searchInput = document.createElement('input');
+    searchInput.type = 'text';
+    searchInput.placeholder = $t('searchTags');
+    searchInput.style.cssText = `width: 100%; background: rgba(30,41,59,0.8); border: 1px solid rgba(59,130,246,0.3); border-radius: 6px; padding: 6px 10px; color: #e2e8f0; font-size: 12px; outline: none; transition: border-color 0.2s; flex-shrink: 0;`;
+    searchInput.onfocus = () => { searchInput.style.borderColor = 'rgba(59,130,246,0.6)'; };
+    searchInput.onblur = () => { searchInput.style.borderColor = 'rgba(59,130,246,0.3)'; };
+    panel.appendChild(searchInput);
+
+    const mainContent = DOM.div(`display: flex; flex: 1; min-height: 0; gap: 6px;`);
+
+    const catSidebar = DOM.div(`width: 90px; flex-shrink: 0; background: rgba(15,23,42,0.5); border-radius: 6px; overflow-y: auto; display: flex; flex-direction: column; gap: 2px; padding: 4px;`);
+
+    const listContainer = DOM.div(`flex: 1; overflow-y: auto; min-height: 0;`);
+
+    mainContent.appendChild(catSidebar);
+    mainContent.appendChild(listContainer);
+    panel.appendChild(mainContent);
+
+    let selectedCatValue = '';
+
+    const renderSidebar = () => {
+        catSidebar.innerHTML = '';
+
+        const allItem = DOM.div(`padding: 7px 8px; font-size: 11px; color: ${selectedCatValue === '' ? '#93c5fd' : '#94a3b8'}; cursor: pointer; border-radius: 4px; transition: all 0.15s ease; background: ${selectedCatValue === '' ? 'rgba(59,130,246,0.2)' : 'transparent'}; font-weight: ${selectedCatValue === '' ? '600' : '400'}; border-left: 2px solid ${selectedCatValue === '' ? '#3b82f6' : 'transparent'};`);
+        allItem.textContent = $t('allCategories');
+        allItem.onmouseenter = () => { if (selectedCatValue !== '') { allItem.style.background = 'rgba(59,130,246,0.1)'; allItem.style.color = '#93c5fd'; } };
+        allItem.onmouseleave = () => { if (selectedCatValue !== '') { allItem.style.background = 'transparent'; allItem.style.color = '#94a3b8'; } };
+        allItem.onclick = () => { selectedCatValue = ''; renderSidebar(); renderList(); };
+        catSidebar.appendChild(allItem);
+
+        categoryNames.forEach(cat => {
+            const item = DOM.div(`padding: 7px 8px; font-size: 11px; color: ${selectedCatValue === cat ? '#93c5fd' : '#94a3b8'}; cursor: pointer; border-radius: 4px; transition: all 0.15s ease; background: ${selectedCatValue === cat ? 'rgba(59,130,246,0.2)' : 'transparent'}; font-weight: ${selectedCatValue === cat ? '600' : '400'}; border-left: 2px solid ${selectedCatValue === cat ? '#3b82f6' : 'transparent'}; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;`);
+            item.textContent = cat;
+            item.title = cat;
+            item.onmouseenter = () => { if (selectedCatValue !== cat) { item.style.background = 'rgba(59,130,246,0.1)'; item.style.color = '#93c5fd'; } };
+            item.onmouseleave = () => { if (selectedCatValue !== cat) { item.style.background = 'transparent'; item.style.color = '#94a3b8'; } };
+            item.onclick = () => { selectedCatValue = cat; renderSidebar(); renderList(); };
+            catSidebar.appendChild(item);
+        });
+    };
+
+    const renderList = () => {
+        listContainer.innerHTML = '';
+        const keyword = searchInput.value.trim().toLowerCase();
+
+        let filteredSets = inspirationSets;
+        if (selectedCatValue && selectedCatValue !== '') {
+            filteredSets = inspirationSets.filter(set => set.category === selectedCatValue);
+        }
+
+        filteredSets = filteredSets.filter(set => {
+            if (!keyword) return true;
+            return set.name.toLowerCase().includes(keyword) || set.value.toLowerCase().includes(keyword);
+        });
+
+        if (filteredSets.length === 0) {
+            const emptyMsg = DOM.div(`text-align: center; color: #64748b; padding: 16px 8px; font-size: 12px;`);
+            emptyMsg.textContent = $t('noInspirationFound');
+            listContainer.appendChild(emptyMsg);
+            return;
+        }
+
+        filteredSets.forEach((set, index) => {
+            if (index > 0) {
+                const divider = DOM.div(`height: 1px; background: rgba(59,130,246,0.15); margin: 4px 0;`);
+                listContainer.appendChild(divider);
+            }
+
+            const item = DOM.div(`padding: 6px 10px; font-size: 12px; color: #e2e8f0; cursor: pointer; border-radius: 4px; transition: all 0.2s ease; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; display: flex; align-items: center; gap: 6px;`);
+
+            let catTag = null;
+            if (selectedCatValue === '' && set.category) {
+                catTag = DOM.div(`background: rgba(59,130,246,0.25); color: #60a5fa; padding: 1px 6px; border-radius: 3px; font-size: 10px; font-weight: 500; white-space: nowrap; flex-shrink: 0; transition: all 0.2s ease;`);
+                catTag.textContent = set.category;
+                item.appendChild(catTag);
+            }
+
+            const displayText = DOM.span(`overflow: hidden; text-overflow: ellipsis; white-space: nowrap; transition: color 0.2s ease;`);
+            displayText.textContent = set.name;
+            item.appendChild(displayText);
+
+            item.title = set.value;
+
+            item.onmouseenter = () => {
+                item.style.background = 'rgba(59,130,246,0.15)';
+                displayText.style.color = '#93c5fd';
+                if (catTag) {
+                    catTag.style.background = 'rgba(59,130,246,0.35)';
+                    catTag.style.color = '#93c5fd';
+                }
+            };
+            item.onmouseleave = () => {
+                item.style.background = 'transparent';
+                displayText.style.color = '#e2e8f0';
+                if (catTag) {
+                    catTag.style.background = 'rgba(59,130,246,0.25)';
+                    catTag.style.color = '#60a5fa';
+                }
+            };
+            item.onclick = () => {
+                const inputEl = tagEditWidget.inputEl;
+                if (inputEl.value) {
+                    inputEl.value = set.value + ", " + inputEl.value;
+                } else {
+                    inputEl.value = set.value;
+                }
+                tagEditWidget.value = inputEl.value;
+                inputEl.dispatchEvent(new Event('input', { bubbles: true }));
+                panel.remove();
+                showToast($t('inspirationInserted'), 'success', 1500);
+            };
+
+            listContainer.appendChild(item);
+        });
+    };
+
+    searchInput.addEventListener('input', renderList);
+
+    renderSidebar();
+    renderList();
+
+    const backdrop = document.createElement('div');
+    backdrop.style.cssText = 'position:fixed;top:0;left:0;width:100%;height:100%;z-index:10000;';
+    document.body.appendChild(backdrop);
+    document.body.appendChild(panel);
+
+    const origRemove = panel.remove.bind(panel);
+    panel.remove = () => {
+        origRemove();
+        if (backdrop.parentNode) backdrop.remove();
+    };
+    backdrop.onclick = () => panel.remove();
+
+    setTimeout(() => { searchInput.focus(); }, 50);
+}
+
+async function showCustomTagInsertSelector(anchorEl, tagEditWidget, node) {
+    const existing = document.getElementById('custom-tag-insert-panel');
+    if (existing) {
+        existing.remove();
+        return;
+    }
+
+    if (!tagsData) {
+        await loadTagsData();
+    }
+
+    const panel = document.createElement('div');
+    panel.id = 'custom-tag-insert-panel';
+    panel.style.cssText = `position: fixed; background: linear-gradient(135deg, #1e293b 0%, #0f172a 100%); border: 1px solid rgba(59,130,246,0.4); border-radius: 8px; padding: 8px; width: 360px; height: 360px; color: #e2e8f0; box-shadow: 0 12px 40px rgba(0,0,0,0.5); z-index: 10001; display: flex; flex-direction: column; overflow: hidden; gap: 6px;`;
+
+    const rect = anchorEl.getBoundingClientRect();
+    panel.style.top = (rect.bottom + 4) + 'px';
+    panel.style.right = (window.innerWidth - rect.right) + 'px';
+
+    const titleBar = DOM.div(`display: flex; align-items: center; justify-content: space-between; padding: 0px 4px 0px 10px; font-size: 12px; font-weight: 700; color: #38bdf8; border-radius: 6px; flex-shrink: 0; letter-spacing: 0.5px; line-height: 1.1;`);
+    const titleText = DOM.span(`text-align: center; flex: 1;`);
+    titleText.textContent = $t('insertCustomTag');
+    titleBar.appendChild(titleText);
+    const closeBtn = document.createElement('button');
+    closeBtn.type = 'button';
+    closeBtn.innerHTML = `<svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>`;
+    closeBtn.style.cssText = `background: none; border: none; color: #64748b; cursor: pointer; padding: 2px; border-radius: 3px; display: flex; align-items: center; justify-content: center; transition: all 0.15s ease;`;
+    closeBtn.onmouseenter = () => { closeBtn.style.color = '#e2e8f0'; closeBtn.style.background = 'rgba(239,68,68,0.2)'; };
+    closeBtn.onmouseleave = () => { closeBtn.style.color = '#64748b'; closeBtn.style.background = 'none'; };
+    closeBtn.onclick = () => { panel.remove(); };
+    titleBar.appendChild(closeBtn);
+    panel.appendChild(titleBar);
+
+    const customTags = tagsData?.['自定义']?.['我的标签'] || [];
+
+    const grouped = {};
+    grouped[''] = [];
+    customTags.forEach(tag => {
+        const cat = tag.category || '';
+        if (!grouped[cat]) grouped[cat] = [];
+        grouped[cat].push(tag);
+    });
+
+    const sortedCats = Object.keys(grouped).sort((a, b) => {
+        if (a === '') return 1;
+        if (b === '') return -1;
+        return a.localeCompare(b);
+    });
+
+    const searchInput = document.createElement('input');
+    searchInput.type = 'text';
+    searchInput.placeholder = $t('searchTags');
+    searchInput.style.cssText = `width: 100%; background: rgba(30,41,59,0.8); border: 1px solid rgba(59,130,246,0.3); border-radius: 6px; padding: 6px 10px; color: #e2e8f0; font-size: 12px; outline: none; transition: border-color 0.2s; flex-shrink: 0;`;
+    searchInput.onfocus = () => { searchInput.style.borderColor = 'rgba(59,130,246,0.6)'; };
+    searchInput.onblur = () => { searchInput.style.borderColor = 'rgba(59,130,246,0.3)'; };
+    panel.appendChild(searchInput);
+
+    const mainContent = DOM.div(`display: flex; flex: 1; min-height: 0; gap: 6px;`);
+
+    const catSidebar = DOM.div(`width: 90px; flex-shrink: 0; background: rgba(15,23,42,0.5); border-radius: 6px; overflow-y: auto; display: flex; flex-direction: column; gap: 2px; padding: 4px;`);
+
+    const listContainer = DOM.div(`flex: 1; overflow-y: auto; min-height: 0;`);
+
+    mainContent.appendChild(catSidebar);
+    mainContent.appendChild(listContainer);
+    panel.appendChild(mainContent);
+
+    let selectedCatValue = '';
+
+    const renderSidebar = () => {
+        catSidebar.innerHTML = '';
+
+        const allItem = DOM.div(`padding: 7px 8px; font-size: 11px; color: ${selectedCatValue === '' ? '#93c5fd' : '#94a3b8'}; cursor: pointer; border-radius: 4px; transition: all 0.15s ease; background: ${selectedCatValue === '' ? 'rgba(59,130,246,0.2)' : 'transparent'}; font-weight: ${selectedCatValue === '' ? '600' : '400'}; border-left: 2px solid ${selectedCatValue === '' ? '#3b82f6' : 'transparent'};`);
+        allItem.textContent = $t('allCategories');
+        allItem.onmouseenter = () => { if (selectedCatValue !== '') { allItem.style.background = 'rgba(59,130,246,0.1)'; allItem.style.color = '#93c5fd'; } };
+        allItem.onmouseleave = () => { if (selectedCatValue !== '') { allItem.style.background = 'transparent'; allItem.style.color = '#94a3b8'; } };
+        allItem.onclick = () => { selectedCatValue = ''; renderSidebar(); renderList(); };
+        catSidebar.appendChild(allItem);
+
+        const uncItem = DOM.div(`padding: 7px 8px; font-size: 11px; color: ${selectedCatValue === '__uncategorized__' ? '#93c5fd' : '#94a3b8'}; cursor: pointer; border-radius: 4px; transition: all 0.15s ease; background: ${selectedCatValue === '__uncategorized__' ? 'rgba(59,130,246,0.2)' : 'transparent'}; font-weight: ${selectedCatValue === '__uncategorized__' ? '600' : '400'}; border-left: 2px solid ${selectedCatValue === '__uncategorized__' ? '#3b82f6' : 'transparent'}; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;`);
+        uncItem.textContent = $t('uncategorized');
+        uncItem.title = $t('uncategorized');
+        uncItem.onmouseenter = () => { if (selectedCatValue !== '__uncategorized__') { uncItem.style.background = 'rgba(59,130,246,0.1)'; uncItem.style.color = '#93c5fd'; } };
+        uncItem.onmouseleave = () => { if (selectedCatValue !== '__uncategorized__') { uncItem.style.background = 'transparent'; uncItem.style.color = '#94a3b8'; } };
+        uncItem.onclick = () => { selectedCatValue = '__uncategorized__'; renderSidebar(); renderList(); };
+        catSidebar.appendChild(uncItem);
+
+        sortedCats.forEach(cat => {
+            if (!cat) return;
+            const item = DOM.div(`padding: 7px 8px; font-size: 11px; color: ${selectedCatValue === cat ? '#93c5fd' : '#94a3b8'}; cursor: pointer; border-radius: 4px; transition: all 0.15s ease; background: ${selectedCatValue === cat ? 'rgba(59,130,246,0.2)' : 'transparent'}; font-weight: ${selectedCatValue === cat ? '600' : '400'}; border-left: 2px solid ${selectedCatValue === cat ? '#3b82f6' : 'transparent'}; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;`);
+            item.textContent = cat;
+            item.title = cat;
+            item.onmouseenter = () => { if (selectedCatValue !== cat) { item.style.background = 'rgba(59,130,246,0.1)'; item.style.color = '#93c5fd'; } };
+            item.onmouseleave = () => { if (selectedCatValue !== cat) { item.style.background = 'transparent'; item.style.color = '#94a3b8'; } };
+            item.onclick = () => { selectedCatValue = cat; renderSidebar(); renderList(); };
+            catSidebar.appendChild(item);
+        });
+    };
+
+    const renderList = () => {
+        listContainer.innerHTML = '';
+        const keyword = searchInput.value.trim().toLowerCase();
+
+        let filteredCats = sortedCats;
+        if (selectedCatValue === '__uncategorized__') {
+            filteredCats = [''];
+        } else if (selectedCatValue) {
+            filteredCats = sortedCats.filter(c => c === selectedCatValue);
+        }
+
+        let hasResults = false;
+        const allTags = [];
+
+        filteredCats.forEach(cat => {
+            const tags = grouped[cat].filter(tag => {
+                if (!keyword) return true;
+                return tag.display.toLowerCase().includes(keyword) || tag.value.toLowerCase().includes(keyword);
+            });
+
+            if (tags.length === 0) return;
+            hasResults = true;
+
+            tags.forEach(tag => {
+                allTags.push(tag);
+            });
+        });
+
+        allTags.forEach((tag, index) => {
+                const item = DOM.div(`padding: 6px 10px; font-size: 12px; color: #e2e8f0; cursor: pointer; border-radius: 4px; transition: all 0.2s ease; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; display: flex; align-items: center; gap: 6px;`);
+                
+                if (index > 0) {
+                    const divider = DOM.div(`height: 1px; background: rgba(59,130,246,0.15); margin: 4px 0;`);
+                    listContainer.appendChild(divider);
+                }
+                
+                let catTag = null;
+                if (selectedCatValue === '' && tag.category) {
+                    catTag = DOM.div(`background: rgba(59,130,246,0.25); color: #60a5fa; padding: 1px 6px; border-radius: 3px; font-size: 10px; font-weight: 500; white-space: nowrap; flex-shrink: 0; transition: all 0.2s ease;`);
+                    catTag.textContent = tag.category;
+                    item.appendChild(catTag);
+                }
+                
+                const displayText = DOM.span(`overflow: hidden; text-overflow: ellipsis; white-space: nowrap; transition: color 0.2s ease;`);
+                displayText.textContent = tag.display;
+                item.appendChild(displayText);
+                
+                item.title = tag.value;
+
+                item.onmouseenter = () => {
+                    item.style.background = 'rgba(59,130,246,0.15)';
+                    displayText.style.color = '#93c5fd';
+                    if (catTag) {
+                        catTag.style.background = 'rgba(59,130,246,0.35)';
+                        catTag.style.color = '#93c5fd';
+                    }
+                };
+                item.onmouseleave = () => {
+                    item.style.background = 'transparent';
+                    displayText.style.color = '#e2e8f0';
+                    if (catTag) {
+                        catTag.style.background = 'rgba(59,130,246,0.25)';
+                        catTag.style.color = '#60a5fa';
+                    }
+                };
+                item.onclick = () => {
+                    const inputEl = tagEditWidget.inputEl;
+                    inputEl.value = tag.value;
+                    tagEditWidget.value = inputEl.value;
+                    inputEl.dispatchEvent(new Event('input', { bubbles: true }));
+                    panel.remove();
+                    showToast($t('tagInserted'), 'info', 1500);
+                };
+
+                listContainer.appendChild(item);
+            });
+
+        if (!hasResults) {
+            const emptyMsg = DOM.div(`text-align: center; color: #64748b; padding: 16px 8px; font-size: 12px;`);
+            emptyMsg.textContent = customTags.length === 0 ? $t('noCustomTagsToInsert') : $t('noTagsFound');
+            listContainer.appendChild(emptyMsg);
+        }
+    };
+
+    searchInput.addEventListener('input', renderList);
+
+    renderSidebar();
+    renderList();
+
+    const backdrop = document.createElement('div');
+    backdrop.style.cssText = 'position:fixed;top:0;left:0;width:100%;height:100%;z-index:10000;';
+    document.body.appendChild(backdrop);
+    document.body.appendChild(panel);
+
+    const origRemove = panel.remove.bind(panel);
+    panel.remove = () => {
+        origRemove();
+        if (backdrop.parentNode) backdrop.remove();
+    };
+    backdrop.onclick = () => panel.remove();
+
+    setTimeout(() => { searchInput.focus(); }, 50);
+}
+
+function showSettingsDropdown(anchorEl) {
+    const existing = document.getElementById('settings-dropdown-panel');
+    if (existing) {
+        existing.remove();
+        return;
+    }
+
+    const panel = document.createElement('div');
+    panel.id = 'settings-dropdown-panel';
+    panel.style.cssText = `position: fixed; background: linear-gradient(135deg, #475569 0%, #334155 100%); border: 1px solid rgba(148,163,184,0.3); border-radius: 10px; padding: 14px; width: 320px; color: #e2e8f0; box-shadow: 0 12px 40px rgba(0,0,0,0.5); z-index: 10001; display: flex; flex-direction: column; overflow: hidden; gap: 8px;`;
+
+    const rect = anchorEl.getBoundingClientRect();
+    panel.style.bottom = (window.innerHeight - rect.top + 6) + 'px';
+    panel.style.left = rect.left + 'px';
+
+    const header = DOM.div(`font-size: 14px; font-weight: 600; color: #e2e8f0; margin-bottom: 4px; text-align: center;`);
+    header.textContent = $t('nodeSettings');
+    panel.appendChild(header);
+
+    const nodeSettings = loadNodeSettings();
+
+    const insertBtnRow = DOM.div(`display: flex; align-items: center; justify-content: space-between; padding: 8px 10px; background: rgba(30,41,59,0.5); border: 1px solid rgba(148,163,184,0.15); border-radius: 8px; transition: all 0.2s ease;`);
+    const insertBtnLeft = DOM.div(`display: flex; flex-direction: column; gap: 1px;`);
+    const insertBtnLabel = DOM.span(`font-size: 13px; font-weight: 500; color: #e2e8f0;`);
+    insertBtnLabel.textContent = $t('showInsertBtn');
+    insertBtnLeft.appendChild(insertBtnLabel);
+    const insertBtnDesc = DOM.span(`font-size: 11px; color: #64748b;`);
+    insertBtnDesc.textContent = $t('showInsertBtnDesc');
+    insertBtnLeft.appendChild(insertBtnDesc);
+    insertBtnRow.appendChild(insertBtnLeft);
+    const insertBtnToggle = createSettingsToggle(nodeSettings.showInsertBtn !== false, (enabled) => {
+        nodeSettings.showInsertBtn = enabled;
+        saveNodeSettings(nodeSettings);
+        applyInputBtnVisibility();
+    });
+    insertBtnRow.appendChild(insertBtnToggle);
+    panel.appendChild(insertBtnRow);
+
+    const inspirationBtnRow = DOM.div(`display: flex; align-items: center; justify-content: space-between; padding: 8px 10px; background: rgba(30,41,59,0.5); border: 1px solid rgba(148,163,184,0.15); border-radius: 8px; transition: all 0.2s ease;`);
+    const inspirationBtnLeft = DOM.div(`display: flex; flex-direction: column; gap: 1px;`);
+    const inspirationBtnLabel = DOM.span(`font-size: 13px; font-weight: 500; color: #e2e8f0;`);
+    inspirationBtnLabel.textContent = $t('showInspirationBtn');
+    inspirationBtnLeft.appendChild(inspirationBtnLabel);
+    const inspirationBtnDesc = DOM.span(`font-size: 11px; color: #64748b;`);
+    inspirationBtnDesc.textContent = $t('showInspirationBtnDesc');
+    inspirationBtnLeft.appendChild(inspirationBtnDesc);
+    inspirationBtnRow.appendChild(inspirationBtnLeft);
+    const inspirationBtnToggle = createSettingsToggle(nodeSettings.showInspirationBtn !== false, (enabled) => {
+        nodeSettings.showInspirationBtn = enabled;
+        saveNodeSettings(nodeSettings);
+        applyInputBtnVisibility();
+    });
+    inspirationBtnRow.appendChild(inspirationBtnToggle);
+    panel.appendChild(inspirationBtnRow);
+
+    const clearBtnRow = DOM.div(`display: flex; align-items: center; justify-content: space-between; padding: 8px 10px; background: rgba(30,41,59,0.5); border: 1px solid rgba(148,163,184,0.15); border-radius: 8px; transition: all 0.2s ease;`);
+    const clearBtnLeft = DOM.div(`display: flex; flex-direction: column; gap: 1px;`);
+    const clearBtnLabel = DOM.span(`font-size: 13px; font-weight: 500; color: #e2e8f0;`);
+    clearBtnLabel.textContent = $t('showClearBtn');
+    clearBtnLeft.appendChild(clearBtnLabel);
+    const clearBtnDesc = DOM.span(`font-size: 11px; color: #64748b;`);
+    clearBtnDesc.textContent = $t('showClearBtnDesc');
+    clearBtnLeft.appendChild(clearBtnDesc);
+    clearBtnRow.appendChild(clearBtnLeft);
+    const clearBtnToggle = createSettingsToggle(nodeSettings.showClearBtn !== false, (enabled) => {
+        nodeSettings.showClearBtn = enabled;
+        saveNodeSettings(nodeSettings);
+        applyInputBtnVisibility();
+    });
+    clearBtnRow.appendChild(clearBtnToggle);
+    panel.appendChild(clearBtnRow);
+
+    const adultRow = DOM.div(`display: flex; align-items: center; justify-content: space-between; padding: 10px 12px; background: ${adultContentEnabled ? 'rgba(127,29,29,0.3)' : 'rgba(30,41,59,0.5)'}; border: 1px solid ${adultContentEnabled ? 'rgba(239,68,68,0.4)' : 'rgba(148,163,184,0.15)'}; border-radius: 8px; transition: all 0.2s ease;`);
+
+    const adultLeft = DOM.div(`display: flex; flex-direction: column; gap: 2px;`);
+
+    const adultLabel = DOM.span(`font-size: 13px; font-weight: 500; color: ${adultContentEnabled ? '#fca5a5' : '#e2e8f0'};`);
+    adultLabel.textContent = $t('adultContentSetting');
+    adultLeft.appendChild(adultLabel);
+
+    const adultDesc = DOM.span(`font-size: 11px; color: #64748b;`);
+    adultDesc.textContent = $t('adultContentDesc');
+    adultLeft.appendChild(adultDesc);
+
+    adultRow.appendChild(adultLeft);
+
+    const adultToggle = DOM.div(`display: inline-flex; align-items: center; justify-content: center; cursor: pointer; padding: 4px 10px; border-radius: 5px; transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1); background: ${adultContentEnabled ? 'rgba(239,68,68,0.85)' : 'rgba(59,130,246,0.2)'}; border: 1px solid ${adultContentEnabled ? 'rgba(239,68,68,0.9)' : 'rgba(59,130,246,0.6)'}; flex-shrink: 0;`);
+
+    const adultToggleText = document.createElement('span');
+    adultToggleText.textContent = adultContentEnabled ? $t('adultContentEnabled') : $t('adultContentDisabled');
+    adultToggleText.style.cssText = `color: ${adultContentEnabled ? '#ffffff' : '#60a5fa'}; font-size: 11px; font-weight: 500; transition: all 0.3s ease; white-space: nowrap;`;
+    adultToggle.appendChild(adultToggleText);
+    adultRow.appendChild(adultToggle);
+
+    adultToggle.onclick = () => {
+        if (!adultContentEnabled) {
+            panel.remove();
+            showAdultUnlockDialog(() => {
+                initializeCategoryList();
+            });
+        } else {
+            panel.remove();
+            showAdultCloseConfirmDialog(() => {
+                adultContentEnabled = false;
+                adultContentUnlocked = false;
+                updateWindowAdultStatus();
+                saveAdultContentSettings();
+                initializeCategoryList();
+            });
+        }
+    };
+
+    adultToggle.onmouseenter = () => {
+        adultToggle.style.transform = 'scale(1.02)';
+        adultToggle.style.background = adultContentEnabled ? 'rgba(220,38,38,0.95)' : 'rgba(59,130,246,0.35)';
+    };
+    adultToggle.onmouseleave = () => {
+        adultToggle.style.transform = 'scale(1)';
+        adultToggle.style.background = adultContentEnabled ? 'rgba(239,68,68,0.85)' : 'rgba(59,130,246,0.2)';
+    };
+
+    panel.appendChild(adultRow);
+
+    document.body.appendChild(panel);
+}
+
 function createAdultToggleButton() {
     const wrapper = DOM.div(`margin-top: auto; padding: 8px 12px; display: flex; flex-direction: column; align-items: center; gap: 4px; position: relative; border-top: 1px solid rgba(148,163,184,0.2); background: ${adultContentEnabled ? 'linear-gradient(180deg, rgba(127,29,29,0.4) 0%, rgba(69,10,10,0.6) 100%)' : 'linear-gradient(135deg, #2d3748 0%, #1e293b 100%)'}; border: 1px solid ${adultContentEnabled ? 'rgba(239,68,68,0.8)' : 'rgba(100,116,139,0.4)'}; border-radius: 8px; margin: 8px 4px; transition: all 0.3s ease; box-shadow: ${adultContentEnabled ? '0 0 12px rgba(239,68,68,0.35), inset 0 0 16px rgba(239,68,68,0.12)' : '0 2px 8px rgba(0,0,0,0.2)'};`);
 
@@ -4283,6 +5144,9 @@ async function showCharacterExtractor() {
     const tagContent = tagSelectorDialog.tagContent;
     tagContent.innerHTML = '';
     tagContent.style.padding = '0';
+    tagContent.style.display = '';
+    tagContent.style.flexDirection = '';
+    tagContent.style.overflow = '';
 
     characterExtractorPanel = document.createElement('div');
     characterExtractorPanel.className = 'character-extractor-panel';
@@ -5054,7 +5918,7 @@ function initializeCategoryList() {
 
     allCategories.forEach((category, index) => {
         const categoryItem = document.createElement('div');
-        categoryItem.style.cssText = `padding: 12px 16px; color: #ccc; cursor: pointer; border-bottom: 1px solid rgb(112, 130, 155); transition: all 0.2s; text-align: center; background: transparent;`;
+        categoryItem.style.cssText = `padding: 12px 16px; color: #ccc; cursor: pointer; border-bottom: 1px solid rgb(112, 130, 155); transition: all 0.2s; text-align: center; background: transparent; display: flex; align-items: center; justify-content: center;`;
         categoryItem.textContent = $tc(category);
         categoryItem.dataset.originalName = category;
         categoryItem.onmouseenter = () => {
@@ -5109,8 +5973,36 @@ function initializeCategoryList() {
 
     categoriesContainer.appendChild(scrollContainer);
 
-    const adultToggle = createAdultToggleButton();
-    categoriesContainer.appendChild(adultToggle);
+    const settingsBtn = DOM.div(`margin-top: auto; height: 36px; display: flex; align-items: center; justify-content: center; gap: 4px; cursor: pointer; background: linear-gradient(135deg, #475569 0%, #334155 100%); border: 1px solid rgba(148,163,184,0.3); border-radius: 8px; margin: 8px auto; padding: 0 10px; transition: all 0.3s ease; box-shadow: 0 2px 8px rgba(0,0,0,0.2);`);
+
+    const settingsBtnIcon = document.createElement('span');
+    settingsBtnIcon.textContent = '⚙️';
+    settingsBtnIcon.style.cssText = `font-size: 16px;`;
+    settingsBtn.appendChild(settingsBtnIcon);
+
+    const settingsBtnText = document.createElement('span');
+    settingsBtnText.textContent = $t('settings');
+    settingsBtnText.style.cssText = `color: #cbd5e1; font-size: 12px; font-weight: 500;`;
+    settingsBtn.appendChild(settingsBtnText);
+
+    settingsBtn.onmouseenter = () => {
+        settingsBtn.style.background = 'linear-gradient(135deg, #64748b 0%, #475569 100%)';
+        settingsBtn.style.borderColor = 'rgba(148,163,184,0.5)';
+    };
+    settingsBtn.onmouseleave = () => {
+        settingsBtn.style.background = 'linear-gradient(135deg, #475569 0%, #334155 100%)';
+        settingsBtn.style.borderColor = 'rgba(148,163,184,0.3)';
+    };
+    settingsBtn.onclick = () => {
+        const existing = document.getElementById('settings-dropdown-panel');
+        if (existing) {
+            existing.remove();
+        } else {
+            showSettingsDropdown(settingsBtn);
+        }
+    };
+
+    categoriesContainer.appendChild(settingsBtn);
 
     categoryList.appendChild(categoriesContainer);
 
@@ -5835,7 +6727,7 @@ function restoreSubCategories(category, savedState) {
         }
 
         const tab = document.createElement('div');
-        tab.style.cssText = `padding: 10px 16px; color: #ccc; cursor: pointer; border-right: 1px solid rgb(112, 130, 155); white-space: normal; word-break: break-word; overflow-wrap: anywhere; transition: background-color 0.2s; min-width: 80px; text-align: center;`;
+        tab.style.cssText = `padding: 10px 16px; color: #ccc; cursor: pointer; border-right: 1px solid rgb(112, 130, 155); white-space: normal; word-break: break-word; overflow-wrap: anywhere; transition: background-color 0.2s; min-width: 80px; text-align: center; display: flex; align-items: center; justify-content: center;`;
         tab.textContent = $tc(subCategory);
 
         tab.onmouseenter = () => {
@@ -6047,7 +6939,7 @@ function showSubSubCategories(category, subCategory) {
     const subSubCategories = tagsData[category][subCategory];
     Object.keys(subSubCategories).forEach((subSubCategory, index) => {
         const tab = document.createElement('div');
-        tab.style.cssText = `padding: 8px 12px; color: #ccc; cursor: pointer; border-right: 1px solid rgb(112, 130, 155); white-space: normal; word-break: break-word; overflow-wrap: anywhere; transition: background-color 0.2s; min-width: 60px; text-align: center; font-size: 13px;`;
+        tab.style.cssText = `padding: 8px 12px; color: #ccc; cursor: pointer; border-right: 1px solid rgb(112, 130, 155); white-space: normal; word-break: break-word; overflow-wrap: anywhere; transition: background-color 0.2s; min-width: 60px; text-align: center; font-size: 13px; display: flex; align-items: center; justify-content: center;`;
         tab.textContent = $tc(subSubCategory);
 
         tab.onmouseenter = () => {
@@ -6129,7 +7021,7 @@ function showSubSubSubCategories(category, subCategory, subSubCategory) {
 
     Object.keys(map).forEach((name, index) => {
         const tab = document.createElement('div');
-        tab.style.cssText = `padding: 6px 10px; color: #ccc; cursor: pointer; border-right: 1px solid rgb(112, 130, 155); white-space: normal; word-break: break-word; overflow-wrap: anywhere; transition: background-color 0.2s; min-width: 50px; text-align: center; font-size: 12px;`;
+        tab.style.cssText = `padding: 6px 10px; color: #ccc; cursor: pointer; border-right: 1px solid rgb(112, 130, 155); white-space: normal; word-break: break-word; overflow-wrap: anywhere; transition: background-color 0.2s; min-width: 50px; text-align: center; font-size: 12px; display: flex; align-items: center; justify-content: center;`;
         tab.textContent = $tc(name);
 
         tab.onmouseenter = () => {
@@ -6485,6 +7377,9 @@ function showTags(category, subCategory) {
 
     const tagContent = tagSelectorDialog.tagContent;
     tagContent.innerHTML = '';
+    tagContent.style.display = '';
+    tagContent.style.flexDirection = '';
+    tagContent.style.overflow = '';
 
     const tags = tagsData[category][subCategory];
     const isCustomCategory = category === '自定义';
@@ -6507,6 +7402,165 @@ function showTags(category, subCategory) {
         tagEntries = actualTags.map(tagObj => [tagObj.display, tagObj.value, tagObj]);
     } else {
         tagEntries = Object.entries(actualTags);
+    }
+
+    if (isCustomCategory && Array.isArray(actualTags) && actualTags.length > 0) {
+        const grouped = {};
+        const uncategorized = [];
+
+        actualTags.forEach(tagObj => {
+            if (tagObj.category) {
+                if (!grouped[tagObj.category]) {
+                    grouped[tagObj.category] = [];
+                }
+                grouped[tagObj.category].push(tagObj);
+            } else {
+                uncategorized.push(tagObj);
+            }
+        });
+
+        const allCategories = [...customTagCategories].filter(cat => grouped[cat]);
+        Object.keys(grouped).forEach(cat => {
+            if (!allCategories.includes(cat)) {
+                allCategories.push(cat);
+            }
+        });
+
+        const hasMultipleGroups = allCategories.length > 0 || uncategorized.length > 0 || customTagCategories.length > 0;
+
+        {
+            const navBar = DOM.div(`display: flex; gap: 6px; margin-bottom: 10px; align-items: center; flex-wrap: wrap; padding-bottom: 6px; border-bottom: 1px solid rgba(59,130,246,0.15);`);
+
+            let activeCat = '__all__';
+            const catTabs = [];
+
+            const createDivider = () => {
+                return DOM.div(`width: 1px; height: 16px; background: rgba(59,130,246,0.25); flex-shrink: 0;`);
+            };
+
+            const createCatTab = (value, label, isActive, isSystem) => {
+                const inactiveColor = '#ffffff';
+                const inactiveHoverColor = '#93c5fd';
+                const baseStyle = `padding: 4px 12px; border-radius: 4px; cursor: pointer; font-size: 12px; font-weight: 400; transition: all 0.2s ease; white-space: nowrap; background: ${isActive ? 'rgba(59,130,246,0.15)' : 'transparent'}; color: ${isActive ? '#93c5fd' : inactiveColor}; border-bottom: 2px solid ${isActive ? '#3b82f6' : 'transparent'};`;
+                const tab = DOM.div(baseStyle);
+                tab.textContent = label;
+                tab.dataset.isSystem = isSystem;
+                tab.onmouseenter = () => { if (!isActive) { tab.style.color = inactiveHoverColor; } };
+                tab.onmouseleave = () => { if (!isActive) { tab.style.color = inactiveColor; } };
+                tab.onclick = () => {
+                    activeCat = value;
+                    catTabs.forEach(t => {
+                        const tv = t.dataset.value;
+                        const ta = tv === activeCat;
+                        t.style.background = ta ? 'rgba(59,130,246,0.15)' : 'transparent';
+                        t.style.color = ta ? '#93c5fd' : '#ffffff';
+                        t.style.borderBottom = ta ? '2px solid #3b82f6' : '2px solid transparent';
+                    });
+                    renderTagsByCat();
+                };
+                tab.dataset.value = value;
+                return tab;
+            };
+
+            const allTab = createCatTab('__all__', $t('allCategories'), true, true);
+            navBar.appendChild(allTab);
+            catTabs.push(allTab);
+
+            navBar.appendChild(createDivider());
+            const uncTab = createCatTab('__uncategorized__', $t('uncategorized'), false, true);
+            navBar.appendChild(uncTab);
+            catTabs.push(uncTab);
+
+            allCategories.forEach(cat => {
+                navBar.appendChild(createDivider());
+                const tab = createCatTab(cat, cat, false, false);
+                navBar.appendChild(tab);
+                catTabs.push(tab);
+            });
+
+            tagContent.appendChild(navBar);
+
+            const tagsArea = DOM.div(`display: flex; flex-wrap: wrap; gap: 6px;`);
+            tagContent.appendChild(tagsArea);
+
+            const renderTagsByCat = () => {
+                tagsArea.innerHTML = '';
+                let tagsToRender = [];
+
+                if (activeCat === '__all__') {
+                    tagsToRender = actualTags;
+                } else if (activeCat === '__uncategorized__') {
+                    tagsToRender = uncategorized;
+                } else {
+                    tagsToRender = grouped[activeCat] || [];
+                }
+
+                const fragment = document.createDocumentFragment();
+                tagsToRender.forEach(tagObj => {
+                    const tagContainer = createTagContainer();
+                    const isSelected = isTagSelected(tagObj.value);
+                    const tagElement = createTagElement(tagObj.display, tagObj.value, isSelected);
+                    tagElement.dataset.display = tagObj.display;
+                    tagElement.dataset.value = tagObj.value;
+                    tagElement.dataset.isCustom = true;
+                    tagElement.dataset.tagObj = JSON.stringify(tagObj);
+                    tagContainer.appendChild(tagElement);
+                    fragment.appendChild(tagContainer);
+                });
+                tagsArea.appendChild(fragment);
+            };
+
+            renderTagsByCat();
+            setupTagContentEventDelegation(tagContent, isCustomCategory);
+            return;
+        }
+
+        allCategories.forEach(cat => {
+            const groupHeader = document.createElement('div');
+            groupHeader.style.cssText = `width: 100%; padding: 8px 12px; margin: 10px 0 4px 0; background: linear-gradient(135deg, rgba(139,92,246,0.2) 0%, rgba(124,58,237,0.15) 100%); border-left: 3px solid #8b5cf6; border-radius: 0 4px 4px 0; color: #a78bfa; font-size: 13px; font-weight: 700; letter-spacing: 0.5px;`;
+            groupHeader.textContent = cat;
+            tagContent.appendChild(groupHeader);
+
+            const groupFragment = document.createDocumentFragment();
+            grouped[cat].forEach(tagObj => {
+                const tagContainer = createTagContainer();
+                const isSelected = isTagSelected(tagObj.value);
+                const tagElement = createTagElement(tagObj.display, tagObj.value, isSelected);
+                tagElement.dataset.display = tagObj.display;
+                tagElement.dataset.value = tagObj.value;
+                tagElement.dataset.isCustom = true;
+                tagElement.dataset.tagObj = JSON.stringify(tagObj);
+                tagContainer.appendChild(tagElement);
+                groupFragment.appendChild(tagContainer);
+            });
+            tagContent.appendChild(groupFragment);
+        });
+
+        if (uncategorized.length > 0) {
+            if (allCategories.length > 0) {
+                const uncategorizedHeader = document.createElement('div');
+                uncategorizedHeader.style.cssText = `width: 100%; padding: 8px 12px; margin: 10px 0 4px 0; background: linear-gradient(135deg, rgba(100,116,139,0.2) 0%, rgba(71,85,105,0.15) 100%); border-left: 3px solid #64748b; border-radius: 0 4px 4px 0; color: #94a3b8; font-size: 13px; font-weight: 700; letter-spacing: 0.5px;`;
+                uncategorizedHeader.textContent = $t('uncategorized');
+                tagContent.appendChild(uncategorizedHeader);
+            }
+
+            const uncFragment = document.createDocumentFragment();
+            uncategorized.forEach(tagObj => {
+                const tagContainer = createTagContainer();
+                const isSelected = isTagSelected(tagObj.value);
+                const tagElement = createTagElement(tagObj.display, tagObj.value, isSelected);
+                tagElement.dataset.display = tagObj.display;
+                tagElement.dataset.value = tagObj.value;
+                tagElement.dataset.isCustom = true;
+                tagElement.dataset.tagObj = JSON.stringify(tagObj);
+                tagContainer.appendChild(tagElement);
+                uncFragment.appendChild(tagContainer);
+            });
+            tagContent.appendChild(uncFragment);
+        }
+
+        setupTagContentEventDelegation(tagContent, isCustomCategory);
+        return;
     }
 
     const fragment = document.createDocumentFragment();
@@ -6624,10 +7678,19 @@ function setupTagContentEventDelegation(tagContent, isCustomCategory) {
     };
 }
 
-function showCustomTagManagement() {
+async function showCustomTagManagement() {
+    if (!tagsData || !tagsData['自定义']) {
+        await loadTagsData();
+    }
+    await loadCustomTagCategories();
     const tagContent = tagSelectorDialog.tagContent;
     tagContent.innerHTML = '';
-    
+    tagContent.style.display = '';
+    tagContent.style.flexDirection = '';
+    tagContent.style.overflow = '';
+
+    const customTags = tagsData['自定义']?.['我的标签'] || [];
+
     if (tagSelectorDialog.subCategoryTabs) {
         tagSelectorDialog.subCategoryTabs.style.display = 'flex';
     }
@@ -6637,18 +7700,18 @@ function showCustomTagManagement() {
     if (tagSelectorDialog.subSubSubCategoryTabs) {
         tagSelectorDialog.subSubSubCategoryTabs.style.display = 'none';
     }
-    
+
     if (tagSelectorDialog.clearButtonContainer) {
         tagSelectorDialog.clearButtonContainer.style.display = 'none';
     }
     if (tagSelectorDialog.formButtonsContainer) {
         tagSelectorDialog.formButtonsContainer.style.display = 'none';
     }
-    
+
     if (tagSelectorDialog.quickRandomBtn) {
         tagSelectorDialog.quickRandomBtn.style.display = 'none';
     }
-    
+
     if (tagSelectorDialog.restoreBtn) {
         tagSelectorDialog.restoreBtn.style.display = 'none';
     }
@@ -6916,6 +7979,7 @@ function showCustomTagManagement() {
                         const result = await response.json();
                         showToast($t('restoreSuccess'), 'success');
                         await loadTagsData();
+                        await loadCustomTagCategories();
                         showCustomTagManagement();
                     } else {
                         const result = await response.json();
@@ -6942,23 +8006,112 @@ function showCustomTagManagement() {
     const titleBar = DOM.div(`color: #38f2f8ff; font-size: 16px; font-weight: 800; margin-bottom: 8px; text-align: center; padding: 8px 15px; background: linear-gradient(135deg, #1e293b 0%, #334155 100%); border: 1px solid rgba(59,130,246,0.3); border-radius: 6px;`);
     titleBar.textContent = $t('editableTagsList');
     tagContent.appendChild(titleBar);
-    
+
+    const filterBar = DOM.div(`display: flex; gap: 6px; margin-bottom: 12px; align-items: center; flex-wrap: wrap;`);
+    tagContent.appendChild(filterBar);
+
+    let currentFilterValue = '__all__';
+    let categoryTabs = [];
+
+    function updateFilterTabs() {
+        filterBar.innerHTML = '';
+        categoryTabs = [];
+
+        const createDivider = () => {
+            return DOM.div(`width: 1px; height: 16px; background: rgba(59,130,246,0.25); flex-shrink: 0;`);
+        };
+
+        const createTab = (value, label, isActive, isSystem) => {
+            const inactiveColor = '#ffffff';
+            const inactiveHoverColor = '#93c5fd';
+            const baseStyle = `padding: 4px 12px; border-radius: 4px; cursor: pointer; font-size: 12px; font-weight: 400; transition: all 0.2s ease; white-space: nowrap; background: ${isActive ? 'rgba(59,130,246,0.15)' : 'transparent'}; color: ${isActive ? '#93c5fd' : inactiveColor}; border-bottom: 2px solid ${isActive ? '#3b82f6' : 'transparent'};`;
+            const tab = DOM.div(baseStyle);
+            tab.textContent = label;
+            tab.onmouseenter = () => {
+                if (!isActive) {
+                    tab.style.color = inactiveHoverColor;
+                }
+            };
+            tab.onmouseleave = () => {
+                if (!isActive) {
+                    tab.style.color = inactiveColor;
+                }
+            };
+            tab.onclick = () => {
+                currentFilterValue = value;
+                updateFilterTabs();
+                renderFilteredTags();
+            };
+            return tab;
+        };
+
+        const manageCatBtn = DOM.btn(`background: linear-gradient(135deg, #8b5cf6 0%, #7c3aed 100%); border: 1px solid rgba(139,92,246,0.7); color: #ffffff; padding: 5px 12px; border-radius: 6px; cursor: pointer; font-size: 12px; font-weight: 600; transition: all 0.2s ease; white-space: nowrap; flex-shrink: 0;`, $t('manageCategories'));
+        manageCatBtn.addEventListener('mouseenter', () => {
+            manageCatBtn.style.background = 'linear-gradient(135deg, #a78bfa 0%, #8b5cf6 100%)';
+        });
+        manageCatBtn.addEventListener('mouseleave', () => {
+            manageCatBtn.style.background = 'linear-gradient(135deg, #8b5cf6 0%, #7c3aed 100%)';
+        });
+        manageCatBtn.onclick = (e) => {
+            e.stopPropagation();
+            showCategoryDropdown(manageCatBtn, null, updateFilterTabs);
+        };
+
+        filterBar.appendChild(manageCatBtn);
+
+        const allTab = createTab('__all__', $t('allCategories'), currentFilterValue === '__all__', true);
+        filterBar.appendChild(allTab);
+        categoryTabs.push(allTab);
+
+        filterBar.appendChild(createDivider());
+        const uncategorizedTab = createTab('__uncategorized__', $t('uncategorized'), currentFilterValue === '__uncategorized__', true);
+        filterBar.appendChild(uncategorizedTab);
+        categoryTabs.push(uncategorizedTab);
+
+        const allCategories = [...customTagCategories];
+        customTags.forEach(tag => {
+            if (tag.category && !allCategories.includes(tag.category)) {
+                allCategories.push(tag.category);
+            }
+        });
+
+        allCategories.forEach(cat => {
+            filterBar.appendChild(createDivider());
+            const tab = createTab(cat, cat, currentFilterValue === cat, false);
+            filterBar.appendChild(tab);
+            categoryTabs.push(tab);
+        });
+    }
+
+    updateFilterTabs();
+
     const tagList = DOM.div(`display: grid; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); gap: 15px; margin-bottom: 20px;`);
     tagContent.appendChild(tagList);
-    
-    const customTags = tagsData['自定义']?.['我的标签'] || [];
-    
+
     if (!tagSelectorDialog.selectedTagForManagement) {
         tagSelectorDialog.selectedTagForManagement = null;
     }
     
-    if (customTags.length === 0) {
-        const emptyMessage = document.createElement('div');
-        emptyMessage.style.cssText = `grid-column: 1 / -1; text-align: center; color: #94a3b8; font-size: 16px; padding: 40px;`;
-        emptyMessage.textContent = $t('noCustomTagsClick');
-        tagList.appendChild(emptyMessage);
-    } else {
-        customTags.forEach(tag => {
+    function renderFilteredTags() {
+        tagList.innerHTML = '';
+        const filterValue = currentFilterValue;
+        
+        let filteredTags = customTags;
+        if (filterValue === '__uncategorized__') {
+            filteredTags = customTags.filter(tag => !tag.category);
+        } else if (filterValue !== '__all__') {
+            filteredTags = customTags.filter(tag => tag.category === filterValue);
+        }
+        
+        if (filteredTags.length === 0) {
+            const emptyMessage = document.createElement('div');
+            emptyMessage.style.cssText = `grid-column: 1 / -1; text-align: center; color: #94a3b8; font-size: 16px; padding: 40px;`;
+            emptyMessage.textContent = $t('noCustomTagsClick');
+            tagList.appendChild(emptyMessage);
+            return;
+        }
+        
+        filteredTags.forEach(tag => {
             const tagItem = document.createElement('div');
             tagItem.style.cssText = `background: linear-gradient(135deg, #2d3748 0%, #1e293b 100%); border: 2px solid #475569; border-radius: 6px; padding: 10px; display: flex; gap: 10px; position: relative; min-height: 100px; cursor: pointer; transition: all 0.3s ease;`;
             
@@ -6992,6 +8145,14 @@ function showCustomTagManagement() {
             const displayText = tag.display.length > 13 ? tag.display.substring(0, 13) + '...' : tag.display;
             tagName.textContent = displayText;
             textContent.appendChild(tagName);
+            
+            if (tag.category) {
+                const categoryBadge = document.createElement('span');
+                categoryBadge.style.cssText = `display: inline-block; padding: 1px 6px; border-radius: 3px; font-size: 10px; font-weight: 600; background: linear-gradient(135deg, #8b5cf6 0%, #7c3aed 100%); color: #ffffff; margin-left: 6px; vertical-align: middle; letter-spacing: 0.3px;`;
+                categoryBadge.textContent = tag.category;
+                tagName.appendChild(categoryBadge);
+            }
+            
             const tagContentPreview = document.createElement('div');
             tagContentPreview.style.cssText = `color: #e2e8f0; font-size: 12px; max-height: 65px; overflow: hidden; text-overflow: ellipsis; display: -webkit-box; -webkit-line-clamp: 4; -webkit-box-orient: vertical; flex: 1;`;
             tagContentPreview.textContent = tag.value;
@@ -7052,7 +8213,7 @@ function showCustomTagManagement() {
                 e.stopPropagation();
                 deleteTooltip.style.opacity = '0';
                 deleteTooltip.style.visibility = 'hidden';
-                if (confirm($t('confirmDeleteTag').replace('{name}', tag.display))) {
+                showConfirmDialog($t('confirmDeleteTag').replace('{name}', tag.display), '', async () => {
                     try {
                         const response = await fetch('/zhihui/user_tags', {
                             method: 'DELETE',
@@ -7090,7 +8251,7 @@ function showCustomTagManagement() {
                         console.error('Error deleting tag:', error);
                         showToast($t('deleteFailed'), 'error');
                     }
-                }
+                });
             };
             
             editBtn.appendChild(editTooltip);
@@ -7136,35 +8297,374 @@ function showCustomTagManagement() {
             tagList.appendChild(tagItem);
         });
     }
+
+    renderFilteredTags();
+}
+
+function showCategoryDialog(existingCategory, onSave) {
+    const overlay = document.createElement('div');
+    overlay.style.cssText = `position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.4); display: flex; justify-content: center; align-items: center; z-index: 10000; backdrop-filter: blur(2px);`;
+    
+    const dialog = document.createElement('div');
+    dialog.style.cssText = `background: linear-gradient(135deg, #1e293b 0%, #0f172a 100%); border: 1px solid rgba(59,130,246,0.4); border-radius: 10px; padding: 20px; min-width: 300px; max-width: 380px; color: #e2e8f0; box-shadow: 0 12px 40px rgba(0,0,0,0.4);`;
+    
+    const title = document.createElement('div');
+    title.style.cssText = `font-size: 15px; font-weight: 700; color: #38bdf8; margin-bottom: 16px; text-shadow: 0 1px 2px rgba(56,189,248,0.3);`;
+    title.textContent = existingCategory ? $t('editCategory') : $t('addCategory');
+    dialog.appendChild(title);
+    
+    const inputLabel = document.createElement('label');
+    inputLabel.style.cssText = `display: block; color: #94a3b8; font-weight: 600; margin-bottom: 6px; font-size: 12px;`;
+    inputLabel.textContent = $t('categoryName');
+    dialog.appendChild(inputLabel);
+    
+    const input = document.createElement('input');
+    input.type = 'text';
+    input.placeholder = $t('categoryNamePlaceholder');
+    input.value = existingCategory || '';
+    input.maxLength = 20;
+    input.style.cssText = `width: 100%; padding: 8px 12px; border: 1px solid rgba(59,130,246,0.4); border-radius: 6px; background: rgba(15,23,42,0.5); color: #e2e8f0; font-size: 13px; margin-bottom: 16px; box-sizing: border-box; outline: none; transition: all 0.2s;`;
+    input.addEventListener('focus', () => {
+        input.style.borderColor = '#38bdf8';
+        input.style.boxShadow = '0 0 0 2px rgba(56,189,248,0.15)';
+    });
+    input.addEventListener('blur', () => {
+        input.style.borderColor = 'rgba(59,130,246,0.4)';
+        input.style.boxShadow = 'none';
+    });
+    dialog.appendChild(input);
+    
+    const btnContainer = document.createElement('div');
+    btnContainer.style.cssText = `display: flex; gap: 8px; justify-content: flex-end;`;
+    
+    const cancelBtn = document.createElement('button');
+    cancelBtn.textContent = '✕';
+    cancelBtn.style.cssText = `background: rgba(100,116,139,0.2); border: 1px solid rgba(100,116,139,0.4); color: #94a3b8; width: 28px; height: 28px; border-radius: 6px; cursor: pointer; font-size: 12px; font-weight: 600; transition: all 0.2s ease; display: flex; align-items: center; justify-content: center; flex-shrink: 0;`;
+    cancelBtn.addEventListener('mouseenter', () => {
+        cancelBtn.style.background = 'rgba(100,116,139,0.35)';
+        cancelBtn.style.color = '#e2e8f0';
+    });
+    cancelBtn.addEventListener('mouseleave', () => {
+        cancelBtn.style.background = 'rgba(100,116,139,0.2)';
+        cancelBtn.style.color = '#94a3b8';
+    });
+    cancelBtn.onclick = () => {
+        document.body.removeChild(overlay);
+    };
+    btnContainer.appendChild(cancelBtn);
+    
+    const confirmBtn = document.createElement('button');
+    confirmBtn.textContent = '✓';
+    confirmBtn.style.cssText = `background: linear-gradient(135deg, #059669 0%, #047857 100%); border: 1px solid rgba(16,185,129,0.6); color: #ffffff; width: 28px; height: 28px; border-radius: 6px; cursor: pointer; font-size: 13px; font-weight: 700; transition: all 0.2s ease; display: flex; align-items: center; justify-content: center; flex-shrink: 0;`;
+    confirmBtn.addEventListener('mouseenter', () => {
+        confirmBtn.style.background = 'linear-gradient(135deg, #10b981 0%, #059669 100%)';
+    });
+    confirmBtn.addEventListener('mouseleave', () => {
+        confirmBtn.style.background = 'linear-gradient(135deg, #059669 0%, #047857 100%)';
+    });
+    confirmBtn.onclick = () => {
+        const value = input.value.trim();
+        if (!value) {
+            showToast($t('categoryRequired'), 'warning');
+            return;
+        }
+        if (value !== existingCategory && customTagCategories.includes(value)) {
+            showToast($t('categoryExists'), 'warning');
+            return;
+        }
+        if (existingCategory && value !== existingCategory) {
+            const idx = customTagCategories.indexOf(existingCategory);
+            if (idx !== -1) {
+                customTagCategories[idx] = value;
+            }
+            const customTags = tagsData['自定义']?.['我的标签'] || [];
+            const updatePromises = [];
+            customTags.forEach(tag => {
+                if (tag.category === existingCategory) {
+                    tag.category = value;
+                    updatePromises.push(
+                        fetch('/zhihui/user_tags', {
+                            method: 'POST',
+                            headers: { 'Content-Type': 'application/json' },
+                            body: JSON.stringify({
+                                name: tag.display,
+                                content: tag.value,
+                                original_name: tag.display,
+                                category: value
+                            })
+                        })
+                    );
+                }
+            });
+            saveCustomTagCategories(customTagCategories);
+            Promise.all(updatePromises).catch(err => {
+                console.error('Error updating tag categories:', err);
+            });
+        } else if (!existingCategory) {
+            customTagCategories.push(value);
+            saveCustomTagCategories(customTagCategories);
+        }
+        document.body.removeChild(overlay);
+        if (onSave) onSave(value);
+    };
+    btnContainer.appendChild(confirmBtn);
+    dialog.appendChild(btnContainer);
+    
+    input.addEventListener('keypress', (e) => {
+        if (e.key === 'Enter') {
+            confirmBtn.click();
+        }
+    });
+    
+    overlay.appendChild(dialog);
+    overlay.addEventListener('click', (e) => {
+        if (e.target === overlay) {
+            document.body.removeChild(overlay);
+        }
+    });
+    document.body.appendChild(overlay);
+    input.focus();
+}
+
+function showCategoryDropdown(anchorEl, filterSelect, updateFilterOptions) {
+    const existing = document.getElementById('category-dropdown-panel');
+    if (existing) {
+        existing.remove();
+        return;
+    }
+    
+    const panel = document.createElement('div');
+    panel.id = 'category-dropdown-panel';
+    panel.style.cssText = `position: fixed; background: linear-gradient(135deg, #1e293b 0%, #0f172a 100%); border: 1px solid rgba(59,130,246,0.4); border-radius: 10px; padding: 14px; width: 280px; max-height: 360px; color: #e2e8f0; box-shadow: 0 12px 40px rgba(0,0,0,0.5); z-index: 10001; display: flex; flex-direction: column; overflow: hidden;`;
+    
+    const rect = anchorEl.getBoundingClientRect();
+    panel.style.top = (rect.bottom + 6) + 'px';
+    panel.style.left = rect.left + 'px';
+    
+    const addRow = DOM.div(`display: flex; gap: 6px; margin-bottom: 10px; flex-shrink: 0;`);
+    
+    const addInput = document.createElement('input');
+    addInput.type = 'text';
+    addInput.placeholder = $t('categoryNamePlaceholder');
+    addInput.maxLength = 20;
+    addInput.style.cssText = `flex: 1; padding: 6px 10px; border: 1px solid rgba(59,130,246,0.4); border-radius: 5px; background: rgba(15,23,42,0.5); color: #e2e8f0; font-size: 12px; outline: none; transition: all 0.2s; min-width: 0;`;
+    addInput.addEventListener('focus', () => {
+        addInput.style.borderColor = '#38bdf8';
+        addInput.style.boxShadow = '0 0 0 2px rgba(56,189,248,0.15)';
+    });
+    addInput.addEventListener('blur', () => {
+        addInput.style.borderColor = 'rgba(59,130,246,0.4)';
+        addInput.style.boxShadow = 'none';
+    });
+    addRow.appendChild(addInput);
+    
+    const addBtn = DOM.btn(`background: linear-gradient(135deg, #059669 0%, #047857 100%); border: 1px solid rgba(16,185,129,0.6); color: #ffffff; width: 28px; height: 28px; border-radius: 6px; cursor: pointer; font-size: 14px; font-weight: 700; transition: all 0.2s ease; display: flex; align-items: center; justify-content: center; flex-shrink: 0;`, '+');
+    addBtn.addEventListener('mouseenter', () => {
+        addBtn.style.background = 'linear-gradient(135deg, #10b981 0%, #059669 100%)';
+    });
+    addBtn.addEventListener('mouseleave', () => {
+        addBtn.style.background = 'linear-gradient(135deg, #059669 0%, #047857 100%)';
+    });
+    addBtn.onclick = () => {
+        const value = addInput.value.trim();
+        if (!value) {
+            showToast($t('categoryRequired'), 'warning');
+            return;
+        }
+        if (customTagCategories.includes(value)) {
+            showToast($t('categoryExists'), 'warning');
+            return;
+        }
+        customTagCategories.push(value);
+        saveCustomTagCategories(customTagCategories);
+        addInput.value = '';
+        renderCategoryList();
+        if (updateFilterOptions) updateFilterOptions();
+        showToast($t('categoryAddedSuccess'), 'success');
+    };
+    addRow.appendChild(addBtn);
+
+    const deleteAllBtn = DOM.btn(`background: linear-gradient(135deg, #ef4444 0%, #dc2626 100%); border: 1px solid rgba(239,68,68,0.6); color: #ffffff; width: 28px; height: 28px; border-radius: 6px; cursor: pointer; font-size: 12px; font-weight: 700; transition: all 0.2s ease; display: flex; align-items: center; justify-content: center; flex-shrink: 0;`, '×');
+    deleteAllBtn.addEventListener('mouseenter', () => {
+        deleteAllBtn.style.background = 'linear-gradient(135deg, #f87171 0%, #ef4444 100%)';
+    });
+    deleteAllBtn.addEventListener('mouseleave', () => {
+        deleteAllBtn.style.background = 'linear-gradient(135deg, #ef4444 0%, #dc2626 100%)';
+    });
+    deleteAllBtn.onclick = () => {
+        if (customTagCategories.length === 0) {
+            showToast($t('noCategoriesToDelete'), 'info');
+            return;
+        }
+        showConfirmDialog($t('deleteAllCategoriesConfirm'), '', async () => {
+            try {
+                const response = await fetch('/zhihui/user_tag_categories/all', {
+                    method: 'DELETE',
+                    headers: { 'Content-Type': 'application/json' }
+                });
+                if (response.ok) {
+                    customTagCategories = [];
+                    await loadTagsData();
+                    renderCategoryList();
+                    if (updateFilterOptions) updateFilterOptions();
+                    showToast($t('allCategoriesDeletedSuccess'), 'success');
+                } else {
+                    showToast($t('deleteFailed'), 'error');
+                }
+            } catch (error) {
+                console.error('Error deleting all categories:', error);
+                showToast($t('deleteFailed'), 'error');
+            }
+        });
+    };
+    addRow.appendChild(deleteAllBtn);
+
+    panel.appendChild(addRow);
+    
+    addInput.addEventListener('keypress', (e) => {
+        if (e.key === 'Enter') {
+            addBtn.click();
+        }
+    });
+    
+    const listContainer = DOM.div(`overflow-y: auto; flex: 1; min-height: 0;`);
+    panel.appendChild(listContainer);
+    
+    function renderCategoryList() {
+        listContainer.innerHTML = '';
+        if (customTagCategories.length === 0) {
+            const emptyMsg = DOM.div(`text-align: center; color: #64748b; padding: 16px 10px; font-size: 12px; border: 1px dashed rgba(100,116,139,0.3); border-radius: 6px;`);
+            emptyMsg.textContent = $t('uncategorized');
+            listContainer.appendChild(emptyMsg);
+            return;
+        }
+        customTagCategories.forEach((cat) => {
+            const row = DOM.div(`display: flex; align-items: center; justify-content: space-between; padding: 6px 10px; background: rgba(30,41,59,0.5); border: 1px solid rgba(59,130,246,0.12); border-radius: 6px; margin-bottom: 4px; transition: all 0.15s ease;`);
+            row.addEventListener('mouseenter', () => {
+                row.style.borderColor = 'rgba(59,130,246,0.35)';
+                row.style.background = 'rgba(30,41,59,0.85)';
+            });
+            row.addEventListener('mouseleave', () => {
+                row.style.borderColor = 'rgba(59,130,246,0.12)';
+                row.style.background = 'rgba(30,41,59,0.5)';
+            });
+            
+            const leftPart = DOM.div(`display: flex; align-items: center; gap: 6px; flex: 1; min-width: 0;`);
+
+            const catName = DOM.span(`color: #e2e8f0; font-size: 12px; font-weight: 500; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;`);
+            catName.textContent = cat;
+            leftPart.appendChild(catName);
+            row.appendChild(leftPart);
+            
+            const btnGroup = DOM.div(`display: flex; gap: 4px; flex-shrink: 0;`);
+            
+            const editBtn = document.createElement('button');
+            editBtn.textContent = '✏️';
+            editBtn.style.cssText = `background: rgba(59,130,246,0.12); border: 1px solid rgba(59,130,246,0.25); color: #93c5fd; width: 24px; height: 24px; border-radius: 5px; cursor: pointer; font-size: 10px; transition: all 0.15s ease; display: flex; align-items: center; justify-content: center; flex-shrink: 0;`;
+            editBtn.addEventListener('mouseenter', () => {
+                editBtn.style.background = 'rgba(59,130,246,0.25)';
+                editBtn.style.borderColor = 'rgba(59,130,246,0.45)';
+            });
+            editBtn.addEventListener('mouseleave', () => {
+                editBtn.style.background = 'rgba(59,130,246,0.12)';
+                editBtn.style.borderColor = 'rgba(59,130,246,0.25)';
+            });
+            editBtn.onclick = (e) => {
+                e.stopPropagation();
+                showCategoryDialog(cat, (newName) => {
+                    renderCategoryList();
+                    if (updateFilterOptions) updateFilterOptions();
+                    showToast($t('categoryUpdatedSuccess'), 'success');
+                });
+            };
+            btnGroup.appendChild(editBtn);
+            
+            const delBtn = document.createElement('button');
+            delBtn.textContent = '✕';
+            delBtn.style.cssText = `background: rgba(239,68,68,0.08); border: 1px solid rgba(239,68,68,0.2); color: #fca5a5; width: 24px; height: 24px; border-radius: 5px; cursor: pointer; font-size: 10px; transition: all 0.15s ease; display: flex; align-items: center; justify-content: center; flex-shrink: 0;`;
+            delBtn.addEventListener('mouseenter', () => {
+                delBtn.style.background = 'rgba(239,68,68,0.2)';
+                delBtn.style.borderColor = 'rgba(239,68,68,0.45)';
+            });
+            delBtn.addEventListener('mouseleave', () => {
+                delBtn.style.background = 'rgba(239,68,68,0.08)';
+                delBtn.style.borderColor = 'rgba(239,68,68,0.2)';
+            });
+            delBtn.onclick = async (e) => {
+                e.stopPropagation();
+                showConfirmDialog($t('categoryDeleteConfirm').replace('{name}', cat), '', async () => {
+                    try {
+                        const response = await fetch('/zhihui/user_tag_categories', {
+                            method: 'DELETE',
+                            headers: { 'Content-Type': 'application/json' },
+                            body: JSON.stringify({ name: cat })
+                        });
+                        if (response.ok) {
+                            customTagCategories = customTagCategories.filter(c => c !== cat);
+                            await loadTagsData();
+                            renderCategoryList();
+                            if (updateFilterOptions) updateFilterOptions();
+                            showToast($t('categoryDeletedSuccess'), 'success');
+                            showCategoryDropdown(anchorEl, filterSelect, updateFilterOptions);
+                        } else {
+                            showToast($t('categoryDeleteFailed'), 'error');
+                        }
+                    } catch (error) {
+                        showToast($t('categoryDeleteFailed'), 'error');
+                    }
+                });
+            };
+            btnGroup.appendChild(delBtn);
+            row.appendChild(btnGroup);
+            listContainer.appendChild(row);
+        });
+    }
+    renderCategoryList();
+    
+    document.body.appendChild(panel);
+    addInput.focus();
+    
+    const closeOnOutside = (e) => {
+        if (!panel.contains(e.target) && e.target !== anchorEl) {
+            panel.remove();
+            document.removeEventListener('mousedown', closeOnOutside, true);
+        }
+    };
+    setTimeout(() => {
+        document.addEventListener('mousedown', closeOnOutside, true);
+    }, 0);
 }
 
 function createTagManagementForm(tagToEdit = null) {
     const tagContent = tagSelectorDialog.tagContent;
     tagContent.innerHTML = '';
+    tagContent.style.display = 'flex';
+    tagContent.style.flexDirection = 'column';
+    tagContent.style.overflow = 'hidden';
     
     if (tagSelectorDialog.managementButtonsContainer) {
         tagSelectorDialog.managementButtonsContainer.style.display = 'none';
     }
     
-    const title = DOM.div(`color: #38f2f8ff; font-size: 18px; font-weight: 600; margin-bottom: 20px; text-align: center;`);
+    const title = DOM.div(`color: #38f2f8ff; font-size: 18px; font-weight: 600; margin-bottom: 20px; text-align: center; flex-shrink: 0;`);
     title.textContent = tagToEdit ? $t('editCustomTag') : $t('addCustomTag');
     tagContent.appendChild(title);
     
-    const formContainer = DOM.div(`background: linear-gradient(135deg, #2d3748 0%, #1e293b 100%); border: 1px solid rgba(59,130,246,0.3); border-radius: 8px; padding: 12px; max-width: 1400px; min-height: 650px; margin: 0 auto;`);
+    const formContainer = DOM.div(`background: linear-gradient(135deg, #2d3748 0%, #1e293b 100%); border: 1px solid rgba(59,130,246,0.3); border-radius: 8px; padding: 12px; max-width: 1400px; margin: 0 auto; display: flex; flex-direction: column; flex: 1; min-height: 0; overflow: hidden;`);
     tagContent.appendChild(formContainer);
     
-    const mainContentContainer = DOM.div(`display: flex; gap: 10px; margin-bottom: 12px; align-items: flex-start;`);
+    const mainContentContainer = DOM.div(`display: flex; gap: 10px; margin-bottom: 12px; align-items: stretch; flex: 1; min-height: 0; overflow: hidden;`);
     formContainer.appendChild(mainContentContainer);
     
-    const leftPreviewContainer = DOM.div(`flex-shrink: 0; width: 400px; text-align: center;`);
+    const leftPreviewContainer = DOM.div(`flex-shrink: 0; width: 400px; text-align: center; display: flex; flex-direction: column;`);
     mainContentContainer.appendChild(leftPreviewContainer);
     
     const previewLabel = document.createElement('label');
-    previewLabel.style.cssText = `display: block; color: #3b82f6; font-weight: 600; margin-bottom: 8px; font-size: 14px; text-shadow: 0 1px 2px rgba(59,130,246,0.3);`;
+    previewLabel.style.cssText = `display: block; color: #3b82f6; font-weight: 600; margin-bottom: 8px; font-size: 14px; text-shadow: 0 1px 2px rgba(59,130,246,0.3); flex-shrink: 0;`;
     previewLabel.textContent = $t('previewImage');
     leftPreviewContainer.appendChild(previewLabel);
     
-    const previewContainer = DOM.div(`width: 380px; max-width: 100%; height: 440px; /* 竖版布局，高度减少60像素 */ display: flex; align-items: center; justify-content: center; border: 1px solid rgba(59,130,246,0.3); border-radius: 6px; background: rgba(15,23,42,0.5); margin-bottom: 10px; margin-left: auto; margin-right: auto; position: relative; overflow: hidden;`);
+    const previewContainer = DOM.div(`width: 380px; max-width: 100%; flex: 1; min-height: 0; display: flex; align-items: center; justify-content: center; border: 1px solid rgba(59,130,246,0.3); border-radius: 6px; background: rgba(15,23,42,0.5); margin-bottom: 10px; margin-left: auto; margin-right: auto; position: relative; overflow: hidden;`);
     
     const noImageHint = DOM.div(`display: flex; flex-direction: column; align-items: center; justify-content: center; color: #94a3b8; opacity: 0.7; gap: 10px;`);
     
@@ -7213,7 +8713,7 @@ function createTagManagementForm(tagToEdit = null) {
     previewInput.style.cssText = `display: none;`;
     leftPreviewContainer.appendChild(previewInput);
     
-    const buttonContainer = DOM.div(`display: flex; gap: 10px; justify-content: center; margin-top: 10px; flex-wrap: wrap;`);
+    const buttonContainer = DOM.div(`display: flex; gap: 10px; justify-content: center; margin-top: 10px; flex-wrap: wrap; flex-shrink: 0;`);
     leftPreviewContainer.appendChild(buttonContainer);
     
     const previewButton = DOM.btn(`background: linear-gradient(135deg, #2563eb 0%, #1d4ed8 100%); border: 1px solid rgba(59,130,246,0.7); color: #ffffff; padding: 6px 16px; border-radius: 4px; cursor: pointer; font-size: 12px; font-weight: 600; transition: all 0.3s ease; white-space: nowrap;`, $t('uploadImage'));
@@ -7252,10 +8752,10 @@ function createTagManagementForm(tagToEdit = null) {
     };
     buttonContainer.appendChild(deleteButton);
     
-    const rightFormContainer = DOM.div(`flex: 1; min-width: 0;`);
+    const rightFormContainer = DOM.div(`flex: 1; min-width: 0; display: flex; flex-direction: column;`);
     mainContentContainer.appendChild(rightFormContainer);
     
-    const nameContainer = DOM.div(`margin-bottom: 12px;`);
+    const nameContainer = DOM.div(`margin-bottom: 12px; flex-shrink: 0;`);
     rightFormContainer.appendChild(nameContainer);
     
     const nameLabel = document.createElement('label');
@@ -7321,7 +8821,47 @@ function createTagManagementForm(tagToEdit = null) {
     });
     nameContainer.appendChild(nameInput);
     
-    const contentContainer = DOM.div(`margin-bottom: 8px;`);
+    const categoryContainer = DOM.div(`margin-bottom: 12px; flex-shrink: 0;`);
+    rightFormContainer.appendChild(categoryContainer);
+    
+    const categoryLabel = document.createElement('label');
+    categoryLabel.style.cssText = `display: block; color: #3b82f6; font-weight: 600; margin-bottom: 8px; font-size: 14px; text-shadow: 0 1px 2px rgba(59,130,246,0.3);`;
+    categoryLabel.textContent = $t('tagCategory');
+    categoryContainer.appendChild(categoryLabel);
+    
+    const categorySelect = document.createElement('select');
+    categorySelect.style.cssText = `width: 100%; padding: 10px; border: 1px solid rgba(59,130,246,0.4); border-radius: 6px; background: rgba(15,23,42,0.3); color: white; font-size: 14px; cursor: pointer; appearance: auto;`;
+    
+    function updateCategoryOptions() {
+        categorySelect.innerHTML = '';
+        const defaultOption = document.createElement('option');
+        defaultOption.value = '';
+        defaultOption.textContent = $t('uncategorized');
+        categorySelect.appendChild(defaultOption);
+        
+        customTagCategories.forEach(cat => {
+            const option = document.createElement('option');
+            option.value = cat;
+            option.textContent = cat;
+            if (tagToEdit?.category === cat) {
+                option.selected = true;
+            }
+            categorySelect.appendChild(option);
+        });
+    }
+    updateCategoryOptions();
+    
+    categorySelect.addEventListener('focus', () => {
+        categorySelect.style.borderColor = '#38bdf8';
+        categorySelect.style.boxShadow = '0 0 0 2px rgba(56,189,248,0.2), inset 0 1px 2px rgba(0,0,0,0.2)';
+    });
+    categorySelect.addEventListener('blur', () => {
+        categorySelect.style.borderColor = 'rgba(59,130,246,0.4)';
+        categorySelect.style.boxShadow = 'none';
+    });
+    categoryContainer.appendChild(categorySelect);
+    
+    const contentContainer = DOM.div(`margin-bottom: 8px; display: flex; flex-direction: column; flex: 1; min-height: 0;`);
     rightFormContainer.appendChild(contentContainer);
     
     const contentLabel = document.createElement('label');
@@ -7332,7 +8872,7 @@ function createTagManagementForm(tagToEdit = null) {
     const contentTextarea = document.createElement('textarea');
     contentTextarea.placeholder = $t('enterTagContent');
     contentTextarea.value = tagToEdit?.value || '';
-    contentTextarea.style.cssText = `width: 100%; padding: 10px; border: 1px solid rgba(59,130,246,0.4); border-radius: 6px; background: rgba(15,23,42,0.3); color: white; font-size: 14px; resize: none; min-height: 480px; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;`;
+    contentTextarea.style.cssText = `width: 100%; padding: 10px; border: 1px solid rgba(59,130,246,0.4); border-radius: 6px; background: rgba(15,23,42,0.3); color: white; font-size: 14px; resize: none; flex: 1; min-height: 0; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;`;
     contentTextarea.addEventListener('focus', () => {
         contentTextarea.style.borderColor = '#38bdf8';
         contentTextarea.style.boxShadow = '0 0 0 2px rgba(56,189,248,0.2), inset 0 1px 2px rgba(0,0,0,0.2)';
@@ -7386,7 +8926,7 @@ function createTagManagementForm(tagToEdit = null) {
     charStatsContainer.appendChild(statsLeft);
     charStatsContainer.appendChild(statsRight);
     
-    const toolsAndStatsContainer = DOM.div(`display: flex; gap: 12px; align-items: center; margin-top: 12px; justify-content: flex-start; flex-wrap: wrap;`);
+    const toolsAndStatsContainer = DOM.div(`display: flex; gap: 12px; align-items: center; margin-top: 12px; justify-content: flex-start; flex-wrap: wrap; flex-shrink: 0;`);
     
     const saveButtonsContainer = DOM.div(`display: flex; gap: 12px; align-items: center; flex-shrink: 0; margin-right: auto; height: fit-content; align-self: center;`);
     
@@ -7768,6 +9308,9 @@ function createTagManagementForm(tagToEdit = null) {
         try {
             const requestData = { name, content };
             
+            const selectedCategory = categorySelect.value;
+            requestData.category = selectedCategory || "";
+            
             if (currentPreviewImage) {
                 requestData.preview_image = currentPreviewImage;
             } else if (tagToEdit && imageDeleted) {
@@ -7824,15 +9367,24 @@ function showTagsFromSubSub(category, subCategory, subSubCategory) {
     }
     
     tagContent.innerHTML = '';
+    tagContent.style.display = '';
+    tagContent.style.flexDirection = '';
+    tagContent.style.overflow = '';
     
     if (tagSelectorDialog.subCategoryTabs) {
         tagSelectorDialog.subCategoryTabs.style.display = 'flex';
+        tagSelectorDialog.subCategoryTabs.style.minHeight = '45px';
+        tagSelectorDialog.subCategoryTabs.style.overflow = 'visible';
     }
     if (tagSelectorDialog.subSubCategoryTabs) {
         tagSelectorDialog.subSubCategoryTabs.style.display = 'flex';
+        tagSelectorDialog.subSubCategoryTabs.style.minHeight = '40px';
+        tagSelectorDialog.subSubCategoryTabs.style.overflow = 'visible';
     }
     if (tagSelectorDialog.subSubSubCategoryTabs) {
         tagSelectorDialog.subSubSubCategoryTabs.style.display = 'none';
+        tagSelectorDialog.subSubSubCategoryTabs.style.minHeight = '35px';
+        tagSelectorDialog.subSubSubCategoryTabs.style.overflow = 'visible';
     }
     
     const categoriesToShowClearButton = ['常规标签', '艺术题材', '人物类', '场景类', '动物生物', '灵感套装', '涩影湿'];
@@ -7939,15 +9491,24 @@ function showTagsFromSubSubSub(category, subCategory, subSubCategory, subSubSubC
     }
     
     tagContent.innerHTML = '';
+    tagContent.style.display = '';
+    tagContent.style.flexDirection = '';
+    tagContent.style.overflow = '';
     
     if (tagSelectorDialog.subCategoryTabs) {
         tagSelectorDialog.subCategoryTabs.style.display = 'flex';
+        tagSelectorDialog.subCategoryTabs.style.minHeight = '45px';
+        tagSelectorDialog.subCategoryTabs.style.overflow = 'visible';
     }
     if (tagSelectorDialog.subSubCategoryTabs) {
         tagSelectorDialog.subSubCategoryTabs.style.display = 'flex';
+        tagSelectorDialog.subSubCategoryTabs.style.minHeight = '40px';
+        tagSelectorDialog.subSubCategoryTabs.style.overflow = 'visible';
     }
     if (tagSelectorDialog.subSubSubCategoryTabs) {
         tagSelectorDialog.subSubSubCategoryTabs.style.display = 'flex';
+        tagSelectorDialog.subSubSubCategoryTabs.style.minHeight = '35px';
+        tagSelectorDialog.subSubSubCategoryTabs.style.overflow = 'visible';
     }
     
     const categoriesToShowClearButton = ['常规标签', '艺术题材', '人物类', '场景类', '动物生物', '灵感套装', '涩影湿'];
@@ -8839,7 +10400,15 @@ async function openRandomGeneratorDialog(tagSelectorDlg) {
     const tagContent = tagSelectorDlg.tagContent;
     if (!tagContent) return;
     
+    if (tagSelectorDlg.rightPanel) {
+        tagSelectorDlg.rightPanel.style.overflow = 'hidden';
+    }
+    
     tagContent.innerHTML = '';
+    tagContent.style.display = '';
+    tagContent.style.flexDirection = '';
+    tagContent.style.overflowY = 'auto';
+    tagContent.style.overflowX = 'hidden';
     
     const content = createRandomGeneratorContent();
     tagContent.appendChild(content);
@@ -8848,7 +10417,7 @@ async function openRandomGeneratorDialog(tagSelectorDlg) {
 function createRandomGeneratorContent() {
     const content = document.createElement('div');
     content.className = 'random-generator-content';
-    content.style.cssText = `padding: 16px; overflow-y: auto; display: flex; flex-direction: column; gap: 16px; height: 100%;`;
+    content.style.cssText = `padding: 16px; display: flex; flex-direction: column; gap: 16px;`;
 
     const rulesSection = createRulesSection();
     rulesSection.classList.add('rules-section');
@@ -9425,7 +10994,7 @@ function showSaveToCustomDialog(prompt) {
                 headers: {
                     'Content-Type': 'application/json',
                 },
-                body: JSON.stringify({ name, content })
+                body: JSON.stringify({ name, content, category: categorySelect2.value || undefined })
             });
 
             const result = await response.json();
@@ -9448,6 +11017,27 @@ function showSaveToCustomDialog(prompt) {
     dialog.appendChild(title);
     dialog.appendChild(nameLabel);
     dialog.appendChild(nameInput);
+    
+    const categoryLabel2 = DOM.div(`color: #94a3b8; font-size: 13px; margin-bottom: 8px;`);
+    categoryLabel2.textContent = $t('tagCategory');
+    
+    const categorySelect2 = document.createElement('select');
+    categorySelect2.style.cssText = `width: 100%; padding: 10px 12px; border: 1px solid rgba(59,130,246,0.4); border-radius: 6px; background: rgba(15,23,42,0.8); color: #e2e8f0; font-size: 14px; box-sizing: border-box; margin-bottom: 16px; outline: none; appearance: auto; cursor: pointer;`;
+    
+    const defaultOpt = document.createElement('option');
+    defaultOpt.value = '';
+    defaultOpt.textContent = $t('uncategorized');
+    categorySelect2.appendChild(defaultOpt);
+    customTagCategories.forEach(cat => {
+        const opt = document.createElement('option');
+        opt.value = cat;
+        opt.textContent = cat;
+        categorySelect2.appendChild(opt);
+    });
+    
+    dialog.appendChild(categoryLabel2);
+    dialog.appendChild(categorySelect2);
+    
     dialog.appendChild(contentLabel);
     dialog.appendChild(contentTextarea);
     dialog.appendChild(buttonContainer);
