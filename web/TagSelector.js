@@ -46,8 +46,6 @@ const TagSelectorState = {
     dialog: null,
     selectedTags: new Map(),
     previousSelectedTags: new Map(),
-    adultContentEnabled: false,
-    adultContentUnlocked: false,
     
     reset() {
         this.currentNode = null;
@@ -4456,7 +4454,11 @@ async function showInspirationSelector(anchorEl, tagEditWidget) {
     }
 
     const inspirationCategories = tagsData['灵感套装'] || {};
-    const categoryNames = Object.keys(inspirationCategories);
+    let categoryNames = Object.keys(inspirationCategories);
+    
+    if (!adultContentEnabled) {
+        categoryNames = categoryNames.filter(cat => cat !== '成人题材');
+    }
     
     const inspirationSets = [];
     categoryNames.forEach(cat => {
@@ -6118,6 +6120,9 @@ function restoreSubCategories(category, savedState) {
     if (category === '自定义' && !subCategoryKeys.includes('标签管理')) {
         subCategoryKeys = [...subCategoryKeys, '标签管理'];
     }
+    if (category === '灵感套装' && !adultContentEnabled) {
+        subCategoryKeys = subCategoryKeys.filter(cat => cat !== '成人题材');
+    }
 
     let targetSubCategoryTab = null;
 
@@ -6722,10 +6727,6 @@ function restoreSubCategories(category, savedState) {
 
 
 
-        if (category === '灵感套装' && subCategory === '成人题材' && !adultContentEnabled) {
-            return;
-        }
-
         const tab = document.createElement('div');
         tab.style.cssText = `padding: 10px 16px; color: #ccc; cursor: pointer; border-right: 1px solid rgb(112, 130, 155); white-space: normal; word-break: break-word; overflow-wrap: anywhere; transition: background-color 0.2s; min-width: 80px; text-align: center; display: flex; align-items: center; justify-content: center;`;
         tab.textContent = $tc(subCategory);
@@ -6845,6 +6846,9 @@ function showSubCategories(category) {
     let subCategoryKeys = Object.keys(subCategories);
     if (category === '自定义' && !subCategoryKeys.includes('标签管理')) {
         subCategoryKeys = [...subCategoryKeys, '标签管理'];
+    }
+    if (category === '灵感套装' && !adultContentEnabled) {
+        subCategoryKeys = subCategoryKeys.filter(cat => cat !== '成人题材');
     }
     
     subCategoryKeys.forEach((subCategory, index) => {
@@ -7649,12 +7653,15 @@ function setupTagContentEventDelegation(tagContent, isCustomCategory) {
         }
 
         if (currentTooltip) {
-            currentTooltip.style.opacity = '0';
+            const tooltipToHide = currentTooltip;
+            tooltipToHide.style.opacity = '0';
             setTimeout(() => {
-                if (currentTooltip && currentTooltip.parentNode) {
-                    currentTooltip.parentNode.removeChild(currentTooltip);
+                if (tooltipToHide && tooltipToHide.parentNode) {
+                    tooltipToHide.parentNode.removeChild(tooltipToHide);
                 }
-                currentTooltip = null;
+                if (currentTooltip === tooltipToHide) {
+                    currentTooltip = null;
+                }
             }, 200);
         }
     };
@@ -7695,7 +7702,7 @@ async function showCustomTagManagement() {
         tagSelectorDialog.subCategoryTabs.style.display = 'flex';
     }
     if (tagSelectorDialog.subSubCategoryTabs) {
-        tagSelectorDialog.subSubCategoryTabs.style.display = 'flex';
+        tagSelectorDialog.subSubCategoryTabs.style.display = 'none';
     }
     if (tagSelectorDialog.subSubSubCategoryTabs) {
         tagSelectorDialog.subSubSubCategoryTabs.style.display = 'none';
@@ -7766,11 +7773,27 @@ async function showCustomTagManagement() {
             deleteAllBtn.style.borderColor = 'rgba(239,68,68,0.8)';
             deleteAllBtn.style.transform = 'none';
         });
+
+        tagSelectorDialog.updateDeleteAllBtnState = (filterValue) => {
+            if (filterValue === '__all__') {
+                deleteAllBtn.innerHTML = `<span style="font-size: 14px; font-weight: 600; display: block;">${$t('deleteAll')}</span>`;
+            } else {
+                deleteAllBtn.innerHTML = `<span style="font-size: 14px; font-weight: 600; display: block;">${$t('deleteCategoryTags')}</span>`;
+            }
+        };
         
         deleteAllBtn.onclick = () => {
             const customTags = tagsData['自定义']?.['我的标签'] || [];
-            if (customTags.length === 0) {
-                showToast($t('noTagsToDelete'), 'info');
+            const currentFilter = tagSelectorDialog.currentManagementFilter || '__all__';
+            let filteredTags = customTags;
+            if (currentFilter === '__uncategorized__') {
+                filteredTags = customTags.filter(tag => !tag.category);
+            } else if (currentFilter !== '__all__') {
+                filteredTags = customTags.filter(tag => tag.category === currentFilter);
+            }
+
+            if (filteredTags.length === 0) {
+                showToast(currentFilter === '__all__' ? $t('noTagsToDelete') : $t('noCategoryTagsToDelete'), 'info');
                 return;
             }
             
@@ -7786,8 +7809,11 @@ async function showCustomTagManagement() {
             
             const warningMessage = document.createElement('div');
             warningMessage.style.cssText = `color: #f9fafb; font-size: 16px; margin-bottom: 20px; line-height: 1.5;`;
+            const warningText = currentFilter === '__all__'
+                ? $t('deleteAllWarningCount').replace('{count}', filteredTags.length)
+                : $t('deleteCategoryWarningCount').replace('{category}', currentFilter === '__uncategorized__' ? $t('uncategorized') : currentFilter).replace('{count}', filteredTags.length);
             warningMessage.innerHTML = `
-                <p>${$t('deleteAllWarningCount').replace('{count}', customTags.length)}</p>
+                <p>${warningText}</p>
                 <p style="color: #fbbf24; font-weight: bold;">${$t('thisActionCannotBeUndone')}</p>
                 <p style="color: #e5e7eb; font-size: 14px; margin-top: 10px;">${$t('pleaseEnterConfirmDelete').replace('{text}', `<strong style="color: #ef4444;">${$t('confirmDeleteText')}</strong>`)}</p>
             `;
@@ -7832,41 +7858,64 @@ async function showCustomTagManagement() {
             
             const confirmDelete = async () => {
                 try {
-                    const response = await fetch('/zhihui/user_tags/all', {
-                        method: 'DELETE',
-                        headers: {
-                            'Content-Type': 'application/json',
+                    if (currentFilter === '__all__') {
+                        const response = await fetch('/zhihui/user_tags/all', {
+                            method: 'DELETE',
+                            headers: { 'Content-Type': 'application/json' }
+                        });
+                        const result = await response.json();
+                        if (response.ok) {
+                            if (tagsData['自定义'] && tagsData['自定义']['我的标签']) {
+                                const allTags = tagsData['自定义']['我的标签'];
+                                allTags.forEach(tag => {
+                                    if (tag && tag.value) {
+                                        selectedTags.delete(tag.value);
+                                    }
+                                });
+                                tagsData['自定义']['我的标签'] = [];
+                            }
+                            localStorage.setItem('tagSelector_user_tags', JSON.stringify(tagsData));
+                            if (window.updateSelectedTagsOverview) window.updateSelectedTagsOverview();
+                            if (window.updateCategoryRedDots) window.updateCategoryRedDots();
+                            document.body.removeChild(warningDialog);
+                            showCustomTagManagement();
+                            showToast(result.message || $t('allTagsDeletedSuccess'), 'success');
+                        } else {
+                            showToast(result.error || $t('deleteFailed'), 'error');
                         }
-                    });
-                    
-                    const result = await response.json();
-                    
-                    if (response.ok) {
-                        if (tagsData['自定义'] && tagsData['自定义']['我的标签']) {
-                            const customTags = tagsData['自定义']['我的标签'];
-                            customTags.forEach(tag => {
+                    } else {
+                        const deletePromises = filteredTags.map(tag =>
+                            fetch('/zhihui/user_tags', {
+                                method: 'DELETE',
+                                headers: { 'Content-Type': 'application/json' },
+                                body: JSON.stringify({ name: tag.display })
+                            })
+                        );
+                        const results = await Promise.all(deletePromises);
+                        const allOk = results.every(r => r.ok);
+                        if (allOk) {
+                            filteredTags.forEach(tag => {
                                 if (tag && tag.value) {
                                     selectedTags.delete(tag.value);
                                 }
+                                const idx = customTags.indexOf(tag);
+                                if (idx !== -1) {
+                                    customTags.splice(idx, 1);
+                                }
                             });
-                            tagsData['自定义']['我的标签'] = [];
+                            localStorage.setItem('tagSelector_user_tags', JSON.stringify(tagsData));
+                            if (window.updateSelectedTagsOverview) window.updateSelectedTagsOverview();
+                            if (window.updateCategoryRedDots) window.updateCategoryRedDots();
+                            document.body.removeChild(warningDialog);
+                            showCustomTagManagement();
+                            const catLabel = currentFilter === '__uncategorized__' ? $t('uncategorized') : currentFilter;
+                            showToast($t('categoryTagsDeletedSuccess').replace('{category}', catLabel).replace('{count}', filteredTags.length), 'success');
+                        } else {
+                            showToast($t('deleteFailed'), 'error');
                         }
-
-                        localStorage.setItem('tagSelector_user_tags', JSON.stringify(tagsData));
-                        if (window.updateSelectedTagsOverview) {
-                            window.updateSelectedTagsOverview();
-                        }
-                        if (window.updateCategoryRedDots) {
-                            window.updateCategoryRedDots();
-                        }
-                        document.body.removeChild(warningDialog);
-                        showCustomTagManagement();
-                        showToast(result.message || $t('allTagsDeletedSuccess'), 'success');
-                    } else {
-                        showToast(result.error || $t('deleteFailed'), 'error');
                     }
                 } catch (error) {
-                    console.error('Error deleting all tags and images:', error);
+                    console.error('Error deleting tags:', error);
                     showToast($t('deleteFailed'), 'error');
                 }
             };
@@ -8003,10 +8052,6 @@ async function showCustomTagManagement() {
         tagSelectorDialog.managementButtonsContainer.style.display = 'flex';
     }
     
-    const titleBar = DOM.div(`color: #38f2f8ff; font-size: 16px; font-weight: 800; margin-bottom: 8px; text-align: center; padding: 8px 15px; background: linear-gradient(135deg, #1e293b 0%, #334155 100%); border: 1px solid rgba(59,130,246,0.3); border-radius: 6px;`);
-    titleBar.textContent = $t('editableTagsList');
-    tagContent.appendChild(titleBar);
-
     const filterBar = DOM.div(`display: flex; gap: 6px; margin-bottom: 12px; align-items: center; flex-wrap: wrap;`);
     tagContent.appendChild(filterBar);
 
@@ -8039,6 +8084,10 @@ async function showCustomTagManagement() {
             };
             tab.onclick = () => {
                 currentFilterValue = value;
+                tagSelectorDialog.currentManagementFilter = value;
+                if (tagSelectorDialog.updateDeleteAllBtnState) {
+                    tagSelectorDialog.updateDeleteAllBtnState(value);
+                }
                 updateFilterTabs();
                 renderFilteredTags();
             };
@@ -8084,6 +8133,10 @@ async function showCustomTagManagement() {
     }
 
     updateFilterTabs();
+    tagSelectorDialog.currentManagementFilter = currentFilterValue;
+    if (tagSelectorDialog.updateDeleteAllBtnState) {
+        tagSelectorDialog.updateDeleteAllBtnState(currentFilterValue);
+    }
 
     const tagList = DOM.div(`display: grid; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); gap: 15px; margin-bottom: 20px;`);
     tagContent.appendChild(tagList);
@@ -8154,7 +8207,7 @@ async function showCustomTagManagement() {
             }
             
             const tagContentPreview = document.createElement('div');
-            tagContentPreview.style.cssText = `color: #e2e8f0; font-size: 12px; max-height: 65px; overflow: hidden; text-overflow: ellipsis; display: -webkit-box; -webkit-line-clamp: 4; -webkit-box-orient: vertical; flex: 1;`;
+            tagContentPreview.style.cssText = `color: #e2e8f0; font-size: 12px; max-height: 65px; overflow: hidden; text-overflow: ellipsis; display: -webkit-box; -webkit-line-clamp: 4; -webkit-box-orient: vertical; flex: 1; overflow-wrap: break-word; word-break: break-all;`;
             tagContentPreview.textContent = tag.value;
             textContent.appendChild(tagContentPreview);
             tagItem.appendChild(textContent);
@@ -8505,6 +8558,26 @@ function showCategoryDropdown(anchorEl, filterSelect, updateFilterOptions) {
                 if (response.ok) {
                     customTagCategories = [];
                     await loadTagsData();
+                    const customTags = tagsData?.['自定义']?.['我的标签'];
+                    if (Array.isArray(customTags)) {
+                        const updatePromises = customTags.map(tag => {
+                            if (tag.category) {
+                                tag.category = '';
+                                return fetch('/zhihui/user_tags', {
+                                    method: 'POST',
+                                    headers: { 'Content-Type': 'application/json' },
+                                    body: JSON.stringify({
+                                        name: tag.display,
+                                        content: tag.value,
+                                        original_name: tag.display,
+                                        category: ''
+                                    })
+                                });
+                            }
+                            return Promise.resolve();
+                        });
+                        await Promise.all(updatePromises);
+                    }
                     renderCategoryList();
                     if (updateFilterOptions) updateFilterOptions();
                     showToast($t('allCategoriesDeletedSuccess'), 'success');
