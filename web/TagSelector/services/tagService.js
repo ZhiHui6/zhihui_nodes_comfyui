@@ -96,26 +96,35 @@ function getTagsFromCategoryPath(categoryPath) {
 
 function extractAllTagsFromObject(obj) {
     const tags = [];
-    
-    function traverse(o) {
-        if (Array.isArray(o)) {
-            o.forEach(item => {
-                if (typeof item === 'string') {
-                    tags.push(item);
-                } else if (typeof item === 'object' && item !== null) {
-                    if (item.value) {
-                        tags.push(item.value);
-                    } else if (item.chineseName) {
-                        tags.push(item.chineseName);
+
+    function extract(current) {
+        if (typeof current === 'object' && current !== null) {
+            if (Array.isArray(current)) {
+                current.forEach(item => {
+                    if (typeof item === 'string') {
+                        tags.push(item);
+                    } else if (typeof item === 'object' && item !== null) {
+                        const val = item.value || item.display || item.chineseName;
+                        if (val) tags.push(val);
                     }
-                }
-            });
-        } else if (typeof o === 'object' && o !== null) {
-            Object.values(o).forEach(v => traverse(v));
+                });
+            } else {
+                Object.entries(current).forEach(([key, value]) => {
+                    if (typeof value === 'string') {
+                        tags.push(value);
+                    } else if (typeof value === 'object' && value !== null) {
+                        if (value.value || value.display || value.chineseName) {
+                            tags.push(value.value || value.display || value.chineseName);
+                        } else {
+                            extract(value);
+                        }
+                    }
+                });
+            }
         }
     }
-    
-    traverse(obj);
+
+    extract(obj);
     return tags;
 }
 

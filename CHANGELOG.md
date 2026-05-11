@@ -1,5 +1,10 @@
 # 更新日志 / Changelog
 
+## 1.0.38 2026-5-11
+- 标签选择器节点(TagSelector)：优化代码结构，改进渲染性能和运行效率
+  <br>
+- TagSelector node: Optimized code structure, improved rendering performance, and run efficiency
+
 ## 1.0.37 2026-5-10
 - 标签选择器节点(TagSelector)：
   - 修复标签选择界面中出现的Bug

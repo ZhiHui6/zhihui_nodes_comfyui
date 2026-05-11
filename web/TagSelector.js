@@ -3,6 +3,7 @@ import { api } from "/scripts/api.js";
 import { i18n } from "./TagSelector/i18n/index.js";
 import { tagI18n } from "./TagSelector/i18n/tags.js";
 import { categoryTranslations } from "./TagSelector/i18n/categories.js";
+import { getState, setState, resetState } from "./TagSelector/core/state.js";
 
 const CONFIG = {
     ICON_SIZE: 24,
@@ -163,7 +164,7 @@ const S = (strings, ...values) => {
     for (let i = 0; i < values.length; i++) {
         result += values[i] + strings[i + 1];
     }
-    return result.replace(/s+/g, ' ').trim();
+    return result.replace(/\s+/g, ' ').trim();
 };
 
 
@@ -779,25 +780,25 @@ const PerformanceUtils = {
         };
     },
 
-    debounce(fn, delay = CONFIG.DEBOUNCE_DELAY) {
+    debounce(fn, wait = 100) {
         let timeoutId = null;
         return function(...args) {
             clearTimeout(timeoutId);
-            timeoutId = setTimeout(() => fn.apply(this, args), delay);
+            timeoutId = setTimeout(() => fn.apply(this, args), wait);
         };
     },
 
     requestAnimationFrameThrottle(fn) {
-        let ticking = false;
+        let rafId = null;
         let lastArgs = null;
         return function(...args) {
             lastArgs = args;
-            if (!ticking) {
-                requestAnimationFrame(() => {
+            if (rafId === null) {
+                rafId = requestAnimationFrame(() => {
                     fn.apply(this, lastArgs);
-                    ticking = false;
+                    rafId = null;
+                    lastArgs = null;
                 });
-                ticking = true;
             }
         };
     },
@@ -812,10 +813,10 @@ const PerformanceUtils = {
         parent.appendChild(fragment);
     },
 
-    memoize(fn) {
+    memoize(fn, resolver) {
         const cache = new Map();
-        return function(...args) {
-            const key = JSON.stringify(args);
+        const memoized = function(...args) {
+            const key = resolver ? resolver(...args) : JSON.stringify(args);
             if (cache.has(key)) {
                 return cache.get(key);
             }
@@ -823,16 +824,18 @@ const PerformanceUtils = {
             cache.set(key, result);
             return result;
         };
+        memoized.cache = cache;
+        return memoized;
     },
 
     weakMemoize(fn) {
         const cache = new WeakMap();
-        return function(obj) {
-            if (cache.has(obj)) {
-                return cache.get(obj);
+        return function(key, ...args) {
+            if (cache.has(key)) {
+                return cache.get(key);
             }
-            const result = fn.call(this, obj);
-            cache.set(obj, result);
+            const result = fn.call(this, key, ...args);
+            cache.set(key, result);
             return result;
         };
     },
@@ -843,50 +846,21 @@ const PerformanceUtils = {
             pool.push(factory());
         }
         return {
-            get() {
+            acquire() {
                 return pool.length > 0 ? pool.pop() : factory();
             },
             release(obj) {
                 reset(obj);
-                pool.push(obj);
+                if (pool.length < initialSize * 2) {
+                    pool.push(obj);
+                }
+            },
+            getPoolSize() {
+                return pool.length;
             }
         };
     }
 };
-
-const tooltipPool = PerformanceUtils.createObjectPool(
-    () => {
-        const tooltip = document.createElement('div');
-        tooltip.className = 'tag-tooltip';
-        return tooltip;
-    },
-    (tooltip) => {
-        tooltip.textContent = '';
-        tooltip.style.cssText = '';
-        if (tooltip.parentNode) {
-            tooltip.parentNode.removeChild(tooltip);
-        }
-    },
-    5
-);
-
-const tagElementPool = PerformanceUtils.createObjectPool(
-    () => {
-        const el = document.createElement('span');
-        el.className = 'tag-element';
-        return el;
-    },
-    (el) => {
-        el.textContent = '';
-        el.style.cssText = '';
-        el.dataset.value = '';
-        el.dataset.originalDisplay = '';
-        if (el.parentNode) {
-            el.parentNode.removeChild(el);
-        }
-    },
-    20
-);
 
 const domCache = new Map();
 const searchCache = new Map();
@@ -1083,72 +1057,103 @@ let randomSettings = {
     totalTagsRange: { min: 12, max: 20 }
 };
 
+const BASE_CATEGORIES = {
+    '常规标签.画质': { enabled: true, weight: 1, count: 1 },
+    '常规标签.摄影': { enabled: true, weight: 1, count: 1 },
+    '常规标签.构图': { enabled: true, weight: 1, count: 1 },
+    '常规标签.光影': { enabled: true, weight: 1, count: 1 },
+    '艺术题材.艺术家风格': { enabled: true, weight: 1, count: 1 },
+    '艺术题材.艺术流派': { enabled: true, weight: 1, count: 1 },
+    '艺术题材.技法形式': { enabled: true, weight: 1, count: 1 },
+    '艺术题材.媒介与效果': { enabled: true, weight: 1, count: 1 },
+    '艺术题材.装饰图案': { enabled: true, weight: 1, count: 1 },
+    '艺术题材.色彩与质感': { enabled: true, weight: 1, count: 1 },
+    '人物类.角色.动漫角色': { enabled: true, weight: 1, count: 1 },
+    '人物类.角色.游戏角色': { enabled: true, weight: 1, count: 1 },
+    '人物类.角色.二次元虚拟偶像': { enabled: true, weight: 1, count: 1 },
+    '人物类.角色.3D动画角色': { enabled: true, weight: 1, count: 1 },
+    '人物类.外貌与特征': { enabled: true, weight: 1, count: 1 },
+    '人物类.人设.职业': { enabled: true, weight: 1, count: 1 },
+    '人物类.人设.性别/年龄': { enabled: true, weight: 1, count: 1 },
+    '人物类.人设.胸部': { enabled: true, weight: 1, count: 1 },
+    '人物类.人设.脸型': { enabled: true, weight: 1, count: 1 },
+    '人物类.人设.鼻子': { enabled: true, weight: 1, count: 1 },
+    '人物类.人设.嘴巴': { enabled: true, weight: 1, count: 1 },
+    '人物类.人设.皮肤': { enabled: true, weight: 1, count: 1 },
+    '人物类.人设.体型': { enabled: true, weight: 1, count: 1 },
+    '人物类.人设.眉毛': { enabled: true, weight: 1, count: 1 },
+    '人物类.人设.头发': { enabled: true, weight: 1, count: 1 },
+    '人物类.人设.眼睛': { enabled: true, weight: 1, count: 1 },
+    '人物类.人设.瞳孔': { enabled: true, weight: 1, count: 1 },
+    '人物类.服饰': { enabled: true, weight: 1, count: 1 },
+    '人物类.服饰.常服': { enabled: true, weight: 1, count: 1 },
+    '人物类.服饰.泳装': { enabled: true, weight: 1, count: 1 },
+    '人物类.服饰.运动装': { enabled: true, weight: 1, count: 1 },
+    '人物类.服饰.内衣': { enabled: true, weight: 1, count: 1 },
+    '人物类.服饰.配饰': { enabled: true, weight: 1, count: 1 },
+    '人物类.服饰.鞋类': { enabled: true, weight: 1, count: 1 },
+    '人物类.服饰.睡衣': { enabled: true, weight: 1, count: 1 },
+    '人物类.服饰.帽子': { enabled: true, weight: 1, count: 1 },
+    '人物类.服饰.制服COS': { enabled: true, weight: 1, count: 1 },
+    '人物类.服饰.传统服饰': { enabled: true, weight: 1, count: 1 },
+    '动作/表情.姿态动作': { enabled: true, weight: 1, count: 1 },
+    '动作/表情.多人互动': { enabled: true, weight: 1, count: 1 },
+    '动作/表情.手部': { enabled: true, weight: 1, count: 1 },
+    '动作/表情.腿部': { enabled: true, weight: 1, count: 1 },
+    '动作/表情.眼神': { enabled: true, weight: 1, count: 1 },
+    '动作/表情.表情': { enabled: true, weight: 1, count: 1 },
+    '动作/表情.嘴型': { enabled: true, weight: 1, count: 1 },
+    '道具.翅膀': { enabled: true, weight: 1, count: 1 },
+    '道具.尾巴': { enabled: true, weight: 1, count: 1 },
+    '道具.耳朵': { enabled: true, weight: 1, count: 1 },
+    '道具.角': { enabled: true, weight: 1, count: 1 },
+    '场景类.光线环境': { enabled: true, weight: 1, count: 1 },
+    '场景类.情感与氛围': { enabled: true, weight: 1, count: 1 },
+    '场景类.背景环境': { enabled: true, weight: 1, count: 1 },
+    '场景类.反射效果': { enabled: true, weight: 1, count: 1 },
+    '场景类.室外': { enabled: true, weight: 1, count: 1 },
+    '场景类.城市': { enabled: true, weight: 1, count: 1 },
+    '场景类.建筑': { enabled: true, weight: 1, count: 1 },
+    '场景类.室内装饰': { enabled: true, weight: 1, count: 1 },
+    '场景类.自然景观': { enabled: true, weight: 1, count: 1 },
+    '场景类.人造景观': { enabled: true, weight: 1, count: 1 },
+    '动物生物.动物': { enabled: true, weight: 1, count: 1 },
+    '动物生物.幻想生物': { enabled: true, weight: 1, count: 1 },
+    '动物生物.行为动态': { enabled: true, weight: 1, count: 1 }
+};
+
+function makeCategories(overrides) {
+    const categories = {};
+    for (const [key, defaults] of Object.entries(BASE_CATEGORIES)) {
+        categories[key] = { ...defaults, ...(overrides[key] || {}) };
+    }
+    return categories;
+}
+
 function resetRandomSettings() {
     randomSettings = {
-        categories: {
-            '常规标签.画质': { enabled: true, weight: 2, count: 1 },
-            '常规标签.摄影': { enabled: true, weight: 2, count: 1 },
-            '常规标签.构图': { enabled: true, weight: 2, count: 1 },
-            '常规标签.光影': { enabled: true, weight: 2, count: 1 },
-            '艺术题材.艺术家风格': { enabled: true, weight: 1, count: 1 },
-            '艺术题材.艺术流派': { enabled: true, weight: 1, count: 1 },
-            '艺术题材.技法形式': { enabled: true, weight: 1, count: 1 },
-            '艺术题材.媒介与效果': { enabled: true, weight: 1, count: 1 },
-            '艺术题材.装饰图案': { enabled: true, weight: 1, count: 1 },
-            '艺术题材.色彩与质感': { enabled: true, weight: 1, count: 1 },
-            '人物类.角色.动漫角色': { enabled: true, weight: 2, count: 1 },
-            '人物类.角色.游戏角色': { enabled: true, weight: 1, count: 1 },
-            '人物类.角色.二次元虚拟偶像': { enabled: true, weight: 1, count: 1 },
-            '人物类.角色.3D动画角色': { enabled: true, weight: 1, count: 1 },
-            '人物类.外貌与特征': { enabled: true, weight: 2, count: 2 },
-            '人物类.人设.职业': { enabled: true, weight: 1, count: 1 },
-            '人物类.人设.性别/年龄': { enabled: true, weight: 1, count: 1 },
-            '人物类.人设.胸部': { enabled: true, weight: 1, count: 1 },
-            '人物类.人设.脸型': { enabled: true, weight: 1, count: 1 },
-            '人物类.人设.鼻子': { enabled: true, weight: 1, count: 1 },
-            '人物类.人设.嘴巴': { enabled: true, weight: 1, count: 1 },
-            '人物类.人设.皮肤': { enabled: true, weight: 1, count: 1 },
-            '人物类.人设.体型': { enabled: true, weight: 1, count: 1 },
-            '人物类.人设.眉毛': { enabled: true, weight: 1, count: 1 },
-            '人物类.人设.头发': { enabled: true, weight: 2, count: 1 },
-            '人物类.人设.眼睛': { enabled: true, weight: 2, count: 1 },
-            '人物类.人设.瞳孔': { enabled: true, weight: 1, count: 1 },
-            '人物类.服饰': { enabled: true, weight: 2, count: 2 },
-            '人物类.服饰.常服': { enabled: true, weight: 2, count: 1 },
-            '人物类.服饰.泳装': { enabled: true, weight: 1, count: 1 },
-            '人物类.服饰.运动装': { enabled: true, weight: 1, count: 1 },
-            '人物类.服饰.内衣': { enabled: true, weight: 1, count: 1 },
-            '人物类.服饰.配饰': { enabled: true, weight: 1, count: 1 },
-            '人物类.服饰.鞋类': { enabled: true, weight: 1, count: 1 },
-            '人物类.服饰.睡衣': { enabled: true, weight: 1, count: 1 },
-            '人物类.服饰.帽子': { enabled: true, weight: 1, count: 1 },
-            '人物类.服饰.制服COS': { enabled: true, weight: 1, count: 1 },
-            '人物类.服饰.传统服饰': { enabled: true, weight: 1, count: 1 },
-            '动作/表情.姿态动作': { enabled: true, weight: 2, count: 1 },
-            '动作/表情.多人互动': { enabled: true, weight: 1, count: 1 },
-            '动作/表情.手部': { enabled: true, weight: 1, count: 1 },
-            '动作/表情.腿部': { enabled: true, weight: 1, count: 1 },
-            '动作/表情.眼神': { enabled: true, weight: 1, count: 1 },
-            '动作/表情.表情': { enabled: true, weight: 2, count: 1 },
-            '动作/表情.嘴型': { enabled: true, weight: 1, count: 1 },
-            '道具.翅膀': { enabled: true, weight: 1, count: 1 },
-            '道具.尾巴': { enabled: true, weight: 1, count: 1 },
-            '道具.耳朵': { enabled: true, weight: 1, count: 1 },
-            '道具.角': { enabled: true, weight: 1, count: 1 },
-            '场景类.光线环境': { enabled: true, weight: 2, count: 1 },
-            '场景类.情感与氛围': { enabled: true, weight: 2, count: 1 },
-            '场景类.背景环境': { enabled: true, weight: 1, count: 1 },
-            '场景类.反射效果': { enabled: true, weight: 1, count: 1 },
-            '场景类.室外': { enabled: true, weight: 2, count: 1 },
-            '场景类.城市': { enabled: true, weight: 1, count: 1 },
-            '场景类.建筑': { enabled: true, weight: 2, count: 1 },
-            '场景类.室内装饰': { enabled: true, weight: 1, count: 1 },
-            '场景类.自然景观': { enabled: true, weight: 2, count: 1 },
-            '场景类.人造景观': { enabled: true, weight: 1, count: 1 },
-            '动物生物.动物': { enabled: false, weight: 1, count: 1 },
-            '动物生物.幻想生物': { enabled: false, weight: 1, count: 1 },
-            '动物生物.行为动态': { enabled: false, weight: 1, count: 1 }
-        },
+        categories: makeCategories({
+            '常规标签.画质': { weight: 2 },
+            '常规标签.摄影': { weight: 2 },
+            '常规标签.构图': { weight: 2 },
+            '常规标签.光影': { weight: 2 },
+            '人物类.角色.动漫角色': { weight: 2 },
+            '人物类.外貌与特征': { weight: 2, count: 2 },
+            '人物类.人设.头发': { weight: 2 },
+            '人物类.人设.眼睛': { weight: 2 },
+            '人物类.服饰': { weight: 2, count: 2 },
+            '人物类.服饰.常服': { weight: 2 },
+            '动作/表情.姿态动作': { weight: 2 },
+            '动作/表情.表情': { weight: 2 },
+            '场景类.光线环境': { weight: 2 },
+            '场景类.情感与氛围': { weight: 2 },
+            '场景类.室外': { weight: 2 },
+            '场景类.建筑': { weight: 2 },
+            '场景类.自然景观': { weight: 2 },
+            '动物生物.动物': { enabled: false },
+            '动物生物.幻想生物': { enabled: false },
+            '动物生物.行为动态': { enabled: false }
+        }),
         adultCategories: { ...ENABLED_ADULT_CATEGORIES },
         excludedCategories: ['自定义', '灵感套装'],
         includeNSFW: false,
@@ -1163,70 +1168,7 @@ const randomPresets = {
         icon: '🔄',
         color: '#22c55e',
         settings: {
-            categories: {
-                '常规标签.画质': { enabled: true, weight: 1, count: 1 },
-                '常规标签.摄影': { enabled: true, weight: 1, count: 1 },
-                '常规标签.构图': { enabled: true, weight: 1, count: 1 },
-                '常规标签.光影': { enabled: true, weight: 1, count: 1 },
-                '艺术题材.艺术家风格': { enabled: true, weight: 1, count: 1 },
-                '艺术题材.艺术流派': { enabled: true, weight: 1, count: 1 },
-                '艺术题材.技法形式': { enabled: true, weight: 1, count: 1 },
-                '艺术题材.媒介与效果': { enabled: true, weight: 1, count: 1 },
-                '艺术题材.装饰图案': { enabled: true, weight: 1, count: 1 },
-                '艺术题材.色彩与质感': { enabled: true, weight: 1, count: 1 },
-                '人物类.角色.动漫角色': { enabled: true, weight: 1, count: 1 },
-                '人物类.角色.游戏角色': { enabled: true, weight: 1, count: 1 },
-                '人物类.角色.二次元虚拟偶像': { enabled: true, weight: 1, count: 1 },
-                '人物类.角色.3D动画角色': { enabled: true, weight: 1, count: 1 },
-                '人物类.外貌与特征': { enabled: true, weight: 1, count: 1 },
-                '人物类.人设.职业': { enabled: true, weight: 1, count: 1 },
-                '人物类.人设.性别/年龄': { enabled: true, weight: 1, count: 1 },
-                '人物类.人设.胸部': { enabled: true, weight: 1, count: 1 },
-                '人物类.人设.脸型': { enabled: true, weight: 1, count: 1 },
-                '人物类.人设.鼻子': { enabled: true, weight: 1, count: 1 },
-                '人物类.人设.嘴巴': { enabled: true, weight: 1, count: 1 },
-                '人物类.人设.皮肤': { enabled: true, weight: 1, count: 1 },
-                '人物类.人设.体型': { enabled: true, weight: 1, count: 1 },
-                '人物类.人设.眉毛': { enabled: true, weight: 1, count: 1 },
-                '人物类.人设.头发': { enabled: true, weight: 1, count: 1 },
-                '人物类.人设.眼睛': { enabled: true, weight: 1, count: 1 },
-                '人物类.人设.瞳孔': { enabled: true, weight: 1, count: 1 },
-                '人物类.服饰': { enabled: true, weight: 1, count: 1 },
-                '人物类.服饰.常服': { enabled: true, weight: 1, count: 1 },
-                '人物类.服饰.泳装': { enabled: true, weight: 1, count: 1 },
-                '人物类.服饰.运动装': { enabled: true, weight: 1, count: 1 },
-                '人物类.服饰.内衣': { enabled: true, weight: 1, count: 1 },
-                '人物类.服饰.配饰': { enabled: true, weight: 1, count: 1 },
-                '人物类.服饰.鞋类': { enabled: true, weight: 1, count: 1 },
-                '人物类.服饰.睡衣': { enabled: true, weight: 1, count: 1 },
-                '人物类.服饰.帽子': { enabled: true, weight: 1, count: 1 },
-                '人物类.服饰.制服COS': { enabled: true, weight: 1, count: 1 },
-                '人物类.服饰.传统服饰': { enabled: true, weight: 1, count: 1 },
-                '动作/表情.姿态动作': { enabled: true, weight: 1, count: 1 },
-                '动作/表情.多人互动': { enabled: true, weight: 1, count: 1 },
-                '动作/表情.手部': { enabled: true, weight: 1, count: 1 },
-                '动作/表情.腿部': { enabled: true, weight: 1, count: 1 },
-                '动作/表情.眼神': { enabled: true, weight: 1, count: 1 },
-                '动作/表情.表情': { enabled: true, weight: 1, count: 1 },
-                '动作/表情.嘴型': { enabled: true, weight: 1, count: 1 },
-                '道具.翅膀': { enabled: true, weight: 1, count: 1 },
-                '道具.尾巴': { enabled: true, weight: 1, count: 1 },
-                '道具.耳朵': { enabled: true, weight: 1, count: 1 },
-                '道具.角': { enabled: true, weight: 1, count: 1 },
-                '场景类.光线环境': { enabled: true, weight: 1, count: 1 },
-                '场景类.情感与氛围': { enabled: true, weight: 1, count: 1 },
-                '场景类.背景环境': { enabled: true, weight: 1, count: 1 },
-                '场景类.反射效果': { enabled: true, weight: 1, count: 1 },
-                '场景类.室外': { enabled: true, weight: 1, count: 1 },
-                '场景类.城市': { enabled: true, weight: 1, count: 1 },
-                '场景类.建筑': { enabled: true, weight: 1, count: 1 },
-                '场景类.室内装饰': { enabled: true, weight: 1, count: 1 },
-                '场景类.自然景观': { enabled: true, weight: 1, count: 1 },
-                '场景类.人造景观': { enabled: true, weight: 1, count: 1 },
-                '动物生物.动物': { enabled: true, weight: 1, count: 1 },
-                '动物生物.幻想生物': { enabled: true, weight: 1, count: 1 },
-                '动物生物.行为动态': { enabled: true, weight: 1, count: 1 }
-            },
+            categories: makeCategories({}),
             adultCategories: { ...DISABLED_ADULT_CATEGORIES },
             excludedCategories: ['自定义', '灵感套装'],
             includeNSFW: false,
@@ -1238,70 +1180,69 @@ const randomPresets = {
         icon: '👤',
         color: '#1e40af',
         settings: {
-            categories: {
-                '常规标签.画质': { enabled: true, weight: 5, count: 2 },
-                '常规标签.摄影': { enabled: true, weight: 3, count: 1 },
-                '常规标签.构图': { enabled: true, weight: 3, count: 1 },
-                '常规标签.光影': { enabled: true, weight: 4, count: 1 },
-                '艺术题材.艺术家风格': { enabled: true, weight: 2, count: 1 },
-                '艺术题材.艺术流派': { enabled: false, weight: 1, count: 1 },
-                '艺术题材.技法形式': { enabled: true, weight: 2, count: 1 },
-                '艺术题材.媒介与效果': { enabled: true, weight: 2, count: 1 },
-                '艺术题材.装饰图案': { enabled: false, weight: 1, count: 1 },
-                '艺术题材.色彩与质感': { enabled: true, weight: 3, count: 1 },
-                '人物类.角色.动漫角色': { enabled: false, weight: 1, count: 1 },
-                '人物类.角色.游戏角色': { enabled: false, weight: 1, count: 1 },
-                '人物类.角色.二次元虚拟偶像': { enabled: false, weight: 1, count: 1 },
-                '人物类.角色.3D动画角色': { enabled: false, weight: 1, count: 1 },
-                '人物类.外貌与特征': { enabled: true, weight: 4, count: 3 },
-                '人物类.人设.职业': { enabled: true, weight: 1, count: 1 },
-                '人物类.人设.性别/年龄': { enabled: true, weight: 3, count: 1 },
-                '人物类.人设.胸部': { enabled: true, weight: 2, count: 1 },
-                '人物类.人设.脸型': { enabled: true, weight: 3, count: 1 },
-                '人物类.人设.鼻子': { enabled: true, weight: 2, count: 1 },
-                '人物类.人设.嘴巴': { enabled: true, weight: 3, count: 1 },
-                '人物类.人设.皮肤': { enabled: true, weight: 3, count: 1 },
-                '人物类.人设.体型': { enabled: true, weight: 2, count: 1 },
-                '人物类.人设.眉毛': { enabled: true, weight: 3, count: 1 },
-                '人物类.人设.头发': { enabled: true, weight: 4, count: 2 },
-                '人物类.人设.眼睛': { enabled: true, weight: 4, count: 2 },
-                '人物类.人设.瞳孔': { enabled: true, weight: 3, count: 1 },
-                '人物类.服饰': { enabled: true, weight: 2, count: 1 },
-                '人物类.服饰.常服': { enabled: true, weight: 2, count: 1 },
-                '人物类.服饰.泳装': { enabled: false, weight: 1, count: 1 },
-                '人物类.服饰.运动装': { enabled: false, weight: 1, count: 1 },
-                '人物类.服饰.内衣': { enabled: false, weight: 1, count: 1 },
-                '人物类.服饰.配饰': { enabled: true, weight: 2, count: 1 },
-                '人物类.服饰.鞋类': { enabled: false, weight: 1, count: 1 },
-                '人物类.服饰.睡衣': { enabled: false, weight: 1, count: 1 },
-                '人物类.服饰.帽子': { enabled: true, weight: 2, count: 1 },
-                '人物类.服饰.制服COS': { enabled: false, weight: 1, count: 1 },
-                '人物类.服饰.传统服饰': { enabled: true, weight: 2, count: 1 },
-                '动作/表情.姿态动作': { enabled: true, weight: 2, count: 1 },
-                '动作/表情.多人互动': { enabled: false, weight: 1, count: 1 },
-                '动作/表情.手部': { enabled: true, weight: 2, count: 1 },
-                '动作/表情.腿部': { enabled: false, weight: 1, count: 1 },
-                '动作/表情.眼神': { enabled: true, weight: 4, count: 1 },
-                '动作/表情.表情': { enabled: true, weight: 4, count: 1 },
-                '动作/表情.嘴型': { enabled: true, weight: 3, count: 1 },
-                '道具.翅膀': { enabled: false, weight: 1, count: 1 },
-                '道具.尾巴': { enabled: false, weight: 1, count: 1 },
-                '道具.耳朵': { enabled: false, weight: 1, count: 1 },
-                '道具.角': { enabled: false, weight: 1, count: 1 },
-                '场景类.光线环境': { enabled: true, weight: 4, count: 1 },
-                '场景类.情感与氛围': { enabled: true, weight: 3, count: 1 },
-                '场景类.背景环境': { enabled: true, weight: 2, count: 1 },
-                '场景类.反射效果': { enabled: true, weight: 2, count: 1 },
-                '场景类.室外': { enabled: false, weight: 1, count: 1 },
-                '场景类.城市': { enabled: false, weight: 1, count: 1 },
-                '场景类.建筑': { enabled: false, weight: 1, count: 1 },
-                '场景类.室内装饰': { enabled: true, weight: 2, count: 1 },
-                '场景类.自然景观': { enabled: false, weight: 1, count: 1 },
-                '场景类.人造景观': { enabled: false, weight: 1, count: 1 },
-                '动物生物.动物': { enabled: false, weight: 1, count: 1 },
-                '动物生物.幻想生物': { enabled: false, weight: 1, count: 1 },
-                '动物生物.行为动态': { enabled: false, weight: 1, count: 1 }
-            },
+            categories: makeCategories({
+                '常规标签.画质': { weight: 5, count: 2 },
+                '常规标签.摄影': { weight: 3 },
+                '常规标签.构图': { weight: 3 },
+                '常规标签.光影': { weight: 4 },
+                '艺术题材.艺术家风格': { weight: 2 },
+                '艺术题材.艺术流派': { enabled: false },
+                '艺术题材.技法形式': { weight: 2 },
+                '艺术题材.媒介与效果': { weight: 2 },
+                '艺术题材.装饰图案': { enabled: false },
+                '艺术题材.色彩与质感': { weight: 3 },
+                '人物类.角色.动漫角色': { enabled: false },
+                '人物类.角色.游戏角色': { enabled: false },
+                '人物类.角色.二次元虚拟偶像': { enabled: false },
+                '人物类.角色.3D动画角色': { enabled: false },
+                '人物类.外貌与特征': { weight: 4, count: 3 },
+                '人物类.人设.性别/年龄': { weight: 3 },
+                '人物类.人设.胸部': { weight: 2 },
+                '人物类.人设.脸型': { weight: 3 },
+                '人物类.人设.鼻子': { weight: 2 },
+                '人物类.人设.嘴巴': { weight: 3 },
+                '人物类.人设.皮肤': { weight: 3 },
+                '人物类.人设.体型': { weight: 2 },
+                '人物类.人设.眉毛': { weight: 3 },
+                '人物类.人设.头发': { weight: 4, count: 2 },
+                '人物类.人设.眼睛': { weight: 4, count: 2 },
+                '人物类.人设.瞳孔': { weight: 3 },
+                '人物类.服饰': { weight: 2 },
+                '人物类.服饰.常服': { weight: 2 },
+                '人物类.服饰.泳装': { enabled: false },
+                '人物类.服饰.运动装': { enabled: false },
+                '人物类.服饰.内衣': { enabled: false },
+                '人物类.服饰.配饰': { weight: 2 },
+                '人物类.服饰.鞋类': { enabled: false },
+                '人物类.服饰.睡衣': { enabled: false },
+                '人物类.服饰.帽子': { weight: 2 },
+                '人物类.服饰.制服COS': { enabled: false },
+                '人物类.服饰.传统服饰': { weight: 2 },
+                '动作/表情.姿态动作': { weight: 2 },
+                '动作/表情.多人互动': { enabled: false },
+                '动作/表情.手部': { weight: 2 },
+                '动作/表情.腿部': { enabled: false },
+                '动作/表情.眼神': { weight: 4 },
+                '动作/表情.表情': { weight: 4 },
+                '动作/表情.嘴型': { weight: 3 },
+                '道具.翅膀': { enabled: false },
+                '道具.尾巴': { enabled: false },
+                '道具.耳朵': { enabled: false },
+                '道具.角': { enabled: false },
+                '场景类.光线环境': { weight: 4 },
+                '场景类.情感与氛围': { weight: 3 },
+                '场景类.背景环境': { weight: 2 },
+                '场景类.反射效果': { weight: 2 },
+                '场景类.室外': { enabled: false },
+                '场景类.城市': { enabled: false },
+                '场景类.建筑': { enabled: false },
+                '场景类.室内装饰': { weight: 2 },
+                '场景类.自然景观': { enabled: false },
+                '场景类.人造景观': { enabled: false },
+                '动物生物.动物': { enabled: false },
+                '动物生物.幻想生物': { enabled: false },
+                '动物生物.行为动态': { enabled: false }
+            }),
             adultCategories: { ...DISABLED_ADULT_CATEGORIES },
             excludedCategories: ['自定义', '灵感套装'],
             includeNSFW: false,
@@ -1313,70 +1254,70 @@ const randomPresets = {
         icon: '🧍',
         color: '#92400e',
         settings: {
-            categories: {
-                '常规标签.画质': { enabled: true, weight: 4, count: 2 },
-                '常规标签.摄影': { enabled: true, weight: 3, count: 1 },
-                '常规标签.构图': { enabled: true, weight: 4, count: 1 },
-                '常规标签.光影': { enabled: true, weight: 3, count: 1 },
-                '艺术题材.艺术家风格': { enabled: true, weight: 2, count: 1 },
-                '艺术题材.艺术流派': { enabled: false, weight: 1, count: 1 },
-                '艺术题材.技法形式': { enabled: true, weight: 2, count: 1 },
-                '艺术题材.媒介与效果': { enabled: true, weight: 2, count: 1 },
-                '艺术题材.装饰图案': { enabled: false, weight: 1, count: 1 },
-                '艺术题材.色彩与质感': { enabled: true, weight: 3, count: 1 },
-                '人物类.角色.动漫角色': { enabled: false, weight: 1, count: 1 },
-                '人物类.角色.游戏角色': { enabled: false, weight: 1, count: 1 },
-                '人物类.角色.二次元虚拟偶像': { enabled: false, weight: 1, count: 1 },
-                '人物类.角色.3D动画角色': { enabled: false, weight: 1, count: 1 },
-                '人物类.外貌与特征': { enabled: true, weight: 3, count: 2 },
-                '人物类.人设.职业': { enabled: true, weight: 2, count: 1 },
-                '人物类.人设.性别/年龄': { enabled: true, weight: 3, count: 1 },
-                '人物类.人设.胸部': { enabled: true, weight: 2, count: 1 },
-                '人物类.人设.脸型': { enabled: true, weight: 2, count: 1 },
-                '人物类.人设.鼻子': { enabled: true, weight: 2, count: 1 },
-                '人物类.人设.嘴巴': { enabled: true, weight: 2, count: 1 },
-                '人物类.人设.皮肤': { enabled: true, weight: 2, count: 1 },
-                '人物类.人设.体型': { enabled: true, weight: 3, count: 1 },
-                '人物类.人设.眉毛': { enabled: true, weight: 2, count: 1 },
-                '人物类.人设.头发': { enabled: true, weight: 3, count: 1 },
-                '人物类.人设.眼睛': { enabled: true, weight: 3, count: 1 },
-                '人物类.人设.瞳孔': { enabled: true, weight: 2, count: 1 },
-                '人物类.服饰': { enabled: true, weight: 4, count: 2 },
-                '人物类.服饰.常服': { enabled: true, weight: 3, count: 1 },
-                '人物类.服饰.泳装': { enabled: true, weight: 2, count: 1 },
-                '人物类.服饰.运动装': { enabled: true, weight: 2, count: 1 },
-                '人物类.服饰.内衣': { enabled: false, weight: 1, count: 1 },
-                '人物类.服饰.配饰': { enabled: true, weight: 3, count: 1 },
-                '人物类.服饰.鞋类': { enabled: true, weight: 2, count: 1 },
-                '人物类.服饰.睡衣': { enabled: false, weight: 1, count: 1 },
-                '人物类.服饰.帽子': { enabled: true, weight: 2, count: 1 },
-                '人物类.服饰.制服COS': { enabled: true, weight: 2, count: 1 },
-                '人物类.服饰.传统服饰': { enabled: true, weight: 2, count: 1 },
-                '动作/表情.姿态动作': { enabled: true, weight: 4, count: 1 },
-                '动作/表情.多人互动': { enabled: false, weight: 1, count: 1 },
-                '动作/表情.手部': { enabled: true, weight: 3, count: 1 },
-                '动作/表情.腿部': { enabled: true, weight: 3, count: 1 },
-                '动作/表情.眼神': { enabled: true, weight: 2, count: 1 },
-                '动作/表情.表情': { enabled: true, weight: 3, count: 1 },
-                '动作/表情.嘴型': { enabled: true, weight: 2, count: 1 },
-                '道具.翅膀': { enabled: true, weight: 2, count: 1 },
-                '道具.尾巴': { enabled: true, weight: 2, count: 1 },
-                '道具.耳朵': { enabled: true, weight: 2, count: 1 },
-                '道具.角': { enabled: true, weight: 2, count: 1 },
-                '场景类.光线环境': { enabled: true, weight: 3, count: 1 },
-                '场景类.情感与氛围': { enabled: true, weight: 3, count: 1 },
-                '场景类.背景环境': { enabled: true, weight: 3, count: 1 },
-                '场景类.反射效果': { enabled: true, weight: 2, count: 1 },
-                '场景类.室外': { enabled: true, weight: 2, count: 1 },
-                '场景类.城市': { enabled: true, weight: 2, count: 1 },
-                '场景类.建筑': { enabled: true, weight: 2, count: 1 },
-                '场景类.室内装饰': { enabled: true, weight: 2, count: 1 },
-                '场景类.自然景观': { enabled: true, weight: 2, count: 1 },
-                '场景类.人造景观': { enabled: true, weight: 2, count: 1 },
-                '动物生物.动物': { enabled: false, weight: 1, count: 1 },
-                '动物生物.幻想生物': { enabled: false, weight: 1, count: 1 },
-                '动物生物.行为动态': { enabled: false, weight: 1, count: 1 }
-            },
+            categories: makeCategories({
+                '常规标签.画质': { weight: 4, count: 2 },
+                '常规标签.摄影': { weight: 3 },
+                '常规标签.构图': { weight: 4 },
+                '常规标签.光影': { weight: 3 },
+                '艺术题材.艺术家风格': { weight: 2 },
+                '艺术题材.艺术流派': { enabled: false },
+                '艺术题材.技法形式': { weight: 2 },
+                '艺术题材.媒介与效果': { weight: 2 },
+                '艺术题材.装饰图案': { enabled: false },
+                '艺术题材.色彩与质感': { weight: 3 },
+                '人物类.角色.动漫角色': { enabled: false },
+                '人物类.角色.游戏角色': { enabled: false },
+                '人物类.角色.二次元虚拟偶像': { enabled: false },
+                '人物类.角色.3D动画角色': { enabled: false },
+                '人物类.外貌与特征': { weight: 3, count: 2 },
+                '人物类.人设.职业': { weight: 2 },
+                '人物类.人设.性别/年龄': { weight: 3 },
+                '人物类.人设.胸部': { weight: 2 },
+                '人物类.人设.脸型': { weight: 2 },
+                '人物类.人设.鼻子': { weight: 2 },
+                '人物类.人设.嘴巴': { weight: 2 },
+                '人物类.人设.皮肤': { weight: 2 },
+                '人物类.人设.体型': { weight: 3 },
+                '人物类.人设.眉毛': { weight: 2 },
+                '人物类.人设.头发': { weight: 3 },
+                '人物类.人设.眼睛': { weight: 3 },
+                '人物类.人设.瞳孔': { weight: 2 },
+                '人物类.服饰': { weight: 4, count: 2 },
+                '人物类.服饰.常服': { weight: 3 },
+                '人物类.服饰.泳装': { weight: 2 },
+                '人物类.服饰.运动装': { weight: 2 },
+                '人物类.服饰.内衣': { enabled: false },
+                '人物类.服饰.配饰': { weight: 3 },
+                '人物类.服饰.鞋类': { weight: 2 },
+                '人物类.服饰.睡衣': { enabled: false },
+                '人物类.服饰.帽子': { weight: 2 },
+                '人物类.服饰.制服COS': { weight: 2 },
+                '人物类.服饰.传统服饰': { weight: 2 },
+                '动作/表情.姿态动作': { weight: 4 },
+                '动作/表情.多人互动': { enabled: false },
+                '动作/表情.手部': { weight: 3 },
+                '动作/表情.腿部': { weight: 3 },
+                '动作/表情.眼神': { weight: 2 },
+                '动作/表情.表情': { weight: 3 },
+                '动作/表情.嘴型': { weight: 2 },
+                '道具.翅膀': { weight: 2 },
+                '道具.尾巴': { weight: 2 },
+                '道具.耳朵': { weight: 2 },
+                '道具.角': { weight: 2 },
+                '场景类.光线环境': { weight: 3 },
+                '场景类.情感与氛围': { weight: 3 },
+                '场景类.背景环境': { weight: 3 },
+                '场景类.反射效果': { weight: 2 },
+                '场景类.室外': { weight: 2 },
+                '场景类.城市': { weight: 2 },
+                '场景类.建筑': { weight: 2 },
+                '场景类.室内装饰': { weight: 2 },
+                '场景类.自然景观': { weight: 2 },
+                '场景类.人造景观': { weight: 2 },
+                '动物生物.动物': { enabled: false },
+                '动物生物.幻想生物': { enabled: false },
+                '动物生物.行为动态': { enabled: false }
+            }),
             adultCategories: { ...DISABLED_ADULT_CATEGORIES },
             excludedCategories: ['自定义', '灵感套装'],
             includeNSFW: false,
@@ -1388,70 +1329,70 @@ const randomPresets = {
         icon: '🏞️',
         color: '#047857',
         settings: {
-            categories: {
-                '常规标签.画质': { enabled: true, weight: 5, count: 2 },
-                '常规标签.摄影': { enabled: true, weight: 3, count: 1 },
-                '常规标签.构图': { enabled: true, weight: 4, count: 1 },
-                '常规标签.光影': { enabled: true, weight: 4, count: 1 },
-                '艺术题材.艺术家风格': { enabled: true, weight: 2, count: 1 },
-                '艺术题材.艺术流派': { enabled: true, weight: 2, count: 1 },
-                '艺术题材.技法形式': { enabled: true, weight: 2, count: 1 },
-                '艺术题材.媒介与效果': { enabled: true, weight: 2, count: 1 },
-                '艺术题材.装饰图案': { enabled: false, weight: 1, count: 1 },
-                '艺术题材.色彩与质感': { enabled: true, weight: 4, count: 1 },
-                '人物类.角色.动漫角色': { enabled: false, weight: 1, count: 1 },
-                '人物类.角色.游戏角色': { enabled: false, weight: 1, count: 1 },
-                '人物类.角色.二次元虚拟偶像': { enabled: false, weight: 1, count: 1 },
-                '人物类.角色.3D动画角色': { enabled: false, weight: 1, count: 1 },
-                '人物类.外貌与特征': { enabled: false, weight: 1, count: 1 },
-                '人物类.人设.职业': { enabled: false, weight: 1, count: 1 },
-                '人物类.人设.性别/年龄': { enabled: false, weight: 1, count: 1 },
-                '人物类.人设.胸部': { enabled: false, weight: 1, count: 1 },
-                '人物类.人设.脸型': { enabled: false, weight: 1, count: 1 },
-                '人物类.人设.鼻子': { enabled: false, weight: 1, count: 1 },
-                '人物类.人设.嘴巴': { enabled: false, weight: 1, count: 1 },
-                '人物类.人设.皮肤': { enabled: false, weight: 1, count: 1 },
-                '人物类.人设.体型': { enabled: false, weight: 1, count: 1 },
-                '人物类.人设.眉毛': { enabled: false, weight: 1, count: 1 },
-                '人物类.人设.头发': { enabled: false, weight: 1, count: 1 },
-                '人物类.人设.眼睛': { enabled: false, weight: 1, count: 1 },
-                '人物类.人设.瞳孔': { enabled: false, weight: 1, count: 1 },
-                '人物类.服饰': { enabled: false, weight: 1, count: 1 },
-                '人物类.服饰.常服': { enabled: false, weight: 1, count: 1 },
-                '人物类.服饰.泳装': { enabled: false, weight: 1, count: 1 },
-                '人物类.服饰.运动装': { enabled: false, weight: 1, count: 1 },
-                '人物类.服饰.内衣': { enabled: false, weight: 1, count: 1 },
-                '人物类.服饰.配饰': { enabled: false, weight: 1, count: 1 },
-                '人物类.服饰.鞋类': { enabled: false, weight: 1, count: 1 },
-                '人物类.服饰.睡衣': { enabled: false, weight: 1, count: 1 },
-                '人物类.服饰.帽子': { enabled: false, weight: 1, count: 1 },
-                '人物类.服饰.制服COS': { enabled: false, weight: 1, count: 1 },
-                '人物类.服饰.传统服饰': { enabled: false, weight: 1, count: 1 },
-                '动作/表情.姿态动作': { enabled: false, weight: 1, count: 1 },
-                '动作/表情.多人互动': { enabled: false, weight: 1, count: 1 },
-                '动作/表情.手部': { enabled: false, weight: 1, count: 1 },
-                '动作/表情.腿部': { enabled: false, weight: 1, count: 1 },
-                '动作/表情.眼神': { enabled: false, weight: 1, count: 1 },
-                '动作/表情.表情': { enabled: false, weight: 1, count: 1 },
-                '动作/表情.嘴型': { enabled: false, weight: 1, count: 1 },
-                '道具.翅膀': { enabled: false, weight: 1, count: 1 },
-                '道具.尾巴': { enabled: false, weight: 1, count: 1 },
-                '道具.耳朵': { enabled: false, weight: 1, count: 1 },
-                '道具.角': { enabled: false, weight: 1, count: 1 },
-                '场景类.光线环境': { enabled: true, weight: 4, count: 1 },
-                '场景类.情感与氛围': { enabled: true, weight: 4, count: 1 },
-                '场景类.背景环境': { enabled: true, weight: 4, count: 1 },
-                '场景类.反射效果': { enabled: true, weight: 3, count: 1 },
-                '场景类.室外': { enabled: true, weight: 4, count: 1 },
-                '场景类.城市': { enabled: true, weight: 3, count: 1 },
-                '场景类.建筑': { enabled: true, weight: 4, count: 1 },
-                '场景类.室内装饰': { enabled: true, weight: 3, count: 1 },
-                '场景类.自然景观': { enabled: true, weight: 4, count: 2 },
-                '场景类.人造景观': { enabled: true, weight: 3, count: 1 },
-                '动物生物.动物': { enabled: true, weight: 2, count: 1 },
-                '动物生物.幻想生物': { enabled: true, weight: 2, count: 1 },
-                '动物生物.行为动态': { enabled: true, weight: 2, count: 1 }
-            },
+            categories: makeCategories({
+                '常规标签.画质': { weight: 5, count: 2 },
+                '常规标签.摄影': { weight: 3 },
+                '常规标签.构图': { weight: 4 },
+                '常规标签.光影': { weight: 4 },
+                '艺术题材.艺术家风格': { weight: 2 },
+                '艺术题材.艺术流派': { weight: 2 },
+                '艺术题材.技法形式': { weight: 2 },
+                '艺术题材.媒介与效果': { weight: 2 },
+                '艺术题材.装饰图案': { enabled: false },
+                '艺术题材.色彩与质感': { weight: 4 },
+                '人物类.角色.动漫角色': { enabled: false },
+                '人物类.角色.游戏角色': { enabled: false },
+                '人物类.角色.二次元虚拟偶像': { enabled: false },
+                '人物类.角色.3D动画角色': { enabled: false },
+                '人物类.外貌与特征': { enabled: false },
+                '人物类.人设.职业': { enabled: false },
+                '人物类.人设.性别/年龄': { enabled: false },
+                '人物类.人设.胸部': { enabled: false },
+                '人物类.人设.脸型': { enabled: false },
+                '人物类.人设.鼻子': { enabled: false },
+                '人物类.人设.嘴巴': { enabled: false },
+                '人物类.人设.皮肤': { enabled: false },
+                '人物类.人设.体型': { enabled: false },
+                '人物类.人设.眉毛': { enabled: false },
+                '人物类.人设.头发': { enabled: false },
+                '人物类.人设.眼睛': { enabled: false },
+                '人物类.人设.瞳孔': { enabled: false },
+                '人物类.服饰': { enabled: false },
+                '人物类.服饰.常服': { enabled: false },
+                '人物类.服饰.泳装': { enabled: false },
+                '人物类.服饰.运动装': { enabled: false },
+                '人物类.服饰.内衣': { enabled: false },
+                '人物类.服饰.配饰': { enabled: false },
+                '人物类.服饰.鞋类': { enabled: false },
+                '人物类.服饰.睡衣': { enabled: false },
+                '人物类.服饰.帽子': { enabled: false },
+                '人物类.服饰.制服COS': { enabled: false },
+                '人物类.服饰.传统服饰': { enabled: false },
+                '动作/表情.姿态动作': { enabled: false },
+                '动作/表情.多人互动': { enabled: false },
+                '动作/表情.手部': { enabled: false },
+                '动作/表情.腿部': { enabled: false },
+                '动作/表情.眼神': { enabled: false },
+                '动作/表情.表情': { enabled: false },
+                '动作/表情.嘴型': { enabled: false },
+                '道具.翅膀': { enabled: false },
+                '道具.尾巴': { enabled: false },
+                '道具.耳朵': { enabled: false },
+                '道具.角': { enabled: false },
+                '场景类.光线环境': { weight: 4 },
+                '场景类.情感与氛围': { weight: 4 },
+                '场景类.背景环境': { weight: 4 },
+                '场景类.反射效果': { weight: 3 },
+                '场景类.室外': { weight: 4 },
+                '场景类.城市': { weight: 3 },
+                '场景类.建筑': { weight: 4 },
+                '场景类.室内装饰': { weight: 3 },
+                '场景类.自然景观': { weight: 4, count: 2 },
+                '场景类.人造景观': { weight: 3 },
+                '动物生物.动物': { weight: 2 },
+                '动物生物.幻想生物': { weight: 2 },
+                '动物生物.行为动态': { weight: 2 }
+            }),
             adultCategories: { ...DISABLED_ADULT_CATEGORIES },
             excludedCategories: ['自定义', '灵感套装'],
             includeNSFW: false,
@@ -3960,6 +3901,14 @@ function createTagSelectorDialog() {
 
 let adultContentEnabled = false;
 let adultContentUnlocked = false;
+let adultUnlockTimestamp = 0;
+let adultFailedAttempts = 0;
+let adultLockoutUntil = 0;
+
+const ADULT_SESSION_TIMEOUT = 4 * 60 * 60 * 1000;
+const ADULT_MAX_FAILED_ATTEMPTS = 5;
+const ADULT_LOCKOUT_DURATION = 30000;
+const ADULT_STORAGE_SALT = 'zhihui_adult_v2_salt_2024';
 
 window.adultContentEnabled = adultContentEnabled;
 window.adultContentUnlocked = adultContentUnlocked;
@@ -3969,32 +3918,81 @@ function updateWindowAdultStatus() {
     window.adultContentUnlocked = adultContentUnlocked;
 }
 
+function _adultStorageHash(data) {
+    let hash = 5381;
+    const str = data + ADULT_STORAGE_SALT;
+    for (let i = 0; i < str.length; i++) {
+        hash = ((hash << 5) + hash) + str.charCodeAt(i);
+        hash = hash & hash;
+    }
+    return hash.toString(36);
+}
+
 function loadAdultContentSettings() {
     try {
-        const settings = localStorage.getItem('zhihui_adult_settings');
-        if (settings) {
-            const parsed = JSON.parse(settings);
-            adultContentEnabled = parsed.enabled || false;
-            adultContentUnlocked = parsed.unlocked || false;
-            updateWindowAdultStatus();
+        const raw = localStorage.getItem('zhihui_adult_settings');
+        if (!raw) return;
+        const parsed = JSON.parse(raw);
+        const expectedHash = _adultStorageHash(
+            String(parsed.enabled) + String(parsed.unlocked) + String(parsed.timestamp || 0)
+        );
+        if (parsed._sig !== expectedHash) {
+            localStorage.removeItem('zhihui_adult_settings');
+            return;
         }
+        adultContentEnabled = parsed.enabled || false;
+        adultContentUnlocked = parsed.unlocked || false;
+        adultUnlockTimestamp = parsed.timestamp || 0;
+
+        if (adultContentEnabled && adultUnlockTimestamp > 0) {
+            const elapsed = Date.now() - adultUnlockTimestamp;
+            if (elapsed > ADULT_SESSION_TIMEOUT) {
+                adultContentEnabled = false;
+                adultContentUnlocked = false;
+                adultUnlockTimestamp = 0;
+                saveAdultContentSettings();
+            }
+        }
+        updateWindowAdultStatus();
     } catch (e) {
-        console.error('加载成人内容设置失败:', e);
+        localStorage.removeItem('zhihui_adult_settings');
     }
 }
 
 function saveAdultContentSettings() {
     try {
-        localStorage.setItem('zhihui_adult_settings', JSON.stringify({
+        const data = {
             enabled: adultContentEnabled,
-            unlocked: adultContentUnlocked
-        }));
-    } catch (e) {
-        console.error('保存成人内容设置失败:', e);
+            unlocked: adultContentUnlocked,
+            timestamp: adultUnlockTimestamp
+        };
+        data._sig = _adultStorageHash(
+            String(data.enabled) + String(data.unlocked) + String(data.timestamp)
+        );
+        localStorage.setItem('zhihui_adult_settings', JSON.stringify(data));
+    } catch (e) {}
+}
+
+function _generateVerificationCode() {
+    const chars = 'ABCDEFGHJKLMNPQRSTUVWXYZ23456789';
+    let code = '';
+    for (let i = 0; i < 4; i++) {
+        code += chars.charAt(Math.floor(Math.random() * chars.length));
     }
+    return code;
 }
 
 function showAdultUnlockDialog(onUnlock) {
+    if (adultLockoutUntil > Date.now()) {
+        const remaining = Math.ceil((adultLockoutUntil - Date.now()) / 1000);
+        showToast(`验证已锁定，请 ${remaining} 秒后再试`, 'error');
+        return;
+    }
+
+    const verificationCode = _generateVerificationCode();
+    const locale = getLocale();
+    const isZh = locale === 'zh';
+
     const overlay = DOM.div(`position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.7); z-index: 20000; display: flex; align-items: center; justify-content: center; backdrop-filter: blur(8px);`);
 
     const dialog = DOM.div(`background:linear-gradient(135deg,#1e293b 0%,#0f172a 100%); border: 2px solid #ef4444; border-radius: 16px; padding: 24px; max-width: 500px; width: 90%; max-height: 80vh; overflow-y: auto; box-shadow: 0 25px 50px -12px rgba(0,0,0,0.5);`);
@@ -4063,13 +4061,15 @@ function showAdultUnlockDialog(onUnlock) {
     const inputLabel = document.createElement('div');
     inputLabel.innerHTML = `
         <span style="color: #fca5a5; font-size: 13px; font-weight: 500;">${$t('enterVerification')}</span>
-        <span style="color: #ef4444; font-size: 14px; font-weight: 700;">${$t('verificationText')}</span>
+        <span style="color: #ef4444; font-size: 18px; font-weight: 700; background: rgba(239,68,68,0.15); padding: 2px 8px; border-radius: 4px; letter-spacing: 3px; font-family: monospace;">${verificationCode}</span>
     `;
-    inputLabel.style.cssText = `margin-bottom: 8px;`;
+    inputLabel.style.cssText = `margin-bottom: 8px; display: flex; align-items: center; gap: 8px;`;
 
     const textInput = document.createElement('input');
     textInput.type = 'text';
-    textInput.placeholder = $t('enterVerificationPlaceholder');
+    textInput.placeholder = isZh ? '请输入上方验证码' : 'Enter the code above';
+    textInput.autocomplete = 'off';
+    textInput.spellcheck = false;
     textInput.style.cssText = `width: 100%; padding: 10px 12px; border: 1px solid rgba(239,68,68,0.4); border-radius: 6px; background: rgba(15,23,42,0.8); color: #e2e8f0; font-size: 14px; box-sizing: border-box; transition: all 0.2s; user-select: none; -webkit-user-select: none; -moz-user-select: none; -ms-user-select: none;`;
     textInput.onfocus = () => {
         textInput.style.borderColor = '#ef4444';
@@ -4091,9 +4091,16 @@ function showAdultUnlockDialog(onUnlock) {
         e.preventDefault();
         return false;
     };
+    textInput.oncontextmenu = (e) => {
+        e.preventDefault();
+        return false;
+    };
 
     inputContainer.appendChild(inputLabel);
     inputContainer.appendChild(textInput);
+
+    const errorMsg = document.createElement('div');
+    errorMsg.style.cssText = `color: #ef4444; font-size: 12px; margin-top: 4px; min-height: 18px; display: none;`;
 
     const buttonContainer = DOM.div(`display: flex; gap: 12px; justify-content: center;`);
 
@@ -4140,7 +4147,7 @@ function showAdultUnlockDialog(onUnlock) {
 
     function updateConfirmButton() {
         const isChecked = checkbox.checked;
-        const isTextValid = textInput.value.trim() === $t('verificationText');
+        const isTextValid = textInput.value.trim().toUpperCase() === verificationCode;
         const canConfirm = isChecked && isTextValid && countdownFinished;
 
         confirmBtn.disabled = !canConfirm;
@@ -4150,7 +4157,11 @@ function showAdultUnlockDialog(onUnlock) {
     }
 
     checkbox.onchange = updateConfirmButton;
-    textInput.oninput = updateConfirmButton;
+    textInput.oninput = function() {
+        textInput.value = textInput.value.toUpperCase();
+        errorMsg.style.display = 'none';
+        updateConfirmButton();
+    };
 
     confirmBtn.onmouseenter = () => {
         if (!confirmBtn.disabled) {
@@ -4166,8 +4177,29 @@ function showAdultUnlockDialog(onUnlock) {
     };
     confirmBtn.onclick = () => {
         if (!confirmBtn.disabled) {
+            if (textInput.value.trim().toUpperCase() !== verificationCode) {
+                adultFailedAttempts++;
+                errorMsg.textContent = isZh
+                    ? `验证码错误，剩余尝试次数: ${ADULT_MAX_FAILED_ATTEMPTS - adultFailedAttempts}`
+                    : `Invalid code, attempts remaining: ${ADULT_MAX_FAILED_ATTEMPTS - adultFailedAttempts}`;
+                errorMsg.style.display = 'block';
+                textInput.value = '';
+                textInput.style.borderColor = '#ef4444';
+                updateConfirmButton();
+
+                if (adultFailedAttempts >= ADULT_MAX_FAILED_ATTEMPTS) {
+                    adultLockoutUntil = Date.now() + ADULT_LOCKOUT_DURATION;
+                    adultFailedAttempts = 0;
+                    document.body.removeChild(overlay);
+                    showToast(isZh ? '验证失败次数过多，已锁定30秒' : 'Too many failed attempts, locked for 30s', 'error');
+                }
+                return;
+            }
+
+            adultFailedAttempts = 0;
             adultContentUnlocked = true;
             adultContentEnabled = true;
+            adultUnlockTimestamp = Date.now();
             updateWindowAdultStatus();
             saveAdultContentSettings();
             document.body.removeChild(overlay);
@@ -4182,6 +4214,7 @@ function showAdultUnlockDialog(onUnlock) {
     dialog.appendChild(warning);
     dialog.appendChild(checkboxContainer);
     dialog.appendChild(inputContainer);
+    dialog.appendChild(errorMsg);
     dialog.appendChild(buttonContainer);
     overlay.appendChild(dialog);
     document.body.appendChild(overlay);
@@ -4940,6 +4973,7 @@ function showSettingsDropdown(anchorEl) {
             showAdultCloseConfirmDialog(() => {
                 adultContentEnabled = false;
                 adultContentUnlocked = false;
+                adultUnlockTimestamp = 0;
                 updateWindowAdultStatus();
                 saveAdultContentSettings();
                 initializeCategoryList();
@@ -4997,6 +5031,7 @@ function createAdultToggleButton() {
             showAdultCloseConfirmDialog(() => {
                 adultContentEnabled = false;
                 adultContentUnlocked = false;
+                adultUnlockTimestamp = 0;
                 updateWindowAdultStatus();
                 saveAdultContentSettings();
                 updateAdultToggleUI(titleIcon, title, button, buttonText, wrapper);

@@ -6,16 +6,28 @@ import random
 from typing import Dict, Any, Optional, List, Set
 from aiohttp import web
 from server import PromptServer
-from functools import lru_cache
 import time
 import urllib.parse
 from cryptography.fernet import Fernet
-import urllib3
-urllib3.disable_warnings(urllib3.exceptions.InsecureRequestWarning)
+
+_http_session = None
+
+
+def _get_http_session():
+    global _http_session
+    if _http_session is None:
+        adapter = requests.adapters.HTTPAdapter(
+            pool_connections=10,
+            pool_maxsize=10,
+            max_retries=2,
+        )
+        _http_session = requests.Session()
+        _http_session.mount("https://", adapter)
+        _http_session.mount("http://", adapter)
+    return _http_session
 
 
 class TagSelectorCache:
-    _instance = None
     _config_cache = None
     _config_cache_time = 0
     _api_keys_cache = None
@@ -24,49 +36,65 @@ class TagSelectorCache:
     _tags_data_cache_time = 0
     _random_settings_cache = None
     _random_settings_cache_time = 0
-    CACHE_TTL = 5
+    CACHE_TTL = 300
 
     @classmethod
-    def get_instance(cls):
-        if cls._instance is None:
-            cls._instance = cls()
-        return cls._instance
+    def _get_default_config_path(cls):
+        return os.path.join(
+            os.path.dirname(os.path.dirname(os.path.dirname(__file__))),
+            "zhiai_api_config.json",
+        )
 
-    def get_config(self, config_path: str) -> dict:
+    @classmethod
+    def _get_default_keys_path(cls):
+        return os.path.join(
+            os.path.dirname(os.path.dirname(os.path.dirname(__file__))),
+            "zhiai_api_keys.json",
+        )
+
+    @classmethod
+    def get_config(cls, config_path: str = None) -> dict:
+        if config_path is None:
+            config_path = cls._get_default_config_path()
         current_time = time.time()
-        if (self._config_cache is not None and 
-            current_time - self._config_cache_time < self.CACHE_TTL):
-            return self._config_cache
+        if (cls._config_cache is not None and 
+            current_time - cls._config_cache_time < cls.CACHE_TTL):
+            return cls._config_cache
         
         try:
             with open(config_path, "r", encoding="utf-8") as f:
-                self._config_cache = json.load(f)
-                self._config_cache_time = current_time
-                return self._config_cache
+                cls._config_cache = json.load(f)
+                cls._config_cache_time = current_time
+                return cls._config_cache
         except Exception:
             return {"platforms": {}, "default_platform": "auto"}
 
-    def get_api_keys(self, keys_path: str) -> dict:
+    @classmethod
+    def get_api_keys(cls, keys_path: str = None) -> dict:
+        if keys_path is None:
+            keys_path = cls._get_default_keys_path()
         current_time = time.time()
-        if (self._api_keys_cache is not None and 
-            current_time - self._api_keys_cache_time < self.CACHE_TTL):
-            return self._api_keys_cache
+        if (cls._api_keys_cache is not None and 
+            current_time - cls._api_keys_cache_time < cls.CACHE_TTL):
+            return cls._api_keys_cache
         
         try:
             with open(keys_path, "r", encoding="utf-8") as f:
-                self._api_keys_cache = json.load(f)
-                self._api_keys_cache_time = current_time
-                return self._api_keys_cache
+                cls._api_keys_cache = json.load(f)
+                cls._api_keys_cache_time = current_time
+                return cls._api_keys_cache
         except Exception:
             return {}
 
-    def invalidate_config_cache(self):
-        self._config_cache = None
-        self._config_cache_time = 0
+    @classmethod
+    def invalidate_config_cache(cls):
+        cls._config_cache = None
+        cls._config_cache_time = 0
 
-    def invalidate_api_keys_cache(self):
-        self._api_keys_cache = None
-        self._api_keys_cache_time = 0
+    @classmethod
+    def invalidate_api_keys_cache(cls):
+        cls._api_keys_cache = None
+        cls._api_keys_cache_time = 0
 
 
 class TagSelector:
@@ -82,9 +110,9 @@ class TagSelector:
             os.path.dirname(os.path.dirname(os.path.dirname(__file__))),
             "zhiai_api_keys.json",
         )
-        self._cache = TagSelectorCache.get_instance()
-        self.config = self._cache.get_config(self.config_path)
-        self.api_keys = self._cache.get_api_keys(self.keys_path)
+        self._cache = TagSelectorCache
+        self.config = TagSelectorCache.get_config(self.config_path)
+        self.api_keys = TagSelectorCache.get_api_keys(self.keys_path)
 
     def load_config(self):
         try:
@@ -109,7 +137,7 @@ class TagSelector:
 
     @classmethod
     def get_platforms_list(cls):
-        config = cls().load_config()
+        config = TagSelectorCache.get_config()
         platforms = ["auto"]
         for platform_key, platform_info in config.get("platforms", {}).items():
             if isinstance(platform_info, dict):
@@ -122,7 +150,7 @@ class TagSelector:
 
     @classmethod
     def get_platform_map(cls):
-        config = cls().load_config()
+        config = TagSelectorCache.get_config()
         platform_map = {"auto": "auto"}
         for platform_key, platform_info in config.get("platforms", {}).items():
             if isinstance(platform_info, dict):
@@ -266,22 +294,15 @@ class TagSelector:
                 if not setting:
                     continue
 
-                should_include = random.random() < (
-                    setting["weight"] / 10
-                )  # 权重转换为概率
-
-                if should_include:
+                if setting["weight"] > 0:
                     tags = self._get_tags_from_category_path(tags_data, category_path)
                     if tags:
-                        random_tags = random.sample(
-                            tags, min(setting["count"], len(tags))
-                        )
+                        select_count = min(setting["count"], len(tags))
+                        effective_count = max(1, round(select_count * setting["weight"] / 2))
+                        effective_count = min(effective_count, len(tags))
+                        random_tags = random.sample(tags, effective_count)
                         for tag in random_tags:
-                            tag_value = (
-                                tag
-                                if isinstance(tag, str)
-                                else tag.get("value", tag.get("display", ""))
-                            )
+                            tag_value = self._extract_tag_value(tag)
                             if tag_value and tag_value not in used_tags:
                                 used_tags.add(tag_value)
                                 generated_tags.append(tag_value)
@@ -303,7 +324,7 @@ class TagSelector:
                     target_count - len(generated_tags), len(remaining_tags)
                 )
                 if additional_count > 0:
-                    additional_tags = random.sample(remaining_tags, additional_count)
+                    additional_tags = random.sample(remaining_tags, min(additional_count, len(remaining_tags)))
                     generated_tags.extend(additional_tags)
 
             result = ", ".join(generated_tags)
@@ -419,55 +440,60 @@ class TagSelector:
 
         return self._extract_all_tags_from_object(current)
 
+    @staticmethod
+    def _extract_tag_value(item):
+        if isinstance(item, str):
+            return item
+        if isinstance(item, dict):
+            return item.get("value", item.get("display", ""))
+        return None
+
     def _extract_all_tags_from_object(self, obj):
         tags = []
 
         def extract(current):
             if isinstance(current, dict):
                 for key, value in current.items():
-                    if isinstance(value, str):
-                        tags.append(value)
+                    val = self._extract_tag_value(value)
+                    if val is not None:
+                        tags.append(val)
                     elif isinstance(value, dict):
                         extract(value)
                     elif isinstance(value, list):
                         for item in value:
-                            if isinstance(item, dict) and "value" in item:
-                                tags.append(item["value"])
-                            elif isinstance(item, str):
-                                tags.append(item)
+                            val = self._extract_tag_value(item)
+                            if val is not None:
+                                tags.append(val)
             elif isinstance(current, list):
                 for item in current:
-                    if isinstance(item, dict) and "value" in item:
-                        tags.append(item["value"])
-                    elif isinstance(item, str):
-                        tags.append(item)
+                    val = self._extract_tag_value(item)
+                    if val is not None:
+                        tags.append(val)
 
         extract(obj)
         return tags
 
     def _get_all_available_tags(self, tags_data, random_settings):
         all_tags = []
-        excluded_categories = random_settings.get("excludedCategories", [])
+        excluded_categories = set(random_settings.get("excludedCategories", []))
 
         def extract_from_category(obj, category_path=""):
             if isinstance(obj, dict):
                 for key, value in obj.items():
                     current_path = f"{category_path}.{key}" if category_path else key
-                    is_excluded = any(
-                        excluded in current_path or excluded in key
-                        for excluded in excluded_categories
-                    )
+                    path_parts = current_path.split(".")
+                    is_excluded = any(part in excluded_categories for part in path_parts)
                     if not is_excluded:
-                        if isinstance(value, str):
-                            all_tags.append(value)
+                        val = self._extract_tag_value(value)
+                        if val is not None:
+                            all_tags.append(val)
                         elif isinstance(value, dict):
                             extract_from_category(value, current_path)
                         elif isinstance(value, list):
                             for item in value:
-                                if isinstance(item, dict) and "value" in item:
-                                    all_tags.append(item["value"])
-                                elif isinstance(item, str):
-                                    all_tags.append(item)
+                                val = self._extract_tag_value(item)
+                                if val is not None:
+                                    all_tags.append(val)
 
         extract_from_category(tags_data)
         return all_tags
@@ -503,11 +529,63 @@ class TagSelector:
             else:
                 return platform_id, None
 
-        for platform_id, platform_config in self.config["platforms"].items():
+        for platform_id, platform_config in self.config.get("platforms", {}).items():
             api_key = self.get_api_key(platform_id)
             if api_key and platform_config.get("enabled", True):
                 return platform_id, platform_config
         return None, None
+
+    @staticmethod
+    def _print_error_block(*lines):
+        print("\n" + "=" * 60)
+        for line in lines:
+            print(line)
+        print("=" * 60 + "\n")
+
+    def _build_system_prompt(self, expand_mode, is_chinese):
+        prompts_path = os.path.join(os.path.dirname(__file__), "prompts.json")
+        try:
+            with open(prompts_path, "r", encoding="utf-8") as f:
+                prompts = json.load(f)
+            lang_key = "zh" if is_chinese else "en"
+            return prompts.get(expand_mode, {}).get(lang_key, None)
+        except Exception:
+            return None
+
+    def _resolve_platform(self, selected_platform):
+        self.config = self.load_config()
+        platform_id, platform_config = self.get_platform(selected_platform)
+
+        if not platform_id:
+            msg = "[TagSelector] 错误：未配置可用的API平台\n请在ComfyUI设置页面的 ZhiAI > API配置 中配置至少一个平台的API密钥"
+            self._print_error_block("[TagSelector] 错误：未配置可用的API平台", "请在ComfyUI设置页面的 ZhiAI > API配置 中配置至少一个平台的API密钥")
+            return None, None, msg
+
+        if platform_config is None:
+            platform_names = {}
+            for p_key, p_info in self.config.get("platforms", {}).items():
+                if isinstance(p_info, dict):
+                    platform_names[p_key] = p_info.get("name", p_key)
+            if "User-defined" not in platform_names.values():
+                platform_names["custom"] = "User-defined"
+            platform_name = platform_names.get(platform_id, platform_id)
+            msg = f"[TagSelector] 错误：当前选择的平台 '{platform_name}' 未配置API密钥\n请在设置页面配置 {platform_name} 的API密钥，或将默认平台切换为其他已配置的平台"
+            self._print_error_block(
+                f"[TagSelector] 错误：当前选择的平台 '{platform_name}' 未配置API密钥",
+                f"请在设置页面配置 {platform_name} 的API密钥，或将默认平台切换为其他已配置的平台"
+            )
+            return None, None, msg
+
+        api_key = self.get_api_key(platform_id)
+        if not api_key:
+            msg = f"[TagSelector] 错误：{platform_config['name']} 未配置API密钥\n请在设置页面配置 {platform_config['name']} 的API密钥"
+            self._print_error_block(
+                f"[TagSelector] 错误：{platform_config['name']} 未配置API密钥",
+                f"请在设置页面配置 {platform_config['name']} 的API密钥"
+            )
+            return None, None, msg
+
+        return platform_id, platform_config, None
 
     def _expand_tags_with_llm(
         self,
@@ -519,263 +597,88 @@ class TagSelector:
     ) -> str:
         try:
             is_chinese = output_language == "Chinese"
-
-            if expand_mode == "Tag Style":
-                if is_chinese:
-                    system_prompt = """你是一个专业的AI绘画提示词扩写助手。请将用户提供的简单标签扩写成极致详细、更丰富的标签形式。
-
-要求：
-1. 保持标签格式，用逗号分隔
-2. 为每个标签添加更多描述性的修饰词
-3. 增加相关的风格、质量、技术参数标签
-4. 保持原有标签的核心含义不变
-5. 输出应该是可以直接用于AI绘画的提示词标签
-6. 直接给出结果，不要出现说明解释性的句段
-7. 请用中文输出所有标签
-
-示例：
-输入：girl, cat, garden
-输出：美丽女孩, 可爱女孩, 精致面部, 表情丰富的眼睛, 可爱猫咪, 毛茸茸的猫, 猫耳朵, 茂盛花园, 盛开花朵, 自然光线, 高质量, 杰作, 精细, 8k分辨率"""
-                else:
-                    system_prompt = """You are a professional AI art prompt expansion assistant. Please expand the simple tags provided by the user into extremely detailed and more richer tag formats.
-
-Requirements:
-1. Maintain tag format, separated by commas
-2. Add more descriptive modifiers to each tag
-3. Add related style, quality, and technical parameter tags
-4. Keep the core meaning of original tags unchanged
-5. Output should be prompt tags that can be directly used for AI art
-6. Give results directly without explanatory sentences
-7. Please output all tags in English
-
-Example:
-Input: girl, cat, garden
-Output: beautiful girl, cute girl, detailed face, expressive eyes, adorable cat, fluffy cat, cat ears, lush garden, blooming flowers, natural lighting, high quality, masterpiece, detailed, 8k resolution"""
-
-            elif expand_mode == "Natural Language":
-                if is_chinese:
-                    system_prompt = """你是一个专业的AI绘画提示词扩写助手。请将用户提供的标签转换成自然流畅的句子。
-
-要求：
-1. 将标签组合成完整的、描述性的句子
-2. 添加极致丰富的细节描述
-3. 使用生动的形容词和副词
-4. 保持语言自然流畅
-5. 适合用作AI绘画的提示词
-6. 直接给出结果，不要出现说明解释性的句段
-7. 请用中文输出描述
-
-示例：
-输入：girl, cat, garden
-输出：一个美丽的年轻女孩，有着富有表现力的眼睛和温柔笑容，坐在一个郁郁葱葱的盛开花园里，花园里满是五颜六色的花朵，她怀里抱一只可爱猫，猫咪有着柔软的毛发，周围被透过绿叶的自然阳光包围，营造出一个宁静而迷人的场景，具有高细节和艺术品质"""
-                else:
-                    system_prompt = """You are a professional AI art prompt expansion assistant. Please convert the tags provided by the user into natural and fluent sentences.
-
-Requirements:
-1. Combine tags into complete, descriptive sentences
-2. Add extreme rich detail descriptions
-3. Use vivid adjectives and adverbs
-4. Keep language natural and fluent
-5. Suitable for use as AI art prompts
-6. Give results directly without explanatory sentences
-7. Please output description in English
-
-Example:
-Input: girl, cat, garden
-Output: A beautiful young girl with expressive eyes and a gentle smile, sitting in a lush blooming garden filled with colorful flowers, holding a cute fluffy cat with soft fur, surrounded by natural sunlight filtering through green leaves, creating a peaceful and enchanting scene with high detail and artistic quality"""
-
-            elif expand_mode == "Structured JSON":
-                if is_chinese:
-                    system_prompt = """你是一位精通AI绘画提示词结构化设计的专家，擅长将描述转化为结构清晰的JSON格式提示词。
-
-你的任务是将用户提供的标签转化为结构化的JSON格式，便于程序解析和处理。
-
-输出JSON结构说明：
-{
-    "quality": ["画质相关标签，如masterpiece, best quality, highly detailed等"],
-    "subject": {
-        "main": "主体描述，如人物、物体、场景等",
-        "appearance": ["外观特征，如发型、肤色、体型等"],
-        "clothing": ["服装描述"],
-        "accessories": ["配饰描述"],
-        "pose": ["姿态动作"],
-        "expression": ["表情描述"]
-    },
-    "environment": {
-        "location": "场景位置",
-        "lighting": ["光线效果"],
-        "atmosphere": ["氛围描述"],
-        "background": ["背景元素"]
-    },
-    "style": {
-        "art_style": ["艺术风格，如写实、动漫、油画等"],
-        "technique": ["技法，如水彩、素描、3D渲染等"],
-        "color_palette": ["色彩风格"]
-    },
-    "technical": {
-        "composition": ["构图方式"],
-        "camera": ["镜头参数"],
-        "rendering": ["渲染技术"]
-    }
-}
-
-要求：
-1. 根据用户提供的标签，智能填充JSON结构的各个字段
-2. 如果某些字段不适用，可以省略或设为空数组
-3. 标签使用英文，描述性文字使用中文
-4. 直接输出JSON对象，不要添加任何解释或markdown代码块标记"""
-                else:
-                    system_prompt = """You are an expert in AI art prompt structured design, skilled at converting descriptions into clearly structured JSON format prompts.
-
-Your task is to convert the tags provided by the user into a structured JSON format for program parsing and processing.
-
-JSON structure specification:
-{
-    "quality": ["quality related tags, e.g. masterpiece, best quality, highly detailed"],
-    "subject": {
-        "main": "main subject description, e.g. person, object, scene",
-        "appearance": ["appearance features, e.g. hairstyle, skin tone, body type"],
-        "clothing": ["clothing description"],
-        "accessories": ["accessories description"],
-        "pose": ["pose and action"],
-        "expression": ["expression description"]
-    },
-    "environment": {
-        "location": "scene location",
-        "lighting": ["lighting effects"],
-        "atmosphere": ["atmosphere description"],
-        "background": ["background elements"]
-    },
-    "style": {
-        "art_style": ["art style, e.g. realistic, anime, oil painting"],
-        "technique": ["technique, e.g. watercolor, sketch, 3D render"],
-        "color_palette": ["color style"]
-    },
-    "technical": {
-        "composition": ["composition method"],
-        "camera": ["camera parameters"],
-        "rendering": ["rendering technology"]
-    }
-}
-
-Requirements:
-1. Intelligently fill the JSON structure fields based on user-provided tags
-2. If certain fields are not applicable, omit them or set to empty arrays
-3. Use English for tags
-4. Output JSON object directly without any explanation or markdown code block markers"""
-
-            else:
+            system_prompt = self._build_system_prompt(expand_mode, is_chinese)
+            if system_prompt is None:
                 return tags_text
 
-            self.config = self.load_config()
-            platform_id, platform_config = self.get_platform(selected_platform)
-
-            if not platform_id:
-                error_output = "[TagSelector] 错误：未配置可用的API平台\n请在ComfyUI设置页面的 ZhiAI > API配置 中配置至少一个平台的API密钥"
-                print("\n" + "=" * 60)
-                print("[TagSelector] 错误：未配置可用的API平台")
-                print("=" * 60)
-                print(
-                    "请在ComfyUI设置页面的 ZhiAI > API配置 中配置至少一个平台的API密钥"
-                )
-                print("=" * 60 + "\n")
-                return error_output
-
-            if platform_config is None:
-                platform_names = {}
-                for p_key, p_info in self.config.get("platforms", {}).items():
-                    if isinstance(p_info, dict):
-                        platform_names[p_key] = p_info.get("name", p_key)
-                if "User-defined" not in platform_names.values():
-                    platform_names["custom"] = "User-defined"
-                platform_name = platform_names.get(platform_id, platform_id)
-                error_output = f"[TagSelector] 错误：当前选择的平台 '{platform_name}' 未配置API密钥\n请在设置页面配置 {platform_name} 的API密钥，或将默认平台切换为其他已配置的平台"
-                print("\n" + "=" * 60)
-                print(
-                    f"[TagSelector] 错误：当前选择的平台 '{platform_name}' 未配置API密钥"
-                )
-                print("=" * 60)
-                print(
-                    f"请在设置页面配置 {platform_name} 的API密钥，或将默认平台切换为其他已配置的平台"
-                )
-                print("=" * 60 + "\n")
-                return error_output
-
-            api_key = self.get_api_key(platform_id)
-            if not api_key:
-                error_output = f"[TagSelector] 错误：{platform_config['name']} 未配置API密钥\n请在设置页面配置 {platform_config['name']} 的API密钥"
-                print("\n" + "=" * 60)
-                print(f"[TagSelector] 错误：{platform_config['name']} 未配置API密钥")
-                print("=" * 60)
-                print(f"请在设置页面配置 {platform_config['name']} 的API密钥")
-                print("=" * 60 + "\n")
-                return error_output
+            platform_id, platform_config, error = self._resolve_platform(selected_platform)
+            if error:
+                return error
 
             user_prompt = f"输入标签：{tags_text}\n\n请扩写："
             temperature = 0.7
 
+            _openai_compatible = self._call_openai_compatible
             platform_call_methods = {
-                "openai": self.call_openai,
+                "openai": _openai_compatible,
                 "claude": self.call_claude,
                 "gemini": self.call_gemini,
-                "zhipu": self.call_zhipu,
-                "deepseek": self.call_deepseek,
-                "siliconflow": self.call_siliconflow,
-                "kimi": self.call_kimi,
-                "minimax": self.call_minimax,
-                "qwen": self.call_qwen,
-                "openrouter": self.call_openrouter,
-                "tencent": self.call_tencent,
-                "nvidia": self.call_nvidia,
-                "custom": self.call_custom,
+                "zhipu": _openai_compatible,
+                "deepseek": _openai_compatible,
+                "siliconflow": _openai_compatible,
+                "kimi": _openai_compatible,
+                "minimax": _openai_compatible,
+                "qwen": _openai_compatible,
+                "openrouter": _openai_compatible,
+                "tencent": _openai_compatible,
+                "nvidia": _openai_compatible,
+                "custom": _openai_compatible,
             }
 
             call_method = platform_call_methods.get(platform_id)
             if call_method:
-                result = call_method(
-                    platform_id,
-                    platform_config,
-                    system_prompt,
-                    user_prompt,
-                    max_tokens,
-                    temperature,
+                return call_method(
+                    platform_id, platform_config, system_prompt, user_prompt, max_tokens, temperature,
                 )
-                return result
-            else:
-                return tags_text
+            return tags_text
 
         except Exception as e:
             error_msg = str(e)
-            error_output = f"[TagSelector] API调用失败：{platform_config['name']}\n错误信息：{error_msg}\n可能的原因：\n  1. API密钥无效或已过期\n  2. 网络连接问题\n  3. API服务暂时不可用\n  4. 模型名称不正确\n建议：请检查设置页面的API配置，或尝试切换其他平台"
-            print("\n" + "=" * 60)
-            print(f"[TagSelector] API调用失败：{platform_config['name']}")
-            print("=" * 60)
-            print(f"错误信息：{error_msg}")
-            print("-" * 60)
-            print("可能的原因：")
-            print("  1. API密钥无效或已过期")
-            print("  2. 网络连接问题")
-            print("  3. API服务暂时不可用")
-            print("  4. 模型名称不正确")
-            print("-" * 60)
-            print("建议：请检查设置页面的API配置，或尝试切换其他平台")
-            print("=" * 60 + "\n")
+            platform_name = platform_config.get("name", "Unknown") if platform_config else "Unknown"
+            error_output = f"[TagSelector] API调用失败：{platform_name}\n错误信息：{error_msg}\n可能的原因：\n  1. API密钥无效或已过期\n  2. 网络连接问题\n  3. API服务暂时不可用\n  4. 模型名称不正确\n建议：请检查设置页面的API配置，或尝试切换其他平台"
+            self._print_error_block(
+                f"[TagSelector] API调用失败：{platform_name}",
+                f"错误信息：{error_msg}",
+                "-" * 60,
+                "可能的原因：",
+                "  1. API密钥无效或已过期",
+                "  2. 网络连接问题",
+                "  3. API服务暂时不可用",
+                "  4. 模型名称不正确",
+                "-" * 60,
+                "建议：请检查设置页面的API配置，或尝试切换其他平台",
+            )
             return error_output
 
-    def call_openai(
-        self, platform_id, config, system_prompt, user_prompt, max_tokens, temperature
-    ):
-        api_key = self.get_api_key(platform_id)
-        model = config["config"].get("model", "gpt-4o-mini")
-        base_url = (
-            config["config"].get("base_url", "https://api.openai.com/v1").rstrip("/")
-        )
+    OPENAI_COMPATIBLE_PLATFORMS = {
+        "openai": {"default_model": "gpt-4o-mini", "default_base_url": "https://api.openai.com/v1"},
+        "zhipu": {"default_model": "glm-4-flash", "default_base_url": "https://open.bigmodel.cn/api/paas/v4"},
+        "deepseek": {"default_model": "deepseek-chat", "default_base_url": "https://api.deepseek.com"},
+        "siliconflow": {"default_model": "Qwen/Qwen2.5-7B-Instruct", "default_base_url": "https://api.siliconflow.cn/v1"},
+        "kimi": {"default_model": "moonshot-v1-8k", "default_base_url": "https://api.moonshot.cn/v1"},
+        "minimax": {"default_model": "MiniMax-M2.5", "default_base_url": "https://api.minimaxi.com/v1"},
+        "qwen": {"default_model": "qwen-turbo", "default_base_url": "https://dashscope.aliyuncs.com/compatible-mode/v1"},
+        "openrouter": {"default_model": "openai/gpt-4o-mini", "default_base_url": "https://openrouter.ai/api/v1", "extra_headers": {"HTTP-Referer": "https://github.com", "X-Title": "ComfyUI ZhiAI Nodes"}},
+        "tencent": {"default_model": "hunyuan-lite", "default_base_url": "https://hunyuan.tencentcloudapi.com"},
+        "nvidia": {"default_model": "nvidia/llama-3.1-nemotron-70b-instruct", "default_base_url": "https://integrate.api.nvidia.com/v1"},
+        "custom": {"default_model": "gpt-4-turbo", "default_base_url": ""},
+    }
 
-        url = f"{base_url}/chat/completions"
-        headers = {
-            "Authorization": f"Bearer {api_key}",
-            "Content-Type": "application/json",
-        }
+    def _call_openai_compatible(self, platform_id, config, system_prompt, user_prompt, max_tokens, temperature):
+        platform_info = self.OPENAI_COMPATIBLE_PLATFORMS.get(platform_id, {})
+        api_key = self.get_api_key(platform_id)
+        model = config["config"].get("model", platform_info.get("default_model", "gpt-4"))
+        base_url = config["config"].get("base_url", platform_info.get("default_base_url", "")).rstrip("/")
+        extra_headers = platform_info.get("extra_headers", {})
+
+        if platform_id == "custom":
+            api_url = config["config"].get("api_url", f"{base_url}/chat/completions")
+            if not api_url:
+                api_url = f"{base_url}/chat/completions"
+        else:
+            api_url = f"{base_url}/chat/completions"
+
+        headers = {"Authorization": f"Bearer {api_key}", "Content-Type": "application/json", **extra_headers}
         data = {
             "model": model,
             "messages": [
@@ -786,15 +689,12 @@ Requirements:
             "temperature": temperature,
         }
 
-        response = requests.post(url, headers=headers, json=data, timeout=60)
+        response = _get_http_session().post(api_url, headers=headers, json=data, timeout=60)
         result = response.json()
 
         if response.status_code == 200 and "choices" in result:
             return result["choices"][0]["message"]["content"].strip()
-        else:
-            raise Exception(
-                f"OpenAI API error: {result.get('error', {}).get('message', 'Unknown error')}"
-            )
+        raise Exception(f"{platform_id} API error: {result.get('error', {}).get('message', 'Unknown error')}")
 
     def call_claude(
         self, platform_id, config, system_prompt, user_prompt, max_tokens, temperature
@@ -819,7 +719,7 @@ Requirements:
             "messages": [{"role": "user", "content": user_prompt}],
         }
 
-        response = requests.post(url, headers=headers, json=data, timeout=60)
+        response = _get_http_session().post(url, headers=headers, json=data, timeout=60)
         result = response.json()
 
         if response.status_code == 200 and "content" in result:
@@ -840,8 +740,8 @@ Requirements:
             .rstrip("/")
         )
 
-        url = f"{base_url}/v1beta/models/{model}:generateContent?key={api_key}"
-        headers = {"Content-Type": "application/json"}
+        url = f"{base_url}/v1beta/models/{model}:generateContent"
+        headers = {"Content-Type": "application/json", "x-goog-api-key": api_key}
         data = {
             "contents": [{"parts": [{"text": system_prompt + "\n\n" + user_prompt}]}],
             "generationConfig": {
@@ -850,7 +750,7 @@ Requirements:
             },
         }
 
-        response = requests.post(url, headers=headers, json=data, timeout=60)
+        response = _get_http_session().post(url, headers=headers, json=data, timeout=60)
         result = response.json()
 
         if response.status_code == 200 and "candidates" in result:
@@ -858,359 +758,6 @@ Requirements:
         else:
             raise Exception(
                 f"Gemini API error: {result.get('error', {}).get('message', 'Unknown error')}"
-            )
-
-    def call_zhipu(
-        self, platform_id, config, system_prompt, user_prompt, max_tokens, temperature
-    ):
-        api_key = self.get_api_key(platform_id)
-        model = config["config"].get("model", "glm-4-flash")
-        base_url = (
-            config["config"]
-            .get("base_url", "https://open.bigmodel.cn/api/paas/v4")
-            .rstrip("/")
-        )
-
-        url = f"{base_url}/chat/completions"
-        headers = {
-            "Authorization": f"Bearer {api_key}",
-            "Content-Type": "application/json",
-        }
-        data = {
-            "model": model,
-            "messages": [
-                {"role": "system", "content": system_prompt},
-                {"role": "user", "content": user_prompt},
-            ],
-            "max_tokens": max_tokens,
-            "temperature": temperature,
-        }
-
-        response = requests.post(url, headers=headers, json=data, timeout=60)
-        result = response.json()
-
-        if response.status_code == 200 and "choices" in result:
-            return result["choices"][0]["message"]["content"].strip()
-        else:
-            raise Exception(
-                f"Zhipu API error: {result.get('error', {}).get('message', 'Unknown error')}"
-            )
-
-    def call_deepseek(
-        self, platform_id, config, system_prompt, user_prompt, max_tokens, temperature
-    ):
-        api_key = self.get_api_key(platform_id)
-        model = config["config"].get("model", "deepseek-chat")
-        base_url = (
-            config["config"].get("base_url", "https://api.deepseek.com").rstrip("/")
-        )
-
-        url = f"{base_url}/chat/completions"
-        headers = {
-            "Authorization": f"Bearer {api_key}",
-            "Content-Type": "application/json",
-        }
-        data = {
-            "model": model,
-            "messages": [
-                {"role": "system", "content": system_prompt},
-                {"role": "user", "content": user_prompt},
-            ],
-            "max_tokens": max_tokens,
-            "temperature": temperature,
-        }
-
-        response = requests.post(url, headers=headers, json=data, timeout=60)
-        result = response.json()
-
-        if response.status_code == 200 and "choices" in result:
-            return result["choices"][0]["message"]["content"].strip()
-        else:
-            raise Exception(
-                f"DeepSeek API error: {result.get('error', {}).get('message', 'Unknown error')}"
-            )
-
-    def call_siliconflow(
-        self, platform_id, config, system_prompt, user_prompt, max_tokens, temperature
-    ):
-        api_key = self.get_api_key(platform_id)
-        model = config["config"].get("model", "Qwen/Qwen2.5-7B-Instruct")
-        base_url = (
-            config["config"]
-            .get("base_url", "https://api.siliconflow.cn/v1")
-            .rstrip("/")
-        )
-
-        url = f"{base_url}/chat/completions"
-        headers = {
-            "Authorization": f"Bearer {api_key}",
-            "Content-Type": "application/json",
-        }
-        data = {
-            "model": model,
-            "messages": [
-                {"role": "system", "content": system_prompt},
-                {"role": "user", "content": user_prompt},
-            ],
-            "max_tokens": max_tokens,
-            "temperature": temperature,
-        }
-
-        response = requests.post(url, headers=headers, json=data, timeout=60)
-        result = response.json()
-
-        if response.status_code == 200 and "choices" in result:
-            return result["choices"][0]["message"]["content"].strip()
-        else:
-            raise Exception(
-                f"SiliconFlow API error: {result.get('error', {}).get('message', 'Unknown error')}"
-            )
-
-    def call_kimi(
-        self, platform_id, config, system_prompt, user_prompt, max_tokens, temperature
-    ):
-        api_key = self.get_api_key(platform_id)
-        model = config["config"].get("model", "moonshot-v1-8k")
-        base_url = (
-            config["config"].get("base_url", "https://api.moonshot.cn/v1").rstrip("/")
-        )
-
-        url = f"{base_url}/chat/completions"
-        headers = {
-            "Authorization": f"Bearer {api_key}",
-            "Content-Type": "application/json",
-        }
-        data = {
-            "model": model,
-            "messages": [
-                {"role": "system", "content": system_prompt},
-                {"role": "user", "content": user_prompt},
-            ],
-            "max_tokens": max_tokens,
-            "temperature": temperature,
-        }
-
-        response = requests.post(url, headers=headers, json=data, timeout=60)
-        result = response.json()
-
-        if response.status_code == 200 and "choices" in result:
-            return result["choices"][0]["message"]["content"].strip()
-        else:
-            raise Exception(
-                f"Kimi API error: {result.get('error', {}).get('message', 'Unknown error')}"
-            )
-
-    def call_minimax(
-        self, platform_id, config, system_prompt, user_prompt, max_tokens, temperature
-    ):
-        api_key = self.get_api_key(platform_id)
-        model = config["config"].get("model", "MiniMax-M2.5")
-        base_url = (
-            config["config"].get("base_url", "https://api.minimaxi.com/v1").rstrip("/")
-        )
-
-        url = f"{base_url}/chat/completions"
-        headers = {
-            "Authorization": f"Bearer {api_key}",
-            "Content-Type": "application/json",
-        }
-        data = {
-            "model": model,
-            "messages": [
-                {"role": "system", "content": system_prompt},
-                {"role": "user", "content": user_prompt},
-            ],
-            "max_tokens": max_tokens,
-            "temperature": temperature,
-        }
-
-        response = requests.post(url, headers=headers, json=data, timeout=60)
-        result = response.json()
-
-        if response.status_code == 200 and "choices" in result:
-            return result["choices"][0]["message"]["content"].strip()
-        else:
-            raise Exception(
-                f"MiniMax API error: {result.get('error', {}).get('message', 'Unknown error')}"
-            )
-
-    def call_qwen(
-        self, platform_id, config, system_prompt, user_prompt, max_tokens, temperature
-    ):
-        api_key = self.get_api_key(platform_id)
-        model = config["config"].get("model", "qwen-turbo")
-        base_url = (
-            config["config"]
-            .get("base_url", "https://dashscope.aliyuncs.com/compatible-mode/v1")
-            .rstrip("/")
-        )
-
-        url = f"{base_url}/chat/completions"
-        headers = {
-            "Authorization": f"Bearer {api_key}",
-            "Content-Type": "application/json",
-        }
-        data = {
-            "model": model,
-            "messages": [
-                {"role": "system", "content": system_prompt},
-                {"role": "user", "content": user_prompt},
-            ],
-            "max_tokens": max_tokens,
-            "temperature": temperature,
-        }
-
-        response = requests.post(url, headers=headers, json=data, timeout=60)
-        result = response.json()
-
-        if response.status_code == 200 and "choices" in result:
-            return result["choices"][0]["message"]["content"].strip()
-        else:
-            raise Exception(
-                f"Qwen API error: {result.get('error', {}).get('message', 'Unknown error')}"
-            )
-
-    def call_openrouter(
-        self, platform_id, config, system_prompt, user_prompt, max_tokens, temperature
-    ):
-        api_key = self.get_api_key(platform_id)
-        model = config["config"].get("model", "openai/gpt-4o-mini")
-        base_url = (
-            config["config"].get("base_url", "https://openrouter.ai/api/v1").rstrip("/")
-        )
-
-        url = f"{base_url}/chat/completions"
-        headers = {
-            "Authorization": f"Bearer {api_key}",
-            "Content-Type": "application/json",
-            "HTTP-Referer": "https://github.com",
-            "X-Title": "ComfyUI ZhiAI Nodes",
-        }
-        data = {
-            "model": model,
-            "messages": [
-                {"role": "system", "content": system_prompt},
-                {"role": "user", "content": user_prompt},
-            ],
-            "max_tokens": max_tokens,
-            "temperature": temperature,
-        }
-
-        response = requests.post(url, headers=headers, json=data, timeout=60)
-        result = response.json()
-
-        if response.status_code == 200 and "choices" in result:
-            return result["choices"][0]["message"]["content"].strip()
-        else:
-            raise Exception(
-                f"OpenRouter API error: {result.get('error', {}).get('message', 'Unknown error')}"
-            )
-
-    def call_tencent(
-        self, platform_id, config, system_prompt, user_prompt, max_tokens, temperature
-    ):
-        api_key = self.get_api_key(platform_id)
-        model = config["config"].get("model", "hunyuan-lite")
-        base_url = (
-            config["config"]
-            .get("base_url", "https://hunyuan.tencentcloudapi.com")
-            .rstrip("/")
-        )
-
-        url = f"{base_url}/chat/completions"
-        headers = {
-            "Authorization": f"Bearer {api_key}",
-            "Content-Type": "application/json",
-        }
-        data = {
-            "model": model,
-            "messages": [
-                {"role": "system", "content": system_prompt},
-                {"role": "user", "content": user_prompt},
-            ],
-            "max_tokens": max_tokens,
-            "temperature": temperature,
-        }
-
-        response = requests.post(url, headers=headers, json=data, timeout=60)
-        result = response.json()
-
-        if response.status_code == 200 and "choices" in result:
-            return result["choices"][0]["message"]["content"].strip()
-        else:
-            raise Exception(
-                f"Tencent API error: {result.get('error', {}).get('message', 'Unknown error')}"
-            )
-
-    def call_nvidia(
-        self, platform_id, config, system_prompt, user_prompt, max_tokens, temperature
-    ):
-        api_key = self.get_api_key(platform_id)
-        model = config["config"].get("model", "nvidia/llama-3.1-nemotron-70b-instruct")
-        base_url = (
-            config["config"]
-            .get("base_url", "https://integrate.api.nvidia.com/v1")
-            .rstrip("/")
-        )
-
-        url = f"{base_url}/chat/completions"
-        headers = {
-            "Authorization": f"Bearer {api_key}",
-            "Content-Type": "application/json",
-        }
-        data = {
-            "model": model,
-            "messages": [
-                {"role": "system", "content": system_prompt},
-                {"role": "user", "content": user_prompt},
-            ],
-            "max_tokens": max_tokens,
-            "temperature": temperature,
-        }
-
-        response = requests.post(url, headers=headers, json=data, timeout=60)
-        result = response.json()
-
-        if response.status_code == 200 and "choices" in result:
-            return result["choices"][0]["message"]["content"].strip()
-        else:
-            raise Exception(
-                f"NVIDIA API error: {result.get('error', {}).get('message', 'Unknown error')}"
-            )
-
-    def call_custom(
-        self, platform_id, config, system_prompt, user_prompt, max_tokens, temperature
-    ):
-        api_key = self.get_api_key(platform_id)
-        model = config["config"].get("model", "gpt-4-turbo")
-        base_url = config["config"].get("base_url", "").rstrip("/")
-        api_url = config["config"].get("api_url", f"{base_url}/chat/completions")
-
-        if not api_url:
-            api_url = f"{base_url}/chat/completions"
-
-        headers = {
-            "Authorization": f"Bearer {api_key}",
-            "Content-Type": "application/json",
-        }
-        data = {
-            "model": model,
-            "messages": [
-                {"role": "system", "content": system_prompt},
-                {"role": "user", "content": user_prompt},
-            ],
-            "max_tokens": max_tokens,
-            "temperature": temperature,
-        }
-
-        response = requests.post(api_url, headers=headers, json=data, timeout=60)
-        result = response.json()
-
-        if response.status_code == 200 and "choices" in result:
-            return result["choices"][0]["message"]["content"].strip()
-        else:
-            raise Exception(
-                f"Custom API error: {result.get('error', {}).get('message', 'Unknown error')}"
             )
 
     @classmethod
@@ -1401,30 +948,8 @@ Requirements:
     def get_user_tags(cls):
         user_tags_path = os.path.join(os.path.dirname(__file__), "user_tags.json")
         try:
-            encodings = ["utf-8", "gbk", "gb2312"]
-            user_tags = None
-
-            for encoding in encodings:
-                try:
-                    with open(user_tags_path, "r", encoding=encoding) as f:
-                        user_tags = json.load(f)
-                    break
-                except UnicodeDecodeError:
-                    continue
-
-            if user_tags is None:
-                with open(user_tags_path, "rb") as f:
-                    content = f.read()
-                    for encoding in encodings:
-                        try:
-                            content_decoded = content.decode(encoding)
-                            user_tags = json.loads(content_decoded)
-                            break
-                        except (UnicodeDecodeError, json.JSONDecodeError):
-                            continue
-
-            if user_tags is None:
-                return {}
+            with open(user_tags_path, "r", encoding="utf-8") as f:
+                user_tags = json.load(f)
 
             converted_tags = {}
             for name, data in user_tags.items():
@@ -1869,7 +1394,7 @@ def fetch_cosplay_prompt(seed, excluded="", custom_prompt=""):
         encoded_prompt = urllib.parse.quote(custom_prompt.strip(), safe='')
         api_url += f"&prompt={encoded_prompt}"
     try:
-        response = requests.get(api_url, timeout=30, verify=False)
+        response = _get_http_session().get(api_url, timeout=30)
         response.raise_for_status()
         data = response.json()
         if "encrypted_data" in data:
