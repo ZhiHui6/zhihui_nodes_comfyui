@@ -159,6 +159,148 @@ const DOM = {
     }
 };
 
+function createCustomDropdown(options = [], config = {}) {
+    const {
+        placeholder = '',
+        selectedValue = '',
+        marginBottom = '0px',
+        width = '100%'
+    } = config;
+
+    const wrapper = document.createElement('div');
+    wrapper.style.cssText = `position: relative; width: ${width}; margin-bottom: ${marginBottom};`;
+
+    const trigger = document.createElement('div');
+    trigger.style.cssText = `width: 100%; padding: 10px 36px 10px 12px; border: 1px solid rgba(148,163,184,0.25); border-radius: 8px; background: linear-gradient(135deg, rgba(15,23,42,0.95) 0%, rgba(30,41,59,0.95) 100%); color: #e2e8f0; font-size: 14px; cursor: pointer; user-select: none; transition: all 0.2s ease; box-sizing: border-box; min-height: 40px; display: flex; align-items: center;`;
+
+    const arrow = document.createElement('span');
+    arrow.style.cssText = `position: absolute; right: 12px; top: 50%; transform: translateY(-50%); color: #64748b; font-size: 10px; transition: transform 0.2s ease; pointer-events: none;`;
+    arrow.innerHTML = '▼';
+
+    const panel = document.createElement('div');
+    panel.style.cssText = `position: absolute; top: calc(100% + 4px); left: 0; right: 0; background: linear-gradient(135deg, #1e293b 0%, #0f172a 100%); border: 1px solid rgba(148,163,184,0.2); border-radius: 8px; box-shadow: 0 8px 24px rgba(0,0,0,0.4); z-index: 10000; max-height: 200px; overflow-y: auto; display: none; padding: 4px;`;
+    panel.style.scrollbarWidth = 'thin';
+    panel.style.scrollbarColor = 'rgba(148,163,184,0.3) transparent';
+
+    let currentValue = selectedValue;
+    let isOpen = false;
+
+    function renderOptions() {
+        panel.innerHTML = '';
+        const allOptions = placeholder ? [{ value: '', label: placeholder }, ...options] : [...options];
+        allOptions.forEach(opt => {
+            const item = document.createElement('div');
+            item.style.cssText = `padding: 8px 12px; border-radius: 6px; cursor: pointer; font-size: 13px; transition: all 0.15s ease; color: ${opt.value === currentValue ? '#60a5fa' : '#cbd5e1'}; background: ${opt.value === currentValue ? 'rgba(96,165,250,0.1)' : 'transparent'}; font-weight: ${opt.value === currentValue ? '600' : '400'};`;
+            if (opt.value === currentValue) {
+                item.style.borderLeft = '2px solid #60a5fa';
+                item.style.paddingLeft = '10px';
+            }
+            item.textContent = opt.label;
+            item.addEventListener('mouseenter', () => {
+                if (opt.value !== currentValue) {
+                    item.style.background = 'rgba(148,163,184,0.1)';
+                    item.style.color = '#f1f5f9';
+                }
+            });
+            item.addEventListener('mouseleave', () => {
+                if (opt.value !== currentValue) {
+                    item.style.background = 'transparent';
+                    item.style.color = '#cbd5e1';
+                }
+            });
+            item.addEventListener('click', (e) => {
+                e.stopPropagation();
+                currentValue = opt.value;
+                trigger.textContent = opt.label || placeholder;
+                trigger.appendChild(arrow);
+                closePanel();
+                renderOptions();
+            });
+            panel.appendChild(item);
+        });
+    }
+
+    function openPanel() {
+        if (isOpen) return;
+        isOpen = true;
+        panel.style.display = 'block';
+        arrow.style.transform = 'translateY(-50%) rotate(180deg)';
+        trigger.style.borderColor = '#60a5fa';
+        trigger.style.boxShadow = '0 0 0 2px rgba(96,165,250,0.15)';
+        renderOptions();
+    }
+
+    function closePanel() {
+        if (!isOpen) return;
+        isOpen = false;
+        panel.style.display = 'none';
+        arrow.style.transform = 'translateY(-50%)';
+        trigger.style.borderColor = 'rgba(148,163,184,0.25)';
+        trigger.style.boxShadow = 'none';
+    }
+
+    trigger.addEventListener('click', (e) => {
+        e.stopPropagation();
+        if (isOpen) {
+            closePanel();
+        } else {
+            openPanel();
+        }
+    });
+
+    trigger.addEventListener('mouseenter', () => {
+        if (!isOpen) {
+            trigger.style.borderColor = 'rgba(148,163,184,0.4)';
+        }
+    });
+    trigger.addEventListener('mouseleave', () => {
+        if (!isOpen) {
+            trigger.style.borderColor = 'rgba(148,163,184,0.25)';
+        }
+    });
+
+    document.addEventListener('click', (e) => {
+        if (!wrapper.contains(e.target)) {
+            closePanel();
+        }
+    });
+
+    renderOptions();
+
+    const initialOpt = options.find(o => o.value === selectedValue);
+    trigger.textContent = initialOpt ? initialOpt.label : (placeholder || '');
+    trigger.appendChild(arrow);
+
+    wrapper.appendChild(trigger);
+    wrapper.appendChild(panel);
+
+    wrapper.value = currentValue;
+    Object.defineProperty(wrapper, 'value', {
+        get() { return currentValue; },
+        set(v) {
+            currentValue = v;
+            const opt = options.find(o => o.value === v);
+            trigger.textContent = opt ? opt.label : (placeholder || '');
+            trigger.appendChild(arrow);
+            renderOptions();
+        }
+    });
+
+    wrapper.updateOptions = function(newOptions, newSelectedValue) {
+        options.length = 0;
+        newOptions.forEach(o => options.push(o));
+        if (newSelectedValue !== undefined) {
+            currentValue = newSelectedValue;
+        }
+        const opt = options.find(o => o.value === currentValue);
+        trigger.textContent = opt ? opt.label : (placeholder || '');
+        trigger.appendChild(arrow);
+        renderOptions();
+    };
+
+    return wrapper;
+}
+
 const S = (strings, ...values) => {
     let result = strings[0];
     for (let i = 0; i < values.length; i++) {
@@ -8867,7 +9009,7 @@ function createTagManagementForm(tagToEdit = null) {
     rightFormContainer.appendChild(nameContainer);
     
     const nameLabel = document.createElement('label');
-    nameLabel.style.cssText = `display: block; color: #3b82f6; font-weight: 600; margin-bottom: 8px; font-size: 14px; text-shadow: 0 1px 2px rgba(59,130,246,0.3);`;
+    nameLabel.style.cssText = `display: block; color: #cbd5e1; font-weight: 500; margin-bottom: 8px; font-size: 13px;`;
     nameLabel.textContent = $t('tagNameLabel');
     nameContainer.appendChild(nameLabel);
     
@@ -8876,13 +9018,13 @@ function createTagManagementForm(tagToEdit = null) {
     nameInput.placeholder = $t('tagNamePlaceholder');
     nameInput.value = tagToEdit?.display || '';
     nameInput.maxLength = 18;
-    nameInput.style.cssText = `width: 100%; padding: 10px; border: 1px solid rgba(59,130,246,0.4); border-radius: 6px; background: rgba(15,23,42,0.3); color: white; font-size: 14px;`;
+    nameInput.style.cssText = `width: 100%; padding: 10px; border: 1px solid rgba(148,163,184,0.25); border-radius: 6px; background: rgba(15,23,42,0.8); color: #e2e8f0; font-size: 14px; outline: none; transition: all 0.2s;`;
     nameInput.addEventListener('focus', () => {
-        nameInput.style.borderColor = '#38bdf8';
-        nameInput.style.boxShadow = '0 0 0 2px rgba(56,189,248,0.2), inset 0 1px 2px rgba(0,0,0,0.2)';
+        nameInput.style.borderColor = '#60a5fa';
+        nameInput.style.boxShadow = '0 0 0 2px rgba(96,165,250,0.15)';
     });
     nameInput.addEventListener('blur', () => {
-        nameInput.style.borderColor = 'rgba(59,130,246,0.4)';
+        nameInput.style.borderColor = 'rgba(148,163,184,0.25)';
         nameInput.style.boxShadow = 'none';
     });
     
@@ -8933,60 +9075,42 @@ function createTagManagementForm(tagToEdit = null) {
     rightFormContainer.appendChild(categoryContainer);
     
     const categoryLabel = document.createElement('label');
-    categoryLabel.style.cssText = `display: block; color: #3b82f6; font-weight: 600; margin-bottom: 8px; font-size: 14px; text-shadow: 0 1px 2px rgba(59,130,246,0.3);`;
+    categoryLabel.style.cssText = `display: block; color: #cbd5e1; font-weight: 500; margin-bottom: 8px; font-size: 13px;`;
     categoryLabel.textContent = $t('tagCategory');
     categoryContainer.appendChild(categoryLabel);
     
-    const categorySelect = document.createElement('select');
-    categorySelect.style.cssText = `width: 100%; padding: 10px; border: 1px solid rgba(59,130,246,0.4); border-radius: 6px; background: rgba(15,23,42,0.3); color: white; font-size: 14px; cursor: pointer; appearance: auto;`;
+    const categorySelect = createCustomDropdown(
+        customTagCategories.map(cat => ({ value: cat, label: cat })),
+        { placeholder: $t('uncategorized'), selectedValue: tagToEdit?.category || '' }
+    );
     
     function updateCategoryOptions() {
-        categorySelect.innerHTML = '';
-        const defaultOption = document.createElement('option');
-        defaultOption.value = '';
-        defaultOption.textContent = $t('uncategorized');
-        categorySelect.appendChild(defaultOption);
-        
-        customTagCategories.forEach(cat => {
-            const option = document.createElement('option');
-            option.value = cat;
-            option.textContent = cat;
-            if (tagToEdit?.category === cat) {
-                option.selected = true;
-            }
-            categorySelect.appendChild(option);
-        });
+        categorySelect.updateOptions(
+            customTagCategories.map(cat => ({ value: cat, label: cat })),
+            categorySelect.value
+        );
     }
-    updateCategoryOptions();
     
-    categorySelect.addEventListener('focus', () => {
-        categorySelect.style.borderColor = '#38bdf8';
-        categorySelect.style.boxShadow = '0 0 0 2px rgba(56,189,248,0.2), inset 0 1px 2px rgba(0,0,0,0.2)';
-    });
-    categorySelect.addEventListener('blur', () => {
-        categorySelect.style.borderColor = 'rgba(59,130,246,0.4)';
-        categorySelect.style.boxShadow = 'none';
-    });
     categoryContainer.appendChild(categorySelect);
     
     const contentContainer = DOM.div(`margin-bottom: 8px; display: flex; flex-direction: column; flex: 1; min-height: 0;`);
     rightFormContainer.appendChild(contentContainer);
     
     const contentLabel = document.createElement('label');
-    contentLabel.style.cssText = `display: block; color: #3b82f6; font-weight: 600; margin-bottom: 8px; font-size: 14px; text-shadow: 0 1px 2px rgba(59,130,246,0.3);`;
+    contentLabel.style.cssText = `display: block; color: #cbd5e1; font-weight: 500; margin-bottom: 8px; font-size: 13px;`;
     contentLabel.textContent = $t('tagContentLabel');
     contentContainer.appendChild(contentLabel);
     
     const contentTextarea = document.createElement('textarea');
     contentTextarea.placeholder = $t('enterTagContent');
     contentTextarea.value = tagToEdit?.value || '';
-    contentTextarea.style.cssText = `width: 100%; padding: 10px; border: 1px solid rgba(59,130,246,0.4); border-radius: 6px; background: rgba(15,23,42,0.3); color: white; font-size: 14px; resize: none; flex: 1; min-height: 0; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;`;
+    contentTextarea.style.cssText = `width: 100%; padding: 10px; border: 1px solid rgba(148,163,184,0.25); border-radius: 6px; background: rgba(15,23,42,0.8); color: #e2e8f0; font-size: 14px; resize: none; flex: 1; min-height: 0; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; outline: none; transition: all 0.2s;`;
     contentTextarea.addEventListener('focus', () => {
-        contentTextarea.style.borderColor = '#38bdf8';
-        contentTextarea.style.boxShadow = '0 0 0 2px rgba(56,189,248,0.2), inset 0 1px 2px rgba(0,0,0,0.2)';
+        contentTextarea.style.borderColor = '#60a5fa';
+        contentTextarea.style.boxShadow = '0 0 0 2px rgba(96,165,250,0.15)';
     });
     contentTextarea.addEventListener('blur', () => {
-        contentTextarea.style.borderColor = 'rgba(59,130,246,0.4)';
+        contentTextarea.style.borderColor = 'rgba(148,163,184,0.25)';
         contentTextarea.style.boxShadow = 'none';
     });
     contentContainer.appendChild(contentTextarea);
@@ -11028,34 +11152,34 @@ function showSaveToCustomDialog(prompt) {
     const title = DOM.div(`color: #60a5fa; font-size: 18px; font-weight: 600; margin-bottom: 16px;`);
     title.textContent = $t('saveToCustomTitle');
 
-    const nameLabel = DOM.div(`color: #94a3b8; font-size: 13px; margin-bottom: 8px;`);
+    const nameLabel = DOM.div(`color: #cbd5e1; font-size: 13px; font-weight: 500; margin-bottom: 8px;`);
     nameLabel.textContent = $t('tagNameLabel');
 
     const nameInput = document.createElement('input');
     nameInput.type = 'text';
     nameInput.placeholder = $t('tagNameInputPlaceholder');
-    nameInput.style.cssText = `width: 100%; padding: 10px 12px; border: 1px solid rgba(59,130,246,0.4); border-radius: 6px; background: rgba(15,23,42,0.8); color: #e2e8f0; font-size: 14px; box-sizing: border-box; margin-bottom: 16px; outline: none; transition: all 0.2s;`;
+    nameInput.style.cssText = `width: 100%; padding: 10px 12px; border: 1px solid rgba(148,163,184,0.25); border-radius: 6px; background: rgba(15,23,42,0.8); color: #e2e8f0; font-size: 14px; box-sizing: border-box; margin-bottom: 16px; outline: none; transition: all 0.2s;`;
     nameInput.onfocus = () => {
-        nameInput.style.borderColor = '#3b82f6';
-        nameInput.style.boxShadow = '0 0 0 3px rgba(59,130,246,0.2)';
+        nameInput.style.borderColor = '#60a5fa';
+        nameInput.style.boxShadow = '0 0 0 2px rgba(96,165,250,0.15)';
     };
     nameInput.onblur = () => {
-        nameInput.style.borderColor = 'rgba(59,130,246,0.4)';
+        nameInput.style.borderColor = 'rgba(148,163,184,0.25)';
         nameInput.style.boxShadow = 'none';
     };
 
-    const contentLabel = DOM.div(`color: #94a3b8; font-size: 13px; margin-bottom: 8px;`);
+    const contentLabel = DOM.div(`color: #cbd5e1; font-size: 13px; font-weight: 500; margin-bottom: 8px;`);
     contentLabel.textContent = $t('tagContentLabel');
 
     const contentTextarea = document.createElement('textarea');
     contentTextarea.value = prompt;
-    contentTextarea.style.cssText = `width: 100%; height: 120px; padding: 10px 12px; border: 1px solid rgba(59,130,246,0.4); border-radius: 6px; background: rgba(15,23,42,0.8); color: #e2e8f0; font-size: 14px; box-sizing: border-box; resize: vertical; outline: none; transition: all 0.2s;`;
+    contentTextarea.style.cssText = `width: 100%; height: 120px; padding: 10px 12px; border: 1px solid rgba(148,163,184,0.25); border-radius: 6px; background: rgba(15,23,42,0.8); color: #e2e8f0; font-size: 14px; box-sizing: border-box; resize: vertical; outline: none; transition: all 0.2s;`;
     contentTextarea.onfocus = () => {
-        contentTextarea.style.borderColor = '#3b82f6';
-        contentTextarea.style.boxShadow = '0 0 0 3px rgba(59,130,246,0.2)';
+        contentTextarea.style.borderColor = '#60a5fa';
+        contentTextarea.style.boxShadow = '0 0 0 2px rgba(96,165,250,0.15)';
     };
     contentTextarea.onblur = () => {
-        contentTextarea.style.borderColor = 'rgba(59,130,246,0.4)';
+        contentTextarea.style.borderColor = 'rgba(148,163,184,0.25)';
         contentTextarea.style.boxShadow = 'none';
     };
 
@@ -11126,26 +11250,16 @@ function showSaveToCustomDialog(prompt) {
     dialog.appendChild(nameLabel);
     dialog.appendChild(nameInput);
     
-    const categoryLabel2 = DOM.div(`color: #94a3b8; font-size: 13px; margin-bottom: 8px;`);
+    const categoryLabel2 = DOM.div(`color: #cbd5e1; font-size: 13px; font-weight: 500; margin-bottom: 8px;`);
     categoryLabel2.textContent = $t('tagCategory');
     
-    const categorySelect2 = document.createElement('select');
-    categorySelect2.style.cssText = `width: 100%; padding: 10px 12px; border: 1px solid rgba(59,130,246,0.4); border-radius: 6px; background: rgba(15,23,42,0.8); color: #e2e8f0; font-size: 14px; box-sizing: border-box; margin-bottom: 16px; outline: none; appearance: auto; cursor: pointer;`;
-    
-    const defaultOpt = document.createElement('option');
-    defaultOpt.value = '';
-    defaultOpt.textContent = $t('uncategorized');
-    categorySelect2.appendChild(defaultOpt);
-    customTagCategories.forEach(cat => {
-        const opt = document.createElement('option');
-        opt.value = cat;
-        opt.textContent = cat;
-        categorySelect2.appendChild(opt);
-    });
+    const categorySelect2 = createCustomDropdown(
+        customTagCategories.map(cat => ({ value: cat, label: cat })),
+        { placeholder: $t('uncategorized'), marginBottom: '16px' }
+    );
     
     dialog.appendChild(categoryLabel2);
     dialog.appendChild(categorySelect2);
-    
     dialog.appendChild(contentLabel);
     dialog.appendChild(contentTextarea);
     dialog.appendChild(buttonContainer);
