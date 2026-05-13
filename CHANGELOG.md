@@ -1,5 +1,10 @@
 # 更新日志 / Changelog
 
+## 1.0.39 2026-5-13
+标签选择器节点(TagSelector)：调整标签选择器快捷输入按钮布局
+  <br>
+TagSelector node: Adjusted shortcut input button layout for optimized user experience
+
 ## 1.0.38 2026-5-11
 - 标签选择器节点(TagSelector)：优化代码结构，改进渲染性能和运行效率
   <br>

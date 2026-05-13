@@ -180,7 +180,7 @@ function createCustomDropdown(options = [], config = {}) {
     const panel = document.createElement('div');
     panel.style.cssText = `position: absolute; top: calc(100% + 4px); left: 0; right: 0; background: linear-gradient(135deg, #1e293b 0%, #0f172a 100%); border: 1px solid rgba(148,163,184,0.2); border-radius: 8px; box-shadow: 0 8px 24px rgba(0,0,0,0.4); z-index: 10000; max-height: 200px; overflow-y: auto; display: none; padding: 4px;`;
     panel.style.scrollbarWidth = 'thin';
-    panel.style.scrollbarColor = 'rgba(148,163,184,0.3) transparent';
+    panel.style.scrollbarColor = 'rgba(96,165,250,0.25) transparent';
 
     let currentValue = selectedValue;
     let isOpen = false;
@@ -392,7 +392,7 @@ function getDescriptionHTML() {
 function createHelpPopup(description, onClose) {
     const docElement = DOM.div(`background: linear-gradient(135deg, rgba(15,23,42,0.98) 0%, rgba(30,41,59,0.98) 100%); backdrop-filter: blur(16px); -webkit-backdrop-filter: blur(16px); position: absolute; color: #e2e8f0; font: 13px 'Segoe UI', system-ui, -apple-system, sans-serif; line-height: 1.6; padding: 20px 24px 24px 24px; border-radius: 16px; border: 1px solid rgba(99,179,237,0.3); z-index: 1000; overflow: hidden; max-width: 560px; max-height: 600px; min-width: 400px; box-shadow: 0 0 40px rgba(59,130,246,0.15), 0 20px 60px rgba(0,0,0,0.4), inset 0 1px 0 rgba(255,255,255,0.08);`);
 
-    docElement.innerHTML = `<div style="overflow-y:auto;max-height:540px;padding-right:8px;scrollbar-width:thin;scrollbar-color:rgba(96,165,250,0.3) transparent;">${description}</div>`;
+    docElement.innerHTML = `<div style="overflow-y:auto;max-height:540px;padding-right:8px;scrollbar-width:thin;scrollbar-color:rgba(96,165,250,0.25) transparent;">${description}</div>`;
 
     const accent = DOM.div(`position: absolute; top: 0; left: 0; right: 0; height: 3px; background: linear-gradient(90deg, #3b82f6, #06b6d4, #3b82f6); border-radius: 16px 16px 0 0; opacity: 0.8;`);
     docElement.insertBefore(accent, docElement.firstChild);
@@ -748,25 +748,29 @@ app.registerExtension({
                 const parentEl = inputEl.parentElement;
                 if (!parentEl) return;
                 
+                if (parentEl.querySelector('.tag-selector-toolbar')) return;
+                
                 parentEl.style.position = "relative";
+                
+                const toolbar = document.createElement('div');
+                toolbar.className = 'tag-selector-toolbar';
+                toolbar.style.cssText = `position: absolute; bottom: 100%; left: 0; display: flex; align-items: center; gap: 4px; padding: 0; margin-bottom: 2px; background: none; border: none; border-radius: 0; z-index: 5;`;
                 
                 const insertBtn = document.createElement("button");
                 insertBtn.type = "button";
                 insertBtn.className = "tag-selector-insert-btn";
-                insertBtn.innerHTML = `<svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="display:block;"><path d="M20.59 13.41l-7.17 7.17a2 2 0 0 1-2.83 0L2 12V2h10l8.59 8.59a2 2 0 0 1 0 2.82z"></path><line x1="7" y1="7" x2="7.01" y2="7"></line></svg>`;
-                insertBtn.style.cssText = `position: absolute; right: 3px; top: 3px; width: 18px; height: 18px; padding: 0; background: rgba(59,130,246,0.35); border: none; border-radius: 3px; cursor: pointer; display: none; align-items: center; justify-content: center; z-index: 10; transition: all 0.2s ease; opacity: 0; color: rgba(59,130,246,0.9);`;
+                insertBtn.innerHTML = `<svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="display:flex;margin:auto;"><path d="M20.59 13.41l-7.17 7.17a2 2 0 0 1-2.83 0L2 12V2h10l8.59 8.59a2 2 0 0 1 0 2.82z"></path><line x1="7" y1="7" x2="7.01" y2="7"></line></svg>`;
+                insertBtn.style.cssText = `display: none; width: 20px; height: 20px; padding: 0; background: rgba(59,130,246,0.15); border: 1px solid rgba(59,130,246,0.25); border-radius: 5px; cursor: pointer; transition: all 0.2s ease; color: #60a5fa;`;
                 insertBtn.dataset.enabled = String(loadNodeSettings().showInsertBtn !== false);
                 
                 insertBtn.onmouseenter = () => {
-                    insertBtn.style.background = "rgba(59,130,246,0.6)";
-                    insertBtn.style.color = "rgba(59,130,246,1)";
-                    insertBtn.style.transform = "scale(1.1)";
+                    insertBtn.style.background = "rgba(59,130,246,0.3)";
+                    insertBtn.style.borderColor = "rgba(59,130,246,0.5)";
                     showInsertTagTooltip(insertBtn);
                 };
                 insertBtn.onmouseleave = () => {
-                    insertBtn.style.background = "rgba(59,130,246,0.35)";
-                    insertBtn.style.color = "rgba(59,130,246,0.9)";
-                    insertBtn.style.transform = "scale(1)";
+                    insertBtn.style.background = "rgba(59,130,246,0.15)";
+                    insertBtn.style.borderColor = "rgba(59,130,246,0.25)";
                     hideInsertTagTooltip();
                 };
                 insertBtn.onclick = (e) => {
@@ -775,25 +779,23 @@ app.registerExtension({
                     showCustomTagInsertSelector(insertBtn, tagEditWidget, node);
                 };
                 
-                parentEl.appendChild(insertBtn);
+                toolbar.appendChild(insertBtn);
                 
                 const inspirationBtn = document.createElement("button");
                 inspirationBtn.type = "button";
                 inspirationBtn.className = "tag-selector-inspiration-btn";
-                inspirationBtn.innerHTML = `<svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="display:block;"><path d="M12 6v6m0 0v6m0-6h6m-6 0H6"></path><circle cx="12" cy="12" r="3"></circle></svg>`;
-                inspirationBtn.style.cssText = `position: absolute; right: 24px; top: 3px; width: 18px; height: 18px; padding: 0; background: rgba(59,130,246,0.35); border: none; border-radius: 3px; cursor: pointer; display: none; align-items: center; justify-content: center; z-index: 10; transition: all 0.2s ease; opacity: 0; color: rgba(59,130,246,0.9);`;
+                inspirationBtn.innerHTML = `<svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="display:flex;margin:auto;"><path d="M9 18h6"></path><path d="M10 22h4"></path><path d="M15.09 14c.18-.98.65-1.74 1.41-2.5A4.65 4.65 0 0 0 18 8 6 6 0 0 0 6 8c0 1 .23 2.23 1.5 3.5A4.61 4.61 0 0 1 8.91 14"></path></svg>`;
+                inspirationBtn.style.cssText = `display: none; width: 20px; height: 20px; padding: 0; background: rgba(139,92,246,0.15); border: 1px solid rgba(139,92,246,0.25); border-radius: 5px; cursor: pointer; transition: all 0.2s ease; color: #a78bfa;`;
                 inspirationBtn.dataset.enabled = String(loadNodeSettings().showInspirationBtn !== false);
                 
                 inspirationBtn.onmouseenter = () => {
-                    inspirationBtn.style.background = "rgba(59,130,246,0.6)";
-                    inspirationBtn.style.color = "rgba(59,130,246,1)";
-                    inspirationBtn.style.transform = "scale(1.1)";
+                    inspirationBtn.style.background = "rgba(139,92,246,0.3)";
+                    inspirationBtn.style.borderColor = "rgba(139,92,246,0.5)";
                     showInspirationTooltip(inspirationBtn);
                 };
                 inspirationBtn.onmouseleave = () => {
-                    inspirationBtn.style.background = "rgba(59,130,246,0.35)";
-                    inspirationBtn.style.color = "rgba(59,130,246,0.9)";
-                    inspirationBtn.style.transform = "scale(1)";
+                    inspirationBtn.style.background = "rgba(139,92,246,0.15)";
+                    inspirationBtn.style.borderColor = "rgba(139,92,246,0.25)";
                     hideInspirationTooltip();
                 };
                 inspirationBtn.onclick = (e) => {
@@ -802,37 +804,39 @@ app.registerExtension({
                     showInspirationSelector(inspirationBtn, tagEditWidget);
                 };
                 
-                parentEl.appendChild(inspirationBtn);
+                toolbar.appendChild(inspirationBtn);
                 
                 const clearBtn = document.createElement("button");
                 clearBtn.type = "button";
                 clearBtn.className = "tag-selector-clear-btn";
-                clearBtn.innerHTML = `<svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="display:block;"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>`;
-                clearBtn.style.cssText = `position: absolute; right: 45px; top: 3px; width: 18px; height: 18px; padding: 0; background: rgba(239,68,68,0.35); border: none; border-radius: 3px; cursor: pointer; display: none; align-items: center; justify-content: center; z-index: 10; transition: all 0.2s ease; opacity: 0; color: rgba(239,68,68,0.9);`;
+                clearBtn.innerHTML = `<svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="display:flex;margin:auto;"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>`;
+                clearBtn.style.cssText = `display: none; width: 20px; height: 20px; padding: 0; background: rgba(239,68,68,0.12); border: 1px solid rgba(239,68,68,0.2); border-radius: 5px; cursor: pointer; transition: all 0.2s ease; color: #f87171;`;
                 clearBtn.dataset.enabled = String(loadNodeSettings().showClearBtn !== false);
                 
                 node._lastClearedTagEdit = undefined;
                 
                 clearBtn.onmouseenter = () => {
                     if (node._lastClearedTagEdit !== undefined) {
-                        clearBtn.style.background = "rgba(34,197,94,0.6)";
-                        clearBtn.style.color = "rgba(34,197,94,1)";
+                        clearBtn.style.background = "rgba(34,197,94,0.25)";
+                        clearBtn.style.borderColor = "rgba(34,197,94,0.4)";
+                        clearBtn.style.color = "#4ade80";
                     } else {
-                        clearBtn.style.background = "rgba(239,68,68,0.6)";
-                        clearBtn.style.color = "rgba(239,68,68,1)";
+                        clearBtn.style.background = "rgba(239,68,68,0.25)";
+                        clearBtn.style.borderColor = "rgba(239,68,68,0.4)";
+                        clearBtn.style.color = "#f87171";
                     }
-                    clearBtn.style.transform = "scale(1.1)";
                     showClearInputTooltip(clearBtn, node._lastClearedTagEdit !== undefined ? 'restoreInputBtnTooltip' : 'clearInputBtnTooltip');
                 };
                 clearBtn.onmouseleave = () => {
                     if (node._lastClearedTagEdit !== undefined) {
-                        clearBtn.style.background = "rgba(34,197,94,0.35)";
-                        clearBtn.style.color = "rgba(34,197,94,0.9)";
+                        clearBtn.style.background = "rgba(34,197,94,0.12)";
+                        clearBtn.style.borderColor = "rgba(34,197,94,0.2)";
+                        clearBtn.style.color = "#4ade80";
                     } else {
-                        clearBtn.style.background = "rgba(239,68,68,0.35)";
-                        clearBtn.style.color = "rgba(239,68,68,0.9)";
+                        clearBtn.style.background = "rgba(239,68,68,0.12)";
+                        clearBtn.style.borderColor = "rgba(239,68,68,0.2)";
+                        clearBtn.style.color = "#f87171";
                     }
-                    clearBtn.style.transform = "scale(1)";
                     hideClearInputTooltip();
                 };
                 clearBtn.onclick = (e) => {
@@ -842,48 +846,36 @@ app.registerExtension({
                         inputEl.value = node._lastClearedTagEdit;
                         tagEditWidget.value = node._lastClearedTagEdit;
                         node._lastClearedTagEdit = undefined;
-                        clearBtn.innerHTML = `<svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="display:block;"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>`;
-                        clearBtn.style.background = "rgba(239,68,68,0.35)";
-                        clearBtn.style.color = "rgba(239,68,68,0.9)";
+                        clearBtn.innerHTML = `<svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="display:flex;margin:auto;"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>`;
+                        clearBtn.style.background = "rgba(239,68,68,0.12)";
+                        clearBtn.style.borderColor = "rgba(239,68,68,0.2)";
+                        clearBtn.style.color = "#f87171";
                         showToast($t('inputRestored'), 'success');
                     } else {
                         node._lastClearedTagEdit = inputEl.value;
                         inputEl.value = "";
                         tagEditWidget.value = "";
-                        clearBtn.innerHTML = `<svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="display:block;"><polyline points="1 4 1 10 7 10"></polyline><polyline points="23 4 23 10 17 10"></polyline><path d="M20.49 15a9 9 0 1 1-2.12-9.36L23 10"></path></svg>`;
-                        clearBtn.style.background = "rgba(34,197,94,0.35)";
-                        clearBtn.style.color = "rgba(34,197,94,0.9)";
+                        clearBtn.innerHTML = `<svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="display:flex;margin:auto;"><polyline points="1 4 1 10 7 10"></polyline><polyline points="23 4 23 10 17 10"></polyline><path d="M20.49 15a9 9 0 1 1-2.12-9.36L23 10"></path></svg>`;
+                        clearBtn.style.background = "rgba(34,197,94,0.12)";
+                        clearBtn.style.borderColor = "rgba(34,197,94,0.2)";
+                        clearBtn.style.color = "#4ade80";
                         showToast($t('inputCleared'), 'success');
                     }
                     inputEl.dispatchEvent(new Event('input', { bubbles: true }));
                 };
                 
-                parentEl.appendChild(clearBtn);
+                toolbar.appendChild(clearBtn);
                 
-                inputEl.addEventListener("focus", () => {
-                    if (insertBtn.dataset.enabled === 'true') {
-                        insertBtn.style.display = "flex";
-                        setTimeout(() => { insertBtn.style.opacity = "1"; }, 10);
-                    }
-                    if (inspirationBtn.dataset.enabled === 'true') {
-                        inspirationBtn.style.display = "flex";
-                        setTimeout(() => { inspirationBtn.style.opacity = "1"; }, 10);
-                    }
-                    if (clearBtn.dataset.enabled === 'true') {
-                        clearBtn.style.display = "flex";
-                        setTimeout(() => { clearBtn.style.opacity = "1"; }, 10);
-                    }
-                });
-                inputEl.addEventListener("blur", () => {
-                    insertBtn.style.opacity = "0";
-                    inspirationBtn.style.opacity = "0";
-                    clearBtn.style.opacity = "0";
-                    setTimeout(() => {
-                        insertBtn.style.display = "none";
-                        inspirationBtn.style.display = "none";
-                        clearBtn.style.display = "none";
-                    }, 200);
-                });
+                parentEl.appendChild(toolbar);
+                
+                function updateToolbarVisibility() {
+                    const hasEnabled = insertBtn.dataset.enabled === 'true' || inspirationBtn.dataset.enabled === 'true' || clearBtn.dataset.enabled === 'true';
+                    toolbar.style.display = hasEnabled ? 'flex' : 'none';
+                    insertBtn.style.display = insertBtn.dataset.enabled === 'true' ? 'flex' : 'none';
+                    inspirationBtn.style.display = inspirationBtn.dataset.enabled === 'true' ? 'flex' : 'none';
+                    clearBtn.style.display = clearBtn.dataset.enabled === 'true' ? 'flex' : 'none';
+                }
+                updateToolbarVisibility();
             }, 100);
         }
     }
@@ -3213,28 +3205,27 @@ function createTagSelectorDialog() {
     overviewTitle.appendChild(hintText);
     overviewTitle.appendChild(selectedCount);
 
-    const selectedTagsList = DOM.div(`display: flex; flex-wrap: wrap; gap: 6px; padding: 0 20px 16px 20px; overflow-y: auto; max-height: 340px; display: none; scrollbar-width: thin; scrollbar-color: #4a9eff #334155;`);
+    const selectedTagsList = DOM.div(`display: flex; flex-wrap: wrap; gap: 6px; padding: 0 20px 16px 20px; overflow-y: auto; max-height: 340px; display: none; scrollbar-width: thin; scrollbar-color: rgba(96,165,250,0.25) transparent;`);
     
     const scrollbarStyle = document.createElement('style');
     scrollbarStyle.textContent = `
-        /* Webkit browsers */
-        div::-webkit-scrollbar {
-            width: 8px;
-            height: 8px;
+        *::-webkit-scrollbar {
+            width: 6px;
+            height: 6px;
         }
         
-        div::-webkit-scrollbar-track {
-            background: #334155;
-            border-radius: 4px;
+        *::-webkit-scrollbar-track {
+            background: transparent;
+            border-radius: 3px;
         }
         
-        div::-webkit-scrollbar-thumb {
-            background: #4a9eff;
-            border-radius: 4px;
+        *::-webkit-scrollbar-thumb {
+            background: rgba(96,165,250,0.25);
+            border-radius: 3px;
         }
         
-        div::-webkit-scrollbar-thumb:hover {
-            background: #3b82f6;
+        *::-webkit-scrollbar-thumb:hover {
+            background: rgba(96,165,250,0.45);
         }
     `;
     document.head.appendChild(scrollbarStyle);
@@ -4523,14 +4514,18 @@ function createSettingsToggle(initialEnabled, onChange) {
 
 function applyInputBtnVisibility() {
     const settings = loadNodeSettings();
-    document.querySelectorAll('.tag-selector-insert-btn').forEach(btn => {
-        btn.dataset.enabled = String(settings.showInsertBtn !== false);
-    });
-    document.querySelectorAll('.tag-selector-inspiration-btn').forEach(btn => {
-        btn.dataset.enabled = String(settings.showInspirationBtn !== false);
-    });
-    document.querySelectorAll('.tag-selector-clear-btn').forEach(btn => {
-        btn.dataset.enabled = String(settings.showClearBtn !== false);
+    document.querySelectorAll('.tag-selector-toolbar').forEach(toolbar => {
+        const insertBtn = toolbar.querySelector('.tag-selector-insert-btn');
+        const inspirationBtn = toolbar.querySelector('.tag-selector-inspiration-btn');
+        const clearBtn = toolbar.querySelector('.tag-selector-clear-btn');
+        if (insertBtn) insertBtn.dataset.enabled = String(settings.showInsertBtn !== false);
+        if (inspirationBtn) inspirationBtn.dataset.enabled = String(settings.showInspirationBtn !== false);
+        if (clearBtn) clearBtn.dataset.enabled = String(settings.showClearBtn !== false);
+        const hasEnabled = (insertBtn && insertBtn.dataset.enabled === 'true') || (inspirationBtn && inspirationBtn.dataset.enabled === 'true') || (clearBtn && clearBtn.dataset.enabled === 'true');
+        toolbar.style.display = hasEnabled ? 'flex' : 'none';
+        if (insertBtn) insertBtn.style.display = insertBtn.dataset.enabled === 'true' ? 'flex' : 'none';
+        if (inspirationBtn) inspirationBtn.style.display = inspirationBtn.dataset.enabled === 'true' ? 'flex' : 'none';
+        if (clearBtn) clearBtn.style.display = clearBtn.dataset.enabled === 'true' ? 'flex' : 'none';
     });
 }
 
@@ -4655,7 +4650,7 @@ async function showInspirationSelector(anchorEl, tagEditWidget) {
 
     const rect = anchorEl.getBoundingClientRect();
     panel.style.top = (rect.bottom + 4) + 'px';
-    panel.style.right = (window.innerWidth - rect.right) + 'px';
+    panel.style.left = rect.left + 'px';
 
     const titleBar = DOM.div(`display: flex; align-items: center; justify-content: space-between; padding: 0px 4px 0px 10px; font-size: 12px; font-weight: 700; color: #38bdf8; border-radius: 6px; flex-shrink: 0; letter-spacing: 0.5px; line-height: 1.1;`);
     const titleText = DOM.span(`text-align: center; flex: 1;`);
@@ -4824,7 +4819,7 @@ async function showCustomTagInsertSelector(anchorEl, tagEditWidget, node) {
 
     const rect = anchorEl.getBoundingClientRect();
     panel.style.top = (rect.bottom + 4) + 'px';
-    panel.style.right = (window.innerWidth - rect.right) + 'px';
+    panel.style.left = rect.left + 'px';
 
     const titleBar = DOM.div(`display: flex; align-items: center; justify-content: space-between; padding: 0px 4px 0px 10px; font-size: 12px; font-weight: 700; color: #38bdf8; border-radius: 6px; flex-shrink: 0; letter-spacing: 0.5px; line-height: 1.1;`);
     const titleText = DOM.span(`text-align: center; flex: 1;`);
