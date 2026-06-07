@@ -3,10 +3,66 @@ import { api } from "/scripts/api.js";
 
 const i18n = {
     zh: {
-        modelManager: "⚙️ 模型管理"
+        modelManager: "⚙️ 模型管理",
+        templateTooltip: "点击选择系统提示词模板",
+        clearTooltip: "点击清空当前输入框内容",
+        restoreTooltip: "点击恢复上次清空的内容",
+        clearContent: "已清空内容",
+        restoreContent: "已恢复内容",
+        noContentToClear: "没有可清空的内容",
+        noContentToRestore: "没有可恢复的内容",
+        manageTemplates: "管理模板",
+        selectTemplate: "选择模板",
+        searchTemplates: "搜索模板...",
+        noTemplates: "暂无模板，请在设置界面中管理模板",
+        templateApplied: "模板已应用",
+        checking: "加载中...",
+        edit: "编辑",
+        delete: "删除",
+        cancel: "取消",
+        save: "保存",
+        createTemplate: "创建模板",
+        templateNamePlaceholder: "模板名称",
+        templateContentPlaceholder: "模板内容",
+        templateNameRequired: "请输入模板名称",
+        templateCreated: "模板已创建",
+        templateUpdated: "模板已更新",
+        templateDeleted: "模板已删除",
+        templateCreateFailed: "创建模板失败",
+        templateUpdateFailed: "更新模板失败",
+        templateDeleteFailed: "删除模板失败",
+        confirmDelete: "确认删除此模板？"
     },
     en: {
-        modelManager: "⚙️ Model Manager"
+        modelManager: "⚙️ Model Manager",
+        templateTooltip: "Click to select a system prompt template",
+        clearTooltip: "Click to clear the current input content",
+        restoreTooltip: "Click to restore the last cleared content",
+        clearContent: "Content cleared",
+        restoreContent: "Content restored",
+        noContentToClear: "No content to clear",
+        noContentToRestore: "No content to restore",
+        manageTemplates: "Manage Templates",
+        selectTemplate: "Select Template",
+        searchTemplates: "Search templates...",
+        noTemplates: "No templates yet. Manage templates in the settings interface",
+        templateApplied: "Template applied",
+        checking: "Loading...",
+        edit: "Edit",
+        delete: "Delete",
+        cancel: "Cancel",
+        save: "Save",
+        createTemplate: "Create Template",
+        templateNamePlaceholder: "Template name",
+        templateContentPlaceholder: "Template content",
+        templateNameRequired: "Template name is required",
+        templateCreated: "Template created",
+        templateUpdated: "Template updated",
+        templateDeleted: "Template deleted",
+        templateCreateFailed: "Failed to create template",
+        templateUpdateFailed: "Failed to update template",
+        templateDeleteFailed: "Failed to delete template",
+        confirmDelete: "Are you sure you want to delete this template?"
     }
 };
 
@@ -448,6 +504,514 @@ async function openSettings(node) {
     }
 }
 
+let _qwen3vlTooltipEl = null;
+
+function showQwen3VLTooltip(btnEl, text) {
+    if (_qwen3vlTooltipEl) _qwen3vlTooltipEl.remove();
+    const tip = document.createElement("div");
+    tip.style.cssText = "position:fixed;z-index:10002;padding:4px 8px;background:#1f2937;border:1px solid rgba(255,255,255,0.15);border-radius:4px;color:#e8e8e8;font-size:11px;pointer-events:none;white-space:nowrap;";
+    tip.textContent = text;
+    document.body.appendChild(tip);
+    const rect = btnEl.getBoundingClientRect();
+    tip.style.left = (rect.left + rect.width / 2 - tip.offsetWidth / 2) + "px";
+    tip.style.top = (rect.top - tip.offsetHeight - 4) + "px";
+    _qwen3vlTooltipEl = tip;
+}
+
+function hideQwen3VLTooltip() {
+    if (_qwen3vlTooltipEl) { _qwen3vlTooltipEl.remove(); _qwen3vlTooltipEl = null; }
+}
+
+function showQwen3VLToast(message, type = "info") {
+    const toast = document.createElement("div");
+    const colors = { success: "#22c55e", error: "#ef4444", warning: "#f59e0b", info: "#667eea" };
+    toast.style.cssText = `position:fixed;top:20px;left:50%;transform:translateX(-50%);padding:8px 16px;background:#1f2937;border:1px solid ${colors[type] || colors.info};border-radius:6px;color:#e8e8e8;font-size:13px;z-index:10003;animation:qwen3vlToastIn 0.3s ease;`;
+    toast.textContent = message;
+    if (!document.querySelector("style[data-qwen3vl-toast-style]")) {
+        const s = document.createElement("style");
+        s.setAttribute("data-qwen3vl-toast-style", "");
+        s.textContent = "@keyframes qwen3vlToastIn{from{opacity:0;transform:translateX(-50%) translateY(-10px)}to{opacity:1;transform:translateX(-50%) translateY(0)}}@keyframes qwen3vlToastOut{from{opacity:1;transform:translateX(-50%) translateY(0)}to{opacity:0;transform:translateX(-50%) translateY(-10px)}}";
+        document.head.appendChild(s);
+    }
+    document.body.appendChild(toast);
+    setTimeout(() => { toast.style.animation = "qwen3vlToastOut 0.3s ease forwards"; setTimeout(() => toast.remove(), 300); }, 2000);
+}
+
+async function showQwen3VLTemplateSelector(node, btnRect) {
+    const existingOverlay = document.getElementById("qwen3vl-settings-template-selector");
+    if (existingOverlay) { existingOverlay.remove(); }
+    
+    const overlay = document.createElement("div");
+    overlay.id = "qwen3vl-settings-template-selector";
+    overlay.style.cssText = "position:fixed;z-index:10001;";
+    
+    const dialog = document.createElement("div");
+    dialog.style.cssText = "width:320px;max-width:90vw;max-height:350px;background:#1f2937;border:1px solid rgba(255,255,255,0.15);border-radius:8px;padding:12px;color:#e8e8e8;box-shadow:0 8px 32px rgba(0,0,0,0.4);display:flex;flex-direction:column;";
+    
+    const header = document.createElement("div");
+    header.style.cssText = "display:flex;align-items:center;justify-content:space-between;margin-bottom:10px;";
+    const title = document.createElement("h3");
+    title.style.cssText = "margin:0;font-size:15px;font-weight:600;background:linear-gradient(90deg,#667eea,#764ba2);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;";
+    title.textContent = $t('selectTemplate');
+    const closeBtn = document.createElement("button");
+    closeBtn.style.cssText = "width:20px;height:20px;border-radius:50%;border:1px solid rgba(255,255,255,0.25);background:transparent;cursor:pointer;display:inline-flex;align-items:center;justify-content:center;color:#9ca3af;font-size:12px;";
+    closeBtn.innerHTML = "×";
+    header.appendChild(title);
+    header.appendChild(closeBtn);
+    
+    const searchInput = document.createElement("input");
+    searchInput.type = "text";
+    searchInput.placeholder = $t('searchTemplates');
+    searchInput.style.cssText = "width:100%;padding:6px 10px;background:#111827;border:1px solid rgba(255,255,255,0.15);border-radius:6px;color:#e8e8e8;font-size:12px;margin-bottom:8px;box-sizing:border-box;";
+    
+    const listContainer = document.createElement("div");
+    listContainer.style.cssText = "flex:1;overflow-y:auto;border:1px solid rgba(255,255,255,0.1);border-radius:6px;min-height:60px;max-height:380px;";
+    
+    const loadingEl = document.createElement("div");
+    loadingEl.style.cssText = "padding:20px;text-align:center;color:#9ca3af;font-size:12px;";
+    loadingEl.textContent = $t('checking');
+    listContainer.appendChild(loadingEl);
+    
+    dialog.appendChild(header);
+    dialog.appendChild(searchInput);
+    dialog.appendChild(listContainer);
+    
+    const manageBtn = document.createElement("button");
+    manageBtn.type = "button";
+    manageBtn.style.cssText = `
+        margin-top: 8px;
+        padding: 6px 0;
+        width: 100%;
+        background: linear-gradient(135deg, #667eea, #764ba2);
+        color: white;
+        border: none;
+        border-radius: 6px;
+        cursor: pointer;
+        font-size: 12px;
+        font-weight: 500;
+        transition: all 0.2s ease;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 4px;
+    `;
+    manageBtn.innerHTML = `<svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"></circle><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06A1.65 1.65 0 0 0 4.68 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06A1.65 1.65 0 0 0 9 4.68a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06A1.65 1.65 0 0 0 19.4 9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"></path></svg> ${$t('manageTemplates')}`;
+    manageBtn.onmouseenter = () => { manageBtn.style.opacity = "0.85"; manageBtn.style.transform = "scale(1.02)"; };
+    manageBtn.onmouseleave = () => { manageBtn.style.opacity = "1"; manageBtn.style.transform = "scale(1)"; };
+    manageBtn.onclick = () => {
+        close();
+        showQwen3VLTemplateManager();
+    };
+    dialog.appendChild(manageBtn);
+    
+    overlay.appendChild(dialog);
+    
+    const close = () => { if (overlay.parentNode) overlay.remove(); };
+    closeBtn.onclick = close;
+    const handleClickOutside = (e) => { if (!overlay.contains(e.target)) { close(); document.removeEventListener("mousedown", handleClickOutside); } };
+    setTimeout(() => { document.addEventListener("mousedown", handleClickOutside); }, 10);
+    
+    const renderList = (templates, searchTerm = "") => {
+        let filtered = templates;
+        if (searchTerm) {
+            const term = searchTerm.toLowerCase();
+            filtered = templates.filter(t => t.name.toLowerCase().includes(term) || t.content.toLowerCase().includes(term));
+        }
+        if (filtered.length === 0) {
+            listContainer.innerHTML = `<div style="padding:20px;text-align:center;color:#9ca3af;font-size:12px;">${$t('noTemplates')}</div>`;
+            return;
+        }
+        listContainer.innerHTML = filtered.map(template => `<div data-id="${template.id}" style="padding:10px 12px;border-bottom:1px solid rgba(255,255,255,0.05);cursor:pointer;transition:background 0.15s ease;"><div style="font-size:14px;font-weight:500;color:#e8e8e8;">${template.name}</div></div>`).join("");
+        listContainer.querySelectorAll("[data-id]").forEach(item => {
+            item.onmouseover = () => { item.style.background = "rgba(102,126,234,0.15)"; };
+            item.onmouseout = () => { item.style.background = "transparent"; };
+            item.onclick = () => {
+                const template = templates.find(t => t.id === item.dataset.id);
+                if (template) {
+                    const systemPromptWidget = node.widgets?.find(w => w.name === "system_prompt");
+                    if (systemPromptWidget) {
+                        systemPromptWidget.value = template.content;
+                        if (systemPromptWidget.callback) systemPromptWidget.callback(template.content);
+                        node.setDirtyCanvas(true, true);
+                        showQwen3VLToast($t('templateApplied'), "success");
+                    }
+                }
+                close();
+            };
+        });
+    };
+    
+    searchInput.addEventListener("input", (e) => { renderList(currentTemplates, e.target.value); });
+    
+    let currentTemplates = [];
+    try {
+        const response = await fetch("/zhihui_nodes/qwen3vl/templates");
+        if (response.ok) {
+            const data = await response.json();
+            currentTemplates = data.templates || [];
+            renderList(currentTemplates);
+        } else {
+            listContainer.innerHTML = `<div style="padding:20px;text-align:center;color:#ef4444;font-size:12px;">${$t('noTemplates')}</div>`;
+        }
+    } catch (e) {
+        listContainer.innerHTML = `<div style="padding:20px;text-align:center;color:#ef4444;font-size:12px;">${$t('noTemplates')}</div>`;
+    }
+    
+    document.body.appendChild(overlay);
+    
+    const dialogRect = dialog.getBoundingClientRect();
+    let left = btnRect.left;
+    let top = btnRect.bottom + 4;
+    if (left + dialogRect.width > window.innerWidth - 10) left = window.innerWidth - dialogRect.width - 10;
+    if (top + dialogRect.height > window.innerHeight - 10) top = btnRect.top - dialogRect.height - 4;
+    if (top < 10) top = 10;
+    if (left < 10) left = 10;
+    overlay.style.left = left + "px";
+    overlay.style.top = top + "px";
+    
+    searchInput.focus();
+}
+
+async function showQwen3VLTemplateManager() {
+    const existingOverlay = document.getElementById("qwen3vl-template-manager");
+    if (existingOverlay) { existingOverlay.remove(); }
+    
+    const overlay = document.createElement("div");
+    overlay.id = "qwen3vl-template-manager";
+    overlay.style.cssText = "position:fixed;left:0;top:0;width:100vw;height:100vh;background:rgba(0,0,0,0.35);backdrop-filter:blur(3px);z-index:10001;display:flex;align-items:center;justify-content:center;";
+    
+    const dialog = document.createElement("div");
+    dialog.style.cssText = "max-width:980px;width:96%;background:#111827;border:1px solid rgba(255,255,255,0.12);border-radius:10px;box-shadow:0 12px 40px rgba(0,0,0,.4);padding:16px 18px;color:#e8e8e8;display:flex;flex-direction:column;max-height:80vh;";
+    
+    const header = document.createElement("div");
+    header.style.cssText = "display:flex;align-items:center;justify-content:space-between;margin-bottom:12px;padding-bottom:8px;border-bottom:1px solid rgba(255,255,255,0.1);";
+    
+    const title = document.createElement("h3");
+    title.style.cssText = "margin:0;font-size:16px;font-weight:600;";
+    title.textContent = $t('manageTemplates');
+    
+    const closeBtn = document.createElement("button");
+    closeBtn.style.cssText = "width:28px;height:28px;border-radius:50%;border:1px solid rgba(255,255,255,0.25);background:#1f2937;cursor:pointer;display:inline-flex;align-items:center;justify-content:center;color:#e8e8e8;font-size:16px;transition:all 0.2s ease;";
+    closeBtn.innerHTML = "×";
+    closeBtn.onmouseover = () => { closeBtn.style.background = "#b91c1c"; closeBtn.style.borderColor = "#ef4444"; };
+    closeBtn.onmouseout = () => { closeBtn.style.background = "#1f2937"; closeBtn.style.borderColor = "rgba(255,255,255,0.25)"; };
+    
+    header.appendChild(title);
+    header.appendChild(closeBtn);
+    
+    const toolbar = document.createElement("div");
+    toolbar.style.cssText = "display:flex;align-items:center;gap:8px;margin-bottom:10px;";
+    
+    const searchInput = document.createElement("input");
+    searchInput.type = "text";
+    searchInput.placeholder = $t('searchTemplates');
+    searchInput.style.cssText = "flex:1;padding:6px 10px;background:#111827;border:1px solid rgba(255,255,255,0.15);border-radius:6px;color:#e8e8e8;font-size:12px;";
+    
+    const createBtn = document.createElement("button");
+    createBtn.style.cssText = "padding:6px 14px;background:linear-gradient(135deg,#22c55e,#16a34a);color:white;border:none;border-radius:6px;cursor:pointer;font-size:12px;font-weight:500;white-space:nowrap;";
+    createBtn.textContent = $t('createTemplate');
+    
+    toolbar.appendChild(searchInput);
+    toolbar.appendChild(createBtn);
+    
+    const listContainer = document.createElement("div");
+    listContainer.style.cssText = "flex:1;overflow-y:auto;border:1px solid rgba(255,255,255,0.1);border-radius:6px;background:#111827;min-height:200px;";
+    
+    dialog.appendChild(header);
+    dialog.appendChild(toolbar);
+    dialog.appendChild(listContainer);
+    overlay.appendChild(dialog);
+    
+    const close = () => { if (overlay.parentNode) overlay.remove(); };
+    closeBtn.onclick = close;
+    overlay.onclick = (e) => { if (e.target === overlay) close(); };
+    
+    const renderList = async (searchTerm = "") => {
+        let templates = [];
+        try {
+            const response = await fetch("/zhihui_nodes/qwen3vl/templates");
+            if (response.ok) {
+                const data = await response.json();
+                templates = data.templates || [];
+            }
+        } catch (e) {}
+        
+        let filtered = templates;
+        if (searchTerm) {
+            const term = searchTerm.toLowerCase();
+            filtered = templates.filter(t => t.name.toLowerCase().includes(term) || t.content.toLowerCase().includes(term));
+        }
+        
+        if (filtered.length === 0) {
+            listContainer.innerHTML = `<div style="padding:20px;text-align:center;color:#9ca3af;font-size:12px;">${$t('noTemplates')}</div>`;
+            return;
+        }
+        
+        listContainer.innerHTML = filtered.map(t => `
+            <div data-id="${t.id}" style="display:flex;align-items:center;justify-content:space-between;padding:10px 12px;border-bottom:1px solid rgba(255,255,255,0.05);">
+                <div style="flex:1;min-width:0;">
+                    <div style="font-size:14px;font-weight:500;color:#e8e8e8;">${t.name}</div>
+                    <div style="font-size:11px;color:#9ca3af;margin-top:2px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">${t.content.substring(0, 80)}${t.content.length > 80 ? '...' : ''}</div>
+                </div>
+                <div style="display:flex;gap:6px;flex-shrink:0;margin-left:8px;">
+                    <button class="edit-btn" data-id="${t.id}" style="padding:4px 10px;background:transparent;border:1px solid rgba(255,255,255,0.15);border-radius:4px;color:#e8e8e8;cursor:pointer;font-size:11px;">${$t('edit')}</button>
+                    <button class="delete-btn" data-id="${t.id}" style="padding:4px 10px;background:transparent;border:1px solid #ef4444;border-radius:4px;color:#ef4444;cursor:pointer;font-size:11px;">${$t('delete')}</button>
+                </div>
+            </div>
+        `).join("");
+        
+        listContainer.querySelectorAll(".edit-btn").forEach(btn => {
+            btn.onclick = async () => {
+                const template = templates.find(t => t.id === btn.dataset.id);
+                if (template) openTemplateEditor(template, renderList);
+            };
+        });
+        
+        listContainer.querySelectorAll(".delete-btn").forEach(btn => {
+            btn.onclick = async () => {
+                if (!window.confirm($t('confirmDelete'))) return;
+                try {
+                    const response = await fetch(`/zhihui_nodes/qwen3vl/templates/${btn.dataset.id}`, { method: "DELETE" });
+                    if (response.ok) {
+                        showQwen3VLToast($t('templateDeleted'), "success");
+                        renderList(searchInput.value);
+                    } else {
+                        showQwen3VLToast($t('templateDeleteFailed'), "error");
+                    }
+                } catch (e) {
+                    showQwen3VLToast($t('templateDeleteFailed'), "error");
+                }
+            };
+        });
+    };
+    
+    const openTemplateEditor = (template = null, onSave = null) => {
+        const editorOverlay = document.createElement("div");
+        editorOverlay.style.cssText = "position:fixed;left:0;top:0;width:100vw;height:100vh;background:rgba(0,0,0,0.3);z-index:10002;display:flex;align-items:center;justify-content:center;";
+        
+        const editorDialog = document.createElement("div");
+        editorDialog.style.cssText = "width:500px;max-width:90vw;background:#1f2937;border:1px solid rgba(255,255,255,0.15);border-radius:10px;padding:16px;color:#e8e8e8;display:flex;flex-direction:column;gap:10px;";
+        
+        const nameInput = document.createElement("input");
+        nameInput.type = "text";
+        nameInput.placeholder = $t('templateNamePlaceholder');
+        nameInput.value = template ? template.name : "";
+        nameInput.style.cssText = "width:100%;padding:10px 12px;background:#111827;border:1px solid rgba(255,255,255,0.15);border-radius:6px;color:#e8e8e8;font-size:14px;box-sizing:border-box;";
+        
+        const contentInput = document.createElement("textarea");
+        contentInput.placeholder = $t('templateContentPlaceholder');
+        contentInput.value = template ? template.content : "";
+        contentInput.style.cssText = "width:100%;min-height:250px;padding:10px 12px;background:#111827;border:1px solid rgba(255,255,255,0.15);border-radius:6px;color:#e8e8e8;font-size:13px;resize:none;box-sizing:border-box;font-family:inherit;";
+        
+        const btnRow = document.createElement("div");
+        btnRow.style.cssText = "display:flex;justify-content:flex-end;gap:8px;";
+        
+        const cancelBtn = document.createElement("button");
+        cancelBtn.style.cssText = "padding:10px 24px;background:linear-gradient(135deg,#ef4444,#dc2626);color:white;border:none;border-radius:6px;cursor:pointer;font-size:14px;font-weight:600;";
+        cancelBtn.textContent = $t('cancel');
+        cancelBtn.onclick = () => { if (editorOverlay.parentNode) editorOverlay.remove(); };
+        
+        const saveBtn = document.createElement("button");
+        saveBtn.style.cssText = "padding:10px 24px;background:linear-gradient(135deg,#22c55e,#16a34a);color:white;border:none;border-radius:6px;cursor:pointer;font-size:14px;font-weight:600;";
+        saveBtn.textContent = $t('save');
+        saveBtn.onclick = async () => {
+            const name = nameInput.value.trim();
+            const content = contentInput.value.trim();
+            if (!name) { showQwen3VLToast($t('templateNameRequired'), "error"); return; }
+            try {
+                let response;
+                if (template) {
+                    response = await fetch(`/zhihui_nodes/qwen3vl/templates/${template.id}`, { method: "PUT", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ name, content }) });
+                } else {
+                    response = await fetch("/zhihui_nodes/qwen3vl/templates", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ name, content }) });
+                }
+                if (response.ok) {
+                    showQwen3VLToast(template ? $t('templateUpdated') : $t('templateCreated'), "success");
+                    if (editorOverlay.parentNode) editorOverlay.remove();
+                    if (onSave) onSave();
+                } else {
+                    showQwen3VLToast($t('templateUpdateFailed'), "error");
+                }
+            } catch (e) {
+                showQwen3VLToast($t('templateUpdateFailed'), "error");
+            }
+        };
+        
+        btnRow.appendChild(cancelBtn);
+        btnRow.appendChild(saveBtn);
+        
+        editorDialog.appendChild(nameInput);
+        editorDialog.appendChild(contentInput);
+        editorDialog.appendChild(btnRow);
+        editorOverlay.appendChild(editorDialog);
+        editorOverlay.onclick = (e) => { if (e.target === editorOverlay) { if (editorOverlay.parentNode) editorOverlay.remove(); } };
+        
+        document.body.appendChild(editorOverlay);
+        nameInput.focus();
+    };
+    
+    createBtn.onclick = () => openTemplateEditor(null, () => renderList(searchInput.value));
+    searchInput.addEventListener("input", (e) => renderList(e.target.value));
+    
+    document.body.appendChild(overlay);
+    renderList();
+}
+
+function addQwen3VLInputButtons(node) {
+    const systemPromptWidget = node.widgets?.find(w => w.name === "system_prompt");
+    if (!systemPromptWidget || !systemPromptWidget.inputEl) return;
+    
+    const inputEl = systemPromptWidget.inputEl;
+    const parentEl = inputEl.parentElement;
+    if (!parentEl) return;
+    
+    if (parentEl.querySelector('.qwen3vl-btn-container')) return;
+    
+    parentEl.style.position = "relative";
+    parentEl.style.paddingTop = "20px";
+    parentEl.style.marginTop = "-15px";
+    
+    const btnContainer = document.createElement("div");
+    btnContainer.className = "qwen3vl-btn-container";
+    btnContainer.style.cssText = `
+        display: flex;
+        gap: 4px;
+        justify-content: flex-end;
+        padding-right: 2px;
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+    `;
+    
+    const restoreBtn = document.createElement("button");
+    restoreBtn.type = "button";
+    restoreBtn.innerHTML = `<svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="display:block;margin:auto;"><polyline points="1 4 1 10 7 10"></polyline><polyline points="23 4 23 10 17 10"></polyline><path d="M20.49 15a9 9 0 1 1-2.12-9.36L23 10"></path></svg>`;
+    restoreBtn.style.cssText = `
+        width: 18px;
+        height: 18px;
+        padding: 0;
+        background: rgba(34, 197, 94, 0.35);
+        border: none;
+        border-radius: 3px;
+        cursor: pointer;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        transition: all 0.2s ease;
+        color: rgba(34, 197, 94, 0.9);
+    `;
+    restoreBtn.onmouseenter = () => {
+        restoreBtn.style.background = "rgba(34, 197, 94, 0.6)";
+        restoreBtn.style.color = "rgba(34, 197, 94, 1)";
+        restoreBtn.style.transform = "scale(1.1)";
+        showQwen3VLTooltip(restoreBtn, $t('restoreTooltip'));
+    };
+    restoreBtn.onmouseleave = () => {
+        restoreBtn.style.background = "rgba(34, 197, 94, 0.35)";
+        restoreBtn.style.color = "rgba(34, 197, 94, 0.9)";
+        restoreBtn.style.transform = "scale(1)";
+        hideQwen3VLTooltip();
+    };
+    restoreBtn.onclick = (e) => {
+        e.preventDefault();
+        e.stopPropagation();
+        if (node._lastClearedContent !== undefined) {
+            inputEl.value = node._lastClearedContent;
+            systemPromptWidget.value = node._lastClearedContent;
+            node._lastClearedContent = undefined;
+            inputEl.dispatchEvent(new Event('input', { bubbles: true }));
+            showQwen3VLToast($t('restoreContent'), "success");
+        } else {
+            showQwen3VLToast($t('noContentToRestore'), "warning");
+        }
+    };
+    btnContainer.appendChild(restoreBtn);
+    
+    const clearBtn = document.createElement("button");
+    clearBtn.type = "button";
+    clearBtn.innerHTML = `<svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="display:block;margin:auto;"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>`;
+    clearBtn.style.cssText = `
+        width: 18px;
+        height: 18px;
+        padding: 0;
+        background: rgba(239, 68, 68, 0.35);
+        border: none;
+        border-radius: 3px;
+        cursor: pointer;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        transition: all 0.2s ease;
+        color: rgba(239, 68, 68, 0.9);
+    `;
+    clearBtn.onmouseenter = () => {
+        clearBtn.style.background = "rgba(239, 68, 68, 0.6)";
+        clearBtn.style.color = "rgba(239, 68, 68, 1)";
+        clearBtn.style.transform = "scale(1.1)";
+        showQwen3VLTooltip(clearBtn, $t('clearTooltip'));
+    };
+    clearBtn.onmouseleave = () => {
+        clearBtn.style.background = "rgba(239, 68, 68, 0.35)";
+        clearBtn.style.color = "rgba(239, 68, 68, 0.9)";
+        clearBtn.style.transform = "scale(1)";
+        hideQwen3VLTooltip();
+    };
+    clearBtn.onclick = (e) => {
+        e.preventDefault();
+        e.stopPropagation();
+        if (inputEl.value.trim()) {
+            node._lastClearedContent = inputEl.value;
+            inputEl.value = "";
+            systemPromptWidget.value = "";
+            inputEl.dispatchEvent(new Event('input', { bubbles: true }));
+            showQwen3VLToast($t('clearContent'), "success");
+        } else {
+            showQwen3VLToast($t('noContentToClear'), "warning");
+        }
+    };
+    btnContainer.appendChild(clearBtn);
+    
+    const templateBtn = document.createElement("button");
+    templateBtn.type = "button";
+    templateBtn.innerHTML = `<svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="display:block;margin:auto;"><rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect><line x1="3" y1="9" x2="21" y2="9"></line><line x1="9" y1="21" x2="9" y2="9"></line></svg>`;
+    templateBtn.style.cssText = `
+        width: 18px;
+        height: 18px;
+        padding: 0;
+        background: rgba(102, 126, 234, 0.35);
+        border: none;
+        border-radius: 3px;
+        cursor: pointer;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        transition: all 0.2s ease;
+        color: rgba(102, 126, 234, 0.9);
+    `;
+    templateBtn.onmouseenter = () => {
+        templateBtn.style.background = "rgba(102, 126, 234, 0.6)";
+        templateBtn.style.color = "rgba(102, 126, 234, 1)";
+        templateBtn.style.transform = "scale(1.1)";
+        showQwen3VLTooltip(templateBtn, $t('templateTooltip'));
+    };
+    templateBtn.onmouseleave = () => {
+        templateBtn.style.background = "rgba(102, 126, 234, 0.35)";
+        templateBtn.style.color = "rgba(102, 126, 234, 0.9)";
+        templateBtn.style.transform = "scale(1)";
+        hideQwen3VLTooltip();
+    };
+    templateBtn.onclick = (e) => {
+        e.preventDefault();
+        e.stopPropagation();
+        const rect = templateBtn.getBoundingClientRect();
+        showQwen3VLTemplateSelector(node, rect);
+    };
+    btnContainer.appendChild(templateBtn);
+    
+    parentEl.appendChild(btnContainer);
+}
+
 app.registerExtension({
     name: "Qwen3VL.Settings",
     async beforeRegisterNodeDef(nodeType, nodeData, app_) {
@@ -459,6 +1023,10 @@ app.registerExtension({
                     setTimeout(() => openSettings(this), 0);
                 }, { label: $t('modelManager') });
                 btn.serialize = false;
+                setTimeout(() => {
+                    addQwen3VLInputButtons(this);
+                    app.graph.setDirtyCanvas(true, true);
+                }, 100);
                 return r;
             };
         }

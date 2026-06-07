@@ -123,12 +123,15 @@ const i18n = {
         sortByTime: "按时间排序",
         applyTemplate: "应用模板",
         templateApplied: "模板已应用",
+        manageTemplates: "管理模板",
         selectTemplate: "选择模板",
         templateTooltip: "点击选择系统提示词模板",
         clearContent: "清空内容",
         restoreContent: "恢复内容",
         clearTooltip: "点击清空当前输入框内容",
         restoreTooltip: "点击恢复上次清空的内容",
+        noContentToClear: "没有可清空的内容",
+        noContentToRestore: "没有可恢复的内容",
         cancel: "取消",
         confirm: "确定",
         save: "保存",
@@ -262,12 +265,15 @@ const i18n = {
         sortByTime: "Sort by time",
         applyTemplate: "Apply Template",
         templateApplied: "Template applied",
+        manageTemplates: "Manage Templates",
         selectTemplate: "Select Template",
         templateTooltip: "Click to select system prompt template",
         clearContent: "Clear Content",
         restoreContent: "Restore Content",
         clearTooltip: "Click to clear current input content",
         restoreTooltip: "Click to restore last cleared content",
+        noContentToClear: "No content to clear",
+        noContentToRestore: "No content to restore",
         cancel: "Cancel",
         confirm: "Confirm",
         save: "Save",
@@ -725,16 +731,126 @@ app.registerExtension({
                 const parentEl = inputEl.parentElement;
                 if (!parentEl) return;
                 
+                if (parentEl.querySelector('.lmstudio-btn-container')) return;
+                
                 parentEl.style.position = "relative";
+                parentEl.style.paddingTop = "20px";
+                parentEl.style.marginTop = "-18px";
+                
+                const btnContainer = document.createElement("div");
+                btnContainer.className = "lmstudio-btn-container";
+                btnContainer.style.cssText = `
+                    display: flex;
+                    gap: 4px;
+                    justify-content: flex-end;
+                    padding-right: 2px;
+                    position: absolute;
+                    top: 0;
+                    left: 0;
+                    right: 0;
+                `;
+                
+                const restoreBtn = document.createElement("button");
+                restoreBtn.type = "button";
+                restoreBtn.className = "lmstudio-restore-btn";
+                restoreBtn.innerHTML = `<svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="display:block;margin:auto;"><polyline points="1 4 1 10 7 10"></polyline><polyline points="23 4 23 10 17 10"></polyline><path d="M20.49 15a9 9 0 1 1-2.12-9.36L23 10"></path></svg>`;
+                restoreBtn.style.cssText = `
+                    width: 18px;
+                    height: 18px;
+                    padding: 0;
+                    background: rgba(34, 197, 94, 0.35);
+                    border: none;
+                    border-radius: 3px;
+                    cursor: pointer;
+                    display: flex;
+                    align-items: center;
+                    justify-content: center;
+                    transition: all 0.2s ease;
+                    color: rgba(34, 197, 94, 0.9);
+                `;
+                
+                restoreBtn.onmouseenter = () => {
+                    restoreBtn.style.background = "rgba(34, 197, 94, 0.6)";
+                    restoreBtn.style.color = "rgba(34, 197, 94, 1)";
+                    restoreBtn.style.transform = "scale(1.1)";
+                    showClearTooltip(restoreBtn, 'restoreTooltip');
+                };
+                restoreBtn.onmouseleave = () => {
+                    restoreBtn.style.background = "rgba(34, 197, 94, 0.35)";
+                    restoreBtn.style.color = "rgba(34, 197, 94, 0.9)";
+                    restoreBtn.style.transform = "scale(1)";
+                    hideClearTooltip();
+                };
+                
+                restoreBtn.onclick = (e) => {
+                    e.preventDefault();
+                    e.stopPropagation();
+                    if (this._lastClearedContent !== undefined) {
+                        inputEl.value = this._lastClearedContent;
+                        systemPromptWidget.value = this._lastClearedContent;
+                        this._lastClearedContent = undefined;
+                        inputEl.dispatchEvent(new Event('input', { bubbles: true }));
+                        showToast($t('restoreContent'), "success");
+                    } else {
+                        showToast($t('noContentToRestore'), "warning");
+                    }
+                };
+                
+                btnContainer.appendChild(restoreBtn);
+                
+                const clearBtn = document.createElement("button");
+                clearBtn.type = "button";
+                clearBtn.className = "lmstudio-clear-btn";
+                clearBtn.innerHTML = `<svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="display:block;margin:auto;"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>`;
+                clearBtn.style.cssText = `
+                    width: 18px;
+                    height: 18px;
+                    padding: 0;
+                    background: rgba(239, 68, 68, 0.35);
+                    border: none;
+                    border-radius: 3px;
+                    cursor: pointer;
+                    display: flex;
+                    align-items: center;
+                    justify-content: center;
+                    transition: all 0.2s ease;
+                    color: rgba(239, 68, 68, 0.9);
+                `;
+                
+                clearBtn.onmouseenter = () => {
+                    clearBtn.style.background = "rgba(239, 68, 68, 0.6)";
+                    clearBtn.style.color = "rgba(239, 68, 68, 1)";
+                    clearBtn.style.transform = "scale(1.1)";
+                    showClearTooltip(clearBtn, 'clearTooltip');
+                };
+                clearBtn.onmouseleave = () => {
+                    clearBtn.style.background = "rgba(239, 68, 68, 0.35)";
+                    clearBtn.style.color = "rgba(239, 68, 68, 0.9)";
+                    clearBtn.style.transform = "scale(1)";
+                    hideClearTooltip();
+                };
+                
+                clearBtn.onclick = (e) => {
+                    e.preventDefault();
+                    e.stopPropagation();
+                    if (inputEl.value.trim()) {
+                        this._lastClearedContent = inputEl.value;
+                        inputEl.value = "";
+                        systemPromptWidget.value = "";
+                        inputEl.dispatchEvent(new Event('input', { bubbles: true }));
+                        showToast($t('clearContent'), "success");
+                    } else {
+                        showToast($t('noContentToClear'), "warning");
+                    }
+                };
+                
+                btnContainer.appendChild(clearBtn);
                 
                 const templateBtn = document.createElement("button");
                 templateBtn.type = "button";
                 templateBtn.className = "lmstudio-template-btn";
-                templateBtn.innerHTML = `<svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="display:block;"><rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect><line x1="3" y1="9" x2="21" y2="9"></line><line x1="9" y1="21" x2="9" y2="9"></line></svg>`;
+                templateBtn.innerHTML = `<svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="display:block;margin:auto;"><rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect><line x1="3" y1="9" x2="21" y2="9"></line><line x1="9" y1="21" x2="9" y2="9"></line></svg>`;
                 templateBtn.style.cssText = `
-                    position: absolute;
-                    right: 3px;
-                    top: 3px;
                     width: 18px;
                     height: 18px;
                     padding: 0;
@@ -742,12 +858,10 @@ app.registerExtension({
                     border: none;
                     border-radius: 3px;
                     cursor: pointer;
-                    display: none;
+                    display: flex;
                     align-items: center;
                     justify-content: center;
-                    z-index: 10;
                     transition: all 0.2s ease;
-                    opacity: 0;
                     color: rgba(102, 126, 234, 0.9);
                 `;
                 
@@ -771,88 +885,13 @@ app.registerExtension({
                     showTemplateSelector(this, rect);
                 };
                 
-                parentEl.appendChild(templateBtn);
+                btnContainer.appendChild(templateBtn);
                 
-                const clearBtn = document.createElement("button");
-                clearBtn.type = "button";
-                clearBtn.className = "lmstudio-clear-btn";
-                clearBtn.innerHTML = `<svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="display:block;"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>`;
-                clearBtn.style.cssText = `
-                    position: absolute;
-                    right: 24px;
-                    top: 3px;
-                    width: 18px;
-                    height: 18px;
-                    padding: 0;
-                    background: rgba(239, 68, 68, 0.35);
-                    border: none;
-                    border-radius: 3px;
-                    cursor: pointer;
-                    display: none;
-                    align-items: center;
-                    justify-content: center;
-                    z-index: 10;
-                    transition: all 0.2s ease;
-                    opacity: 0;
-                    color: rgba(239, 68, 68, 0.9);
-                `;
-                
-                clearBtn.onmouseenter = () => {
-                    clearBtn.style.background = "rgba(239, 68, 68, 0.6)";
-                    clearBtn.style.color = "rgba(239, 68, 68, 1)";
-                    clearBtn.style.transform = "scale(1.1)";
-                    showClearTooltip(clearBtn, this._lastClearedContent ? 'restoreTooltip' : 'clearTooltip');
-                };
-                clearBtn.onmouseleave = () => {
-                    clearBtn.style.background = "rgba(239, 68, 68, 0.35)";
-                    clearBtn.style.color = "rgba(239, 68, 68, 0.9)";
-                    clearBtn.style.transform = "scale(1)";
-                    hideClearTooltip();
-                };
-                
-                clearBtn.onclick = (e) => {
-                    e.preventDefault();
-                    e.stopPropagation();
-                    if (this._lastClearedContent !== undefined) {
-                        inputEl.value = this._lastClearedContent;
-                        systemPromptWidget.value = this._lastClearedContent;
-                        this._lastClearedContent = undefined;
-                        clearBtn.innerHTML = `<svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="display:block;"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>`;
-                        clearBtn.style.background = "rgba(239, 68, 68, 0.35)";
-                        showToast($t('restoreContent'), "success");
-                    } else {
-                        this._lastClearedContent = inputEl.value;
-                        inputEl.value = "";
-                        systemPromptWidget.value = "";
-                        clearBtn.innerHTML = `<svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="display:block;"><polyline points="1 4 1 10 7 10"></polyline><polyline points="23 4 23 10 17 10"></polyline><path d="M20.49 15a9 9 0 1 1-2.12-9.36L23 10"></path></svg>`;
-                        clearBtn.style.background = "rgba(34, 197, 94, 0.35)";
-                        showToast($t('clearContent'), "success");
-                    }
-                    inputEl.dispatchEvent(new Event('input', { bubbles: true }));
-                };
-                
-                parentEl.appendChild(clearBtn);
-                
-                inputEl.addEventListener("focus", () => {
-                    templateBtn.style.display = "flex";
-                    clearBtn.style.display = "flex";
-                    setTimeout(() => {
-                        templateBtn.style.opacity = "1";
-                        clearBtn.style.opacity = "1";
-                    }, 10);
-                });
-                
-                inputEl.addEventListener("blur", () => {
-                    templateBtn.style.opacity = "0";
-                    clearBtn.style.opacity = "0";
-                    setTimeout(() => {
-                        templateBtn.style.display = "none";
-                        clearBtn.style.display = "none";
-                    }, 200);
-                });
+                parentEl.appendChild(btnContainer);
                 
                 this._templateBtn = templateBtn;
                 this._clearBtn = clearBtn;
+                this._restoreBtn = restoreBtn;
             };
             
             nodeType.prototype._refreshModelsList = async function() {
@@ -1149,6 +1188,35 @@ async function showTemplateSelector(node, btnRect) {
     dialog.appendChild(header);
     dialog.appendChild(searchInput);
     dialog.appendChild(listContainer);
+    
+    const manageBtn = document.createElement("button");
+    manageBtn.type = "button";
+    manageBtn.style.cssText = `
+        margin-top: 8px;
+        padding: 6px 0;
+        width: 100%;
+        background: linear-gradient(135deg, #667eea, #764ba2);
+        color: white;
+        border: none;
+        border-radius: 6px;
+        cursor: pointer;
+        font-size: 12px;
+        font-weight: 500;
+        transition: all 0.2s ease;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 4px;
+    `;
+    manageBtn.innerHTML = `<svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"></circle><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06A1.65 1.65 0 0 0 4.68 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06A1.65 1.65 0 0 0 9 4.68a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06A1.65 1.65 0 0 0 19.4 9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"></path></svg> ${$t('manageTemplates')}`;
+    manageBtn.onmouseenter = () => { manageBtn.style.opacity = "0.85"; manageBtn.style.transform = "scale(1.02)"; };
+    manageBtn.onmouseleave = () => { manageBtn.style.opacity = "1"; manageBtn.style.transform = "scale(1)"; };
+    manageBtn.onclick = () => {
+        close();
+        showLMStudioSettings(node);
+    };
+    dialog.appendChild(manageBtn);
+    
     overlay.appendChild(dialog);
     
     const close = () => {
@@ -1235,7 +1303,7 @@ async function showTemplateSelector(node, btnRect) {
     let currentTemplates = [];
     
     try {
-        const response = await fetch("/zhihui/lmstudio/templates");
+        const response = await fetch("/zhihui_nodes/qwen3vl/templates");
         if (response.ok) {
             const data = await response.json();
             currentTemplates = data.templates || [];
@@ -2574,7 +2642,7 @@ function showLMStudioSettings(node) {
     
     const loadTemplates = async () => {
         try {
-            const response = await fetch("/zhihui/lmstudio/templates");
+            const response = await fetch("/zhihui_nodes/qwen3vl/templates");
             if (response.ok) {
                 const data = await response.json();
                 templates = data.templates || [];
@@ -2725,13 +2793,13 @@ function showLMStudioSettings(node) {
             try {
                 let response;
                 if (isEdit) {
-                    response = await fetch(`/zhihui/lmstudio/templates/${templateId}`, {
+                    response = await fetch(`/zhihui_nodes/qwen3vl/templates/${templateId}`, {
                         method: "PUT",
                         headers: { "Content-Type": "application/json" },
                         body: JSON.stringify({ name, content })
                     });
                 } else {
-                    response = await fetch("/zhihui/lmstudio/templates", {
+                    response = await fetch("/zhihui_nodes/qwen3vl/templates", {
                         method: "POST",
                         headers: { "Content-Type": "application/json" },
                         body: JSON.stringify({ name, content })
@@ -2761,7 +2829,7 @@ function showLMStudioSettings(node) {
     const deleteTemplate = async (templateId) => {
         showConfirm($t('confirmDelete'), async () => {
             try {
-                const response = await fetch(`/zhihui/lmstudio/templates/${templateId}`, {
+                const response = await fetch(`/zhihui_nodes/qwen3vl/templates/${templateId}`, {
                     method: "DELETE"
                 });
                 

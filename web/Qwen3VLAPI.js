@@ -77,6 +77,9 @@ const i18n = {
         restoreTooltip: "点击恢复上次清空的内容",
         clearContent: "已清空内容",
         restoreContent: "已恢复内容",
+        noContentToClear: "没有可清空的内容",
+        noContentToRestore: "没有可恢复的内容",
+        manageTemplates: "管理模板",
         selectTemplate: "选择模板",
         searchTemplates: "搜索模板...",
         noTemplates: "暂无模板，请在设置界面中管理模板",
@@ -193,6 +196,9 @@ const i18n = {
         restoreTooltip: "Click to restore the last cleared content",
         clearContent: "Content cleared",
         restoreContent: "Content restored",
+        noContentToClear: "No content to clear",
+        noContentToRestore: "No content to restore",
+        manageTemplates: "Manage Templates",
         selectTemplate: "Select Template",
         searchTemplates: "Search templates...",
         noTemplates: "No templates yet. Manage templates in the settings interface",
@@ -2109,6 +2115,41 @@ async function showQwen3VLTemplateSelector(node, btnRect) {
     dialog.appendChild(header);
     dialog.appendChild(searchInput);
     dialog.appendChild(listContainer);
+    
+    const manageBtn = document.createElement("button");
+    manageBtn.type = "button";
+    manageBtn.style.cssText = `
+        margin-top: 8px;
+        padding: 6px 0;
+        width: 100%;
+        background: linear-gradient(135deg, #667eea, #764ba2);
+        color: white;
+        border: none;
+        border-radius: 6px;
+        cursor: pointer;
+        font-size: 12px;
+        font-weight: 500;
+        transition: all 0.2s ease;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 4px;
+    `;
+    manageBtn.innerHTML = `<svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"></circle><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06A1.65 1.65 0 0 0 4.68 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06A1.65 1.65 0 0 0 9 4.68a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06A1.65 1.65 0 0 0 19.4 9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"></path></svg> ${$t('manageTemplates')}`;
+    manageBtn.onmouseenter = () => { manageBtn.style.opacity = "0.85"; manageBtn.style.transform = "scale(1.02)"; };
+    manageBtn.onmouseleave = () => { manageBtn.style.opacity = "1"; manageBtn.style.transform = "scale(1)"; };
+    manageBtn.onclick = () => {
+        close();
+        const existingOverlay2 = document.getElementById("qwen3vl-template-selector");
+        if (existingOverlay2) { existingOverlay2.remove(); }
+        apiConfigManager.showConfigDialog(null);
+        setTimeout(() => {
+            const templatesTab = document.querySelector('.qwen3vl-nav-tab[data-page="templates"]');
+            if (templatesTab) templatesTab.click();
+        }, 100);
+    };
+    dialog.appendChild(manageBtn);
+    
     overlay.appendChild(dialog);
     
     const close = () => {
@@ -2192,62 +2233,163 @@ function addQwen3VLInputButtons(node) {
     const parentEl = inputEl.parentElement;
     if (!parentEl) return;
     
+    if (parentEl.querySelector('.qwen3vl-btn-container')) return;
+    
     parentEl.style.position = "relative";
+    parentEl.style.paddingTop = "20px";
+    parentEl.style.marginTop = "-15px";
     
-    const templateBtn = document.createElement("button");
-    templateBtn.type = "button";
-    templateBtn.innerHTML = `<svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="display:block;"><rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect><line x1="3" y1="9" x2="21" y2="9"></line><line x1="9" y1="21" x2="9" y2="9"></line></svg>`;
-    templateBtn.style.cssText = "position:absolute;right:3px;top:3px;width:18px;height:18px;padding:0;background:rgba(102,126,234,0.35);border:none;border-radius:3px;cursor:pointer;display:none;align-items:center;justify-content:center;z-index:10;transition:all 0.2s ease;opacity:0;color:rgba(102,126,234,0.9);";
+    const btnContainer = document.createElement("div");
+    btnContainer.className = "qwen3vl-btn-container";
+    btnContainer.style.cssText = `
+        display: flex;
+        gap: 4px;
+        justify-content: flex-end;
+        padding-right: 2px;
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+    `;
     
-    templateBtn.onmouseenter = () => { templateBtn.style.background = "rgba(102,126,234,0.6)"; templateBtn.style.color = "rgba(102,126,234,1)"; templateBtn.style.transform = "scale(1.1)"; showQwen3VLTemplateTooltip(templateBtn); };
-    templateBtn.onmouseleave = () => { templateBtn.style.background = "rgba(102,126,234,0.35)"; templateBtn.style.color = "rgba(102,126,234,0.9)"; templateBtn.style.transform = "scale(1)"; hideQwen3VLTemplateTooltip(); };
-    templateBtn.onclick = (e) => { e.preventDefault(); e.stopPropagation(); const rect = templateBtn.getBoundingClientRect(); showQwen3VLTemplateSelector(node, rect); };
+    const restoreBtn = document.createElement("button");
+    restoreBtn.type = "button";
+    restoreBtn.innerHTML = `<svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="display:block;margin:auto;"><polyline points="1 4 1 10 7 10"></polyline><polyline points="23 4 23 10 17 10"></polyline><path d="M20.49 15a9 9 0 1 1-2.12-9.36L23 10"></path></svg>`;
+    restoreBtn.style.cssText = `
+        width: 18px;
+        height: 18px;
+        padding: 0;
+        background: rgba(34, 197, 94, 0.35);
+        border: none;
+        border-radius: 3px;
+        cursor: pointer;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        transition: all 0.2s ease;
+        color: rgba(34, 197, 94, 0.9);
+    `;
     
-    parentEl.appendChild(templateBtn);
+    restoreBtn.onmouseenter = () => {
+        restoreBtn.style.background = "rgba(34, 197, 94, 0.6)";
+        restoreBtn.style.color = "rgba(34, 197, 94, 1)";
+        restoreBtn.style.transform = "scale(1.1)";
+        showQwen3VLClearTooltip(restoreBtn, 'restoreTooltip');
+    };
+    restoreBtn.onmouseleave = () => {
+        restoreBtn.style.background = "rgba(34, 197, 94, 0.35)";
+        restoreBtn.style.color = "rgba(34, 197, 94, 0.9)";
+        restoreBtn.style.transform = "scale(1)";
+        hideQwen3VLClearTooltip();
+    };
     
-    const clearBtn = document.createElement("button");
-    clearBtn.type = "button";
-    clearBtn.innerHTML = `<svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="display:block;"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>`;
-    clearBtn.style.cssText = "position:absolute;right:24px;top:3px;width:18px;height:18px;padding:0;background:rgba(239,68,68,0.35);border:none;border-radius:3px;cursor:pointer;display:none;align-items:center;justify-content:center;z-index:10;transition:all 0.2s ease;opacity:0;color:rgba(239,68,68,0.9);";
-    
-    clearBtn.onmouseenter = () => { clearBtn.style.background = "rgba(239,68,68,0.6)"; clearBtn.style.color = "rgba(239,68,68,1)"; clearBtn.style.transform = "scale(1.1)"; showQwen3VLClearTooltip(clearBtn, node._lastClearedContent !== undefined ? 'restoreTooltip' : 'clearTooltip'); };
-    clearBtn.onmouseleave = () => { clearBtn.style.background = node._lastClearedContent !== undefined ? "rgba(34,197,94,0.35)" : "rgba(239,68,68,0.35)"; clearBtn.style.color = node._lastClearedContent !== undefined ? "rgba(34,197,94,0.9)" : "rgba(239,68,68,0.9)"; clearBtn.style.transform = "scale(1)"; hideQwen3VLClearTooltip(); };
-    clearBtn.onclick = (e) => {
+    restoreBtn.onclick = (e) => {
         e.preventDefault();
         e.stopPropagation();
         if (node._lastClearedContent !== undefined) {
             inputEl.value = node._lastClearedContent;
             systemPromptWidget.value = node._lastClearedContent;
             node._lastClearedContent = undefined;
-            clearBtn.innerHTML = `<svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="display:block;"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>`;
-            clearBtn.style.background = "rgba(239,68,68,0.35)";
-            clearBtn.style.color = "rgba(239,68,68,0.9)";
+            inputEl.dispatchEvent(new Event('input', { bubbles: true }));
             showQwen3VLToast($t('restoreContent'), "success");
         } else {
+            showQwen3VLToast($t('noContentToRestore'), "warning");
+        }
+    };
+    
+    btnContainer.appendChild(restoreBtn);
+    
+    const clearBtn = document.createElement("button");
+    clearBtn.type = "button";
+    clearBtn.innerHTML = `<svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="display:block;margin:auto;"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>`;
+    clearBtn.style.cssText = `
+        width: 18px;
+        height: 18px;
+        padding: 0;
+        background: rgba(239, 68, 68, 0.35);
+        border: none;
+        border-radius: 3px;
+        cursor: pointer;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        transition: all 0.2s ease;
+        color: rgba(239, 68, 68, 0.9);
+    `;
+    
+    clearBtn.onmouseenter = () => {
+        clearBtn.style.background = "rgba(239, 68, 68, 0.6)";
+        clearBtn.style.color = "rgba(239, 68, 68, 1)";
+        clearBtn.style.transform = "scale(1.1)";
+        showQwen3VLClearTooltip(clearBtn, 'clearTooltip');
+    };
+    clearBtn.onmouseleave = () => {
+        clearBtn.style.background = "rgba(239, 68, 68, 0.35)";
+        clearBtn.style.color = "rgba(239, 68, 68, 0.9)";
+        clearBtn.style.transform = "scale(1)";
+        hideQwen3VLClearTooltip();
+    };
+    
+    clearBtn.onclick = (e) => {
+        e.preventDefault();
+        e.stopPropagation();
+        if (inputEl.value.trim()) {
             node._lastClearedContent = inputEl.value;
             inputEl.value = "";
             systemPromptWidget.value = "";
-            clearBtn.innerHTML = `<svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="display:block;"><polyline points="1 4 1 10 7 10"></polyline><polyline points="23 4 23 10 17 10"></polyline><path d="M20.49 15a9 9 0 1 1-2.12-9.36L23 10"></path></svg>`;
-            clearBtn.style.background = "rgba(34,197,94,0.35)";
-            clearBtn.style.color = "rgba(34,197,94,0.9)";
+            inputEl.dispatchEvent(new Event('input', { bubbles: true }));
             showQwen3VLToast($t('clearContent'), "success");
+        } else {
+            showQwen3VLToast($t('noContentToClear'), "warning");
         }
-        inputEl.dispatchEvent(new Event('input', { bubbles: true }));
     };
     
-    parentEl.appendChild(clearBtn);
+    btnContainer.appendChild(clearBtn);
     
-    inputEl.addEventListener("focus", () => {
-        templateBtn.style.display = "flex";
-        clearBtn.style.display = "flex";
-        setTimeout(() => { templateBtn.style.opacity = "1"; clearBtn.style.opacity = "1"; }, 10);
-    });
+    const templateBtn = document.createElement("button");
+    templateBtn.type = "button";
+    templateBtn.innerHTML = `<svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="display:block;margin:auto;"><rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect><line x1="3" y1="9" x2="21" y2="9"></line><line x1="9" y1="21" x2="9" y2="9"></line></svg>`;
+    templateBtn.style.cssText = `
+        width: 18px;
+        height: 18px;
+        padding: 0;
+        background: rgba(102, 126, 234, 0.35);
+        border: none;
+        border-radius: 3px;
+        cursor: pointer;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        transition: all 0.2s ease;
+        color: rgba(102, 126, 234, 0.9);
+    `;
     
-    inputEl.addEventListener("blur", () => {
-        templateBtn.style.opacity = "0";
-        clearBtn.style.opacity = "0";
-        setTimeout(() => { templateBtn.style.display = "none"; clearBtn.style.display = "none"; }, 200);
-    });
+    templateBtn.onmouseenter = () => {
+        templateBtn.style.background = "rgba(102, 126, 234, 0.6)";
+        templateBtn.style.color = "rgba(102, 126, 234, 1)";
+        templateBtn.style.transform = "scale(1.1)";
+        showQwen3VLTemplateTooltip(templateBtn);
+    };
+    templateBtn.onmouseleave = () => {
+        templateBtn.style.background = "rgba(102, 126, 234, 0.35)";
+        templateBtn.style.color = "rgba(102, 126, 234, 0.9)";
+        templateBtn.style.transform = "scale(1)";
+        hideQwen3VLTemplateTooltip();
+    };
+    templateBtn.onclick = (e) => {
+        e.preventDefault();
+        e.stopPropagation();
+        const rect = templateBtn.getBoundingClientRect();
+        showQwen3VLTemplateSelector(node, rect);
+    };
+    
+    btnContainer.appendChild(templateBtn);
+    
+    parentEl.appendChild(btnContainer);
+    
+    node._templateBtn = templateBtn;
+    node._clearBtn = clearBtn;
+    node._restoreBtn = restoreBtn;
 }
 
 app.registerExtension({

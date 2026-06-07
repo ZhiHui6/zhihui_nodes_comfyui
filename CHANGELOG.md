@@ -1,5 +1,12 @@
 # 更新日志 / Changelog
 
+## 1.1.1 2026-6-7
+LM Studio节点：修复标签选择器快捷输入按钮布局问题
+Qwen3VL系列节点：增加模板管理功能、快捷按钮
+  <br>
+LM Studio node: Fixed shortcut input button layout issue in TagSelector node
+Qwen3VL series nodes: Added template management feature, shortcut buttons
+
 ## 1.0.39 2026-5-13
 标签选择器节点(TagSelector)：调整标签选择器快捷输入按钮布局
   <br>
