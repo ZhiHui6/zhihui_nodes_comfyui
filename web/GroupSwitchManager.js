@@ -250,6 +250,16 @@ function getGroupNodes(group) {
     return Array.from(group._children).filter((c) => c instanceof LGraphNode);
 }
 
+function normalizeGroupColor(color) {
+    if (!color) return '';
+
+    let normalized = String(color).replace('#', '').trim().toLowerCase();
+    if (normalized.length === 3) {
+        normalized = normalized.replace(/(.)(.)(.)/, "$1$1$2$2$3$3");
+    }
+    return `#${normalized}`;
+}
+
 class GroupSwitchManagerService {
     constructor() {
         this.msThreshold = 400;
@@ -347,7 +357,7 @@ class GroupSwitchManagerService {
             if (!group || !group.title) continue;
             const nodes = getGroupNodes(group);
             const hasActiveNode = nodes.some(n => n.mode === 0);
-            states.set(group.title, {
+            states.set(group, {
                 enabled: hasActiveNode,
                 group: group
             });
@@ -384,6 +394,8 @@ app.registerExtension({
             this.properties.toggleRestriction = this.properties.toggleRestriction || 'unlimited';
             this.properties.showNavigateIndicator = this.properties.showNavigateIndicator !== undefined ? this.properties.showNavigateIndicator : true;
             this.groupReferences = new WeakMap();
+            this.groupKeys = new WeakMap();
+            this.groupConfigReferences = new WeakMap();
             this._processingStack = new Set();
             this.size = [400, 500];
             this._gmmHelp = false;
@@ -865,17 +877,25 @@ app.registerExtension({
                     transition: all 0.3s ease;
                     cursor: pointer;
                     flex-shrink: 0;
-                    display: flex;
-                    align-items: center;
-                    justify-content: center;
                     position: relative;
+                    box-sizing: border-box;
+                    padding: 0;
+                    margin: 0;
                 }
 
                 .gmm-switch svg {
+                    position: absolute;
+                    top: 50%;
+                    left: 50%;
+                    transform: translate(-50%, -50%);
                     width: 10px;
                     height: 10px;
                     stroke: rgba(255, 255, 255, 0.3);
                     transition: all 0.3s ease;
+                    display: block;
+                    overflow: visible;
+                    padding: 0;
+                    margin: 0;
                 }
 
                 .gmm-switch:hover {
@@ -899,19 +919,28 @@ app.registerExtension({
                     border-radius: 50%;
                     background: rgba(116, 55, 149, 0.2);
                     border: 1px solid rgba(116, 55, 149, 0.3);
-                    display: flex;
-                    align-items: center;
-                    justify-content: center;
                     transition: all 0.2s ease;
                     cursor: pointer;
                     flex-shrink: 0;
+                    position: relative;
+                    box-sizing: border-box;
+                    padding: 0;
+                    margin: 0;
                 }
 
                 .gmm-linkage-button svg {
+                    position: absolute;
+                    top: 50%;
+                    left: 50%;
+                    transform: translate(-50%, -50%);
                     width: 10px;
                     height: 10px;
                     stroke: #B0B0B0;
                     transition: all 0.2s ease;
+                    display: block;
+                    overflow: visible;
+                    padding: 0;
+                    margin: 0;
                 }
 
                 .gmm-linkage-button:hover {
@@ -940,19 +969,28 @@ app.registerExtension({
                     border-radius: 4px;
                     background: rgba(74, 144, 226, 0.2);
                     border: 1px solid rgba(74, 144, 226, 0.3);
-                    display: flex;
-                    align-items: center;
-                    justify-content: center;
                     transition: all 0.2s ease;
                     cursor: pointer;
                     flex-shrink: 0;
+                    position: relative;
+                    box-sizing: border-box;
+                    padding: 0;
+                    margin: 0;
                 }
 
                 .gmm-navigate-button svg {
+                    position: absolute;
+                    top: 50%;
+                    left: 50%;
+                    transform: translate(-50%, -50%);
                     width: 10px;
                     height: 10px;
                     stroke: #4A90E2;
                     transition: all 0.2s ease;
+                    display: block;
+                    overflow: visible;
+                    padding: 0;
+                    margin: 0;
                 }
 
                 .gmm-navigate-button:hover {
@@ -1518,21 +1556,8 @@ app.registerExtension({
             }
 
             displayGroups.forEach(group => {
-                let groupConfig = this.properties.groups.find(g => g.group_name === group.title);
-                if (!groupConfig) {
-                    groupConfig = {
-                        id: Date.now() + Math.random(),
-                        group_name: group.title,
-                        enabled: this.isGroupEnabled(group),
-                        linkage: {
-                            on_enable: [],
-                            on_disable: []
-                        }
-                    };
-                    this.properties.groups.push(groupConfig);
-                } else {
-                    groupConfig.enabled = this.isGroupEnabled(group);
-                }
+                const groupConfig = this.getGroupConfig(group);
+                groupConfig.enabled = this.isGroupEnabled(group);
 
                 if (!this.groupReferences.has(group)) {
                     this.groupReferences.set(group, group.title);
@@ -1543,19 +1568,105 @@ app.registerExtension({
             });
 
             const beforeCleanupCount = this.properties.groups.length;
+            const activeGroupKeys = new Set(allWorkflowGroups.map(group => this.getGroupKey(group)));
             this.properties.groups = this.properties.groups.filter(config =>
-                allWorkflowGroups.some(g => g.title === config.group_name)
+                (config.group_key && activeGroupKeys.has(config.group_key)) ||
+                (!config.group_key && allWorkflowGroups.some(g => g.title === config.group_name))
             );
             const afterCleanupCount = this.properties.groups.length;
             if (beforeCleanupCount !== afterCleanupCount) {
             }
 
-            logger.info('[GMM-UI] === 组列表更新完成 ===');
+            (typeof logger !== 'undefined' ? logger : console).info('[GMM-UI] === 组列表更新完成 ===');
         };
 
         nodeType.prototype.getWorkflowGroups = function () {
             if (!app.graph || !app.graph._groups) return [];
             return app.graph._groups.filter(g => g && g.title);
+        };
+
+        nodeType.prototype.getGroupKey = function (group) {
+            if (!group) return '';
+
+            const cachedKey = this.groupKeys.get(group);
+            if (cachedKey) return cachedKey;
+
+            const color = normalizeGroupColor(group.color);
+            const sameFingerprint = this.getWorkflowGroups().filter(candidate =>
+                candidate.title === group.title &&
+                normalizeGroupColor(candidate.color) === color
+            );
+            const occurrence = sameFingerprint.indexOf(group);
+            const key = JSON.stringify([group.title, color, Math.max(0, occurrence)]);
+
+            this.groupKeys.set(group, key);
+            return key;
+        };
+
+        nodeType.prototype.getGroupConfig = function (group) {
+            if (!group) return null;
+
+            const existingReference = this.groupConfigReferences.get(group);
+            if (existingReference && this.properties.groups.includes(existingReference)) {
+                existingReference.group_name = group.title;
+                existingReference.group_color = normalizeGroupColor(group.color);
+                existingReference.linkage = existingReference.linkage || { on_enable: [], on_disable: [] };
+                return existingReference;
+            }
+
+            const groupKey = this.getGroupKey(group);
+            const groupColor = normalizeGroupColor(group.color);
+            let groupConfig = this.properties.groups.find(config => config.group_key === groupKey);
+
+            if (!groupConfig) {
+                groupConfig = this.properties.groups.find(config =>
+                    config.group_name === group.title &&
+                    normalizeGroupColor(config.group_color || config.color) === groupColor
+                );
+            }
+
+            // Migrate legacy configs that only stored the title. Once assigned to the
+            // first matching group, the key prevents a second same-title group from
+            // reusing that config.
+            if (!groupConfig) {
+                const legacyConfigs = this.properties.groups.filter(config =>
+                    !config.group_key && !config.group_color && config.group_name === group.title
+                );
+                if (legacyConfigs.length === 1) {
+                    groupConfig = legacyConfigs[0];
+                }
+            }
+
+            if (!groupConfig) {
+                groupConfig = {
+                    id: Date.now() + Math.random(),
+                    group_name: group.title,
+                    group_key: groupKey,
+                    group_color: groupColor,
+                    enabled: this.isGroupEnabled(group),
+                    linkage: {
+                        on_enable: [],
+                        on_disable: []
+                    }
+                };
+                this.properties.groups.push(groupConfig);
+            } else {
+                groupConfig.group_key = groupKey;
+                groupConfig.group_name = group.title;
+                groupConfig.group_color = groupColor;
+                groupConfig.linkage = groupConfig.linkage || { on_enable: [], on_disable: [] };
+            }
+
+            this.groupConfigReferences.set(group, groupConfig);
+            return groupConfig;
+        };
+
+        nodeType.prototype.resolveGroup = function (groupOrName) {
+            if (!app.graph || !app.graph._groups) return null;
+            if (groupOrName && typeof groupOrName === 'object') {
+                return app.graph._groups.includes(groupOrName) ? groupOrName : null;
+            }
+            return app.graph._groups.find(group => group && group.title === groupOrName) || null;
         };
 
         nodeType.prototype.sortGroupsByOrder = function (groups) {
@@ -1673,19 +1784,8 @@ app.registerExtension({
 
             for (const group of sortedGroups) {
                 const currentEnabled = group._gmm_hasAnyActiveNode;
-                let groupConfig = this.properties.groups.find(g => g.group_name === group.title);
-
-                if (!groupConfig) {
-                    groupConfig = {
-                        id: Date.now() + Math.random(),
-                        group_name: group.title,
-                        enabled: currentEnabled,
-                        linkage: { on_enable: [], on_disable: [] }
-                    };
-                    this.properties.groups.push(groupConfig);
-                } else {
-                    groupConfig.enabled = currentEnabled;
-                }
+                const groupConfig = this.getGroupConfig(group);
+                groupConfig.enabled = currentEnabled;
 
                 if (!this.groupReferences.has(group)) {
                     this.groupReferences.set(group, group.title);
@@ -1693,10 +1793,7 @@ app.registerExtension({
 
                 const cachedName = this.groupReferences.get(group);
                 if (cachedName && cachedName !== group.title) {
-                    const oldConfig = this.properties.groups.find(g => g.group_name === cachedName);
-                    if (oldConfig) {
-                        oldConfig.group_name = group.title;
-                    }
+                    groupConfig.group_name = group.title;
                     const orderIndex = this.properties.groupOrder.indexOf(cachedName);
                     if (orderIndex !== -1) {
                         this.properties.groupOrder[orderIndex] = group.title;
@@ -1706,11 +1803,13 @@ app.registerExtension({
                 }
 
                 let groupItem = listContainer.children[index];
-                const expectedId = `gmm-group-${group.title}`;
+                const groupKey = this.getGroupKey(group);
+                const expectedId = `gmm-group-${encodeURIComponent(groupKey)}`;
 
-                if (!groupItem || groupItem.getAttribute('data-group-name') !== group.title) {
+                if (!groupItem || groupItem.getAttribute('data-group-key') !== groupKey) {
                     const newItem = this.createGroupItem(groupConfig, group);
                     newItem.setAttribute('data-group-name', group.title);
+                    newItem.setAttribute('data-group-key', groupKey);
                     newItem.id = expectedId;
 
                     if (groupItem) {
@@ -1744,17 +1843,16 @@ app.registerExtension({
 
                     const colorIndicator = groupItem.querySelector('.gmm-group-color-indicator');
                     if (colorIndicator) {
-                        const currentColor = group?.color || '#888888';
+                        const currentColor = normalizeGroupColor(group?.color || '#888888');
                         const currentBg = colorIndicator.style.backgroundColor;
-                        const normalizedCurrent = currentColor.startsWith('#') ? currentColor : '#' + currentColor;
-                        if (!currentBg || currentBg !== normalizedCurrent) {
-                            colorIndicator.style.backgroundColor = normalizedCurrent;
+                        if (!currentBg || currentBg !== currentColor) {
+                            colorIndicator.style.backgroundColor = currentColor;
                             isDirty = true;
                         }
                     }
                 }
 
-                this.properties.groupStatesCache[group.title] = currentEnabled;
+                this.properties.groupStatesCache[groupKey] = currentEnabled;
                 index++;
             }
 
@@ -1763,8 +1861,10 @@ app.registerExtension({
                 isDirty = true;
             }
 
+            const activeGroupKeys = new Set(groups.map(group => this.getGroupKey(group)));
             this.properties.groups = this.properties.groups.filter(config =>
-                groups.some(g => g.title === config.group_name)
+                (config.group_key && activeGroupKeys.has(config.group_key)) ||
+                (!config.group_key && groups.some(g => g.title === config.group_name))
             );
 
             if (isDirty) {
@@ -1783,7 +1883,7 @@ app.registerExtension({
 
                 const cachedName = this.groupReferences.get(group);
                 if (cachedName && cachedName !== group.title) {
-                    const config = this.properties.groups.find(g => g.group_name === cachedName);
+                    const config = this.getGroupConfig(group);
                     if (config) {
                         config.group_name = group.title;
                     }
@@ -1793,8 +1893,10 @@ app.registerExtension({
                         this.properties.groupOrder[orderIndex] = group.title;
                     }
 
-                    if (this.properties.groupStatesCache[cachedName] !== undefined) {
-                        this.properties.groupStatesCache[group.title] = this.properties.groupStatesCache[cachedName];
+                    const groupKey = this.getGroupKey(group);
+                    if (this.properties.groupStatesCache[cachedName] !== undefined &&
+                        this.properties.groupStatesCache[groupKey] === undefined) {
+                        this.properties.groupStatesCache[groupKey] = this.properties.groupStatesCache[cachedName];
                         delete this.properties.groupStatesCache[cachedName];
                     }
 
@@ -1805,13 +1907,15 @@ app.registerExtension({
                 }
 
                 const currentState = this.isGroupEnabled(group);
-                const cachedState = this.properties.groupStatesCache[group.title];
+                const groupKey = this.getGroupKey(group);
+                const cachedState = this.properties.groupStatesCache[groupKey] ??
+                    this.properties.groupStatesCache[group.title];
 
                 if (cachedState !== undefined && cachedState !== currentState) {
                     hasStateChange = true;
                 }
 
-                this.properties.groupStatesCache[group.title] = currentState;
+                this.properties.groupStatesCache[groupKey] = currentState;
             });
 
             if (hasStateChange || hasRename) {
@@ -1862,6 +1966,7 @@ app.registerExtension({
             const item = document.createElement('div');
             item.className = 'gmm-group-item';
             item.dataset.groupName = groupConfig.group_name;
+            item.dataset.groupKey = this.getGroupKey(group);
             item.draggable = false;
 
             const displayName = this.truncateText(groupConfig.group_name, 30);
@@ -1871,7 +1976,7 @@ app.registerExtension({
                 (groupConfig.linkage.on_enable?.length > 0 ||
                  groupConfig.linkage.on_disable?.length > 0);
 
-            const groupColor = group?.color || '#888888';
+            const groupColor = normalizeGroupColor(group?.color || '#888888');
             const showNavigate = this.properties.showNavigateIndicator !== undefined ? this.properties.showNavigateIndicator : true;
 
             item.innerHTML = `
@@ -1911,7 +2016,7 @@ app.registerExtension({
             const switchBtn = item.querySelector('.gmm-switch');
             switchBtn.addEventListener('click', (e) => {
                 e.stopPropagation();
-                this.toggleGroup(groupConfig.group_name, !groupConfig.enabled);
+                this.toggleGroup(group, !groupConfig.enabled);
             });
 
             const linkageBtn = item.querySelector('.gmm-linkage-button');
@@ -1924,7 +2029,7 @@ app.registerExtension({
             if (navigateBtn) {
                 navigateBtn.addEventListener('click', (e) => {
                     e.stopPropagation();
-                    this.navigateToGroup(groupConfig.group_name);
+                    this.navigateToGroup(group);
                 });
             }
 
@@ -2060,63 +2165,94 @@ app.registerExtension({
             this.properties.groupOrder = newOrder;
         };
 
-        nodeType.prototype.toggleGroup = function (groupName, enable) {
-            if (!this._processingStack) {
-                this._processingStack = new Set();
-            }
+        nodeType.prototype.getFilteredGroups = function () {
+            const allGroups = this.getWorkflowGroups();
+            let filtered = allGroups;
 
-            if (this._processingStack.has(groupName)) {
-                return;
-            }
+            if (this.properties.matchMode === 'title' && this.properties.titleKeywords) {
+                const keywords = this.properties.titleKeywords.split(',').map(k => k.trim().toLowerCase()).filter(k => k);
+                if (keywords.length > 0) {
+                    filtered = filtered.filter(g => {
+                        const title = (g.title || '').toLowerCase();
+                        return keywords.some(kw => title.includes(kw));
+                    });
+                }
+            } else if (this.properties.matchMode === 'colors' && this.properties.selectedColorFilter) {
+                let filterColor = this.properties.selectedColorFilter.trim().toLowerCase();
+                if (typeof LGraphCanvas !== 'undefined' && LGraphCanvas.node_colors) {
+                    const colorMap = LGraphCanvas.node_colors;
+                    if (colorMap[filterColor]) {
+                        filterColor = colorMap[filterColor].groupcolor;
+                    } else {
+                        const underscore = filterColor.replace(/\s+/g, '_');
+                        if (colorMap[underscore]) filterColor = colorMap[underscore].groupcolor;
+                        else {
+                            const spaceless = filterColor.replace(/\s+/g, '');
+                            if (colorMap[spaceless]) filterColor = colorMap[spaceless].groupcolor;
+                        }
+                    }
+                }
+                const targetHex = normalizeGroupColor(filterColor);
 
-            const group = app.graph._groups.find(g => g.title === groupName);
-            if (!group) {
-                return;
+                filtered = filtered.filter(g => {
+                    if (!g.color) return false;
+                    return normalizeGroupColor(g.color) === targetHex;
+                });
             }
+            return filtered;
+        };
+
+        nodeType.prototype.getFilteredGroupNames = function () {
+            return this.getFilteredGroups().map(group => group.title);
+        };
+
+        nodeType.prototype.toggleGroup = function (groupOrName, enable, options = {}) {
+            if (!this._processingStack) this._processingStack = new Set();
+
+            const group = this.resolveGroup(groupOrName);
+            if (!group) return;
+            const groupKey = this.getGroupKey(group);
+            if (this._processingStack.has(groupKey)) return;
 
             const nodes = this.getNodesInGroup(group);
-            if (nodes.length === 0) {
-                return;
-            }
+            if (nodes.length === 0) return;
 
-            this._processingStack.add(groupName);
+            this._processingStack.add(groupKey);
 
             try {
                 const toggleRestriction = this.properties.toggleRestriction || 'unlimited';
+                const skipAlwaysOne = options.skipAlwaysOne === true;
 
-                if (enable && toggleRestriction !== 'unlimited') {
-                    const currentEnabledGroups = this.properties.groups.filter(g => g.enabled);
-                    
-                    if (toggleRestriction === 'always_one') {
-                        currentEnabledGroups.forEach(g => {
-                            if (g.group_name !== groupName) {
-                                this.toggleGroupInternal(g.group_name, false);
-                            }
-                        });
-                    }
+                // Always One 逻辑：仅当非跳过模式、且为开启操作时生效
+                if (enable && toggleRestriction === 'always_one' && !skipAlwaysOne) {
+                    // 关键修复：仅获取当前 Match 模式过滤出的可见组
+                    const enabledOthers = this.getFilteredGroups().filter(otherGroup => {
+                        if (otherGroup === group) return false;
+                        return this.getGroupConfig(otherGroup)?.enabled;
+                    });
+
+                    // 关闭其他可见组，传入 skipAlwaysOne: true 防止递归 enforcement，但保留联动执行
+                    enabledOthers.forEach(otherGroup => {
+                        this.toggleGroup(otherGroup, false, { skipAlwaysOne: true, skipUIUpdate: true });
+                    });
                 }
 
-                this.toggleGroupInternal(groupName, enable);
+                this.toggleGroupInternal(group, enable);
 
-                this.updateGroupsList();
-                app.graph.setDirtyCanvas(true, true);
-
-                const event = new CustomEvent('group-mute-changed', {
-                    detail: {
-                        sourceId: this._gmmInstanceId,
-                        groupName: groupName,
-                        enabled: enable,
-                        timestamp: Date.now()
-                    }
-                });
-                window.dispatchEvent(event);
+                if (!options.skipUIUpdate) {
+                    this.updateGroupsList();
+                    app.graph.setDirtyCanvas(true, true);
+                    window.dispatchEvent(new CustomEvent('group-mute-changed', {
+                        detail: { sourceId: this._gmmInstanceId, groupName: group.title, groupKey, enabled: enable, timestamp: Date.now() }
+                    }));
+                }
             } finally {
-                this._processingStack.delete(groupName);
+                this._processingStack.delete(groupKey);
             }
         };
 
-        nodeType.prototype.toggleGroupInternal = function (groupName, enable) {
-            const group = app.graph._groups.find(g => g.title === groupName);
+        nodeType.prototype.toggleGroupInternal = function (groupOrName, enable) {
+            const group = this.resolveGroup(groupOrName);
             if (!group) return;
 
             const nodes = this.getNodesInGroup(group);
@@ -2131,16 +2267,16 @@ app.registerExtension({
             }
             changeModeOfNodes(nodes, mode);
 
-            const config = this.properties.groups.find(g => g.group_name === groupName);
+            const config = this.getGroupConfig(group);
             if (config) {
                 config.enabled = enable;
             }
 
-            this.applyLinkage(groupName, enable);
+            this.applyLinkage(group, enable);
         };
 
-        nodeType.prototype.navigateToGroup = function (groupName) {
-            const group = app.graph._groups.find(g => g.title === groupName);
+        nodeType.prototype.navigateToGroup = function (groupOrName) {
+            const group = this.resolveGroup(groupOrName);
             if (!group) {
                 return;
             }
@@ -2170,8 +2306,9 @@ app.registerExtension({
             });
         };
 
-        nodeType.prototype.applyLinkage = function (groupName, enabled) {
-            const config = this.properties.groups.find(g => g.group_name === groupName);
+        nodeType.prototype.applyLinkage = function (groupOrName, enabled) {
+            const group = this.resolveGroup(groupOrName);
+            const config = this.getGroupConfig(group);
             if (!config || !config.linkage) return;
 
             const rules = enabled ? config.linkage.on_enable : config.linkage.on_disable;
@@ -2179,7 +2316,8 @@ app.registerExtension({
 
             rules.forEach(rule => {
                 const targetEnable = rule.action === "enable";
-                this.toggleGroup(rule.target_group, targetEnable);
+                // 关键修复：联动触发时跳过 Always One 限制和 UI 刷新，避免级联污染，但完整保留联动链执行
+                this.toggleGroup(rule.target_group, targetEnable, { skipAlwaysOne: true, skipUIUpdate: true });
             });
         };
 
@@ -2439,7 +2577,9 @@ app.registerExtension({
 
             dialog.querySelector('#gmm-save').addEventListener('click', (e) => {
                 e.stopPropagation();
-                const originalConfig = this.properties.groups.find(g => g.group_name === groupConfig.group_name);
+                const originalConfig = this.properties.groups.includes(groupConfig)
+                    ? groupConfig
+                    : this.properties.groups.find(g => g.group_key === groupConfig.group_key);
                 if (originalConfig) {
                     originalConfig.linkage = tempConfig.linkage;
                 }

@@ -125,8 +125,22 @@ function createHelpPopup(description, onClose) {
     return docElement;
 }
 
+let aspectRatioPresetsCache = null;
+
 app.registerExtension({
     name: "ImageAspectRatio",
+
+    async setup() {
+        try {
+            const res = await fetch("/zhihui_nodes/aspect_ratio/presets");
+            if (!res.ok) throw new Error(`HTTP ${res.status}`);
+            aspectRatioPresetsCache = await res.json();
+        } catch (e) {
+            console.warn("[ImageAspectRatio] 预设数据加载失败，使用空数据回退：", e);
+            aspectRatioPresetsCache = {};
+        }
+    },
+
     async beforeRegisterNodeDef(nodeType, nodeData, app) {
         if (nodeData.name === "ImageAspectRatio") {
             const onNodeCreated = nodeType.prototype.onNodeCreated;
@@ -148,104 +162,11 @@ app.registerExtension({
                     }
                 }
 
-                const PRESETS_DATA = {
-                    "Qwen image": {
-                        "1:1": ["1328x1328"],
-                        "16:9": ["1664x928"],
-                        "9:16": ["928x1664"],
-                        "4:3": ["1472x1104"],
-                        "3:4": ["1104x1472"],
-                        "3:2": ["1584x1056"],
-                        "2:3": ["1056x1584"],
-                        "Cinema": ["4K 4032x2128", "2K 2016x1008"],
-                        "Video": ["1080p 1904x1008", "720p 1232x672"],
-                    },
-                    "Flux": {
-                        "1:1": ["1024x1024"],
-                        "16:9": ["1344x768"],
-                        "9:16": ["768x1344"],
-                        "4:3": ["1152x864"],
-                        "3:4": ["864x1152"],
-                        "3:2": ["1216x832"],
-                        "2:3": ["832x1216"],
-                    },
-                    "Flux.2": {
-                        "1:1": ["S 1024x1024", "M 1280x1280", "L 1536x1536"],
-                        "16:9": ["S 1344x768", "M 1728x960", "L 2048x1152"],
-                        "9:16": ["S 768x1344", "M 960x1728", "L 1152x2048"],
-                        "4:3": ["S 1152x864", "M 1408x1056", "L 1728x1296"],
-                        "3:4": ["S 864x1152", "M 1088x1472", "L 1280x1728"],
-                        "3:2": ["S 1216x832", "M 1536x1024", "L 1920x1280"],
-                        "2:3": ["S 832x1216", "M 1024x1536", "L 1280x1920"],
-                    },
-                    "Flux2 klein": {
-                        "1:1": ["S 768x768", "M 896x896", "L 1024x1024"],
-                        "16:9": ["S 1024x576", "M 1152x640", "L 1344x768"],
-                        "9:16": ["S 576x1024", "M 640x1152", "L 768x1344"],
-                        "4:3": ["S 768x576", "M 960x704", "L 1024x768"],
-                        "3:4": ["S 576x768", "M 704x960", "L 768x1024"],
-                        "3:2": ["S 960x640", "M 1152x768", "L 1344x896"],
-                        "2:3": ["S 640x960", "M 768x1152", "L 896x1344"],
-                        "Cinema": ["4K 4096x2160", "2K 2048x1072"],
-                        "Video": ["1080p 1920x1072", "720p 1280x720"],
-                    },
-                    "Wan": {
-                        "16:9": ["1280x720"],
-                        "9:16": ["720x1280"],
-                        "4:3": ["1024x768"],
-                        "3:4": ["768x1024"],
-                        "21:9": ["1344x576"],
-                        "9:21": ["576x1344"],
-                        "Cinema": ["4K 4096x2144", "2K 2048x1056"],
-                        "Video": ["1080p 1920x1056", "720p 1280x704"],
-                    },
-                    "SDXL": {
-                        "1:1": ["1024x1024"],
-                        "9:8": ["1152x896"],
-                        "8:9": ["896x1152"],
-                        "3:2": ["1216x832"],
-                        "2:3": ["832x1216"],
-                        "7:4": ["1344x768"],
-                        "4:7": ["768x1344"],
-                        "12:5": ["1536x640"],
-                        "5:12": ["640x1536"],
-                    },
-                    "LTX2.3": {
-                        "16:9": ["480p 832x480", "720p 1280x704", "1080p 1920x1088", "2K 2048x1152", "4K 3840x2176"],
-                        "10:16": ["480p 480x768", "720p 704x1152", "1080p 1088x1728", "2K 1280x2048", "4K 2368x3840"],
-                        "16:10": ["480p 768x480", "720p 1152x704", "1080p 1728x1088", "2K 2048x1280", "4K 3840x2368"],
-                        "9:16": ["480p 480x832", "720p 704x1280", "1080p 1088x1920", "2K 1152x2048", "4K 2176x3840"],
-                        "21:9": ["480p 1152x480", "720p 1728x704", "1080p 2560x1088", "2K 2688x1152", "4K 5120x2176"],
-                        "9:21": ["480p 480x1152", "720p 704x1728", "1080p 1088x2560", "2K 1152x2688", "4K 2176x5120"],
-                    },
-                    "Z-image": {
-                        "1:1": ["1024x1024", "1280x1280", "1536x1536"],
-                        "9:7": ["1152x896", "1440x1120", "1728x1344"],
-                        "7:9": ["896x1152", "1120x1440", "1344x1728"],
-                        "4:3": ["1152x864", "1472x1104", "1728x1296"],
-                        "3:4": ["864x1152", "1104x1472", "1296x1728"],
-                        "3:2": ["1248x832", "1536x1024", "1872x1248"],
-                        "2:3": ["832x1248", "1024x1536", "1248x1872"],
-                        "16:9": ["1280x720", "1536x864", "2048x1152"],
-                        "9:16": ["720x1280", "864x1536", "1152x2048"],
-                        "21:9": ["1344x576", "1680x720", "2016x864"],
-                        "9:21": ["576x1344", "720x1680", "864x2016"],
-                        "Cinema": ["4K 4096x2112", "2K 2048x1024"],
-                        "Video": ["1080p 1920x1024", "720p 1280x704"],
-                    },
-                    "Custom Size": {},
-                };
+                const PRESETS_DATA = aspectRatioPresetsCache || {};
 
-                const ALL_CATEGORIES = [...new Set([
-                    ...Object.keys(PRESETS_DATA["Qwen image"]),
-                    ...Object.keys(PRESETS_DATA["Flux"]),
-                    ...Object.keys(PRESETS_DATA["Flux.2"]),
-                    ...Object.keys(PRESETS_DATA["Flux2 klein"]),
-                    ...Object.keys(PRESETS_DATA["Wan"]),
-                    ...Object.keys(PRESETS_DATA["SDXL"]),
-                    ...Object.keys(PRESETS_DATA["LTX2.3"]),
-                    ...Object.keys(PRESETS_DATA["Z-image"]),
-                ])].sort();
+                const ALL_CATEGORIES = [...new Set(
+                    Object.values(PRESETS_DATA).flatMap(categories => Object.keys(categories))
+                )].sort();
 
                 const setComboOptions = (widget, values) => {
                     if (!widget) return;

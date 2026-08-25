@@ -190,7 +190,7 @@ const MENU_STYLES = {
     },
     menuContainer: {
         position: 'fixed',
-        zIndex: '9999',
+        zIndex: '10011',
         display: 'flex',
         gap: '12px',
         opacity: '0',
@@ -370,7 +370,7 @@ const MENU_STYLES = {
         left: '0',
         width: '100%',
         height: '100%',
-        zIndex: '9998',
+        zIndex: '10010',
         background: 'transparent'
     }
 };
@@ -530,6 +530,11 @@ function createMenuUI(node, presetWidget) {
 
         overlay = document.createElement('div');
         Object.assign(overlay.style, MENU_STYLES.overlay);
+        overlay.addEventListener('pointerdown', (e) => {
+            e.preventDefault();
+            e.stopPropagation();
+            closeMenu();
+        });
         overlay.addEventListener('click', closeMenu);
         overlay.addEventListener('contextmenu', (e) => e.preventDefault());
 

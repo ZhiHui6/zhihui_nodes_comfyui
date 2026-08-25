@@ -39,9 +39,11 @@ app.registerExtension({
 
                 const target = parseInt(this.widgets?.find(w => w.name === "inputcount")?.value) || 0;
                 for (let i = 1; i <= 10; i++) {
-                    const w = this.widgets?.find(w => w.name === `replace_${i}`);
+                    const rw = this.widgets?.find(w => w.name === `replace_${i}`);
+                    const fw = this.widgets?.find(w => w.name === `find_${i}`);
                     const show = !enabled && i <= target;
-                    applyWidgetVisibility(w, show);
+                    applyWidgetVisibility(rw, show);
+                    applyWidgetVisibility(fw, show);
                 }
 
                 this.size = this.computeSize(this.size);
@@ -78,67 +80,25 @@ app.registerExtension({
                     this.widgets = [];
                 }
 
-                const currentPairs = this.widgets.filter(w => w.name && w.name.startsWith("find_")).length;
+                const inputcountWidget = this.widgets.find(w => w.name === "inputcount");
+                const isChinese = inputcountWidget && (inputcountWidget.label === "输入数量" || inputcountWidget.name === "输入数量");
 
-                if (target_number_of_inputs === currentPairs) return;
+                // 补齐 find_/replace_。不要删除或重排 widget——widgets 数组的顺序
+                // 必须与 INPUT_TYPES 定义顺序一致，否则 configure 按位置恢复值会错位，
+                // 导致 unify_replace 被写入文本值（truthy）而意外自动启用并丢失全部参数。
+                for (let i = 1; i <= 10; i++) {
+                    const findName = `find_${i}`;
+                    const replaceName = `replace_${i}`;
 
-                if (target_number_of_inputs < currentPairs) {
-                    for (let i = this.widgets.length - 1; i >= 0; i--) {
-                        const widget = this.widgets[i];
-                        if (widget.name && (widget.name.startsWith("find_") || widget.name.startsWith("replace_"))) {
-                            const parts = widget.name.split("_");
-                            const index = parseInt(parts[1]);
-                            if (index > target_number_of_inputs) {
-                                this.widgets.splice(i, 1);
-                            }
-                        }
+                    if (!this.widgets.find(w => w.name === findName)) {
+                        const w = this.addWidget("text", findName, "", () => {}, {});
+                        if (isChinese) w.label = `搜索_${i}`;
                     }
-                } else {
-                    const inputcountWidget = this.widgets.find(w => w.name === "inputcount");
-                    const isChinese = inputcountWidget && (inputcountWidget.label === "输入数量" || inputcountWidget.name === "输入数量");
-
-                    for (let i = 1; i <= target_number_of_inputs; i++) {
-                        const findName = `find_${i}`;
-                        const replaceName = `replace_${i}`;
-                        
-                        if (!this.widgets.find(w => w.name === findName)) {
-                            const w = this.addWidget("text", findName, "", () => {}, {});
-                            if (isChinese) w.label = `搜索_${i}`;
-                        }
-                        if (!this.widgets.find(w => w.name === replaceName)) {
-                            const w = this.addWidget("text", replaceName, "", () => {}, {});
-                            if (isChinese) w.label = `替换_${i}`;
-                        }
+                    if (!this.widgets.find(w => w.name === replaceName)) {
+                        const w = this.addWidget("text", replaceName, "", () => {}, {});
+                        if (isChinese) w.label = `替换_${i}`;
                     }
                 }
-
-                this.widgets.sort((a, b) => {
-                    if (a.name === "unify_replace") return -1;
-                    if (b.name === "unify_replace") return 1;
-                    if (a.name === "unified_replace") return -1;
-                    if (b.name === "unified_replace") return 1;
-                    if (a.type === "button") return 1;
-                    if (b.type === "button") return -1;
-                    if (a.name === "inputcount") return 1;
-                    if (b.name === "inputcount") return -1;
-
-                    const aIsFind = a.name.startsWith("find_");
-                    const aIsReplace = a.name.startsWith("replace_");
-                    const bIsFind = b.name.startsWith("find_");
-                    const bIsReplace = b.name.startsWith("replace_");
-
-                    if ((aIsFind || aIsReplace) && (bIsFind || bIsReplace)) {
-                        const aIndex = parseInt(a.name.split("_")[1]);
-                        const bIndex = parseInt(b.name.split("_")[1]);
-                        if (aIndex !== bIndex) {
-                            return aIndex - bIndex;
-                        }
-
-                        if (aIsFind && bIsReplace) return -1;
-                        if (aIsReplace && bIsFind) return 1;
-                    }
-                    return 0;
-                });
 
                 this.onResize?.(this.size);
                 this.setSize([this.size[0], 0]);

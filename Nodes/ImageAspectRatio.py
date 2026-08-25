@@ -1,4 +1,6 @@
 import torch
+from aiohttp import web
+from server import PromptServer
 
 class ImageAspectRatio:
     PRESETS_QWEN = {
@@ -311,28 +313,106 @@ class ImageAspectRatio:
         },
     }
 
+    PRESETS_KREA2 = {
+        "1:1": {
+            "1024x1024": (1024, 1024),
+        },
+        "4:3": {
+            "1184x896": (1184, 896),
+        },
+        "3:2": {
+            "1248x832": (1248, 832),
+        },
+        "16:9": {
+            "1376x768": (1376, 768),
+        },
+        "2.35:1": {
+            "1568x672": (1568, 672),
+        },
+        "4:5": {
+            "928x1152": (928, 1152),
+        },
+        "2:3": {
+            "832x1248": (832, 1248),
+        },
+        "9:16": {
+            "768x1376": (768, 1376),
+        },
+    }
+
+    PRESETS_MINIMAX_H3 = {
+        "16:9": {
+            "608x352": (608, 352),
+            "736x416": (736, 416),
+            "864x480": (864, 480),
+            "960x544": (960, 544),
+            "1056x608": (1056, 608),
+            "1152x640": (1152, 640),
+            "1216x672": (1216, 672),
+            "1280x736": (1280, 736),
+        },
+        "9:16": {
+            "352x640": (352, 640),
+            "416x768": (416, 768),
+            "480x864": (480, 864),
+            "544x992": (544, 992),
+            "608x1088": (608, 1088),
+            "640x1152": (640, 1152),
+            "672x1216": (672, 1216),
+            "736x1312": (736, 1312),
+        },
+        "21:9": {
+            "832x352": (832, 352),
+            "992x416": (992, 416),
+            "1120x480": (1120, 480),
+            "1280x544": (1280, 544),
+            "1440x608": (1440, 608),
+            "1504x640": (1504, 640),
+            "1568x672": (1568, 672),
+            "1728x736": (1728, 736),
+        },
+        "9:21": {
+            "352x832": (352, 832),
+            "416x992": (416, 992),
+            "480x1120": (480, 1120),
+            "544x1280": (544, 1280),
+            "608x1440": (608, 1440),
+            "640x1504": (640, 1504),
+            "672x1568": (672, 1568),
+            "736x1728": (736, 1728),
+        },
+    }
+
+    # 单一数据源：模式名 -> 尺寸预设。前端与后端均从此处派生，避免重复维护。
+    PRESET_MODES = {
+        "Qwen image": PRESETS_QWEN,
+        "Flux": PRESETS_FLUX,
+        "Flux.2": PRESETS_FLUX2,
+        "Flux2 klein": PRESETS_FLUX2_KLEIN,
+        "Wan": PRESETS_WAN,
+        "SDXL": PRESETS_SD,
+        "LTX2.3": PRESETS_LTX2,
+        "Z-image": PRESETS_ZIMAGE,
+        "Krea2": PRESETS_KREA2,
+        "MiniMax H3": PRESETS_MINIMAX_H3,
+    }
+
     @classmethod
     def INPUT_TYPES(s):
+        all_presets = list(s.PRESET_MODES.values())
         all_categories = list(set(
-            list(s.PRESETS_QWEN.keys()) +
-            list(s.PRESETS_FLUX.keys()) +
-            list(s.PRESETS_FLUX2.keys()) +
-            list(s.PRESETS_FLUX2_KLEIN.keys()) +
-            list(s.PRESETS_WAN.keys()) +
-            list(s.PRESETS_SD.keys()) +
-            list(s.PRESETS_LTX2.keys()) +
-            list(s.PRESETS_ZIMAGE.keys())
+            category for preset in all_presets for category in preset.keys()
         ))
 
-        all_sizes = []
-        for preset in [s.PRESETS_QWEN, s.PRESETS_FLUX, s.PRESETS_FLUX2, s.PRESETS_FLUX2_KLEIN, s.PRESETS_WAN, s.PRESETS_SD, s.PRESETS_LTX2, s.PRESETS_ZIMAGE]:
-            for category_sizes in preset.values():
-                all_sizes.extend(category_sizes.keys())
-        all_sizes = list(set(all_sizes))
+        all_sizes = list(set(
+            size for preset in all_presets
+            for category_sizes in preset.values()
+            for size in category_sizes.keys()
+        ))
 
         return {
             "required": {
-                "preset_mode": (["Qwen image", "Flux", "Flux.2", "Flux2 klein", "Wan", "SDXL", "LTX2.3", "Z-image", "Custom Size"], {"default": "Z-image"}),
+                "preset_mode": (list(s.PRESET_MODES.keys()) + ["Custom Size"], {"default": "Z-image"}),
                 "aspect_category": (all_categories, {"default": "1:1"}),
                 "aspect_size": (all_sizes, {"default": all_sizes[0] if all_sizes else "default"}),
             },
@@ -361,18 +441,7 @@ class ImageAspectRatio:
         if preset_mode == "Custom Size":
             width, height = custom_width, custom_height
         else:
-            preset_maps = {
-                "Qwen image": self.PRESETS_QWEN,
-                "Flux": self.PRESETS_FLUX,
-                "Flux.2": self.PRESETS_FLUX2,
-                "Flux2 klein": self.PRESETS_FLUX2_KLEIN,
-                "Wan": self.PRESETS_WAN,
-                "SDXL": self.PRESETS_SD,
-                "LTX2.3": self.PRESETS_LTX2,
-                "Z-image": self.PRESETS_ZIMAGE
-            }
-
-            preset_map = preset_maps.get(preset_mode, self.PRESETS_QWEN)
+            preset_map = self.PRESET_MODES.get(preset_mode, self.PRESETS_QWEN)
 
             if aspect_category in preset_map and aspect_size in preset_map[aspect_category]:
                 width, height = preset_map[aspect_category][aspect_size]
@@ -384,3 +453,21 @@ class ImageAspectRatio:
         latent = {"samples": torch.zeros([batch_size, 4, latent_height, latent_width])}
 
         return (width, height, latent)
+
+
+def _serialize_presets():
+    result = {}
+    for mode, preset in ImageAspectRatio.PRESET_MODES.items():
+        result[mode] = {
+            category: list(sizes.keys())
+            for category, sizes in preset.items()
+        }
+    return result
+
+
+@PromptServer.instance.routes.get("/zhihui_nodes/aspect_ratio/presets")
+async def get_aspect_ratio_presets(request):
+    try:
+        return web.json_response(_serialize_presets())
+    except Exception as e:
+        return web.json_response({"error": str(e)}, status=500)
