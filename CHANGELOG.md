@@ -3,7 +3,7 @@
 - 修复组管理器节点(GroupManager)中的几个运作逻辑错误
 - 修复提示词替换节点(PromptReplace)中的输入框会被重置的问题
 - 修复系统提示词节点(SystemPrompt)中在最新版本ComfyUI中显示出错的问题
-- 
+- 图像宽高比节点(ImageAspectRatio)：增加Krea2和H3的预设比例
 
 ## 1.1.1 2026-6-7
 LM Studio节点：修复标签选择器快捷输入按钮布局问题
