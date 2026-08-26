@@ -193,7 +193,11 @@ const i18n = {
         previewMode: "预览模式：",
         standard: "标准",
         debug: "排错",
-        markdown: "Markdown"
+        markdown: "Markdown",
+        copy: "复制",
+        copied: "已复制",
+        copyFailed: "复制失败",
+        copyEmpty: "暂无内容"
     },
     en: {
         nodeTitle: "ShowAny Node",
@@ -216,7 +220,11 @@ const i18n = {
         previewMode: "Preview Mode:",
         standard: "Standard",
         debug: "Debug",
-        markdown: "Markdown"
+        markdown: "Markdown",
+        copy: "Copy",
+        copied: "Copied",
+        copyFailed: "Copy failed",
+        copyEmpty: "Nothing to copy"
     }
 };
 
@@ -321,6 +329,62 @@ app.registerExtension({
                 return str;
             }
 
+            function getCopyText(node) {
+                const data = node.__showAnyRawData;
+                const mode = node.properties.showAnyMode || "Standard";
+                const isDebugMode = mode === "Debug";
+                let items = [];
+                if (Array.isArray(data)) {
+                    items = data;
+                } else if (data !== null && data !== undefined) {
+                    items = [data];
+                }
+                return items
+                    .map((item) => {
+                        if (item === null || item === undefined) return "";
+                        return fixEncoding(String(item), isDebugMode);
+                    })
+                    .join("\n");
+            }
+
+            async function copyTextToClipboard(text) {
+                if (navigator.clipboard && window.isSecureContext) {
+                    try {
+                        await navigator.clipboard.writeText(text);
+                        return true;
+                    } catch (e) {}
+                }
+                try {
+                    const ta = document.createElement("textarea");
+                    ta.value = text;
+                    ta.style.cssText = "position:fixed;opacity:0;";
+                    document.body.appendChild(ta);
+                    ta.select();
+                    const ok = document.execCommand("copy");
+                    document.body.removeChild(ta);
+                    return ok;
+                } catch (e) {
+                    return false;
+                }
+            }
+
+            function flashCopyButton(button, labelText, text) {
+                const label = button._label || button;
+                label.textContent = labelText;
+                button.style.borderColor = "#60a5fa";
+                button.style.color = "#60a5fa";
+                clearTimeout(button._copyFlashTimer);
+                button._copyFlashTimer = setTimeout(() => {
+                    label.textContent = text;
+                    button.style.color = "#93c5fd";
+                    button.style.borderColor = "rgba(96,165,250,0.4)";
+                    if (!button.matches(':hover')) {
+                        button.style.background = "rgba(96,165,250,0.15)";
+                    }
+                    button._copyFlashTimer = null;
+                }, 1500);
+            }
+
             function createItemContainer(text, isDebugMode) {
                 const container = document.createElement("div");
                 container.style.cssText = "display:flex;flex-direction:column;gap:4px;width:100%;box-sizing:border-box;";
@@ -366,7 +430,7 @@ app.registerExtension({
                 itemsContainer.style.cssText = "display:flex;flex-direction:column;gap:8px;width:100%;overflow-y:auto;flex:1;";
 
                 const footer = document.createElement("div");
-                footer.style.cssText = "display:flex;align-items:center;gap:8px;font-size:12px;color:#cbd5e1;flex-shrink:0;";
+                footer.style.cssText = "display:flex;align-items:center;gap:8px;width:100%;font-size:12px;color:#cbd5e1;flex-shrink:0;box-sizing:border-box;";
 
                 const modeLabel = document.createElement("span");
                 modeLabel.textContent = t("previewMode");
@@ -380,13 +444,15 @@ app.registerExtension({
 
                 const mkRadio = (value, text) => {
                     const label = document.createElement("label");
-                    label.style.cssText = "display:flex;align-items:center;gap:4px;";
+                    label.style.cssText = "display:flex;align-items:center;gap:4px;cursor:pointer;";
                     const input = document.createElement("input");
                     input.type = "radio";
                     input.name = radioName;
                     input.value = value;
+                    input.style.cssText = "accent-color:#60a5fa;margin:0;";
                     const span = document.createElement("span");
                     span.textContent = text;
+                    span.style.cssText = "color:#e5e7eb;";
                     label.appendChild(input);
                     label.appendChild(span);
                     return { label, input };
@@ -400,8 +466,37 @@ app.registerExtension({
                 modeWrap.appendChild(radioDebug.label);
                 modeWrap.appendChild(radioMarkdown.label);
 
+                const copyButton = document.createElement("button");
+                copyButton.type = "button";
+                const copyLabel = document.createElement("span");
+                copyLabel.textContent = t("copy");
+                copyLabel.style.cssText = "display:block;line-height:1;";
+                copyButton.appendChild(copyLabel);
+                copyButton._label = copyLabel;
+                copyButton.style.cssText = "margin-left:auto;flex-shrink:0;display:inline-flex;align-items:center;justify-content:center;height:20px;min-width:0;background:rgba(96,165,250,0.15);color:#93c5fd;border:1px solid rgba(96,165,250,0.4);border-radius:4px;padding:0 6px;font-size:11px;text-align:center;box-sizing:border-box;cursor:pointer;outline:none;appearance:none;-webkit-appearance:none;transition:background 0.15s ease,color 0.15s ease,border-color 0.15s ease;";
+                copyButton.addEventListener("mouseenter", () => {
+                    if (copyButton._copyFlashTimer) return;
+                    copyButton.style.background = "rgba(96,165,250,0.3)";
+                });
+                copyButton.addEventListener("mouseleave", () => {
+                    if (copyButton._copyFlashTimer) return;
+                    copyButton.style.background = "rgba(96,165,250,0.15)";
+                });
+                copyButton.addEventListener("click", async (event) => {
+                    event.preventDefault();
+                    event.stopPropagation();
+                    const text = getCopyText(node);
+                    if (!text) {
+                        flashCopyButton(copyButton, t("copyEmpty"), t("copy"));
+                        return;
+                    }
+                    const ok = await copyTextToClipboard(text);
+                    flashCopyButton(copyButton, ok ? t("copied") : t("copyFailed"), t("copy"));
+                });
+
                 footer.appendChild(modeLabel);
                 footer.appendChild(modeWrap);
+                footer.appendChild(copyButton);
 
                 host.appendChild(itemsContainer);
                 host.appendChild(footer);
@@ -431,6 +526,16 @@ app.registerExtension({
                 node.__showAnyPreview.radioStandard.input.checked = initialMode === "Standard";
                 node.__showAnyPreview.radioDebug.input.checked = initialMode === "Debug";
                 node.__showAnyPreview.radioMarkdown.input.checked = initialMode === "Markdown";
+
+                const syncRadioColors = () => {
+                    node.__showAnyPreview.radioStandardLabel.style.color = node.__showAnyPreview.radioStandard.input.checked ? "#93c5fd" : "#e5e7eb";
+                    node.__showAnyPreview.radioDebugLabel.style.color = node.__showAnyPreview.radioDebug.input.checked ? "#93c5fd" : "#e5e7eb";
+                    node.__showAnyPreview.radioMarkdownLabel.style.color = node.__showAnyPreview.radioMarkdown.input.checked ? "#93c5fd" : "#e5e7eb";
+                };
+                syncRadioColors();
+                node.__showAnyPreview.radioStandard.input.addEventListener("change", syncRadioColors);
+                node.__showAnyPreview.radioDebug.input.addEventListener("change", syncRadioColors);
+                node.__showAnyPreview.radioMarkdown.input.addEventListener("change", syncRadioColors);
 
                 const onModeChange = () => {
                     let mode = "Standard";
@@ -520,6 +625,9 @@ app.registerExtension({
                 node.__showAnyPreview.radioStandardLabel.textContent = t("standard");
                 node.__showAnyPreview.radioDebugLabel.textContent = t("debug");
                 node.__showAnyPreview.radioMarkdownLabel.textContent = t("markdown");
+                if (!node.__showAnyPreview.copyButton._copyFlashTimer) {
+                    (node.__showAnyPreview.copyButton._label || node.__showAnyPreview.copyButton).textContent = t("copy");
+                }
             }
 
             const onNodeCreated = nodeType.prototype.onNodeCreated;

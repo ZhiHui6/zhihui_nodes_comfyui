@@ -148,19 +148,20 @@ const MENU_STYLES = {
         alignItems: 'center',
         justifyContent: 'space-between',
         width: '100%',
-        padding: '8px 12px',
+        height: '28px',
+        minHeight: '28px',
+        padding: '0 10px',
         background: 'linear-gradient(135deg, rgba(30, 30, 40, 0.95) 0%, rgba(22, 22, 32, 0.95) 100%)',
         border: '1px solid rgba(100, 100, 140, 0.35)',
-        borderRadius: '8px',
+        borderRadius: '6px',
         color: '#c8c8d4',
-        fontSize: '13px',
+        fontSize: '12px',
         cursor: 'pointer',
         transition: 'all 0.25s cubic-bezier(0.4, 0, 0.2, 1)',
         boxShadow: '0 1px 3px rgba(0, 0, 0, 0.2)',
         userSelect: 'none',
         fontFamily: 'inherit',
-        boxSizing: 'border-box',
-        minHeight: '36px'
+        boxSizing: 'border-box'
     },
     triggerHover: {
         borderColor: 'rgba(120, 140, 200, 0.6)',
@@ -739,6 +740,9 @@ function createMenuUI(node, presetWidget) {
         updateTriggerDisplay();
         renderPresetList(searchInput ? searchInput.value : '');
         closeMenu();
+        if (presetWidget.callback) {
+            presetWidget.callback(path);
+        }
         if (node.setDirtyCanvas) {
             node.setDirtyCanvas(true, true);
         }
@@ -918,6 +922,18 @@ app.registerExtension({
         await loadTranslations();
         currentLocale = getLocale();
 
+        function cleanupOrphanedContainers() {
+            document.querySelectorAll('div[data-sp-loader="1"]').forEach(el => el.remove());
+        }
+        cleanupOrphanedContainers();
+
+        const origClear = app.graph.clear;
+        app.graph.clear = function () {
+            cleanupOrphanedContainers();
+            localeChangeListeners.length = 0;
+            return origClear.apply(this, arguments);
+        };
+
         setInterval(() => {
             const newLocale = getLocale();
             if (newLocale !== currentLocale) {
@@ -938,18 +954,18 @@ app.registerExtension({
                 this._translationsLoaded = false;
 
                 const self = this;
-                localeChangeListeners.push((newLocale) => {
+                this._localeChangeListener = (newLocale) => {
                     if (self._systemPromptLocale !== newLocale) {
                         self._systemPromptLocale = newLocale;
                         if (translationsData) {
                             updateAllSystemPromptWidgets(self, translationsData);
                         }
-                        const presetWidget = self.widgets ? self.widgets.find(w => w.name === "system_preset") : null;
-                        if (presetWidget && presetWidget._menuUI) {
-                            presetWidget._menuUI.updateLocale();
+                        if (self._presetMenuUI) {
+                            self._presetMenuUI.updateLocale();
                         }
                     }
-                });
+                };
+                localeChangeListeners.push(this._localeChangeListener);
 
                 loadTranslations().then((translations) => {
                     this._translationsLoaded = true;
@@ -958,79 +974,84 @@ app.registerExtension({
 
                 const presetWidget = this.widgets ? this.widgets.find(w => w.name === "system_preset") : null;
                 if (presetWidget) {
-                    const originalComputeSize = presetWidget.computeSize;
-                    const originalDraw = presetWidget.draw;
+                    // Hide the original combo widget completely - this prevents both
+                    // default drawing AND default click/dropdown behavior
+                    presetWidget.hidden = true;
 
-                    let menuUI = null;
+                    // Create our custom trigger button as a DOM element
+                    const host = document.createElement('div');
+                    host.setAttribute('data-sp-loader', '1');
+                    host.style.cssText = 'width:100%;pointer-events:auto;box-sizing:border-box;';
 
-                    presetWidget.computeSize = function (width) {
-                        if (originalComputeSize) {
-                            return originalComputeSize.call(this, width);
-                        }
-                        return [Math.max(200, width || 200), 28];
+                    // Create menu UI
+                    let menuUI = createMenuUI(this, presetWidget);
+                    host.appendChild(menuUI.container);
+
+                    // Add as proper DOM widget via ComfyUI API
+                    const domWidget = this.addDOMWidget("system_preset_selector", "div", host, {
+                        getValue: () => presetWidget.value,
+                        setValue: (v) => { presetWidget.value = v; },
+                        serialize: false // original widget handles serialization
+                    });
+                    domWidget.computeSize = function(width) {
+                        return [Math.max(200, width || 200), 32];
                     };
 
-                    presetWidget.draw = function (ctx, node, widget_width, y, widget_height) {
-                        if (!menuUI) {
-                            const widgetContainer = document.createElement('div');
-                            widgetContainer.style.cssText = 'position:absolute;pointer-events:auto;';
+                    // Store references for cleanup
+                    this._presetDomHost = host;
+                    this._presetMenuUI = menuUI;
+                    this._presetWidget = presetWidget;
 
-                            menuUI = createMenuUI(node, presetWidget);
-                            widgetContainer.appendChild(menuUI.container);
+                    // Reorder widgets: move our DOM widget to where the hidden combo was
+                    const presetIdx = this.widgets.indexOf(presetWidget);
+                    const domIdx = this.widgets.indexOf(domWidget);
+                    if (presetIdx !== -1 && domIdx !== -1 && domIdx > presetIdx) {
+                        this.widgets.splice(domIdx, 1);
+                        this.widgets.splice(presetIdx, 0, domWidget);
+                    }
 
-                            const nodeEl = document.querySelector(`.litegraph[data-node-id="${node.id}"]`) ||
-                                document.querySelector(`[data-node-id="${node.id}"]`);
-
-                            if (nodeEl) {
-                                nodeEl.appendChild(widgetContainer);
-                            } else {
-                                document.body.appendChild(widgetContainer);
-                            }
-
-                            this._menuContainer = widgetContainer;
-                            this._menuUI = menuUI;
-                        }
-
-                        if (this._menuContainer) {
-                            const transform = ctx.getTransform();
-                            const scale = app.canvas.ds.scale;
-                            const offset = app.canvas.ds.offset;
-
-                            const marginLeft = 10;
-                            const marginRight = 10;
-                            const yPadding = 4;
-
-                            const canvasX = node.pos[0] + marginLeft;
-                            const canvasY = node.pos[1] + y + yPadding;
-                            const screenX = (canvasX + offset[0]) * scale;
-                            const screenY = (canvasY + offset[1]) * scale;
-                            const elWidth = (widget_width - marginLeft - marginRight) * scale;
-
-                            this._menuContainer.style.left = screenX + 'px';
-                            this._menuContainer.style.top = screenY + 'px';
-                            this._menuContainer.style.width = elWidth + 'px';
-                            this._menuContainer.style.display = node.flags.collapsed ? 'none' : 'block';
-                        }
-
-                        if (originalDraw) {
-                            originalDraw.call(this, ctx, node, widget_width, y, widget_height);
-                        }
-                    };
-
-                    const originalOnRemoved = nodeType.prototype.onRemoved;
-                    nodeType.prototype.onRemoved = function () {
-                        if (presetWidget._menuUI) {
-                            presetWidget._menuUI.destroy();
-                        }
-                        if (presetWidget._menuContainer && presetWidget._menuContainer.parentNode) {
-                            presetWidget._menuContainer.remove();
-                        }
-                        if (originalOnRemoved) {
-                            return originalOnRemoved.apply(this, arguments);
-                        }
-                    };
+                    // Recalculate node size after DOM widget is added
+                    setTimeout(() => {
+                        self.setSize(self.computeSize());
+                    }, 0);
+                    setTimeout(() => {
+                        self.setSize(self.computeSize());
+                    }, 50);
                 }
 
+                const originalOnRemoved = this.onRemoved;
+                this.onRemoved = function () {
+
+                    if (this._localeChangeListener) {
+                        const idx = localeChangeListeners.indexOf(this._localeChangeListener);
+                        if (idx !== -1) {
+                            localeChangeListeners.splice(idx, 1);
+                        }
+                        this._localeChangeListener = null;
+                    }
+
+                    if (this._presetMenuUI) {
+                        this._presetMenuUI.destroy();
+                        this._presetMenuUI = null;
+                    }
+                    this._presetDomHost = null;
+                    this._presetWidget = null;
+
+                    if (originalOnRemoved) {
+                        return originalOnRemoved.apply(this, arguments);
+                    }
+                };
+
+                return result;
+            };
+
+            // Hook onConfigure to refresh the trigger display after workflow load
+            const onConfigure = nodeType.prototype.onConfigure;
+            nodeType.prototype.onConfigure = function () {
+                const result = onConfigure ? onConfigure.apply(this, arguments) : undefined;
+                if (this._presetMenuUI) {
+                    this._presetMenuUI.refresh();
+                }
                 return result;
             };
 
@@ -1040,9 +1061,8 @@ app.registerExtension({
                 if (translationsData && this._translationsLoaded) {
                     updateAllSystemPromptWidgets(this, translationsData);
                 }
-                const presetWidget = this.widgets ? this.widgets.find(w => w.name === "system_preset") : null;
-                if (presetWidget && presetWidget._menuUI) {
-                    presetWidget._menuUI.refresh();
+                if (this._presetMenuUI) {
+                    this._presetMenuUI.refresh();
                 }
                 return result;
             };
