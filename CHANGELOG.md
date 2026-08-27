@@ -1,4 +1,8 @@
 # 更新日志 / Changelog
+## 1.1.2 2026-8-27
+重构"文本编辑器（继续运行）"节点运作方式，移除手动同步按钮，改为节点暂停时自动同步输入文本
+ <br>
+Restructure the operation mode of the "Text Editor with Continue" node by removing the manual synchronization button and automatically synchronizing input text when the node is paused
 
 ## 1.1.2 2026-8-25
 - 显示任何节点（ShowAny）新增“复制”按钮，用于复制当前显示的文本到剪贴板

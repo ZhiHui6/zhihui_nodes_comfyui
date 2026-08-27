@@ -173,7 +173,8 @@ This node collection contains numerous nodes with different functionalities, div
 <b>Features</b>:
 - <b>Workflow Pause</b>: Automatically pauses workflow execution, waiting for user interaction
 - <b>Real-time Editing</b>: Provides an editable text area, supporting multi-line text editing
-- <b>Manual Sync</b>: Requires manual clicking of the sync button to update content after editing
+- <b>Automatic Sync</b>: Automatically fetches and synchronizes the incoming text when the node pauses
+- <b>Built-in Help</b>: Click the help button in the node's top-right corner to view usage instructions
 
 <b>Use Cases</b>:
 - Scenarios requiring human intervention and text adjustment in workflows

@@ -542,16 +542,12 @@
     },
     "TextEditorWithContinue": {
         "title": "文本编辑器（继续运行）",
-        "description": "文本编辑器（手动同步）：暂停工作流执行，提供手动文本同步和可编辑文本区域，用户点击继续按钮时恢复执行。",
+        "description": "文本编辑器：暂停工作流执行，在节点暂停时自动获取并同步输入文本到可编辑文本区域，用户点击继续按钮时恢复执行。点击右上角帮助按钮查看使用说明。",
         "inputs": {
             "text": "文本"
         },
-        "widgets": {
-            "editable_text": "可编辑文本"
-        },
         "outputs": {
-            "text_output": "文本输出",
-            "help_info": "帮助信息"
+            "text_output": "文本输出"
         }
     },
     "PauseWorkflow": {
