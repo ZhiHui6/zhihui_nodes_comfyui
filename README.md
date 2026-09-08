@@ -1,6 +1,6 @@
 ### [[English Document]](README_EN.md)
 
-# 🎨 潪AI ComfyUI 节点包 
+# 🎨 智爱 ComfyUI 节点包 
 
 完整更新日志：查看<a href="CHANGELOG.md">`CHANGELOG.md`</a>
 
