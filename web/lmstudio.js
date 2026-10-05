@@ -36,13 +36,12 @@ const i18n = {
         unloadModelListTimeout: "模型列表卸载超时",
         unloadModelTimeout: "模型卸载超时",
         seconds: "秒",
-        saveAll: "保存所有设置",
         resetDefault: "恢复默认",
+        autoSaveHint: "设置修改后即时保存",
         confirmReset: "确定要恢复默认设置吗？这将重置所有配置为默认值。",
         saveSuccess: "所有设置已保存到配置文件",
         saveSuccessRefresh: "设置已保存，请刷新页面以更新主节点的预设选项",
         saveFailed: "保存设置失败",
-        endpointUnsavedRefresh: "服务端点已修改但尚未保存，保存后才会对节点生效。是否保存并刷新状态？",
         settingsUnsavedClose: "有设置项已修改但尚未保存，是否保存后关闭？（放弃会把各项恢复为上次保存的值，窗口保持在设置页）",
         resetSuccess: "已恢复默认设置并保存",
         resetFailed: "保存默认设置失败",
@@ -233,13 +232,12 @@ const i18n = {
         unloadModelListTimeout: "Unload Model List Timeout",
         unloadModelTimeout: "Unload Model Timeout",
         seconds: "S",
-        saveAll: "Save All Settings",
         resetDefault: "Reset Default",
+        autoSaveHint: "Changes are saved automatically",
         confirmReset: "Are you sure you want to reset to default settings? This will reset all configurations.",
         saveSuccess: "All settings saved to configuration file",
         saveSuccessRefresh: "Settings saved, please refresh page to update main node preset options",
         saveFailed: "Failed to save settings",
-        endpointUnsavedRefresh: "The endpoint has been modified but not saved; it only takes effect after saving. Save and refresh status?",
         settingsUnsavedClose: "Some settings have been modified but not saved. Save before closing? (Discard restores the last saved values and keeps this window on the settings page)",
         resetSuccess: "Reset to default and saved",
         resetFailed: "Failed to save default settings",
@@ -6195,7 +6193,13 @@ function showLMStudioSettings(node) {
                 border-top: 1px solid ${LMS_TOKENS.color.line};
                 background: linear-gradient(0deg, rgba(59, 130, 246, 0.12), rgba(59, 130, 246, 0));
             }
+            #${uniqueId} .save-section__hint {
+                font-size: var(--fs-label);
+                line-height: var(--lh-base);
+                color: ${LMS_TOKENS.color.textFaint};
+            }
             #${uniqueId} .reset-default-btn {
+                margin-left: auto;
                 padding: 9px 17px;
                 font-family: inherit;
                 font-size: var(--fs-body);
@@ -6213,28 +6217,7 @@ function showLMStudioSettings(node) {
                 color: #FFFFFF;
                 background: ${LMS_TOKENS.action.neutralHover};
             }
-            #${uniqueId} .save-all-btn {
-                margin-left: auto;
-                display: inline-flex;
-                align-items: center;
-                gap: 7px;
-                padding: 10px 21px;
-                font-family: inherit;
-                font-size: var(--fs-body);
-                font-weight: 600;
-                color: #FFFFFF;
-                background: ${LMS_TOKENS.action.primary};
-                border: none;
-                border-radius: ${LMS_TOKENS.radius.md};
-                cursor: pointer;
-                box-shadow: 0 3px 10px rgba(37, 99, 235, 0.28);
-                transition: background-color ${LMS_TOKENS.motion.fast} ${LMS_TOKENS.motion.easing},
-                            box-shadow ${LMS_TOKENS.motion.fast} ${LMS_TOKENS.motion.easing},
-                            opacity ${LMS_TOKENS.motion.fast} ${LMS_TOKENS.motion.easing};
-            }
-            #${uniqueId} .save-all-btn:hover { background: ${LMS_TOKENS.action.primaryHover}; box-shadow: 0 5px 14px rgba(59, 130, 246, 0.34); }
             #${uniqueId} .reset-default-btn:focus-visible,
-            #${uniqueId} .save-all-btn:focus-visible,
             #${uniqueId} .dashboard-refresh:focus-visible,
             #${uniqueId} .template-create-btn:focus-visible,
             #${uniqueId} .template-action-btn:focus-visible {
@@ -6474,11 +6457,8 @@ function showLMStudioSettings(node) {
                 </section>
             </div>
             <footer class="save-section">
+                <span class="save-section__hint">${$t('autoSaveHint')}</span>
                 <button class="reset-default-btn" type="button" id="lmstudio-reset-default">${$t('resetDefault')}</button>
-                <button class="save-all-btn" type="button" id="lmstudio-save-all">
-                    ${lmsSvg('check', 15)}
-                    <span>${$t('saveAll')}</span>
-                </button>
             </footer>
         </div>
     `;
@@ -6546,13 +6526,11 @@ function showLMStudioSettings(node) {
     const endpointInput = dialog.querySelector("#lmstudio-endpoint-input");
     const getEndpointWidget = () => node.widgets?.find(w => w.name === "endpoint");
     endpointInput.value = normalizeEndpoint(getEndpointWidget()?.value) || LMS_DEFAULT_ENDPOINT;
-    // 已保存端点基准：输入框与之不同即为「临时输入」，刷新状态时弹保存警告
-    let savedEndpoint = normalizeEndpoint(endpointInput.value);
-    const isEndpointUnsaved = () => normalizeEndpoint(endpointInput.value) !== savedEndpoint;
 
     // 关闭弹窗：任一设置项未保存时先弹警告
     // 确认=保存并关闭；放弃=退回上次保存的值并留在设置页；右上角 ✕ = 只收掉提示，改动原样留着
-    closeBtn.onclick = () => {
+    closeBtn.onclick = async () => {
+        await flushAutoSave();
         if (isSettingsDirty()) {
             // 未保存的两处提示里，第二条按钮语义是「丢弃改动」，所以标「放弃」而不是「取消」
             showConfirm($t('settingsUnsavedClose'), async () => {
@@ -6642,18 +6620,11 @@ function showLMStudioSettings(node) {
         refreshBtn.disabled = false;
     };
     
-    refreshBtn.onclick = () => {
-        // 端点是临时输入时先弹保存警告：确认则保存后再刷新，取消不动
-        if (isEndpointUnsaved()) {
-            showConfirm($t('endpointUnsavedRefresh'), async () => {
-                if (await saveAllSettings()) refreshDashboard();
-            }, null, $t('discard'));
-            return;
-        }
+    refreshBtn.onclick = async () => {
+        await flushAutoSave();
         refreshDashboard();
     };
     
-    const saveAllBtn = dialog.querySelector("#lmstudio-save-all");
     const resetDefaultBtn = dialog.querySelector("#lmstudio-reset-default");
     const timeoutFetchInput = dialog.querySelector("#lmstudio-timeout-fetch");
     const timeoutApiInput = dialog.querySelector("#lmstudio-timeout-api");
@@ -6685,7 +6656,10 @@ function showLMStudioSettings(node) {
                 + '<polyline points="' + (isUp ? "1 5 5 1 9 5" : "1 1 5 5 9 1") + '"/></svg>';
             // 别把焦点从输入框抢走：:focus 光环不闪断，连按也不用重新点框
             btn.onmousedown = (e) => e.preventDefault();
-            btn.onclick = () => { if (isUp) input.stepUp(); else input.stepDown(); };
+            btn.onclick = () => {
+                if (isUp) input.stepUp(); else input.stepDown();
+                scheduleAutoSave(260);
+            };
             stepper.appendChild(btn);
         });
         wrap.appendChild(stepper);
@@ -7008,8 +6982,8 @@ function showLMStudioSettings(node) {
         timeoutUnloadInput.value = timeouts[3];
     };
 
-    /** 保存全部设置；返回是否成功，供「保存并刷新 / 保存并关闭」复用 */
-    const saveAllSettings = async () => {
+    /** 保存全部设置；返回是否成功；silent 用于即时保存，成功时不弹提示 */
+    const saveAllSettings = async (silent = false) => {
         const showLogPanel = showLogPanelSwitch.get();
         const folderReadMode = dialog.querySelector("#lmstudio-folder-mode-recursive").checked ? "recursive" : "sequential";
         const endpoint = normalizeEndpoint(endpointInput.value) || LMS_DEFAULT_ENDPOINT;
@@ -7035,7 +7009,6 @@ function showLMStudioSettings(node) {
             });
 
             if (response.ok) {
-                savedEndpoint = endpoint;
                 savedSettings = readSettingsSnapshot();
                 node.lmstudioState.showLogPanel = showLogPanel;
                 if (node._logPanelHost) {
@@ -7049,7 +7022,7 @@ function showLMStudioSettings(node) {
                 }
                 node.setDirtyCanvas(true, true);
 
-                showToast($t('saveSuccess'), "success");
+                if (!silent) showToast($t('saveSuccess'), "success");
                 return true;
             }
             showToast($t('saveFailed'), "error");
@@ -7059,7 +7032,50 @@ function showLMStudioSettings(node) {
         return false;
     };
 
-    saveAllBtn.onclick = saveAllSettings;
+    let autoSaveTimer = null;
+    let autoSaveInFlight = null;
+
+    const runAutoSave = async () => {
+        autoSaveTimer = null;
+        if (!isSettingsDirty()) return;
+        autoSaveInFlight = saveAllSettings(true);
+        try {
+            await autoSaveInFlight;
+        } finally {
+            autoSaveInFlight = null;
+        }
+    };
+
+    const scheduleAutoSave = (delay = 0) => {
+        if (autoSaveTimer) clearTimeout(autoSaveTimer);
+        autoSaveTimer = setTimeout(runAutoSave, delay);
+    };
+
+    const flushAutoSave = async () => {
+        if (autoSaveTimer) {
+            clearTimeout(autoSaveTimer);
+            await runAutoSave();
+        }
+        if (autoSaveInFlight) await autoSaveInFlight;
+    };
+
+    endpointInput.addEventListener("change", () => scheduleAutoSave());
+    showLogPanelSwitch.el.addEventListener("lms-change", () => scheduleAutoSave());
+    dialog.querySelectorAll('input[name="folder_read_mode"]').forEach((radio) => {
+        radio.addEventListener("change", () => scheduleAutoSave());
+    });
+    dialog.querySelectorAll(".timeout-input").forEach((input) => {
+        input.addEventListener("change", () => {
+            const value = parseInt(input.value, 10);
+            const min = parseInt(input.min, 10);
+            const max = parseInt(input.max, 10);
+            let next = Number.isFinite(value) ? value : parseInt(input.defaultValue, 10);
+            if (Number.isFinite(min)) next = Math.max(min, next);
+            if (Number.isFinite(max)) next = Math.min(max, next);
+            if (String(next) !== input.value) input.value = String(next);
+            scheduleAutoSave(260);
+        });
+    });
 
     resetDefaultBtn.onclick = () => {
         showConfirm(
@@ -7116,7 +7132,6 @@ function showLMStudioSettings(node) {
                     });
 
                     if (response.ok) {
-                        savedEndpoint = LMS_DEFAULT_ENDPOINT;
                         savedSettings = readSettingsSnapshot();
                         if (needRefresh) {
                             showToast($t('saveSuccessRefresh'), "success");

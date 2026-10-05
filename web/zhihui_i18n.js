@@ -13,8 +13,8 @@ import { app } from "/scripts/app.js";
  * 语言变化时立即重刷已存在节点，无需刷新页面。
  */
 
-const NODES_URL = "/zhihui_nodes/locale/zh/nodes.json";
-const VALUES_URL = "/zhihui_nodes/locale/zh/values.json";
+const NODES_URL = "/zhihui_nodes/locale/zh/nodes";
+const VALUES_URL = "/zhihui_nodes/locale/zh/values";
 
 const LOCALE_KEYS = ["Comfy.Locale", "Comfy.Language"];
 const STORAGE_KEYS = ["Comfy.Locale", "Comfy.Language", "i18nextLng"];
@@ -163,6 +163,15 @@ function zhOption(className, widgetName, value) {
 	const text = String(value ?? "");
 	if (!text) return null;
 	return textOf(nodeDict(className)?.options?.[widgetName]?.[text]) ?? textOf(dicts.values[text]);
+}
+
+export function zhNodeInfo(className) {
+	return {
+		title: zhText(className, "title"),
+		description: zhText(className, "description"),
+		inputLabel: (name) => zhLabel(className, name),
+		outputLabel: (name) => zhOutput(className, name),
+	};
 }
 
 /* ------------------------------- 通用改写 ------------------------------- */

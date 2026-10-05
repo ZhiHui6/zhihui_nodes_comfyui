@@ -4,6 +4,32 @@ import { drawNodeHelpButton } from "./node_title_icons.js";
 let marked = null;
 let markedLoading = false;
 
+const SHOW_ANY_MIN_WIDTH = 520;
+const SHOW_ANY_MIN_HEIGHT = 300;
+
+function clampShowAnySize(node) {
+    if (!node) return false;
+    const width = Math.max(node.size?.[0] || 0, SHOW_ANY_MIN_WIDTH);
+    const height = Math.max(node.size?.[1] || 0, SHOW_ANY_MIN_HEIGHT);
+    if (node.size && node.size[0] === width && node.size[1] === height) return false;
+    if (typeof node.setSize === "function") node.setSize([width, height]);
+    else node.size = [width, height];
+    return true;
+}
+
+function widestInlineWidth(texts, fontCss) {
+    const probe = document.createElement("span");
+    probe.style.cssText = "position:absolute;left:-9999px;top:0;visibility:hidden;white-space:nowrap;box-sizing:border-box;" + fontCss;
+    document.body.appendChild(probe);
+    let width = 0;
+    for (const text of texts) {
+        probe.textContent = text;
+        width = Math.max(width, probe.getBoundingClientRect().width);
+    }
+    probe.remove();
+    return Math.ceil(width);
+}
+
 async function loadMarked() {
     if (marked) return true;
     if (markedLoading) return false;
@@ -418,21 +444,21 @@ app.registerExtension({
                 itemsContainer.style.cssText = "display:flex;flex-direction:column;gap:8px;width:100%;overflow-y:auto;flex:1;";
 
                 const footer = document.createElement("div");
-                footer.style.cssText = "display:flex;align-items:center;gap:8px;width:100%;font-size:12px;color:#cbd5e1;flex-shrink:0;box-sizing:border-box;";
+                footer.style.cssText = "display:flex;align-items:center;gap:8px;width:100%;font-size:12px;color:#cbd5e1;flex-shrink:0;box-sizing:border-box;white-space:nowrap;";
 
                 const modeLabel = document.createElement("span");
                 modeLabel.textContent = t("previewMode");
-                modeLabel.style.cssText = "margin-right:4px;";
+                modeLabel.style.cssText = "margin-right:4px;flex-shrink:0;white-space:nowrap;";
 
                 const modeWrap = document.createElement("div");
-                modeWrap.style.cssText = "display:flex;align-items:center;gap:10px;";
+                modeWrap.style.cssText = "display:flex;align-items:center;gap:10px;flex-shrink:0;white-space:nowrap;";
 
                 uniqueCounter++;
                 const radioName = `showany-mode-${Date.now()}-${uniqueCounter}`;
 
                 const mkRadio = (value, text) => {
                     const label = document.createElement("label");
-                    label.style.cssText = "display:flex;align-items:center;gap:4px;cursor:pointer;";
+                    label.style.cssText = "display:flex;align-items:center;gap:4px;cursor:pointer;white-space:nowrap;";
                     const input = document.createElement("input");
                     input.type = "radio";
                     input.name = radioName;
@@ -461,7 +487,14 @@ app.registerExtension({
                 copyLabel.style.cssText = "display:block;line-height:1;";
                 copyButton.appendChild(copyLabel);
                 copyButton._label = copyLabel;
-                copyButton.style.cssText = "margin-left:auto;flex-shrink:0;display:inline-flex;align-items:center;justify-content:center;height:20px;min-width:0;background:rgba(96,165,250,0.15);color:#93c5fd;border:1px solid rgba(96,165,250,0.4);border-radius:4px;padding:0 6px;font-size:11px;text-align:center;box-sizing:border-box;cursor:pointer;outline:none;appearance:none;-webkit-appearance:none;transition:background 0.15s ease,color 0.15s ease,border-color 0.15s ease;";
+                copyButton.style.cssText = "margin-left:auto;flex-shrink:0;display:inline-flex;align-items:center;justify-content:center;height:20px;white-space:nowrap;background:rgba(96,165,250,0.15);color:#93c5fd;border:1px solid rgba(96,165,250,0.4);border-radius:4px;padding:0 6px;font-size:11px;text-align:center;box-sizing:border-box;cursor:pointer;outline:none;appearance:none;-webkit-appearance:none;transition:background 0.15s ease,color 0.15s ease,border-color 0.15s ease;";
+                copyButton._syncWidth = () => {
+                    copyButton.style.minWidth = widestInlineWidth(
+                        [t("copy"), t("copied"), t("copyFailed"), t("copyEmpty")],
+                        "font-size:11px;padding:0 6px;border:1px solid transparent;",
+                    ) + "px";
+                };
+                copyButton._syncWidth();
                 copyButton.addEventListener("mouseenter", () => {
                     if (copyButton._copyFlashTimer) return;
                     copyButton.style.background = "rgba(96,165,250,0.3)";
@@ -499,6 +532,7 @@ app.registerExtension({
                     radioDebug,
                     radioMarkdown,
                     modeLabel,
+                    copyButton,
                     radioStandardLabel: radioStandard.label.querySelector('span'),
                     radioDebugLabel: radioDebug.label.querySelector('span'),
                     radioMarkdownLabel: radioMarkdown.label.querySelector('span')
@@ -539,11 +573,7 @@ app.registerExtension({
                 node.__showAnyPreview.radioDebug.input.addEventListener("change", onModeChange);
                 node.__showAnyPreview.radioMarkdown.input.addEventListener("change", onModeChange);
 
-                if (!node.size || node.size.length < 2) {
-                    node.size = [520, 300];
-                } else {
-                    node.size = [Math.max(node.size[0], 520), Math.max(node.size[1], 300)];
-                }
+                clampShowAnySize(node);
             }
 
             function updatePreview(node, data) {
@@ -616,6 +646,7 @@ app.registerExtension({
                 if (!node.__showAnyPreview.copyButton._copyFlashTimer) {
                     (node.__showAnyPreview.copyButton._label || node.__showAnyPreview.copyButton).textContent = t("copy");
                 }
+                node.__showAnyPreview.copyButton._syncWidth?.();
             }
 
             const onNodeCreated = nodeType.prototype.onNodeCreated;
@@ -633,6 +664,25 @@ app.registerExtension({
             nodeType.prototype.onExecuted = function (message) {
                 onExecuted?.apply(this, arguments);
                 updatePreview(this, message?.text);
+            };
+
+            const onConfigure = nodeType.prototype.onConfigure;
+            nodeType.prototype.onConfigure = function () {
+                const r = onConfigure?.apply(this, arguments);
+                setTimeout(() => {
+                    clampShowAnySize(this);
+                    this.setDirtyCanvas?.(true, true);
+                }, 0);
+                return r;
+            };
+
+            const onResize = nodeType.prototype.onResize;
+            nodeType.prototype.onResize = function (size) {
+                const r = onResize?.apply(this, arguments);
+                if (size && (size[0] < SHOW_ANY_MIN_WIDTH || size[1] < SHOW_ANY_MIN_HEIGHT)) {
+                    clampShowAnySize(this);
+                }
+                return r;
             };
 
             const onDrawForeground = nodeType.prototype.onDrawForeground;

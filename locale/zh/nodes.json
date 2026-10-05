@@ -1259,5 +1259,27 @@
         "outputs": {
             "model": "模型"
         }
+    },
+    "MultimediaAdvancedLoader": {
+        "title": "多媒体加载器",
+        "description": "多媒体加载器：以缩略图网格管理 input 目录中的图片、视频与音频。载入模式：默认载入图片、视频与音频并输出 MiniMax H3 媒体包端口，切到「仅图片」隐藏音频与视频、只输出图像端口；输出方式支持点击选中（仅输出选中项）与智能编号（全部按编号顺序输出）。",
+        "widgets": {
+            "output_mode": "输出模式",
+            "load_mode": "载入模式"
+        },
+        "outputs": {
+            "images": "图像输出",
+            "media_bundle": "媒体输出"
+        }
+    },
+    "VideoPreview": {
+        "title": "视频预览",
+        "description": "视频预览：接收上游视频并在节点上直接播放，无需保存到输出目录。视频只做无损封装写入 temp 目录并在多次执行间复用，不解码视频帧；输出端口原样透传视频，可继续接保存等下游节点。",
+        "inputs": {
+            "video": "视频"
+        },
+        "outputs": {
+            "VIDEO": "视频"
+        }
     }
 }

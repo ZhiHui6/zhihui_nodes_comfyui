@@ -66,6 +66,8 @@ from .Nodes.PromptExpander import PromptExpander
 from .Nodes.LMStudio.lmstudio_node import LMStudioNode
 from .Nodes.LMStudio import lmstudio_api
 from .Nodes.GroupSwitchManager import GroupSwitchManager
+from .Nodes.MultimediaAdvancedLoader import MultimediaAdvancedLoader
+from .Nodes.VideoPreview import VideoPreview
 
 import os
 
@@ -133,6 +135,8 @@ NODE_CLASS_MAPPINGS = {
     "PromptExpander": PromptExpander,
     "LMStudioNode": LMStudioNode,
     "GroupSwitchManager": GroupSwitchManager,
+    "MultimediaAdvancedLoader": MultimediaAdvancedLoader,
+    "VideoPreview": VideoPreview,
 }
 
 NODE_DISPLAY_NAME_MAPPINGS = {
@@ -199,6 +203,8 @@ NODE_DISPLAY_NAME_MAPPINGS = {
     "PromptExpander": "Prompt Expander",
     "LMStudioNode": "LM Studio Node",
     "GroupSwitchManager": "Group Switch Manager",
+    "MultimediaAdvancedLoader": "Multimedia Loader",
+    "VideoPreview": "Video Preview",
 }
 
 from . import locale_api

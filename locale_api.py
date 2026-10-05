@@ -12,6 +12,8 @@ LOCALE_FILES = frozenset({"nodes", "values"})
 async def get_locale_file(request):
     language = request.match_info.get("language", "")
     name = request.match_info.get("name", "")
+    if name.endswith(".json"):
+        name = name[:-5]
     if not LANGUAGE_PATTERN.match(language) or name not in LOCALE_FILES:
         return web.json_response({"status": "error", "message": "Unknown locale file"}, status=404)
     path = os.path.normpath(os.path.join(LOCALE_DIR, language, f"{name}.json"))
