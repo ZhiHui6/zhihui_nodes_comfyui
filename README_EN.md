@@ -8,7 +8,7 @@
 
 ## 📖 Project Introduction
 
-This is a ComfyUI custom node tool collection carefully created by **Binity**, designed to provide users with a series of practical and efficient nodes to enhance and extend ComfyUI's functionality. This node collection contains 56 functional nodes, covering text processing, prompt optimization, image processing, translation tools, music creation assistance, AI vision understanding, Latent processing, and other aspects, providing comprehensive support for your AI creation.
+This is a ComfyUI custom node tool collection carefully created by **Binity**, designed to provide users with a series of practical and efficient nodes to enhance and extend ComfyUI's functionality. This node collection contains 55 functional nodes, covering text processing, prompt optimization, image processing, translation tools, music creation assistance, AI vision understanding, Latent processing, and other aspects, providing comprehensive support for your AI creation.
 
 ***If this project helps you, please give us a ⭐Star! Your support is our motivation for continuous improvement.***
 
@@ -49,12 +49,12 @@ The node pack ships with its own Chinese/English dictionary and follows ComfyUI'
 </tr>
 <tr>
 <td><b>LM Studio Node</b><br><code>LMStudioNode</code></td>
-<td>AI Vision Understanding</td>
+<td>AI Assistant</td>
 <td>A vision understanding node that connects to a local LM Studio server, supporting image analysis and text generation. Enables private image analysis using locally deployed models without cloud APIs. Supports multiple preset templates, output language control, and multi-image input.</td>
 </tr>
 <tr>
 <td><b>Image Understanding Online</b><br><code>ImageUnderstandingOnline</code></td>
-<td>AI Vision Understanding</td>
+<td>AI Assistant</td>
 <td>Image understanding through any OpenAI-compatible online multimodal endpoint — no local GPU required. Preconfigure up to 6 platform profiles and switch between them directly from the node's dropdown. Handles single or multiple images, lets a text prompt port take over the whole prompt section, runs as a plain text node when no image is docked, and shares the LM Studio node's prompt template categories and batch processing.</td>
 </tr>
 </table>
@@ -84,22 +84,6 @@ This node collection contains numerous nodes with different functionalities, div
 <img src="images/多行文本.jpg" alt="Multi-line Text" width="45%"/>
 </a>
 </div></td>
-</tr>
-<tr>
-<td><b>Priority Text Switch</b><br><code>PriorityTextSwitch</code></td>
-<td>Priority text switching node: When both text A and text B ports are connected, it prioritizes output from port B; if port B is empty or not connected, it outputs text from port A; if both ports are empty, it returns an empty string.
-
-<b>Features</b>:
-- <b>Priority Control</b>: Text B port has higher priority than text A port
-- <b>Intelligent Switching</b>: Automatically detects input status, falls back to A or outputs empty text when empty
-
-<br>
-<div align="left">
-<a href="images/Priority Text Switch.jpg" target="_blank">
-<img src="images/Priority Text Switch.jpg" alt="Priority Text Switch" width="45%"/>
-</a>
-</div>
-</td>
 </tr>
 <tr>
 <td><b>Prompt Merger (with comments)</b><br><code>TextCombinerNode</code></td>
@@ -192,16 +176,59 @@ This node collection contains numerous nodes with different functionalities, div
 </td>
 </tr>
 <tr>
-<td><b>Type Designer</b><br><code>TypeDesigner</code></td>
-<td>Provides a visual interface for users to browse and select various font art styles (such as 3D, neon, metal, etc.), automatically providing corresponding preset prompts to facilitate artistic text creation.
+<td><b>Text Switch (Dual Mode)</b><br><code>TextSwitchDualMode</code></td>
+<td>Dual mode switcher supporting variable number of text inputs. Control the number of ports through the slider <code>inputcount</code> and click the button <code>Update inputs</code> to synchronously add/remove ports; in manual mode, select output by index (the <code>select_text</code> option automatically updates with <code>inputcount</code>); in automatic mode, output only when there is a unique non-empty input, and an error will be prompted if multiple non-empty inputs are detected. All newly added text input ports are non-mandatory, suitable for flexible switching and comparative experiments between different version prompts.
 
 <br>
 <div align="left">
-<a href="images/Type-Designer1.jpg" target="_blank">
-<img src="images/Type-Designer1.jpg" alt="Type Designer 1" width="45%"/>
+<a href="images/Text Switch Dual Mode.jpg" target="_blank">
+<img src="images/Text Switch Dual Mode.jpg" alt="Text Switch (Dual Mode)" width="45%"/>
 </a>
-<a href="images/Type-Designer2.jpg" target="_blank">
-<img src="images/Type-Designer2.jpg" alt="Type Designer 2" width="45%"/>
+</div>
+</td>
+</tr>
+<tr>
+<td><b>Priority Text Switch</b><br><code>PriorityTextSwitch</code></td>
+<td>Priority text switching node: When both text A and text B ports are connected, it prioritizes output from port B; if port B is empty or not connected, it outputs text from port A; if both ports are empty, it returns an empty string.
+
+<b>Features</b>:
+- <b>Priority Control</b>: Text B port has higher priority than text A port
+- <b>Intelligent Switching</b>: Automatically detects input status, falls back to A or outputs empty text when empty
+
+<br>
+<div align="left">
+<a href="images/Priority Text Switch.jpg" target="_blank">
+<img src="images/Priority Text Switch.jpg" alt="Priority Text Switch" width="45%"/>
+</a>
+</div>
+</td>
+</tr>
+<tr>
+<td><b>Trigger Word Merger</b><br><code>TriggerWordMerger</code></td>
+<td>Intelligently merges specific trigger words with the main text, supporting weight control (e.g., <code>(word:1.5)</code>). Suitable for adding model-specific trigger words or style words and precisely controlling their influence strength.
+
+<br>
+<div align="left">
+<a href="images/触发词合并器.jpg" target="_blank">
+<img src="images/触发词合并器.jpg" alt="Trigger Word Merger" width="45%"/>
+</a>
+</div>
+</td>
+</tr>
+<tr>
+<td><b>Multi-Platform Translation</b><br><code>MultiPlatformTranslate</code></td>
+<td>
+
+Multi-platform translation node, supporting Baidu, Alibaba Cloud, Youdao, Zhipu AI and Google — 5 platforms in total. Users can set API keys for each platform through the configuration management interface to achieve high-quality professional translation services.
+
+<b>Features</b>:
+- <b>Multi-platform Support</b>: Supports mainstream translation platforms to meet different needs
+- <b>Configuration Management</b>: Easily manage API keys for each platform through a graphical interface
+- <b>Professional Translation</b>: Provides high-quality professional translation services
+
+<div align="left">
+<a href="images/Multi Platform Translate.jpg" target="_blank">
+<img src="images/Multi Platform Translate.jpg" alt="Multi-Platform Translation" width="45%"/>
 </a>
 </div>
 </td>
@@ -216,8 +243,89 @@ This node collection contains numerous nodes with different functionalities, div
 <th>Function Description</th>
 </tr>
 <tr>
-<td><b>Image Editing Presets</b><br><code>ImageEditingPresets</code></td>
-<td>Provides a professional image editing preset library with various professional presets, offering stylized guidance for image generation, helping users quickly apply common artistic styles and effects.</td>
+<td><b>🏷️TAG Selector</b><br><code>TagSelector</code></td>
+<td>
+
+A new generation of intelligent tag management system, integrating massive preset tag libraries, custom tag functionality, and built-in AI expansion capabilities, providing an unprecedented tag selection experience to quickly build complex prompts and improve creative efficiency.
+
+<b>Core Functions</b>:
+- <b>Rich Tag Categories:</b> Covers comprehensive categories including regular tags, art subjects, character attributes, scene environments, and more
+- <b>Custom Tag Management:</b> Supports adding, editing, and deleting personal exclusive tags to create personalized tag libraries
+- <b>Intelligent Search and Location:</b> Supports keyword search to quickly find target tags
+- <b>Real-time Selection Statistics:</b> Dynamically displays the count and detailed list of selected tags
+- <b>Random Tag Generation:</b> Intelligent random tag generation function, supporting automatic generation of diverse tag combinations based on category weights and quantity configuration
+- <b>Built-in AI Expansion</b>: One-click intelligent expansion function, supporting both tag-style and natural language-style expansion modes
+
+<br>
+<div align="left">
+<a href="images/Tag Selector1.jpg" target="_blank">
+<img src="images/Tag Selector1.jpg" alt="Tag Selector1" width="45%"/>
+</a>
+<a href="images/Tag Selector2.jpg" target="_blank">
+<img src="images/Tag Selector2.jpg" alt="Tag Selector2" width="45%"/>
+</a>
+</div>
+</td>
+</tr>
+<tr>
+<td><b>Prompt Card Selector</b><br><code>PromptCardSelector</code></td>
+<td>Supports random/sequential extraction modes, single/multiple card loading, various splitting methods, and card pool shuffling strategies. Built-in card pool manager provides browsing/search/editing functions, supports importing/exporting card files, suitable for prompt combination and batch management.
+
+<b>Features</b>:
+- <b>Dual Extraction Modes</b>: Supports both random extraction and sequential extraction modes
+- <b>Multi-card Loading</b>: Supports single-card and multi-card loading modes
+- <b>Flexible Splitting</b>: Supports multiple text splitting methods (blank lines, line breaks, etc.)
+- <b>Card Pool Management</b>: Built-in card pool manager providing browsing, searching, and editing functions
+- <b>Import/Export</b>: Supports importing and exporting prompt card files
+- <b>Shuffling Strategy</b>: Supports card pool shuffling strategies to increase randomness
+
+<br>
+<div align="left">
+<a href="images/Prompt Card Selector1.jpg" target="_blank">
+<img src="images/Prompt Card Selector1.jpg" alt="Prompt Card Selector1" width="30%"/>
+</a>
+<a href="images/Prompt Card Selector2.jpg" target="_blank">
+<img src="images/Prompt Card Selector2.jpg" alt="Prompt Card Selector2" width="30%"/>
+</a>
+<a href="images/Prompt Card Selector3.jpg" target="_blank">
+<img src="images/Prompt Card Selector3.jpg" alt="Prompt Card Selector3" width="30%"/>
+</a>
+</div>
+</td>
+</tr>
+<tr>
+<td><b>Prompt Gallery</b><br><code>PromptGallery</code></td>
+<td>Prompt gallery node: loads an image-prompt library from a specified directory, then outputs the content of the <code>.txt</code> file that shares the same filename as the selected image. Useful for managing “image–prompt” pairs and quickly retrieving prompts in workflows.
+
+<br>
+<div align="left">
+<a href="images/Prompt Gallery.jpg" target="_blank">
+<img src="images/Prompt Gallery.jpg" alt="Prompt Gallery" width="60%"/>
+</a>
+</div>
+</td>
+</tr>
+<tr>
+<td><b>Prompt Preset - Single Choice</b><br><code>PromptPresetOneChoice</code></td>
+<td>Provides 6 preset options, allowing users to conveniently switch between different presets. Suitable for saving commonly used prompt templates and quickly applying them to different scenarios.
+
+<br>
+<div align="left">
+<a href="images/单选提示词预设.jpg" target="_blank">
+<img src="images/单选提示词预设.jpg" alt="Single Choice Prompt Preset" width="45%"/>
+</a>
+</div></td>
+</tr>
+<tr>
+<td><b>Prompt Preset - Multiple Choice</b><br><code>PromptPresetMultipleChoice</code></td>
+<td>Supports selecting multiple presets simultaneously and merging them for output, with each preset having independent switch and comment functionality. Suitable for building complex combination prompts and flexibly controlling the enabled status of each part.
+
+<br>
+<div align="left">
+<a href="images/多选提示词预设.jpg" target="_blank">
+<img src="images/多选提示词预设.jpg" alt="Multiple Choice Prompt Preset" width="45%"/>
+</a>
+</div></td>
 </tr>
 <tr>
 <td><b>Photography Prompt Generator</b><br><code>PhotographPromptGenerator</code></td>
@@ -263,92 +371,20 @@ A comprehensive prompt generator written based on WanXiang 2.2 official document
 </td>
 </tr>
 <tr>
-<td><b>Prompt Preset - Single Choice</b><br><code>PromptPresetOneChoice</code></td>
-<td>Provides 6 preset options, allowing users to conveniently switch between different presets. Suitable for saving commonly used prompt templates and quickly applying them to different scenarios.
+<td><b>Image Editing Presets</b><br><code>ImageEditingPresets</code></td>
+<td>Provides a professional image editing preset library with various professional presets, offering stylized guidance for image generation, helping users quickly apply common artistic styles and effects.</td>
+</tr>
+<tr>
+<td><b>Type Designer</b><br><code>TypeDesigner</code></td>
+<td>Provides a visual interface for users to browse and select various font art styles (such as 3D, neon, metal, etc.), automatically providing corresponding preset prompts to facilitate artistic text creation.
 
 <br>
 <div align="left">
-<a href="images/单选提示词预设.jpg" target="_blank">
-<img src="images/单选提示词预设.jpg" alt="Single Choice Prompt Preset" width="45%"/>
+<a href="images/Type-Designer1.jpg" target="_blank">
+<img src="images/Type-Designer1.jpg" alt="Type Designer 1" width="45%"/>
 </a>
-</div></td>
-</tr>
-<tr>
-<td><b>Prompt Preset - Multiple Choice</b><br><code>PromptPresetMultipleChoice</code></td>
-<td>Supports selecting multiple presets simultaneously and merging them for output, with each preset having independent switch and comment functionality. Suitable for building complex combination prompts and flexibly controlling the enabled status of each part.
-
-<br>
-<div align="left">
-<a href="images/多选提示词预设.jpg" target="_blank">
-<img src="images/多选提示词预设.jpg" alt="Multiple Choice Prompt Preset" width="45%"/>
-</a>
-</div></td>
-</tr>
-<tr>
-<td><b>Trigger Word Merger</b><br><code>TriggerWordMerger</code></td>
-<td>Intelligently merges specific trigger words with the main text, supporting weight control (e.g., <code>(word:1.5)</code>). Suitable for adding model-specific trigger words or style words and precisely controlling their influence strength.
-
-<br>
-<div align="left">
-<a href="images/触发词合并器.jpg" target="_blank">
-<img src="images/触发词合并器.jpg" alt="Trigger Word Merger" width="45%"/>
-</a>
-</div>
-</td>
-</tr>
-<tr>
-<td><b>System Prompt Loader</b><br><code>SystemPromptLoader</code></td>
-<td>Dynamically loads system-level prompts from preset folders, with optional merging with user input. Suitable for managing and applying complex system prompt templates, improving the consistency and quality of generation results.<br><br>
-<div align="left">
-<a href="images/System Prompt Loader.jpg" target="_blank">
-<img src="images/System Prompt Loader.jpg" alt="System Prompt Loader" width="45%"/>
-</a>
-</div>
-</td>
-</tr>
-<tr>
-<td><b>Extra Options List</b><br><code>ExtraOptions</code></td>
-<td>A universal extra options list, similar to JoyCaption's design, with a master switch and independent prompt input box. Suitable for adding auxiliary prompts or control parameters, enhancing workflow flexibility.<br><br>
-<div align="left">
-<a href="images/额外引导选项（通用）.jpg" target="_blank">
-<img src="images/额外引导选项（通用）.jpg" alt="Extra Options List" width="45%"/>
-</a>
-</div></td>
-</tr>
-<tr>
-<td><b>Prompt Card Selector</b><br><code>PromptCardSelector</code></td>
-<td>Supports random/sequential extraction modes, single/multiple card loading, various splitting methods, and card pool shuffling strategies. Built-in card pool manager provides browsing/search/editing functions, supports importing/exporting card files, suitable for prompt combination and batch management.
-
-<b>Features</b>:
-- <b>Dual Extraction Modes</b>: Supports both random extraction and sequential extraction modes
-- <b>Multi-card Loading</b>: Supports single-card and multi-card loading modes
-- <b>Flexible Splitting</b>: Supports multiple text splitting methods (blank lines, line breaks, etc.)
-- <b>Card Pool Management</b>: Built-in card pool manager providing browsing, searching, and editing functions
-- <b>Import/Export</b>: Supports importing and exporting prompt card files
-- <b>Shuffling Strategy</b>: Supports card pool shuffling strategies to increase randomness
-
-<br>
-<div align="left">
-<a href="images/Prompt Card Selector1.jpg" target="_blank">
-<img src="images/Prompt Card Selector1.jpg" alt="Prompt Card Selector1" width="30%"/>
-</a>
-<a href="images/Prompt Card Selector2.jpg" target="_blank">
-<img src="images/Prompt Card Selector2.jpg" alt="Prompt Card Selector2" width="30%"/>
-</a>
-<a href="images/Prompt Card Selector3.jpg" target="_blank">
-<img src="images/Prompt Card Selector3.jpg" alt="Prompt Card Selector3" width="30%"/>
-</a>
-</div>
-</td>
-</tr>
-<tr>
-<td><b>Prompt Gallery</b><br><code>PromptGallery</code></td>
-<td>Prompt gallery node: loads an image-prompt library from a specified directory, then outputs the content of the <code>.txt</code> file that shares the same filename as the selected image. Useful for managing “image–prompt” pairs and quickly retrieving prompts in workflows.
-
-<br>
-<div align="left">
-<a href="images/Prompt Gallery.jpg" target="_blank">
-<img src="images/Prompt Gallery.jpg" alt="Prompt Gallery" width="60%"/>
+<a href="images/Type-Designer2.jpg" target="_blank">
+<img src="images/Type-Designer2.jpg" alt="Type Designer 2" width="45%"/>
 </a>
 </div>
 </td>
@@ -510,6 +546,33 @@ Labels upstream images as Img 1…Img N (图1…图N in the Chinese UI) and prev
 
 </td>
 </tr>
+<tr>
+<td><b>Image Switch (Dual Mode)</b><br><code>ImageSwitchDualMode</code></td>
+<td>Dual mode switcher supporting variable number of image inputs. Control the number of ports through the slider <code>inputcount</code> and click the button <code>Update inputs</code> to synchronously add/remove ports; in manual mode, select output by index (the <code>select_image</code> option automatically updates with <code>inputcount</code>); in automatic mode, output only when there is a unique non-empty input, and an error will be prompted if multiple non-empty inputs are detected. All newly added image input ports are non-mandatory, facilitating flexible comparison between different generation results or different processing paths.
+
+<br>
+<div align="left">
+<a href="images/Image Switch Dual Mode.jpg" target="_blank">
+<img src="images/Image Switch Dual Mode.jpg" alt="Image Switch (Dual Mode)" width="45%"/>
+</a>
+</div>
+</td>
+</tr>
+<tr>
+<td><b>Priority Image Switch</b><br><code>PriorityImageSwitch</code></td>
+<td>Intelligent priority image switching node that prioritizes output from port B when both image A and image B ports are connected; if port B has no input, it outputs the content of image A port; if both ports have no input, it prompts to connect at least one input port.
+
+<b>Features</b>:
+- <b>Priority Control</b>: Image B port has higher priority than image A port
+- <b>Intelligent Switching</b>: Automatically detects input status, seamlessly switches output, reducing manual switching operations
+
+<br>
+<div align="left">
+<a href="images/优先级图像切换.jpg" target="_blank">
+<img src="images/优先级图像切换.jpg" alt="Priority Image Switch" width="45%"/>
+</a>
+</div></td>
+</tr>
 </table>
 
 ### 🎞️ Film Post-Processing Nodes
@@ -622,6 +685,19 @@ Professional video frame extraction tool that supports extracting a specified nu
 </div>
 </td>
 </tr>
+<tr>
+<td><b>Video Preview</b><br><code>VideoPreview</code></td>
+<td>
+
+Plays an incoming video directly on the node, so results can be previewed without saving to the output directory first.
+
+<b>Core Features</b>:
+- <b>In-Node Playback</b>: the video plays right in the node panel, skipping the output directory
+- <b>Lossless Packaging</b>: the video is only remuxed losslessly into the temp directory and reused across runs; frames are never decoded
+- <b>Pass-through</b>: the output socket returns the video unchanged, so it can feed downstream nodes such as Save Video
+
+</td>
+</tr>
 </table>
 
 ### 🎵 Music-Related Nodes
@@ -670,7 +746,51 @@ Calculates audio file duration information, outputting seconds, formatted time, 
 </tr>
 </table>
 
-### 🤖 AI Vision Understanding Nodes
+### 🧊 Latent Nodes
+
+<table>
+<tr>
+<th width="30%">Node Name</th>
+<th>Function Description</th>
+</tr>
+<tr>
+<td><b>Latent Switch (Dual Mode)</b><br><code>LatentSwitchDualMode</code></td>
+<td>Dual mode switcher supporting variable number of latent inputs. Control the number of ports through the slider <code>inputcount</code> and click the button <code>Update inputs</code> to synchronously add/remove ports; in manual mode, select output by index (the <code>select_channel</code> option automatically updates with <code>inputcount</code>); in automatic mode, output only when there is a unique non-empty input, and an error will be prompted if multiple non-empty inputs are detected. All newly added latent input ports are non-mandatory, suitable for flexible switching and comparative experiments between different generation paths.
+
+<br>
+<div align="left">
+<a href="images/Latent Switch Dual Mode.jpg" target="_blank">
+<img src="images/Latent Switch Dual Mode.jpg" alt="Latent Switch (Dual Mode)" width="45%"/>
+</a>
+</div>
+</td>
+</tr>
+</table>
+
+### 📦 Loader Nodes
+
+<table>
+<tr>
+<th width="30%">Node Name</th>
+<th>Function Description</th>
+</tr>
+<tr>
+<td><b>Multimedia Loader</b><br><code>MultimediaAdvancedLoader</code></td>
+<td>
+
+Browse the images, videos and audio in the `input` directory as a thumbnail grid and pick the assets to send downstream.
+
+<b>Core Features</b>:
+- <b>Three Asset Types</b>: Images, videos and audio browsed and selected in a single grid
+- <b>Load Mode</b>: Loads everything by default and outputs the MiniMax H3 media bundle port; switching to "Images only" hides audio and video and outputs the image port alone
+- <b>Output Modes</b>: "Click to select" outputs only the picked items, "Smart numbering" outputs all of them in numbered order
+- <b>Downstream Wiring</b>: the media output docks directly with the LM Studio node and the Image Understanding Online node
+
+</td>
+</tr>
+</table>
+
+### 🤖 AI Assistant Nodes
 
 <table>
 <tr>
@@ -767,111 +887,25 @@ A vision understanding node that connects to a local LM Studio server, supportin
 </div>
 </td>
 </tr>
+<tr>
+<td><b>System Prompt Loader</b><br><code>SystemPromptLoader</code></td>
+<td>Dynamically loads system-level prompts from preset folders, with optional merging with user input. Suitable for managing and applying complex system prompt templates, improving the consistency and quality of generation results.<br><br>
+<div align="left">
+<a href="images/System Prompt Loader.jpg" target="_blank">
+<img src="images/System Prompt Loader.jpg" alt="System Prompt Loader" width="45%"/>
+</a>
+</div>
+</td>
+</tr>
 </table>
 
-### ⚙️ Logic and Utility Nodes
+### ⚙️ Toolkit Nodes
 
 <table>
 <tr>
 <th width="30%">Node Name</th>
 <th>Function Description</th>
 </tr>
-<tr>
-<td><b>🏷️TAG Selector</b><br><code>TagSelector</code></td>
-<td>
-
-A new generation of intelligent tag management system, integrating massive preset tag libraries, custom tag functionality, and built-in AI expansion capabilities, providing an unprecedented tag selection experience to quickly build complex prompts and improve creative efficiency.
-
-<b>Core Functions</b>:
-- <b>Rich Tag Categories:</b> Covers comprehensive categories including regular tags, art subjects, character attributes, scene environments, and more
-- <b>Custom Tag Management:</b> Supports adding, editing, and deleting personal exclusive tags to create personalized tag libraries
-- <b>Intelligent Search and Location:</b> Supports keyword search to quickly find target tags
-- <b>Real-time Selection Statistics:</b> Dynamically displays the count and detailed list of selected tags
-- <b>Random Tag Generation:</b> Intelligent random tag generation function, supporting automatic generation of diverse tag combinations based on category weights and quantity configuration
-- <b>Built-in AI Expansion</b>: One-click intelligent expansion function, supporting both tag-style and natural language-style expansion modes
-
-<br>
-<div align="left">
-<a href="images/Tag Selector1.jpg" target="_blank">
-<img src="images/Tag Selector1.jpg" alt="Tag Selector1" width="45%"/>
-</a>
-<a href="images/Tag Selector2.jpg" target="_blank">
-<img src="images/Tag Selector2.jpg" alt="Tag Selector2" width="45%"/>
-</a>
-</div>
-</td>
-</tr>
-<tr>
-<td><b>Latent Switch (Dual Mode)</b><br><code>LatentSwitchDualMode</code></td>
-<td>Dual mode switcher supporting variable number of latent inputs. Control the number of ports through the slider <code>inputcount</code> and click the button <code>Update inputs</code> to synchronously add/remove ports; in manual mode, select output by index (the <code>select_channel</code> option automatically updates with <code>inputcount</code>); in automatic mode, output only when there is a unique non-empty input, and an error will be prompted if multiple non-empty inputs are detected. All newly added latent input ports are non-mandatory, suitable for flexible switching and comparative experiments between different generation paths.
-
-<br>
-<div align="left">
-<a href="images/Latent Switch Dual Mode.jpg" target="_blank">
-<img src="images/Latent Switch Dual Mode.jpg" alt="Latent Switch (Dual Mode)" width="45%"/>
-</a>
-</div>
-</td>
-</tr>
-<tr>
-<td><b>Text Switch (Dual Mode)</b><br><code>TextSwitchDualMode</code></td>
-<td>Dual mode switcher supporting variable number of text inputs. Control the number of ports through the slider <code>inputcount</code> and click the button <code>Update inputs</code> to synchronously add/remove ports; in manual mode, select output by index (the <code>select_text</code> option automatically updates with <code>inputcount</code>); in automatic mode, output only when there is a unique non-empty input, and an error will be prompted if multiple non-empty inputs are detected. All newly added text input ports are non-mandatory, suitable for flexible switching and comparative experiments between different version prompts.
-
-<br>
-<div align="left">
-<a href="images/Text Switch Dual Mode.jpg" target="_blank">
-<img src="images/Text Switch Dual Mode.jpg" alt="Text Switch (Dual Mode)" width="45%"/>
-</a>
-</div>
-</td>
-</tr>
-<tr>
-<td><b>Image Switch (Dual Mode)</b><br><code>ImageSwitchDualMode</code></td>
-<td>Dual mode switcher supporting variable number of image inputs. Control the number of ports through the slider <code>inputcount</code> and click the button <code>Update inputs</code> to synchronously add/remove ports; in manual mode, select output by index (the <code>select_image</code> option automatically updates with <code>inputcount</code>); in automatic mode, output only when there is a unique non-empty input, and an error will be prompted if multiple non-empty inputs are detected. All newly added image input ports are non-mandatory, facilitating flexible comparison between different generation results or different processing paths.
-
-<br>
-<div align="left">
-<a href="images/Image Switch Dual Mode.jpg" target="_blank">
-<img src="images/Image Switch Dual Mode.jpg" alt="Image Switch (Dual Mode)" width="45%"/>
-</a>
-</div>
-</td>
-</tr>
-<tr>
-<td><b>Priority Image Switch</b><br><code>PriorityImageSwitch</code></td>
-<td>Intelligent priority image switching node that prioritizes output from port B when both image A and image B ports are connected; if port B has no input, it outputs the content of image A port; if both ports have no input, it prompts to connect at least one input port.
-
-<b>Features</b>:
-- <b>Priority Control</b>: Image B port has higher priority than image A port
-- <b>Intelligent Switching</b>: Automatically detects input status, seamlessly switches output, reducing manual switching operations
-
-<br>
-<div align="left">
-<a href="images/优先级图像切换.jpg" target="_blank">
-<img src="images/优先级图像切换.jpg" alt="Priority Image Switch" width="45%"/>
-</a>
-</div></td>
-</tr>
-<tr>
-<td><b>Multi-Platform Translation</b><br><code>MultiPlatformTranslate</code></td>
-<td>
-
-Multi-platform translation node, supporting Baidu, Alibaba Cloud, Youdao, Zhipu AI and Google — 5 platforms in total. Users can set API keys for each platform through the configuration management interface to achieve high-quality professional translation services.
-
-<b>Features</b>:
-- <b>Multi-platform Support</b>: Supports mainstream translation platforms to meet different needs
-- <b>Configuration Management</b>: Easily manage API keys for each platform through a graphical interface
-- <b>Professional Translation</b>: Provides high-quality professional translation services
-
-<div align="left">
-<a href="images/Multi Platform Translate.jpg" target="_blank">
-<img src="images/Multi Platform Translate.jpg" alt="Multi-Platform Translation" width="45%"/>
-</a>
-</div>
-</td>
-</tr>
-
-
 <tr>
 <td><b>Resource Cleaner</b><br><code>ResourceCleaner</code></td>
 <td>
@@ -956,35 +990,7 @@ Visual group switch management tool that automatically detects all groups in the
 </div>
 </td>
 </tr>
-<tr>
-<td><b>Multimedia Loader</b><br><code>MultimediaAdvancedLoader</code></td>
-<td>
-
-Browse the images, videos and audio in the `input` directory as a thumbnail grid and pick the assets to send downstream.
-
-<b>Core Features</b>:
-- <b>Three Asset Types</b>: Images, videos and audio browsed and selected in a single grid
-- <b>Load Mode</b>: Loads everything by default and outputs the MiniMax H3 media bundle port; switching to "Images only" hides audio and video and outputs the image port alone
-- <b>Output Modes</b>: "Click to select" outputs only the picked items, "Smart numbering" outputs all of them in numbered order
-- <b>Downstream Wiring</b>: the media output docks directly with the LM Studio node and the Image Understanding Online node
-
-</td>
-</tr>
-<tr>
-<td><b>Video Preview</b><br><code>VideoPreview</code></td>
-<td>
-
-Plays an incoming video directly on the node, so results can be previewed without saving to the output directory first.
-
-<b>Core Features</b>:
-- <b>In-Node Playback</b>: the video plays right in the node panel, skipping the output directory
-- <b>Lossless Packaging</b>: the video is only remuxed losslessly into the temp directory and reused across runs; frames are never decoded
-- <b>Pass-through</b>: the output socket returns the video unchanged, so it can feed downstream nodes such as Save Video
-
-</td>
-</tr>
 </table>
-
 ---
 
 ## 🚀 Installation Methods
@@ -1016,7 +1022,7 @@ Restart ComfyUI to use the nodes.
 
 ### 🧭 Where The Nodes Live
 
-After installation every node sits under the **Zhi.AI** top-level category of the right-click menu, split into Text, Generator, Image, MovieTools, Video, Loaders, Latent, Toolkit, Utility, Audio, LM Studio, Image Understanding, Florence2 and LLM Extra Options submenus. These labels follow the ComfyUI interface language, with product names such as LM Studio and Florence2 left as-is. Restart ComfyUI after installing or updating the pack so the nodes get registered.
+After installation every node sits under the **Zhi.AI** top-level category of the right-click menu, split into Text, Generator, Image, MovieTools, Video, Loaders, Latent, Toolkit, Audio, AI Assistant submenus. These labels follow the ComfyUI interface language, with product names such as LM Studio and Florence2 left as-is. Restart ComfyUI after installing or updating the pack so the nodes get registered.
 
 ### 🔑 First-run Configuration
 

@@ -3990,7 +3990,7 @@ function addIUOInputButtons(node) {
 app.registerExtension({
     name: "Comfyui_ImageUnderstandingOnline.APIConfig",
     async beforeRegisterNodeDef(nodeType, nodeData, app) {
-        if (!nodeData?.category?.startsWith("Zhi.AI/Image Understanding") && 
+        if (!nodeData?.category?.startsWith("Zhi.AI/AI Assistant") && 
             !nodeData?.category?.startsWith("Comfyui_ImageUnderstandingOnline")) {
             return;
         }

@@ -330,7 +330,7 @@ def _text_inputs():
     }
 
 class LMStudioNode:
-    CATEGORY = "Zhi.AI/LM Studio"
+    CATEGORY = "Zhi.AI/AI Assistant"
     FUNCTION = "run"
     INPUT_IS_LIST = True
     RETURN_TYPES = ("STRING",)

@@ -213,7 +213,7 @@ class ImageUnderstandingOnline:
     OUTPUT_NODE = True
     INPUT_IS_LIST = True
     FUNCTION = "analyze_image"
-    CATEGORY = "Zhi.AI/Image Understanding"
+    CATEGORY = "Zhi.AI/AI Assistant"
     
     def __init__(self):
         self.api_config_path = os.path.join(current_dir, "api_config.json")

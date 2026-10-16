@@ -62,7 +62,7 @@ class SystemPromptLoader:
     RETURN_TYPES = ("STRING",)
     RETURN_NAMES = ("system_prompt",)
     FUNCTION = "load_preset"
-    CATEGORY = "Zhi.AI/Generator"
+    CATEGORY = "Zhi.AI/AI Assistant"
     OUTPUT_NODE = True
     DESCRIPTION = "Loads system prompt templates straight from preset files and outputs only the system prompt."
 

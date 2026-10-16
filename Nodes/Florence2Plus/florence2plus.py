@@ -210,7 +210,7 @@ class Florence2Plus:
     RETURN_TYPES = ("STRING",)
     RETURN_NAMES = ("text",)
     FUNCTION = "describe_image"
-    CATEGORY = "Zhi.AI/Florence2"
+    CATEGORY = "Zhi.AI/AI Assistant"
 
     def _clear_model(self):
         try:

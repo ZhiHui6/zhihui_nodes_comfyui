@@ -42,7 +42,7 @@ class LLMExtraOptions:
     RETURN_TYPES = ("LLM_EXTRA_OPTIONS",)
     RETURN_NAMES = ("extra_options",)
     FUNCTION = "generate_extra_options"
-    CATEGORY = "Zhi.AI/LLM Extra Options"
+    CATEGORY = "Zhi.AI/AI Assistant"
 
     def generate_extra_options(self, extra_options_control, refer_character_name, exclude_people_info, include_lighting, include_camera_angle,
                      include_watermark, include_JPEG_artifacts, include_exif, exclude_sexual,

@@ -3,7 +3,6 @@ from .Nodes.PromptPreset.PromptPresetMultipleChoice import PromptPresetMultipleC
 from .Nodes.ImageEditingPresets.ImageEditingPresets import ImageEditingPresets
 from .Nodes.SystemPrompt.SystemPromptLoader import SystemPromptLoader
 from .Nodes.SystemPrompt import system_prompt_api
-from .Nodes.ExtraOptions import ExtraOptions
 from .Nodes.MultiLineTextNode import MultiLineTextNode
 from .Nodes.TextCombinerNode import TextCombinerNode
 from .Nodes.TextMergerNode import TextMergerNode
@@ -67,7 +66,6 @@ NODE_CLASS_MAPPINGS = {
     "PromptPresetMultipleChoice": PromptPresetMultipleChoice,
     "ImageEditingPresets": ImageEditingPresets,
     "SystemPromptLoader": SystemPromptLoader,
-    "ExtraOptions": ExtraOptions,
     "MultiLineTextNode": MultiLineTextNode,
     "TextCombinerNode": TextCombinerNode,
     "TextMergerNode": TextMergerNode,
@@ -126,7 +124,6 @@ NODE_DISPLAY_NAME_MAPPINGS = {
     "PromptPresetMultipleChoice": "Prompt Preset Multiple Choice",
     "ImageEditingPresets": "Image Editing Presets",
     "SystemPromptLoader": "System Prompt Loader",
-    "ExtraOptions": "Extra Options",
     "MultiLineTextNode": "Multi Line Text Node",
     "TextCombinerNode": "Text Combiner Node",
     "TextMergerNode": "Text Merger Node",

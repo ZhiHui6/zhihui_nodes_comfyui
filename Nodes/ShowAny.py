@@ -25,7 +25,7 @@ class ShowAny:
     
     RETURN_TYPES = ("STRING",)
     FUNCTION = "notify"
-    CATEGORY = "Zhi.AI/Toolkit"
+    CATEGORY = "Zhi.AI/Text"
     DESCRIPTION = "Displays content of any type directly on the node for debugging and preview."
 
     def _to_text(self, value):

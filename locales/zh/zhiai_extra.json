@@ -113,11 +113,6 @@
             "image_output": "图像输出"
         }
     },
-    "ExtraOptions": {
-        "outputs": {
-            "guide_output": "引导输出"
-        }
-    },
     "LaplacianSharpen": {
         "outputs": {
             "image_output": "图像输出"

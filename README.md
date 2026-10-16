@@ -8,7 +8,7 @@
 
 ## 📖 项目介绍
 
-这是一个由 **Binity** 精心创建的 ComfyUI 自定义节点工具合集，旨在为用户提供一系列实用、高效的节点，以增强和扩展 ComfyUI 的功能。本节点集包含56个功能节点，涵盖文本处理、提示词优化、图像处理、翻译工具、音乐创作辅助、AI视觉理解、Latent处理等多个方面，为您的 AI 创作提供全方位支持。
+这是一个由 **Binity** 精心创建的 ComfyUI 自定义节点工具合集，旨在为用户提供一系列实用、高效的节点，以增强和扩展 ComfyUI 的功能。本节点集包含55个功能节点，涵盖文本处理、提示词优化、图像处理、翻译工具、音乐创作辅助、AI视觉理解、Latent处理等多个方面，为您的 AI 创作提供全方位支持。
 
 ***如果这个项目对您有帮助，请给我们一个⭐Star！您的支持是我们持续改进的动力。***
 
@@ -49,12 +49,12 @@
 </tr>
 <tr>
 <td><b>LM Studio节点</b><br><code>LMStudioNode</code></td>
-<td>AI视觉理解</td>
+<td>AI 助手</td>
 <td>连接本地LM Studio服务器的视觉理解节点，支持图像分析和文本生成。通过LM Studio本地部署的大模型，实现无需云端API的私有化图像分析。支持多种预设模板、输出语言控制和多图像输入。</td>
 </tr>
 <tr>
 <td><b>图像理解在线版</b><br><code>ImageUnderstandingOnline</code></td>
-<td>AI视觉理解</td>
+<td>AI 助手</td>
 <td>通过任意 OpenAI 兼容的在线多模态接口进行图像理解，无需本地GPU，可预设最多 6 套平台配置并在节点下拉菜单中直接切换。支持单图与多图输入、文本提示词端口整段接管、未接图像时作为纯文本节点调用，并与 LM Studio 节点共用提示词模板分类与批处理能力。</td>
 </tr>
 </table>
@@ -84,22 +84,6 @@
 <img src="images/多行文本.jpg" alt="多行文本" width="45%"/>
 </a>
 </div></td>
-</tr>
-<tr>
-<td><b>优先级文本切换</b><br><code>PriorityTextSwitch</code></td>
-<td>优先级文本切换节点：当同时接入文本A和文本B端口时，优先输出B端口；如果B端口为空或未连接，则输出文本A端口；如果两个端口都为空，则返回空字符串。
-
-<b>特点</b>：
-- <b>优先级控制</b>：文本B端口优先级高于文本A端口
-- <b>智能切换</b>：自动检测输入状态，空值时回退到A或输出空文本
-
-<br>
-<div align="left">
-<a href="images/Priority Text Switch.jpg" target="_blank">
-<img src="images/Priority Text Switch.jpg" alt="优先级文本切换" width="45%"/>
-</a>
-</div>
-</td>
 </tr>
 <tr>
 <td><b>提示词合并器(可注释)</b><br><code>TextCombinerNode</code></td>
@@ -192,16 +176,59 @@
 </td>
 </tr>
 <tr>
-<td><b>字体设计师</b><br><code>TypeDesigner</code></td>
-<td>提供可视化界面，让用户浏览和选择各种字体艺术风格（如3D、霓虹、金属等），自动提供对应的预设提示词，方便进行艺术字创作。
+<td><b>文本切换器(双模式)</b><br><code>TextSwitchDualMode</code></td>
+<td>支持可变数量的文本输入的双模式切换器。通过滑块 <code>inputcount</code> 控制端口数量，并点击按钮 <code>Update inputs</code> 同步增删端口；手动模式下按索引选择输出（<code>select_text</code> 选项随 <code>inputcount</code> 自动更新）；自动模式仅在存在唯一非空输入时输出，检测到多个非空输入将提示错误。新增的文本输入端口均为非必连，适合在不同版本提示词之间灵活切换与对比实验。
 
 <br>
 <div align="left">
-<a href="images/Type-Designer1.jpg" target="_blank">
-<img src="images/Type-Designer1.jpg" alt="Type Designer 1" width="45%"/>
+<a href="images/Text Switch Dual Mode.jpg" target="_blank">
+<img src="images/Text Switch Dual Mode.jpg" alt="文本切换器(双模式)" width="45%"/>
 </a>
-<a href="images/Type-Designer2.jpg" target="_blank">
-<img src="images/Type-Designer2.jpg" alt="Type Designer 2" width="45%"/>
+</div>
+</td>
+</tr>
+<tr>
+<td><b>优先级文本切换</b><br><code>PriorityTextSwitch</code></td>
+<td>优先级文本切换节点：当同时接入文本A和文本B端口时，优先输出B端口；如果B端口为空或未连接，则输出文本A端口；如果两个端口都为空，则返回空字符串。
+
+<b>特点</b>：
+- <b>优先级控制</b>：文本B端口优先级高于文本A端口
+- <b>智能切换</b>：自动检测输入状态，空值时回退到A或输出空文本
+
+<br>
+<div align="left">
+<a href="images/Priority Text Switch.jpg" target="_blank">
+<img src="images/Priority Text Switch.jpg" alt="优先级文本切换" width="45%"/>
+</a>
+</div>
+</td>
+</tr>
+<tr>
+<td><b>触发词合并器</b><br><code>TriggerWordMerger</code></td>
+<td>将特定的触发词（Trigger Words）与主文本智能合并，并支持权重控制（例如 <code>(word:1.5)</code>）。适用于添加模型特定的触发词或风格词，并精确控制其影响强度。
+
+<br>
+<div align="left">
+<a href="images/触发词合并器.jpg" target="_blank">
+<img src="images/触发词合并器.jpg" alt="触发词合并器" width="45%"/>
+</a>
+</div>
+</td>
+</tr>
+<tr>
+<td><b>多平台翻译</b><br><code>MultiPlatformTranslate</code></td>
+<td>
+
+多平台翻译节点，支持百度、阿里云、有道、智谱AI和谷歌在线共5个平台。用户可以通过配置管理界面设置各平台的API密钥，实现高质量的专业翻译服务。
+
+<b>特点</b>：
+- <b>多平台支持</b>：支持主流翻译平台，满足不同需求
+- <b>配置管理</b>：通过图形化界面轻松管理各平台API密钥
+- <b>专业翻译</b>：提供高质量的专业翻译服务
+
+<div align="left">
+<a href="images/Multi Platform Translate.jpg" target="_blank">
+<img src="images/Multi Platform Translate.jpg" alt="多平台翻译" width="45%"/>
 </a>
 </div>
 </td>
@@ -216,8 +243,101 @@
 <th>功能描述</th>
 </tr>
 <tr>
-<td><b>图像编辑预设</b><br><code>ImageEditingPresets</code></td>
-<td>提供专业的图像编辑预设库，包含多种专业预设，为图像生成提供风格化指导，帮助用户快速应用常见的艺术风格和效果。</td>
+<td><b>🏷️TAG标签选择器</b><br><code>TagSelector</code></td>
+<td>
+
+新一代智能标签管理系统，集成海量预设标签库、自定义标签功能、角色提取器和内置AI扩写能力，提供前所未有的标签选择体验，快速构建复杂提示词，提升创作效率。
+
+<b>核心功能</b>：
+- <b>标签分类丰富：</b>涵盖常规标签、艺术题材、人物属性、场景环境等全方位分类
+- <b>自定义标签管理：</b>支持添加、编辑、删除个人专属标签，打造个性化标签库
+- <b>智能搜索定位：</b>支持关键词搜索，快速找到目标标签
+- <b>实时选择统计：</b>动态显示已选标签数量和详细列表
+- <b>随机标签生成：</b>智能随机标签生成功能，支持按分类权重和数量配置自动生成多样化标签组合
+- <b>角色提取器：</b>从远程服务器获取角色数据，自动生成AI绘图提示词，支持历史记录管理
+- <b>内置AI扩写</b>：一键智能扩写功能，支持标签式和自然语言式两种扩写模式
+
+<b>参数说明</b>：
+- <b>tag_edit：</b>手动编辑的标签文本，支持直接输入或粘贴
+- <b>random_logic：</b>随机逻辑选择（Disabled/Random Tags/Character Extractor）
+  - <b>Disabled：</b>禁用随机功能
+  - <b>Random Tags：</b>使用随机标签界面中配置的规则生成标签
+  - <b>Character Extractor：</b>使用角色提取器功能获取标签
+- <b>expand_mode：</b>扩写模式选择（Disabled/Tag Style/Natural Language/Structured JSON）
+- <b>output_language：</b>扩写结果语言（Chinese/English）
+- <b>platform：</b>API平台选择（auto自动选择可用平台）
+- <b>max_tokens：</b>AI生成内容的最大令牌数
+
+<br>
+<div align="left">
+<a href="images/Tag Selector1.jpg" target="_blank">
+<img src="images/Tag Selector1.jpg" alt="Tag Selector1" width="45%"/>
+</a>
+<a href="images/Tag Selector2.jpg" target="_blank">
+<img src="images/Tag Selector2.jpg" alt="Tag Selector2" width="45%"/>
+</a>
+</div>
+</td>
+</tr>
+<tr>
+<td><b>提示词卡选择器</b><br><code>PromptCardSelector</code></td>
+<td>支持随机/顺序抽取模式、单卡/多卡加载、多种分割方式及卡池洗牌策略，内置卡池管理器提供浏览/搜索/编辑功能，支持导入/导出卡文件，适用于提示词组合与批量管理。
+
+<b>特点</b>：
+- <b>双抽取模式</b>：支持随机抽取和顺序抽取两种模式
+- <b>多卡加载</b>：支持单卡和多卡加载模式
+- <b>灵活分割</b>：支持多种文本分割方式（空白行、换行符等）
+- <b>卡池管理</b>：内置卡池管理器，提供浏览、搜索、编辑功能
+- <b>导入导出</b>：支持提示卡文件的导入和导出
+- <b>洗牌策略</b>：支持卡池洗牌策略，增加随机性
+
+<br>
+<div align="left">
+<a href="images/Prompt Card Selector1.jpg" target="_blank">
+<img src="images/Prompt Card Selector1.jpg" alt="提示词卡选择器1" width="30%"/>
+</a>
+<a href="images/Prompt Card Selector2.jpg" target="_blank">
+<img src="images/Prompt Card Selector2.jpg" alt="提示词卡选择器2" width="30%"/>
+</a>
+<a href="images/Prompt Card Selector3.jpg" target="_blank">
+<img src="images/Prompt Card Selector3.jpg" alt="提示词卡选择器3" width="30%"/>
+</a>
+</div>
+</td>
+</tr>
+<tr>
+<td><b>提示词图库</b><br><code>PromptGallery</code></td>
+<td>提示词图库节点：从指定目录加载包含缩略图和文本的图文库，从用户选择的图片输出与图片同名的 <code>.txt</code> 文件内容（提示词文本）。适用于将"图像-提示词"成对管理并在工作流中快速取用。
+
+<br>
+<div align="left">
+<a href="images/Prompt Gallery.jpg" target="_blank">
+<img src="images/Prompt Gallery.jpg" alt="提示词图库" width="60%"/>
+</a>
+</div>
+</td>
+</tr>
+<tr>
+<td><b>提示词预设 - 单选</b><br><code>PromptPresetOneChoice</code></td>
+<td>提供6个预设选项，用户可以方便地在不同预设之间切换。适合保存常用的提示词模板，快速应用到不同场景。
+
+<br>
+<div align="left">
+<a href="images/单选提示词预设.jpg" target="_blank">
+<img src="images/单选提示词预设.jpg" alt="单选提示词预设" width="45%"/>
+</a>
+</div></td>
+</tr>
+<tr>
+<td><b>提示词预设 - 多选</b><br><code>PromptPresetMultipleChoice</code></td>
+<td>支持同时选择多个预设，并将它们合并输出，每个预设都带有独立的开关和注释功能。适合构建复杂的组合提示词，灵活控制各部分的启用状态。
+
+<br>
+<div align="left">
+<a href="images/多选提示词预设.jpg" target="_blank">
+<img src="images/多选提示词预设.jpg" alt="多选提示词预设" width="45%"/>
+</a>
+</div></td>
 </tr>
 <tr>
 <td><b>摄影提示词生成器</b><br><code>PhotographPromptGenerator</code></td>
@@ -264,92 +384,20 @@
 </td>
 </tr>
 <tr>
-<td><b>提示词预设 - 单选</b><br><code>PromptPresetOneChoice</code></td>
-<td>提供6个预设选项，用户可以方便地在不同预设之间切换。适合保存常用的提示词模板，快速应用到不同场景。
+<td><b>图像编辑预设</b><br><code>ImageEditingPresets</code></td>
+<td>提供专业的图像编辑预设库，包含多种专业预设，为图像生成提供风格化指导，帮助用户快速应用常见的艺术风格和效果。</td>
+</tr>
+<tr>
+<td><b>字体设计师</b><br><code>TypeDesigner</code></td>
+<td>提供可视化界面，让用户浏览和选择各种字体艺术风格（如3D、霓虹、金属等），自动提供对应的预设提示词，方便进行艺术字创作。
 
 <br>
 <div align="left">
-<a href="images/单选提示词预设.jpg" target="_blank">
-<img src="images/单选提示词预设.jpg" alt="单选提示词预设" width="45%"/>
+<a href="images/Type-Designer1.jpg" target="_blank">
+<img src="images/Type-Designer1.jpg" alt="Type Designer 1" width="45%"/>
 </a>
-</div></td>
-</tr>
-<tr>
-<td><b>提示词预设 - 多选</b><br><code>PromptPresetMultipleChoice</code></td>
-<td>支持同时选择多个预设，并将它们合并输出，每个预设都带有独立的开关和注释功能。适合构建复杂的组合提示词，灵活控制各部分的启用状态。
-
-<br>
-<div align="left">
-<a href="images/多选提示词预设.jpg" target="_blank">
-<img src="images/多选提示词预设.jpg" alt="多选提示词预设" width="45%"/>
-</a>
-</div></td>
-</tr>
-<tr>
-<td><b>触发词合并器</b><br><code>TriggerWordMerger</code></td>
-<td>将特定的触发词（Trigger Words）与主文本智能合并，并支持权重控制（例如 <code>(word:1.5)</code>）。适用于添加模型特定的触发词或风格词，并精确控制其影响强度。
-
-<br>
-<div align="left">
-<a href="images/触发词合并器.jpg" target="_blank">
-<img src="images/触发词合并器.jpg" alt="触发词合并器" width="45%"/>
-</a>
-</div>
-</td>
-</tr>
-<tr>
-<td><b>系统引导词加载器</b><br><code>SystemPromptLoader</code></td>
-<td>从预设文件夹动态加载系统级引导词（System Prompt），并可选择性地与用户输入合并。适合管理和应用复杂的系统提示模板，提高生成结果的一致性和质量。<br><br>
-<div align="left">
-<a href="images/System Prompt Loader.jpg" target="_blank">
-<img src="images/System Prompt Loader.jpg" alt="系统提示词加载器" width="45%"/>
-</a>
-</div>
-</td>
-</tr>
-<tr>
-<td><b>额外选项列表</b><br><code>ExtraOptions</code></td>
-<td>一个通用的额外选项列表，类似于 JoyCaption 的设计，设有总开关和独立的引导词输入框。适合添加辅助提示或控制参数，增强工作流的灵活性。<br><br>
-<div align="left">
-<a href="images/额外引导选项（通用）.jpg" target="_blank">
-<img src="images/额外引导选项（通用）.jpg" alt="额外选项列表" width="45%"/>
-</a>
-</div></td>
-</tr>
-<tr>
-<td><b>提示词卡选择器</b><br><code>PromptCardSelector</code></td>
-<td>支持随机/顺序抽取模式、单卡/多卡加载、多种分割方式及卡池洗牌策略，内置卡池管理器提供浏览/搜索/编辑功能，支持导入/导出卡文件，适用于提示词组合与批量管理。
-
-<b>特点</b>：
-- <b>双抽取模式</b>：支持随机抽取和顺序抽取两种模式
-- <b>多卡加载</b>：支持单卡和多卡加载模式
-- <b>灵活分割</b>：支持多种文本分割方式（空白行、换行符等）
-- <b>卡池管理</b>：内置卡池管理器，提供浏览、搜索、编辑功能
-- <b>导入导出</b>：支持提示卡文件的导入和导出
-- <b>洗牌策略</b>：支持卡池洗牌策略，增加随机性
-
-<br>
-<div align="left">
-<a href="images/Prompt Card Selector1.jpg" target="_blank">
-<img src="images/Prompt Card Selector1.jpg" alt="提示词卡选择器1" width="30%"/>
-</a>
-<a href="images/Prompt Card Selector2.jpg" target="_blank">
-<img src="images/Prompt Card Selector2.jpg" alt="提示词卡选择器2" width="30%"/>
-</a>
-<a href="images/Prompt Card Selector3.jpg" target="_blank">
-<img src="images/Prompt Card Selector3.jpg" alt="提示词卡选择器3" width="30%"/>
-</a>
-</div>
-</td>
-</tr>
-<tr>
-<td><b>提示词图库</b><br><code>PromptGallery</code></td>
-<td>提示词图库节点：从指定目录加载包含缩略图和文本的图文库，从用户选择的图片输出与图片同名的 <code>.txt</code> 文件内容（提示词文本）。适用于将"图像-提示词"成对管理并在工作流中快速取用。
-
-<br>
-<div align="left">
-<a href="images/Prompt Gallery.jpg" target="_blank">
-<img src="images/Prompt Gallery.jpg" alt="提示词图库" width="60%"/>
+<a href="images/Type-Designer2.jpg" target="_blank">
+<img src="images/Type-Designer2.jpg" alt="Type Designer 2" width="45%"/>
 </a>
 </div>
 </td>
@@ -511,6 +559,33 @@
 
 </td>
 </tr>
+<tr>
+<td><b>图像切换器(双模式)</b><br><code>ImageSwitchDualMode</code></td>
+<td>支持可变数量的图像输入的双模式切换器。通过滑块 <code>inputcount</code> 控制端口数量，并点击按钮 <code>Update inputs</code> 同步增删端口；手动模式下按索引选择输出（<code>select_image</code> 选项随 <code>inputcount</code> 自动更新）；自动模式仅在存在唯一非空输入时输出，检测到多个非空输入将提示错误。新增的图像输入端口均为非必连，便于在不同生成结果或不同处理路径之间进行灵活对比。
+
+<br>
+<div align="left">
+<a href="images/Image Switch Dual Mode.jpg" target="_blank">
+<img src="images/Image Switch Dual Mode.jpg" alt="图像切换器(双模式)" width="45%"/>
+</a>
+</div>
+</td>
+</tr>
+<tr>
+<td><b>优先级图像切换</b><br><code>PriorityImageSwitch</code></td>
+<td>智能优先级图像切换节点，当同时接入图像A和图像B端口时，优先输出B端口的内容；如果B端口无输入，则输出图像A端口的内容；如果两个端口都无输入，则弹出提示要求至少连接一个输入端口。
+
+<b>特点</b>：
+- <b>优先级控制</b>：图像B端口优先级高于图像A端口
+- <b>智能切换</b>：自动检测输入状态，无缝切换输出，减少手动切换操作
+
+<br>
+<div align="left">
+<a href="images/优先级图像切换.jpg" target="_blank">
+<img src="images/优先级图像切换.jpg" alt="优先级图像切换" width="45%"/>
+</a>
+</div></td>
+</tr>
 </table>
 
 ### 🎞️ 电影后期处理类节点
@@ -615,6 +690,19 @@
 </div>
 </td>
 </tr>
+<tr>
+<td><b>视频预览</b><br><code>VideoPreview</code></td>
+<td>
+
+接收上游视频并在节点上直接播放，无需先保存到输出目录即可预览结果。
+
+<b>核心功能</b>：
+- <b>节点内播放</b>：视频直接在节点面板中播放，省去写入输出目录的步骤
+- <b>无损封装</b>：视频仅做无损封装写入 temp 目录，并在多次执行间复用，不解码视频帧
+- <b>原样透传</b>：输出端口原样传递视频，可继续接入保存视频等下游节点
+
+</td>
+</tr>
 </table>
 
 ### 🎵 音乐相关节点
@@ -663,7 +751,51 @@
 </tr>
 </table>
 
-### 🤖 AI视觉理解节点
+### 🧊 潜空间节点
+
+<table>
+<tr>
+<th width="30%">节点名称</th>
+<th>功能描述</th>
+</tr>
+<tr>
+<td><b>Latent切换器(双模式)</b><br><code>LatentSwitchDualMode</code></td>
+<td>支持可变数量的潜变量输入的双模式切换器。通过滑块 <code>inputcount</code> 控制端口数量，并点击按钮 <code>Update inputs</code> 同步增删端口；手动模式下按索引选择输出（<code>select_channel</code> 选项随 <code>inputcount</code> 自动更新）；自动模式仅在存在唯一非空输入时输出，检测到多个非空输入将提示错误。新增的潜变量输入端口均为非必连，适合在不同生成路径之间灵活切换与对比实验。
+
+<br>
+<div align="left">
+<a href="images/Latent Switch Dual Mode.jpg" target="_blank">
+<img src="images/Latent Switch Dual Mode.jpg" alt="Latent切换器(双模式)" width="45%"/>
+</a>
+</div>
+</td>
+</tr>
+</table>
+
+### 📦 加载器节点
+
+<table>
+<tr>
+<th width="30%">节点名称</th>
+<th>功能描述</th>
+</tr>
+<tr>
+<td><b>多媒体加载器</b><br><code>MultimediaAdvancedLoader</code></td>
+<td>
+
+以缩略图网格管理 `input` 目录中的图片、视频与音频素材，可视化挑选后输出给下游节点。
+
+<b>核心功能</b>：
+- <b>三种素材</b>：图片、视频与音频统一在一个网格界面中浏览与选择
+- <b>载入模式</b>：默认载入全部素材并输出 MiniMax H3 媒体包端口；切到「仅图片」则隐藏音频与视频，只输出图像端口
+- <b>输出方式</b>：支持「点击选中」（仅输出选中项）与「智能编号」（全部按编号顺序输出）
+- <b>对接下游</b>：媒体输出可直连 LM Studio 节点与图像理解在线版节点的图像/媒体端口
+
+</td>
+</tr>
+</table>
+
+### 🤖 AI 助手节点
 
 <table>
 <tr>
@@ -760,123 +892,25 @@
 </div>
 </td>
 </tr>
+<tr>
+<td><b>系统引导词加载器</b><br><code>SystemPromptLoader</code></td>
+<td>从预设文件夹动态加载系统级引导词（System Prompt），并可选择性地与用户输入合并。适合管理和应用复杂的系统提示模板，提高生成结果的一致性和质量。<br><br>
+<div align="left">
+<a href="images/System Prompt Loader.jpg" target="_blank">
+<img src="images/System Prompt Loader.jpg" alt="系统提示词加载器" width="45%"/>
+</a>
+</div>
+</td>
+</tr>
 </table>
 
-### ⚙️ 逻辑与工具类节点
+### ⚙️ 工具箱节点
 
 <table>
 <tr>
 <th width="30%">节点名称</th>
 <th>功能描述</th>
 </tr>
-<tr>
-<td><b>🏷️TAG标签选择器</b><br><code>TagSelector</code></td>
-<td>
-
-新一代智能标签管理系统，集成海量预设标签库、自定义标签功能、角色提取器和内置AI扩写能力，提供前所未有的标签选择体验，快速构建复杂提示词，提升创作效率。
-
-<b>核心功能</b>：
-- <b>标签分类丰富：</b>涵盖常规标签、艺术题材、人物属性、场景环境等全方位分类
-- <b>自定义标签管理：</b>支持添加、编辑、删除个人专属标签，打造个性化标签库
-- <b>智能搜索定位：</b>支持关键词搜索，快速找到目标标签
-- <b>实时选择统计：</b>动态显示已选标签数量和详细列表
-- <b>随机标签生成：</b>智能随机标签生成功能，支持按分类权重和数量配置自动生成多样化标签组合
-- <b>角色提取器：</b>从远程服务器获取角色数据，自动生成AI绘图提示词，支持历史记录管理
-- <b>内置AI扩写</b>：一键智能扩写功能，支持标签式和自然语言式两种扩写模式
-
-<b>参数说明</b>：
-- <b>tag_edit：</b>手动编辑的标签文本，支持直接输入或粘贴
-- <b>random_logic：</b>随机逻辑选择（Disabled/Random Tags/Character Extractor）
-  - <b>Disabled：</b>禁用随机功能
-  - <b>Random Tags：</b>使用随机标签界面中配置的规则生成标签
-  - <b>Character Extractor：</b>使用角色提取器功能获取标签
-- <b>expand_mode：</b>扩写模式选择（Disabled/Tag Style/Natural Language/Structured JSON）
-- <b>output_language：</b>扩写结果语言（Chinese/English）
-- <b>platform：</b>API平台选择（auto自动选择可用平台）
-- <b>max_tokens：</b>AI生成内容的最大令牌数
-
-<br>
-<div align="left">
-<a href="images/Tag Selector1.jpg" target="_blank">
-<img src="images/Tag Selector1.jpg" alt="Tag Selector1" width="45%"/>
-</a>
-<a href="images/Tag Selector2.jpg" target="_blank">
-<img src="images/Tag Selector2.jpg" alt="Tag Selector2" width="45%"/>
-</a>
-</div>
-</td>
-</tr>
-<tr>
-<td><b>Latent切换器(双模式)</b><br><code>LatentSwitchDualMode</code></td>
-<td>支持可变数量的潜变量输入的双模式切换器。通过滑块 <code>inputcount</code> 控制端口数量，并点击按钮 <code>Update inputs</code> 同步增删端口；手动模式下按索引选择输出（<code>select_channel</code> 选项随 <code>inputcount</code> 自动更新）；自动模式仅在存在唯一非空输入时输出，检测到多个非空输入将提示错误。新增的潜变量输入端口均为非必连，适合在不同生成路径之间灵活切换与对比实验。
-
-<br>
-<div align="left">
-<a href="images/Latent Switch Dual Mode.jpg" target="_blank">
-<img src="images/Latent Switch Dual Mode.jpg" alt="Latent切换器(双模式)" width="45%"/>
-</a>
-</div>
-</td>
-</tr>
-<tr>
-<td><b>文本切换器(双模式)</b><br><code>TextSwitchDualMode</code></td>
-<td>支持可变数量的文本输入的双模式切换器。通过滑块 <code>inputcount</code> 控制端口数量，并点击按钮 <code>Update inputs</code> 同步增删端口；手动模式下按索引选择输出（<code>select_text</code> 选项随 <code>inputcount</code> 自动更新）；自动模式仅在存在唯一非空输入时输出，检测到多个非空输入将提示错误。新增的文本输入端口均为非必连，适合在不同版本提示词之间灵活切换与对比实验。
-
-<br>
-<div align="left">
-<a href="images/Text Switch Dual Mode.jpg" target="_blank">
-<img src="images/Text Switch Dual Mode.jpg" alt="文本切换器(双模式)" width="45%"/>
-</a>
-</div>
-</td>
-</tr>
-<tr>
-<td><b>图像切换器(双模式)</b><br><code>ImageSwitchDualMode</code></td>
-<td>支持可变数量的图像输入的双模式切换器。通过滑块 <code>inputcount</code> 控制端口数量，并点击按钮 <code>Update inputs</code> 同步增删端口；手动模式下按索引选择输出（<code>select_image</code> 选项随 <code>inputcount</code> 自动更新）；自动模式仅在存在唯一非空输入时输出，检测到多个非空输入将提示错误。新增的图像输入端口均为非必连，便于在不同生成结果或不同处理路径之间进行灵活对比。
-
-<br>
-<div align="left">
-<a href="images/Image Switch Dual Mode.jpg" target="_blank">
-<img src="images/Image Switch Dual Mode.jpg" alt="图像切换器(双模式)" width="45%"/>
-</a>
-</div>
-</td>
-</tr>
-<tr>
-<td><b>优先级图像切换</b><br><code>PriorityImageSwitch</code></td>
-<td>智能优先级图像切换节点，当同时接入图像A和图像B端口时，优先输出B端口的内容；如果B端口无输入，则输出图像A端口的内容；如果两个端口都无输入，则弹出提示要求至少连接一个输入端口。
-
-<b>特点</b>：
-- <b>优先级控制</b>：图像B端口优先级高于图像A端口
-- <b>智能切换</b>：自动检测输入状态，无缝切换输出，减少手动切换操作
-
-<br>
-<div align="left">
-<a href="images/优先级图像切换.jpg" target="_blank">
-<img src="images/优先级图像切换.jpg" alt="优先级图像切换" width="45%"/>
-</a>
-</div></td>
-</tr>
-<tr>
-<td><b>多平台翻译</b><br><code>MultiPlatformTranslate</code></td>
-<td>
-
-多平台翻译节点，支持百度、阿里云、有道、智谱AI和谷歌在线共5个平台。用户可以通过配置管理界面设置各平台的API密钥，实现高质量的专业翻译服务。
-
-<b>特点</b>：
-- <b>多平台支持</b>：支持主流翻译平台，满足不同需求
-- <b>配置管理</b>：通过图形化界面轻松管理各平台API密钥
-- <b>专业翻译</b>：提供高质量的专业翻译服务
-
-<div align="left">
-<a href="images/Multi Platform Translate.jpg" target="_blank">
-<img src="images/Multi Platform Translate.jpg" alt="多平台翻译" width="45%"/>
-</a>
-</div>
-</td>
-</tr>
-
-
 <tr>
 <td><b>资源清理器</b><br><code>ResourceCleaner</code></td>
 <td>
@@ -960,35 +994,7 @@
 </div>
 </td>
 </tr>
-<tr>
-<td><b>多媒体加载器</b><br><code>MultimediaAdvancedLoader</code></td>
-<td>
-
-以缩略图网格管理 `input` 目录中的图片、视频与音频素材，可视化挑选后输出给下游节点。
-
-<b>核心功能</b>：
-- <b>三种素材</b>：图片、视频与音频统一在一个网格界面中浏览与选择
-- <b>载入模式</b>：默认载入全部素材并输出 MiniMax H3 媒体包端口；切到「仅图片」则隐藏音频与视频，只输出图像端口
-- <b>输出方式</b>：支持「点击选中」（仅输出选中项）与「智能编号」（全部按编号顺序输出）
-- <b>对接下游</b>：媒体输出可直连 LM Studio 节点与图像理解在线版节点的图像/媒体端口
-
-</td>
-</tr>
-<tr>
-<td><b>视频预览</b><br><code>VideoPreview</code></td>
-<td>
-
-接收上游视频并在节点上直接播放，无需先保存到输出目录即可预览结果。
-
-<b>核心功能</b>：
-- <b>节点内播放</b>：视频直接在节点面板中播放，省去写入输出目录的步骤
-- <b>无损封装</b>：视频仅做无损封装写入 temp 目录，并在多次执行间复用，不解码视频帧
-- <b>原样透传</b>：输出端口原样传递视频，可继续接入保存视频等下游节点
-
-</td>
-</tr>
 </table>
-
 ---
 
 ## 🚀 安装方式
@@ -1020,7 +1026,7 @@ git clone https://github.com/ZhiHui6/zhiai_nodes_comfyui.git
 
 ### 🧭 节点菜单位置
 
-安装后所有节点都在右键菜单的 **Zhi.AI** 顶级分类下，按用途分为 Text（文本）、Generator（生成器）、Image（图像）、MovieTools（影视工具）、Video（视频）、Loaders（加载器）、Latent（潜空间）、Toolkit（工具箱）、Utility（实用工具）、Audio（音频）、LM Studio、Image Understanding（图像理解）、Florence2、LLM Extra Options（LLM 扩展选项）等子菜单；子菜单名跟随 ComfyUI 界面语言切换，LM Studio、Florence2 等产品名保持原样。新增或更新节点包后需要重启 ComfyUI 才会完成注册。
+安装后所有节点都在右键菜单的 **Zhi.AI** 顶级分类下，按用途分为 Text（文本）、Generator（生成器）、Image（图像）、MovieTools（影视工具）、Video（视频）、Loaders（加载器）、Latent（潜空间）、Toolkit（工具箱）、Audio（音频）、AI Assistant（AI 助手）等子菜单；子菜单名跟随 ComfyUI 界面语言切换，LM Studio、Florence2 等产品名保持原样。新增或更新节点包后需要重启 ComfyUI 才会完成注册。
 
 ### 🔑 首次使用配置
 
