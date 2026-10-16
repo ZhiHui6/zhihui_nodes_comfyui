@@ -14,7 +14,7 @@ class AudioDuration:
     RETURN_TYPES = ("FLOAT", "STRING", "INT")
     RETURN_NAMES = ("duration_seconds", "formatted_time", "duration_ms")
     FUNCTION = "calculate_audio_duration"
-    CATEGORY = "audio/utils"
+    CATEGORY = "Zhi.AI/Audio"
     DESCRIPTION = "Calculates the duration of the audio."
     OUTPUT_NODE = False
 

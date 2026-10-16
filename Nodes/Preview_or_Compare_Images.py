@@ -52,7 +52,7 @@ class PreviewOrCompareImages(PreviewImage):
     NAME = "Preview or Compare Images"
     CATEGORY = "Zhi.AI/Image"
     FUNCTION = "compare_images"
-    DESCRIPTION = "Preview a single image or compare two images side by side. Supports displaying one or two images with optional comparison functionality."
+    DESCRIPTION = "Preview a single image or compare two images side by side with a draggable split line."
     OUTPUT_NODE = True
     RETURN_TYPES = ()
 

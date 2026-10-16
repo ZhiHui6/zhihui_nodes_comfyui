@@ -47,7 +47,7 @@ function $t(key) {
 async function loadTranslations() {
     if (translationsData) return translationsData;
     try {
-        const response = await api.fetchApi("/zhihui/system_prompt/translations");
+        const response = await api.fetchApi("/zhiai/system_prompt/translations");
         translationsData = await response.json();
         return translationsData;
     } catch (e) {
@@ -377,18 +377,18 @@ const MENU_STYLES = {
 };
 
 function createStyleSheet() {
-    const styleId = 'zhihui-system-prompt-menu-styles';
+    const styleId = 'zhiai-system-prompt-menu-styles';
     if (document.getElementById(styleId)) return;
     const style = document.createElement('style');
     style.id = styleId;
     style.textContent = `
-        .zhihui-sp-menu-scroll::-webkit-scrollbar { width: 5px; }
-        .zhihui-sp-menu-scroll::-webkit-scrollbar-track { background: transparent; }
-        .zhihui-sp-menu-scroll::-webkit-scrollbar-thumb { background: rgba(120,120,160,0.25); border-radius: 10px; }
-        .zhihui-sp-menu-scroll::-webkit-scrollbar-thumb:hover { background: rgba(140,140,180,0.4); }
-        .zhihui-sp-menu-scroll { scrollbar-width: thin; scrollbar-color: rgba(120,120,160,0.25) transparent; }
-        .zhihui-sp-preset-item { position: relative; }
-        .zhihui-sp-preset-item::after {
+        .zhiai-sp-menu-scroll::-webkit-scrollbar { width: 5px; }
+        .zhiai-sp-menu-scroll::-webkit-scrollbar-track { background: transparent; }
+        .zhiai-sp-menu-scroll::-webkit-scrollbar-thumb { background: rgba(120,120,160,0.25); border-radius: 10px; }
+        .zhiai-sp-menu-scroll::-webkit-scrollbar-thumb:hover { background: rgba(140,140,180,0.4); }
+        .zhiai-sp-menu-scroll { scrollbar-width: thin; scrollbar-color: rgba(120,120,160,0.25) transparent; }
+        .zhiai-sp-preset-item { position: relative; }
+        .zhiai-sp-preset-item::after {
             content: '';
             position: absolute;
             left: 14px;
@@ -397,10 +397,10 @@ function createStyleSheet() {
             height: 1px;
             background: rgba(255,255,255,0.02);
         }
-        .zhihui-sp-category-header { position: relative; }
-        .zhihui-sp-category-header:first-child { margin-top: 0 !important; }
-        .zhihui-sp-category-header + .zhihui-sp-preset-item::after { display: none; }
-        .zhihui-sp-preset-item:last-child::after { display: none; }
+        .zhiai-sp-category-header { position: relative; }
+        .zhiai-sp-category-header:first-child { margin-top: 0 !important; }
+        .zhiai-sp-category-header + .zhiai-sp-preset-item::after { display: none; }
+        .zhiai-sp-preset-item:last-child::after { display: none; }
     `;
     document.head.appendChild(style);
 }
@@ -495,7 +495,7 @@ function createMenuUI(node, presetWidget) {
 
         listContainer = document.createElement('div');
         Object.assign(listContainer.style, MENU_STYLES.listContainer);
-        listContainer.classList.add('zhihui-sp-menu-scroll');
+        listContainer.classList.add('zhiai-sp-menu-scroll');
         menuPanel.appendChild(listContainer);
 
         menuContainer.appendChild(menuPanel);
@@ -518,7 +518,7 @@ function createMenuUI(node, presetWidget) {
 
         previewContent = document.createElement('div');
         Object.assign(previewContent.style, MENU_STYLES.previewContent);
-        previewContent.classList.add('zhihui-sp-menu-scroll');
+        previewContent.classList.add('zhiai-sp-menu-scroll');
 
         previewEmptyEl = document.createElement('div');
         Object.assign(previewEmptyEl.style, MENU_STYLES.previewEmpty);
@@ -602,7 +602,7 @@ function createMenuUI(node, presetWidget) {
             if (category !== '__root__') {
                 const catHeader = document.createElement('div');
                 Object.assign(catHeader.style, MENU_STYLES.categoryHeader);
-                catHeader.classList.add('zhihui-sp-category-header');
+                catHeader.classList.add('zhiai-sp-category-header');
                 const catIcon = document.createElement('span');
                 Object.assign(catIcon.style, MENU_STYLES.categoryIcon);
                 catIcon.innerHTML = '&#128193;';
@@ -620,7 +620,7 @@ function createMenuUI(node, presetWidget) {
             for (const item of filteredItems) {
                 const itemEl = document.createElement('div');
                 Object.assign(itemEl.style, MENU_STYLES.presetItem);
-                itemEl.classList.add('zhihui-sp-preset-item');
+                itemEl.classList.add('zhiai-sp-preset-item');
 
                 const isSelected = item.fullPath === selectedPath;
                 if (isSelected) {
@@ -694,7 +694,7 @@ function createMenuUI(node, presetWidget) {
 
         try {
             const encodedPath = encodeURIComponent(path);
-            const response = await api.fetchApi(`/zhihui/system_prompt/preview?path=${encodedPath}`);
+            const response = await api.fetchApi(`/zhiai/system_prompt/preview?path=${encodedPath}`);
             const data = await response.json();
             if (data && data.content) {
                 previewCache[path] = data.content;
@@ -875,7 +875,7 @@ function createMenuUI(node, presetWidget) {
 
     async function loadPresets() {
         try {
-            const response = await api.fetchApi('/zhihui/system_prompt/presets');
+            const response = await api.fetchApi('/zhiai/system_prompt/presets');
             const data = await response.json();
             if (data && data.presets) {
                 allPresets = data.presets;
@@ -916,7 +916,7 @@ function createMenuUI(node, presetWidget) {
 }
 
 app.registerExtension({
-    name: "Zhihui.SystemPromptLoader",
+    name: "Zhiai.SystemPromptLoader",
 
     async setup() {
         await loadTranslations();
@@ -974,35 +974,28 @@ app.registerExtension({
 
                 const presetWidget = this.widgets ? this.widgets.find(w => w.name === "system_preset") : null;
                 if (presetWidget) {
-                    // Hide the original combo widget completely - this prevents both
-                    // default drawing AND default click/dropdown behavior
                     presetWidget.hidden = true;
 
-                    // Create our custom trigger button as a DOM element
                     const host = document.createElement('div');
                     host.setAttribute('data-sp-loader', '1');
                     host.style.cssText = 'width:100%;pointer-events:auto;box-sizing:border-box;';
 
-                    // Create menu UI
                     let menuUI = createMenuUI(this, presetWidget);
                     host.appendChild(menuUI.container);
 
-                    // Add as proper DOM widget via ComfyUI API
                     const domWidget = this.addDOMWidget("system_preset_selector", "div", host, {
                         getValue: () => presetWidget.value,
                         setValue: (v) => { presetWidget.value = v; },
-                        serialize: false // original widget handles serialization
+                        serialize: false
                     });
                     domWidget.computeSize = function(width) {
                         return [Math.max(200, width || 200), 32];
                     };
 
-                    // Store references for cleanup
                     this._presetDomHost = host;
                     this._presetMenuUI = menuUI;
                     this._presetWidget = presetWidget;
 
-                    // Reorder widgets: move our DOM widget to where the hidden combo was
                     const presetIdx = this.widgets.indexOf(presetWidget);
                     const domIdx = this.widgets.indexOf(domWidget);
                     if (presetIdx !== -1 && domIdx !== -1 && domIdx > presetIdx) {
@@ -1010,7 +1003,6 @@ app.registerExtension({
                         this.widgets.splice(presetIdx, 0, domWidget);
                     }
 
-                    // Recalculate node size after DOM widget is added
                     setTimeout(() => {
                         self.setSize(self.computeSize());
                     }, 0);
@@ -1045,7 +1037,6 @@ app.registerExtension({
                 return result;
             };
 
-            // Hook onConfigure to refresh the trigger display after workflow load
             const onConfigure = nodeType.prototype.onConfigure;
             nodeType.prototype.onConfigure = function () {
                 const result = onConfigure ? onConfigure.apply(this, arguments) : undefined;

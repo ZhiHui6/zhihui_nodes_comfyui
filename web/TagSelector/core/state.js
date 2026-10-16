@@ -1,7 +1,7 @@
 const ADULT_SESSION_TIMEOUT = 4 * 60 * 60 * 1000;
 const ADULT_MAX_FAILED_ATTEMPTS = 5;
 const ADULT_LOCKOUT_DURATION = 30000;
-const ADULT_STORAGE_SALT = 'zhihui_adult_v2_salt_2024';
+const ADULT_STORAGE_SALT = 'zhiai_adult_v2_salt_2024';
 
 const state = {
     tagSelectorDialog: null,

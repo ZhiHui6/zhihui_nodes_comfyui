@@ -2,9 +2,13 @@
 
 # 🎨 智爱 ComfyUI 节点包 
 
+<p align="center">
+  <img src="icon.png" alt="Zhi.AI ComfyUI Node Pack" width="180"/>
+</p>
+
 ## 📖 项目介绍
 
-这是一个由 **Binity** 精心创建的 ComfyUI 自定义节点工具合集，旨在为用户提供一系列实用、高效的节点，以增强和扩展 ComfyUI 的功能。本节点集包含55+功能节点，涵盖文本处理、提示词优化、图像处理、翻译工具、音乐创作辅助、AI视觉理解、Latent处理等多个方面，为您的 AI 创作提供全方位支持。
+这是一个由 **Binity** 精心创建的 ComfyUI 自定义节点工具合集，旨在为用户提供一系列实用、高效的节点，以增强和扩展 ComfyUI 的功能。本节点集包含56个功能节点，涵盖文本处理、提示词优化、图像处理、翻译工具、音乐创作辅助、AI视觉理解、Latent处理等多个方面，为您的 AI 创作提供全方位支持。
 
 ***如果这个项目对您有帮助，请给我们一个⭐Star！您的支持是我们持续改进的动力。***
 
@@ -15,7 +19,7 @@
 
 ### **核心功能特色**
 
-- 🔄 **多引擎翻译节点**：集成百度、腾讯、有道、谷歌在线等5大翻平台，支持中英互译，可自动识别输入语言，自由切换翻译平台。
+- 🔄 **多引擎翻译节点**：集成百度、阿里云、有道、智谱AI与谷歌在线共5大翻译平台，支持中英互译，可自动识别输入语言，自由切换翻译平台。
 
 - 📝 **全面文本处理**：提供多行文本编辑、文本合并分离、内容提取修改、语言过滤等文本操作节点。
 
@@ -33,23 +37,25 @@
 <th width="19%">类别</th>
 <th width="51%">核心功能</th>
 </tr>
-
 <tr>
 <td><b>标签选择器</b><br><code>TagSelector</code></td>
 <td>提示词处理</td>
 <td>新一代智能标签管理系统，集成海量预设标签库、自定义标签管理、角色提取器和内置AI扩写功能。提供可视化标签选择界面，支持随机标签生成和多模式扩写。</td>
 </tr>
-
 <tr>
 <td><b>摄影提示词生成器</b><br><code>PhotographPromptGenerator</code></td>
 <td>提示词处理</td>
-<td>专业摄影风格提示词生成器，涵盖人物、场景、镜头、光线、服装等16个维度。支持输出模式切换（标签组合/模板文本），集成AI扩写功能。配有用户自定义选项扩展和模板编辑助手界面。</td>
+<td>专业摄影风格提示词生成器，涵盖人物、场景、镜头、光线、服装等32个维度。支持标签组合与模板文本两种输出模式，可随机选择增加创意多样性。配有用户自定义选项扩展和模板编辑助手界面。</td>
 </tr>
-
 <tr>
-<td><b>LM工作室节点</b><br><code>LMStudioNode</code></td>
+<td><b>LM Studio节点</b><br><code>LMStudioNode</code></td>
 <td>AI视觉理解</td>
 <td>连接本地LM Studio服务器的视觉理解节点，支持图像分析和文本生成。通过LM Studio本地部署的大模型，实现无需云端API的私有化图像分析。支持多种预设模板、输出语言控制和多图像输入。</td>
+</tr>
+<tr>
+<td><b>图像理解在线版</b><br><code>ImageUnderstandingOnline</code></td>
+<td>AI视觉理解</td>
+<td>通过任意 OpenAI 兼容的在线多模态接口进行图像理解，无需本地GPU，可预设最多 6 套平台配置并在节点下拉菜单中直接切换。支持单图与多图输入、文本提示词端口整段接管、未接图像时作为纯文本节点调用，并与 LM Studio 节点共用提示词模板分类与批处理能力。</td>
 </tr>
 </table>
 
@@ -95,6 +101,7 @@
 </div>
 </td>
 </tr>
+<tr>
 <td><b>提示词合并器(可注释)</b><br><code>TextCombinerNode</code></td>
 <td>合并两个文本输入，并可通过独立的开关控制每个文本的输出，并带注释功能。可用于动态组合不同的提示词部分，灵活构建完整提示。
 
@@ -136,7 +143,6 @@
 </a>
 </div></td>
 </tr>
-
 <tr>
 <td><b>提示词删除</b><br><code>PromptDelete</code></td>
 <td>提示词删除节点：支持动态数量的查找与删除操作，适合批量删除不需要的触发词、风格词或模型相关文本。并支持自动格式化功能，清理残留符号。
@@ -148,7 +154,6 @@
 </div>
 </td>
 </tr>
-
 <tr>
 <td><b>提示词替换</b><br><code>PromptReplace</code></td>
 <td>提示词替换节点：支持动态数量的查找与替换操作，适合批量替换触发词、风格词或模型相关文本。
@@ -160,10 +165,9 @@
 </div>
 </td>
 </tr>
-
 <tr>
 <td><b>显示任何</b><br><code>ShowAny</code></td>
-<td>用于在ComfyUI界面中显示任意类型内容的节点，支持多行文本展示，可实时显示上游节点传递的文本信息，便于调试和查看中间结果。支持标准模式和排错模式两种显示方式。</td>
+<td>用于在ComfyUI界面中显示任意类型内容的节点，支持多行文本展示，可实时显示上游节点传递的文本信息，便于调试和查看中间结果。提供源码模式和Markdown模式两种预览方式。</td>
 </tr>
 <tr>
 <td><b>文本编辑器（继续运行）</b><br><code>TextEditorWithContinue</code></td>
@@ -204,7 +208,7 @@
 </tr>
 </table>
 
-### � 提示词处理类节点
+### 🎯 提示词处理类节点
 
 <table>
 <tr>
@@ -246,12 +250,11 @@
 <td><b>万相视频提示词生成器</b><br><code>WanPromptGenerator</code></td>
 <td>
 
-基于万相2.2官方文档编写的全能型提示词生成器，支持自定义和预设两种组合方法，涵盖运镜、场景、光线、构图等16个维度的专业视频提示词生成。
+基于万相2.2官方文档编写的全能型提示词生成器，支持自定义和预设两种组合方法，涵盖运镜、场景、光线、构图等17个维度的专业视频提示词生成。
 
 <b>特点</b>：
 - <b>双模式切换</b>：支持自定义组合和预设组合模式，通过开关按钮一键切换
 - <b>多维度选择</b>：涵盖主体类型、场景类型、光源类型、光线类型、时间段、景别、构图、镜头焦段、机位角度、镜头类型、色调、运镜方式、人物情绪、运动类型、视觉风格、特效镜头、动作姿势17个专业维度
-- <b>智能扩写</b>：支持多种LLM模型免费在线扩写
 
 <div align="left">
 <a href="images/万相视频提示词生成器.jpg" target="_blank">
@@ -260,7 +263,6 @@
 </div>
 </td>
 </tr>
-
 <tr>
 <td><b>提示词预设 - 单选</b><br><code>PromptPresetOneChoice</code></td>
 <td>提供6个预设选项，用户可以方便地在不同预设之间切换。适合保存常用的提示词模板，快速应用到不同场景。
@@ -305,7 +307,6 @@
 </div>
 </td>
 </tr>
-
 <tr>
 <td><b>额外选项列表</b><br><code>ExtraOptions</code></td>
 <td>一个通用的额外选项列表，类似于 JoyCaption 的设计，设有总开关和独立的引导词输入框。适合添加辅助提示或控制参数，增强工作流的灵活性。<br><br>
@@ -353,24 +354,6 @@
 </div>
 </td>
 </tr>
-<tr>
-<td><b>提示词扩写器</b><br><code>PromptExpander</code></td>
-<td>使用AI大模型将简短的提示词扩展为详细、高质量的内容。
-
-<b>特点</b>：
-- <b>双核心风格</b>：支持自然语言式扩写和标签式扩写两种核心风格
-- <b>多平台支持</b>：支持OpenAI、Anthropic、Google、智谱AI、深度求索、硅基流动、月之暗面、稀宇科技、阿里云、OpenRouter、腾讯、英伟达等平台
-- <b>自定义提示词</b>：支持完全自定义系统提示词，满足个性化需求
-- <b>多语言输出</b>：支持中文和英文两种输出语言
-
-<br>
-<div align="left">
-<a href="images/Prompt Expander.jpg" target="_blank">
-<img src="images/Prompt Expander.jpg" alt="提示词扩写器" width="45%"/>
-</a>
-</div>
-</td>
-</tr>
 </table>
 
 ### 🖼️ 图像处理类节点
@@ -397,7 +380,7 @@
 <td>智能图像宽高比设置工具，支持多种预设模式和自定义尺寸配置。
 
 <b>特点</b>：
-- <b>多预设支持</b>：内置Qwen、Flux、Wan、SDXL、LTX2.3等主流模型的专用宽高比预设
+- <b>多预设支持</b>：内置Qwen、Flux、Flux.2、Flux2 klein、Wan、SDXL、LTX2.3、Z-image、Krea2、MiniMax H3等主流模型的专用宽高比预设
 - <b>自定义模式</b>：支持完全自定义的宽度和高度设置
 - <b>宽高比锁定</b>：提供宽高比锁定功能，修改一个维度时自动调整另一个维度
 - <b>尺寸互换</b>：一键互换宽高数值，方便调整横竖屏方向
@@ -515,6 +498,19 @@
 </div>
 </td>
 </tr>
+<tr>
+<td><b>图像编号看板</b><br><code>ImageIndexer</code></td>
+<td>
+把上游图像按顺序编号为「图1…图N」（英文界面为 Img 1…Img N），并在节点上以带编号的缩略图网格预览，图像本身原样透传、像素不做任何改动。编号顺序与下游多图节点（LM Studio 节点、图像理解在线版）展开图片的顺序一致，适合在写多图提示词时准确指代第几张图。
+
+<b>特点</b>：
+- <b>顺序对齐</b>：按下游展开后的单元顺序编号，批量张量会自动逐张拆开计数
+- <b>透传输出</b>：输出的图像与输入完全相同，可直接串接在任意下游节点之前
+- <b>缩略图预览</b>：点击缩略图打开放大查看器；最多预览前 32 张，超出部分仍照常计数与透传
+- <b>改选即预览</b>：上游接多媒体加载器时，改选图片立刻更新缩略图、无需先运行节点（标注「未运行」）；运行后切换为节点实际输出的预览。工作流重新加载时先摆上次运行的结果（高度与存档一致），等你改选再让实时预览接管
+
+</td>
+</tr>
 </table>
 
 ### 🎞️ 电影后期处理类节点
@@ -540,7 +536,6 @@
 </div>
 </td>
 </tr>
-
 <tr>
 <td><b>拉普拉斯锐化</b><br><code>LaplacianSharpen</code></td>
 <td>
@@ -632,7 +627,7 @@
 <tr>
 <td><b>Suno歌词生成器</b><br><code>SunoLyricsGenerator</code></td>
 <td>
-专业的AI歌词创作工具，基于在线LLM生成结构化的可演唱歌词，支持多种音乐风格和语言。
+把用户描述与主题、歌词语言、演唱编制、歌词风格、情绪、曲风等选项（可随机组合）拼装成一条带 Suno 段落标签格式要求的结构化创作指令，输出给 LLM 节点或 Suno 使用。节点本身完全本地运行，不联网。
 
 <br>
 <div align="left">
@@ -662,11 +657,8 @@
 计算音频文件的时长信息，输出秒数、格式化时间和毫秒数三种格式。
 
 <b>特点</b>：
-- <b>多格式输出</b>：同时输出秒数、格式化时间（HH:MM:SS.mmm）和毫秒数
-- <b>自动适配</b>：自动适配不同维度的音频张量
-- <b>精确计算</b>：基于采样率进行精确时长计算
-
-<br>
+- <b>格式化时间</b>：按 HH:MM:SS.mmm 输出，便于直接拼入提示词或文件名
+- <b>自动适配</b>：兼容不同维度的音频张量，基于采样率精确计算时长
 </td>
 </tr>
 </table>
@@ -679,126 +671,36 @@
 <th>功能描述</th>
 </tr>
 <tr>
-<td><b>Qwen3-VL基础版</b><br><code>Qwen3VLBasic</code></td>
+<td><b>图像理解在线版</b><br><code>ImageUnderstandingOnline</code></td>
 <td>
-基于阿里巴巴Qwen3-VL模型的基础视觉理解节点，提供简洁高效的图像和视频分析功能，支持多种模型版本和量化选项，为Qwen3-VL高级版简化而来的版本。
-
-<br>
-<div align="left">
-<a href="images/Qwen3-VL Basic.jpg" target="_blank">
-<img src="images/Qwen3-VL Basic.jpg" alt="Qwen3-VL基础版" width="45%"/>
-</a>
-</div>
-</td>
-</tr>
-
-<tr>
-<td><b>Qwen3-VL高级版</b><br><code>Qwen3VLAdvanced</code></td>
-<td>
-基于阿里巴巴Qwen3-VL模型的专业级视觉理解节点，集成众多预设提示词模板，支持智能批量处理、高级量化技术和思维链推理功能。提供从标签生成到创意分析的多种预设模式，具备解锁限制、多语言输出、批量处理等高级特性。
-
-**参数详解文档**：[Qwen3VL_Parameters_Guide.md](doc/Qwen3VL_Parameters_Guide.md)
-
-<br>
-<div align="left">
-<a href="images/Qwen3VL高级版.jpg" target="_blank">
-<img src="images/Qwen3VL高级版.jpg" alt="Qwen3-VL Advanced" width="45%"/>
-</a>
-</div>
-</td>
-</tr>
-<tr>
-<td><b>Qwen3-VL在线版</b><br><code>Qwen3VLAPI</code></td>
-<td>
-功能强大的云端视觉理解节点，支持多平台在线API调用和批量图像分析，提供丰富的模型选择和灵活的配置方式。
+通过 OpenAI 兼容的在线多模态接口进行图像理解的节点，可在通讯配置中预先设置多个平台，并在节点上直接切换。
 
 <b>支持平台</b>：
-- <b>硅基流动平台、魔搭社区平台、自定义API</b>
+- <b>任意 OpenAI 兼容接口（自定义配置）</b>
 
 <b>核心特点</b>：
 - <b>云端部署</b>：无需本地GPU，通过API调用云端模型
-- <b>双重配置模式</b>：平台预设和完全自定义两种模式
-- <b>批量处理</b>：支持文件夹批量处理，自动保存结果
+- <b>多平台配置</b>：最多预设 6 套自定义配置，平台切换在节点的下拉菜单中完成
+- <b>单图与多图</b>：可接单张图像，也可接图像列表；多张图片会全部合并进同一次请求（与 LM Studio 节点一致），适合差异比对等需要同时看到多图的场景
+- <b>文本提示词端口</b>：接入任意字符串输出后，连入的文本替换整个提示词区（预设、用户提示词与系统提示词全部忽略），面板的「提示词」卡片会整张锁定并提示「提示词由文本端口提供」（与 LM Studio 节点一致）
+- <b>纯文本可用</b>：不接图像端口时自动作为纯文本节点调用同一平台，提示词与采样参数照常生效
 - <b>模板分类</b>：与LM Studio节点共用的提示词模板支持单层分类，可筛选、新建、重命名与删除分类
-
-<br>
-<div align="left">
-<a href="images/Qwen3-VL API.jpg" target="_blank">
-<img src="images/Qwen3-VL API.jpg" alt="Qwen3-VL在线版" width="45%"/>
-</a>
-<a href="images/Qwen3-VL API2.jpg" target="_blank">
-<img src="images/Qwen3-VL API2.jpg" alt="Qwen3-VL在线版2" width="45%"/>
-</a>
-</div>
+- <b>批处理</b>：与LM Studio节点同一套批处理能力，只从「批处理路径」的文件夹读取图片，逐张请求并把结果写入图片同名的 <code>.txt</code>；支持「跳过重复」（已存在同名 txt 的图片直接跳过，便于断点续跑）；读取方式可在设置弹窗中切换「递归遍历模式」（一次性遍历所有子文件夹）与「顺序轮次模式」（按文件夹名称顺序依次处理，进度自动记录、中断后可从断点继续）；路径支持拖入文件夹、「设定」按钮选目录或手动输入
 </td>
 </tr>
 <tr>
-<td><b>Qwen3-VL额外选项</b><br><code>Qwen3VLExtraOptions</code></td>
+<td><b>LLM额外选项</b><br><code>LLMExtraOptions</code></td>
 <td>
-为Qwen3-VL节点提供详细的输出控制选项，包括人物信息、光照分析、相机角度、水印检测等高级配置参数。
+为LLM节点提供详细的输出控制选项，包括人物信息、光照分析、相机角度、水印检测等高级配置参数。
 
 <br>
 <div align="left">
-<a href="images/Qwen3VL额外选项.jpg" target="_blank">
-<img src="images/Qwen3VL额外选项.jpg" alt="Qwen3-VL Extra Options" width="45%"/>
+<a href="images/LLM额外选项.jpg" target="_blank">
+<img src="images/LLM额外选项.jpg" alt="LLM Extra Options" width="45%"/>
 </a>
 </div>
 </td>
 </tr>
-<tr>
-<td><b>Qwen3-VL图像加载器</b><br><code>ImageLoader</code></td>
-<td>
-专为Qwen3-VL优化的图像加载节点，支持多种图像格式和批量加载功能。
-
-<br>
-<div align="left">
-<a href="images/Qwen3-VL Image Loader.jpg" target="_blank">
-<img src="images/Qwen3-VL Image Loader.jpg" alt="Qwen3-VL Image Loader" width="45%"/>
-</a>
-</div>
-</td>
-</tr>
-<tr>
-<td><b>Qwen3-VL视频加载器</b><br><code>VideoLoader</code></td>
-<td>
-专为Qwen3-VL优化的视频加载节点，支持多种视频格式和帧提取功能。
-
-<br>
-<div align="left">
-<a href="images/Qwen3-VL Video Loader.jpg" target="_blank">
-<img src="images/Qwen3-VL Video Loader.jpg" alt="Qwen3-VL Video Loader" width="45%"/>
-</a>
-</div>
-</td>
-</tr>
-
-<tr>
-<td><b>Qwen3-VL多路径输入</b><br><code>MultiplePathsInput</code></td>
-<td>
-支持同时处理多个文件路径的输入节点，便于批量处理图像和视频文件。
-
-<br>
-<div align="left">
-<a href="images/Qwen3-VL Multiple Paths Input.jpg" target="_blank">
-<img src="images/Qwen3-VL Multiple Paths Input.jpg" alt="Qwen3-VL Multiple Paths Input" width="45%"/>
-</a>
-</div>
-</td>
-</tr>
-<tr>
-<td><b>Qwen3-VL路径切换器</b><br><code>PathSwitch</code></td>
-<td>
-双通道路径切换器，支持手动和自动两种切换模式。可在2个来自MultiplePathsInput节点的路径输入之间智能切换，支持注释标签便于管理。手动模式下可指定选择通道，自动模式下智能选择第一个非空输入，适用于工作流中的条件分支和动态切换。输出可直接连接到Qwen3-VL高级版的source_path输入。
-
-<br>
-<div align="left">
-<a href="images/Qwen3-VL Path Switch.jpg" target="_blank">
-<img src="images/Qwen3-VL Path Switch.jpg" alt="Qwen3-VL Path Switch" width="45%"/>
-</a>
-</div>
-</td>
-</tr>
-
 <tr>
 <td><b>Florence2 Plus</b><br><code>Florence2Plus</code></td>
 <td>
@@ -827,42 +729,6 @@
 </div>
 </td>
 </tr>
-
-<tr>
-<td><b>Sa2VA高级版</b><br><code>Sa2VAAdvanced</code></td>
-<td>
-基于字节跳动Sa2VA模型的专业级图像分割节点，提供精确的智能分割功能，支持多种模型版本和量化配置。通过自然语言提示词控制分割区域，实现对图像中特定对象的精准分割，输出高质量的遮罩数据。
-
-<b>核心功能</b>：
-- <b>智能分割</b>：基于自然语言提示词进行精确的图像对象分割
-- <b>多模型支持</b>：支持多种Sa2VA模型版本，包括InternVL3和Qwen系列
-- <b>量化优化</b>：提供4bit和8bit量化选项，优化性能和资源使用
-- <b>Flash Attention</b>：支持Flash Attention技术，提升推理效率
-- <b>模型管理</b>：内置模型下载和管理功能，支持本地缓存
-<br>
-<div align="left">
-<a href="images/Sa2VA Advanced1.jpg" target="_blank">
-<img src="images/Sa2VA Advanced1.jpg" alt="Sa2VA高级版-界面1" width="45%"/>
-</a>
-<a href="images/Sa2VA Advanced2.jpg" target="_blank">
-<img src="images/Sa2VA Advanced2.jpg" alt="Sa2VA高级版-界面2" width="45%"/>
-</a>
-</div>
-</td>
-</tr>
-<tr>
-<td><b>Sa2VA分割预设</b><br><code>Sa2VASegmentationPreset</code></td>
-<td>
-提供交互式分割预设选择的工具节点，可在界面中选择常见部位/对象并生成中文分割提示文本输出，用于驱动 Sa2VA 高级版的分割。将本节点的 <code>segmentation_preset</code> 输出连接到 Sa2VA 高级版的同名输入即可生效。若该输入为空，Sa2VA 高级版将改用字符串输入框中的 <code>segmentation_prompt</code>。
-
-<br>
-<div align="left">
-<a href="images/Sa2VA Segmentation Preset.jpg" target="_blank">
-<img src="images/Sa2VA Segmentation Preset.jpg" alt="Sa2VA分割预设" width="45%"/>
-</a>
-</div>
-</td>
-</tr>
 <tr>
 <td><b>LM Studio节点</b><br><code>LMStudioNode</code></td>
 <td>
@@ -880,12 +746,11 @@
 - <b>输出语言控制</b>：支持中文、英文、中英双语等多种输出语言
 - <b>模型自动发现</b>：自动获取LM Studio中已加载的模型列表
 - <b>模型刷新</b>：一键刷新按钮，当模型列表显示异常时可重新获取
-- <b>多图像输入</b>：画布上只需一个图像端口，每接一张会自动在尾部补下一个，最多同时接入 12 张进行单轮推理
+- <b>多图像输入</b>：画布上只有一个图像端口，接入多媒体加载器的图像输出（图像列表）即合成一次多图推理；接入数量由上游节点决定
+- <b>文本提示词端口</b>：接入任意文本输出后，提示词由连线内容提供，整组提示词功能区自动禁用
+- <b>模型卸载开关</b>：勾选 <code>unload_model</code> 后，推理结束自动卸载 LM Studio 中已加载的模型，释放显存
 - <b>推理日志面板</b>：实时显示推理日志，仅显示当前运行信息
 - <b>可视化设置</b>：提供状态设置界面，方便配置参数
-
-<b>配套节点</b>：
-- <b>LM Studio模型卸载</b>：一键卸载LM Studio中已加载的模型，释放显存
 
 <br>
 <div align="left">
@@ -992,12 +857,11 @@
 </a>
 </div></td>
 </tr>
-
 <tr>
 <td><b>多平台翻译</b><br><code>MultiPlatformTranslate</code></td>
 <td>
 
-多平台翻译节点，支持百度、阿里云、有道、智谱AI和免费翻译服务。用户可以通过配置管理界面设置各平台的API密钥，实现高质量的专业翻译服务。
+多平台翻译节点，支持百度、阿里云、有道、智谱AI和谷歌在线共5个平台。用户可以通过配置管理界面设置各平台的API密钥，实现高质量的专业翻译服务。
 
 <b>特点</b>：
 - <b>多平台支持</b>：支持主流翻译平台，满足不同需求
@@ -1022,20 +886,6 @@
 <b>特点</b>：
 - <b>独立控制</b>：三个清理功能配备独立开关，可单独或组合使用
 - <b>详细报告</b>：输出清理过程的详细报告，便于监控资源释放情况
-
-</td>
-</tr>
-<tr>
-<td><b>工作流暂停器</b><br><code>PauseWorkflow</code></td>
-<td>
-
-智能工作流控制节点，可在任意位置暂停工作流执行，等待用户交互后继续或取消执行。
-
-<b>特点</b>：
-- <b>通用输入</b>：支持任意类型的数据输入和输出，可插入工作流的任何位置
-- <b>交互式控制</b>：提供继续和取消两个操作选项
-- <b>状态管理</b>：智能管理每个节点实例的暂停状态
-- <b>异常处理</b>：取消时抛出中断异常，安全终止工作流
 
 </td>
 </tr>
@@ -1110,6 +960,33 @@
 </div>
 </td>
 </tr>
+<tr>
+<td><b>多媒体加载器</b><br><code>MultimediaAdvancedLoader</code></td>
+<td>
+
+以缩略图网格管理 `input` 目录中的图片、视频与音频素材，可视化挑选后输出给下游节点。
+
+<b>核心功能</b>：
+- <b>三种素材</b>：图片、视频与音频统一在一个网格界面中浏览与选择
+- <b>载入模式</b>：默认载入全部素材并输出 MiniMax H3 媒体包端口；切到「仅图片」则隐藏音频与视频，只输出图像端口
+- <b>输出方式</b>：支持「点击选中」（仅输出选中项）与「智能编号」（全部按编号顺序输出）
+- <b>对接下游</b>：媒体输出可直连 LM Studio 节点与图像理解在线版节点的图像/媒体端口
+
+</td>
+</tr>
+<tr>
+<td><b>视频预览</b><br><code>VideoPreview</code></td>
+<td>
+
+接收上游视频并在节点上直接播放，无需先保存到输出目录即可预览结果。
+
+<b>核心功能</b>：
+- <b>节点内播放</b>：视频直接在节点面板中播放，省去写入输出目录的步骤
+- <b>无损封装</b>：视频仅做无损封装写入 temp 目录，并在多次执行间复用，不解码视频帧
+- <b>原样透传</b>：输出端口原样传递视频，可继续接入保存视频等下游节点
+
+</td>
+</tr>
 </table>
 
 ---
@@ -1120,7 +997,7 @@
 
 1. 安装 [ComfyUI Manager](https://github.com/ltdrdata/ComfyUI-Manager)
 2. 在 Manager 菜单中选择 "Install Custom Nodes"
-3. 搜索 `zhihui_nodes_comfyui` 并点击 "Install" 按钮
+3. 搜索 `zhiai_nodes_comfyui` 并点击 "Install" 按钮
 4. 等待安装完成后重启 ComfyUI，即可在节点菜单中找到新添加的节点
 
 ### 🔧 方式二：通过 Git 安装
@@ -1128,7 +1005,7 @@
 进入 ComfyUI 的 `custom_nodes` 目录，执行以下命令：
 
 ```bash
-git clone https://github.com/ZhiHui6/zhihui_nodes_comfyui.git
+git clone https://github.com/ZhiHui6/zhiai_nodes_comfyui.git
 ```
 
 重启 ComfyUI 即可使用。
@@ -1136,26 +1013,50 @@ git clone https://github.com/ZhiHui6/zhihui_nodes_comfyui.git
 ### 📁 方式三：手动安装
 
 1. 下载本仓库的 ZIP 文件并解压
-2. 将整个 `zhihui_nodes_comfyui` 文件夹复制到 ComfyUI 的 `custom_nodes` 目录下
+2. 将整个 `zhiai_nodes_comfyui` 文件夹复制到 ComfyUI 的 `custom_nodes` 目录下
 3. 重启 ComfyUI
 
 ---
 
+### 🧭 节点菜单位置
+
+安装后所有节点都在右键菜单的 **Zhi.AI** 顶级分类下，按用途分为 Text（文本）、Generator（生成器）、Image（图像）、MovieTools（影视工具）、Video（视频）、Loaders（加载器）、Latent（潜空间）、Toolkit（工具箱）、Utility（实用工具）、Audio（音频）、LM Studio、Image Understanding（图像理解）、Florence2、LLM Extra Options（LLM 扩展选项）等子菜单；子菜单名跟随 ComfyUI 界面语言切换，LM Studio、Florence2 等产品名保持原样。新增或更新节点包后需要重启 ComfyUI 才会完成注册。
+
+### 🔑 首次使用配置
+
+- **联网需求**：翻译、AI 扩写、在线图像理解会调用远端接口；文本处理、图像与 Latent 类节点完全本地运行。
+- **LLM 平台密钥**：打开 ComfyUI 的「设置」面板 → **ZhiAI** → 点击「📝 API 设置」，即可为 OpenAI、Google、ZhipuAI、DeepSeek、SiliconFlow、MoonshotAI、MiniMax、Alibaba、VolcEngine、Tencent、ModelScope、NVIDIA 以及自定义接口填写 API Key、Base URL 与模型名称，并支持测试连接。标签选择器的 AI 扩写直接读取这套配置（`platform` 选择 auto 时自动挑用可用平台），图像理解在线版的接口配置也与之共用同一份存储。
+- **翻译平台密钥**：在「多平台翻译」节点上点击「⚙️ 配置管理」按钮，分别填写百度、阿里云、有道、智谱AI、谷歌在线的密钥。
+- **LM Studio**：需要本机运行 LM Studio 并开启本地服务器（默认端口 1234），详见上文该节点的「前置要求」。
+- **Florence2 Plus**：首次运行会按所选型号从 HuggingFace 或 ModelScope 下载模型权重，请预留磁盘空间与网络。
+
 ### 📋 依赖项
 
-本节点集大部分功能无需额外依赖，开箱即用。部分在线功能（如翻译、提示词优化）需要网络连接。
-
-如需手动安装依赖，可执行：
+通过 ComfyUI Manager 安装时依赖会自动安装；手动部署时执行：
 
 ```bash
 pip install -r requirements.txt
 ```
+
+各依赖的用途如下：
+
+- **opencv-python**：颜色移除、图像旋转工具、视频帧提取器、LM Studio 节点
+- **scikit-image**：色彩匹配
+- **transformers / huggingface_hub / modelscope / timm / einops**：Florence2 Plus
+- **openai**：图像理解在线版
+- **nvidia-ml-py**：预留显存设置器（需要 NVIDIA 驱动）
+- **cryptography**：标签选择器角色提取器内置数据的解密读取
+
+## 📄 许可证
+
+本项目基于 **GPL-3.0** 许可证开源，完整条款见 [LICENSE](LICENSE)。
+
 ## 🤝 贡献指南
 
-我们欢迎各种形式的贡献，包括但不限于：
-<div align="left">
-[🔴报告问题和提出建议 ] | [💡提交功能请求] | [📚改进文档] | [💻提交代码贡献]<br>
+我们欢迎各种形式的贡献：
 
-</div>
+- 🐛 [报告问题](https://github.com/ZhiHui6/zhiai_nodes_comfyui/issues/new?labels=bug)
+- 💡 [提出功能建议](https://github.com/ZhiHui6/zhiai_nodes_comfyui/issues/new?labels=enhancement)
+- 📚 改进文档、💻 提交代码：直接开 [Pull Request](https://github.com/ZhiHui6/zhiai_nodes_comfyui/compare)
 
 如果您有任何想法或建议，请随时提出 Issue 或 Pull Request。

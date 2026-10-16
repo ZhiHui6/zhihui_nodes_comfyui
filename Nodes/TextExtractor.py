@@ -17,7 +17,7 @@ class TextExtractor:
     RETURN_NAMES = ("text_output",)
     FUNCTION = "extract_text"
     CATEGORY = "Zhi.AI/Text"
-    DESCRIPTION = "Text Extractor: Extracts specific content from text based on the selected extraction type. Supports Chinese extraction (extracts all Chinese characters, punctuation and numbers) and English extraction (extracts all English characters, punctuation and numbers), suitable for multilingual text processing and content separation."
+    DESCRIPTION = "Keeps only the Chinese or English content (characters, punctuation and numbers) picked by the extraction type."
 
     def extract_text(self, text_input, extraction_type):
         if extraction_type == "zh":

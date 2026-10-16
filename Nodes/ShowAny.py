@@ -25,8 +25,8 @@ class ShowAny:
     
     RETURN_TYPES = ("STRING",)
     FUNCTION = "notify"
-    CATEGORY = "Zhi.AI/Text"
-    DESCRIPTION = "Text Display: Used to display text content in the ComfyUI interface. Can receive any text input and display it visually on the node interface, convenient for debugging and viewing text processing results."
+    CATEGORY = "Zhi.AI/Toolkit"
+    DESCRIPTION = "Displays content of any type directly on the node for debugging and preview."
 
     def _to_text(self, value):
         if value is None:

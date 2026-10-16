@@ -26,7 +26,7 @@ class FilmGrain:
     RETURN_NAMES = ("image_output",)
     FUNCTION = "apply_grain"
     CATEGORY = "Zhi.AI/MovieTools"
-    DESCRIPTION = "Film Grain Effect: Adds film grain texture to images, simulating the visual effect of traditional film photography. Supports adjusting grain strength, saturation blend ratio, and choosing between Gaussian or uniform grain distribution types. Suitable for cinematic post-processing."
+    DESCRIPTION = "Adds film grain texture to images, with adjustable strength, saturation blend and grain distribution."
 
     def apply_grain(self, input_image=None, grain_strength=0.04, saturation_blend=0.5, grain_distribution=None, switch=True):
         if not switch:

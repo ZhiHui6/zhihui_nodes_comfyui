@@ -20,7 +20,7 @@ class PromptDelete:
     FUNCTION = "delete_text"
     OUTPUT_NODE = False
     CATEGORY = "Zhi.AI/Text"
-    DESCRIPTION = "Prompt Deletion: Search and delete text with up to 10 search strings. Optional auto-formatting."
+    DESCRIPTION = "Searches and deletes up to 10 strings from text, with optional auto-formatting."
 
     def delete_text(self, text_input, inputcount, auto_format=False, **kwargs):
         if text_input is None:
@@ -33,7 +33,6 @@ class PromptDelete:
             inputcount = 0
         inputcount = max(0, min(10, inputcount))
         
-        # Deletion logic
         for i in range(1, inputcount + 1):
             find_key = f"find_{i}"
             find_val = kwargs.get(find_key, "")

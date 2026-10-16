@@ -2,9 +2,13 @@
 
 # 🎨 Zhi.AI ComfyUI Node Pack 
 
+<p align="center">
+  <img src="icon.png" alt="Zhi.AI ComfyUI Node Pack" width="180"/>
+</p>
+
 ## 📖 Project Introduction
 
-This is a ComfyUI custom node tool collection carefully created by **Binity**, designed to provide users with a series of practical and efficient nodes to enhance and extend ComfyUI's functionality. This node collection contains 55+ functional nodes, covering text processing, prompt optimization, image processing, translation tools, music creation assistance, AI vision understanding, Latent processing, and other aspects, providing comprehensive support for your AI creation.
+This is a ComfyUI custom node tool collection carefully created by **Binity**, designed to provide users with a series of practical and efficient nodes to enhance and extend ComfyUI's functionality. This node collection contains 56 functional nodes, covering text processing, prompt optimization, image processing, translation tools, music creation assistance, AI vision understanding, Latent processing, and other aspects, providing comprehensive support for your AI creation.
 
 ***If this project helps you, please give us a ⭐Star! Your support is our motivation for continuous improvement.***
 
@@ -15,7 +19,7 @@ The node pack ships with its own Chinese/English dictionary and follows ComfyUI'
 
 ### **Core Functionality Features**
 
-- 🔄 **Multi-Engine Translation Nodes**: Integrates 5 major translation platforms including Baidu, Tencent, Youdao, Google, and free online services, supporting Chinese-English mutual translation with automatic input language detection and flexible platform switching.
+- 🔄 **Multi-Engine Translation Nodes**: Integrates 5 major translation platforms including Baidu, Alibaba Cloud, Youdao, Zhipu AI and Google, supporting Chinese-English mutual translation with automatic input language detection and flexible platform switching.
 
 - 📝 **Comprehensive Text Processing**: Provides text operation nodes including multi-line text editing, text merging and separation, content extraction and modification, and language filtering.
 
@@ -33,23 +37,25 @@ The node pack ships with its own Chinese/English dictionary and follows ComfyUI'
 <th width="19%">Category</th>
 <th width="51%">Core Functionality</th>
 </tr>
-
 <tr>
 <td><b>TagSelector</b><br><b>Tag Selector</b><br><code>TagSelector</code></td>
 <td>Prompt Processing</td>
 <td>A new generation of intelligent tag management system, providing a visual tag selection interface, supporting custom tag management and intelligent search functions. Rich in categories, covering numerous professional tags such as image quality, photography, and artistic styles.</td>
 </tr>
-
 <tr>
 <td><b>Photography Prompt Generator</b><br><code>PhotographPromptGenerator</code></td>
 <td>Prompt Processing</td>
-<td>Professional photography-style prompt generator, covering 16 dimensions including characters, scenes, lenses, lighting, and clothing. Supports output mode switching (tag combination/template text), integrated AI expansion function. Equipped with user-defined option extension and template editing assistant interface.</td>
+<td>Professional photography-style prompt generator, covering 32 dimensions including characters, scenes, lenses, lighting, and clothing. Supports tag-combination and template-text output modes plus random selection for more variety. Equipped with user-defined option extension and template editing assistant interface.</td>
 </tr>
-
 <tr>
 <td><b>LM Studio Node</b><br><code>LMStudioNode</code></td>
 <td>AI Vision Understanding</td>
 <td>A vision understanding node that connects to a local LM Studio server, supporting image analysis and text generation. Enables private image analysis using locally deployed models without cloud APIs. Supports multiple preset templates, output language control, and multi-image input.</td>
+</tr>
+<tr>
+<td><b>Image Understanding Online</b><br><code>ImageUnderstandingOnline</code></td>
+<td>AI Vision Understanding</td>
+<td>Image understanding through any OpenAI-compatible online multimodal endpoint — no local GPU required. Preconfigure up to 6 platform profiles and switch between them directly from the node's dropdown. Handles single or multiple images, lets a text prompt port take over the whole prompt section, runs as a plain text node when no image is docked, and shares the LM Studio node's prompt template categories and batch processing.</td>
 </tr>
 </table>
 
@@ -95,6 +101,7 @@ This node collection contains numerous nodes with different functionalities, div
 </div>
 </td>
 </tr>
+<tr>
 <td><b>Prompt Merger (with comments)</b><br><code>TextCombinerNode</code></td>
 <td>Merges two text inputs, with independent switches to control the output of each text, and includes comment functionality. Can be used to dynamically combine different prompt parts, flexibly building complete prompts.
 
@@ -136,7 +143,6 @@ This node collection contains numerous nodes with different functionalities, div
 </a>
 </div></td>
 </tr>
-
 <tr>
 <td><b>Prompt Delete</b><br><code>PromptDelete</code></td>
 <td>Prompt Deletion Node: Supports dynamic number of search and delete operations, suitable for batch deleting unwanted trigger words, style words, or model-related text. Also supports auto-formatting to clean up residual symbols.
@@ -148,7 +154,6 @@ This node collection contains numerous nodes with different functionalities, div
 </div>
 </td>
 </tr>
-
 <tr>
 <td><b>Prompt Replace</b><br><code>PromptReplace</code></td>
 <td>Prompt replacement node: supports a dynamic number of find/replace operations, suitable for batch replacing trigger words, style terms, or model-related text.
@@ -218,12 +223,11 @@ This node collection contains numerous nodes with different functionalities, div
 <td><b>Photography Prompt Generator</b><br><code>PhotographPromptGenerator</code></td>
 <td>
 
-Professional photography prompt generator with 16 customizable dimensions (camera, lens, lighting, pose, clothing, etc.). Features dual output modes - Tags for tag combinations and Template for formatted text. Includes AI-powered prompt expansion with independent system prompts for each mode. Supports custom user options and template editing helper.
+Professional photography prompt generator with 32 customizable dimensions (camera, lens, lighting, pose, clothing, etc.). Features dual output modes - Tags for tag combinations and Template for formatted text. Supports custom user options and template editing helper.
 
 <b>Features</b>:
-- 16 professional photography dimensions including character, clothing, camera, lens, lighting, and more
+- 32 professional photography dimensions including character, clothing, camera, lens, lighting, and more
 - Dual output modes: Tags (comma-separated) and Template (formatted text)
-- AI-powered expansion with mode-specific system prompts for optimal results
 - User-defined options support for flexible customization
 - Built-in template editor helper for easy template creation and management
 - Random selection option for creative inspiration
@@ -250,7 +254,6 @@ A comprehensive prompt generator written based on WanXiang 2.2 official document
 <b>Features</b>:
 - <b>Dual Mode Switching</b>: Supports custom combination and preset combination modes, switchable with one click
 - <b>Multi-dimensional Selection</b>: Covers 17 professional dimensions including subject type, scene type, light source type, light type, time period, shot size, composition, lens focal length, camera angle, lens type, color tone, camera movement, character emotion, motion type, visual style, special effects shots, and action poses
-- <b>Intelligent Expansion</b>: Supports multiple LLM models for free online expansion
 
 <div align="left">
 <a href="images/万相视频提示词生成器.jpg" target="_blank">
@@ -259,7 +262,6 @@ A comprehensive prompt generator written based on WanXiang 2.2 official document
 </div>
 </td>
 </tr>
-
 <tr>
 <td><b>Prompt Preset - Single Choice</b><br><code>PromptPresetOneChoice</code></td>
 <td>Provides 6 preset options, allowing users to conveniently switch between different presets. Suitable for saving commonly used prompt templates and quickly applying them to different scenarios.
@@ -292,6 +294,7 @@ A comprehensive prompt generator written based on WanXiang 2.2 official document
 <img src="images/触发词合并器.jpg" alt="Trigger Word Merger" width="45%"/>
 </a>
 </div>
+</td>
 </tr>
 <tr>
 <td><b>System Prompt Loader</b><br><code>SystemPromptLoader</code></td>
@@ -303,7 +306,6 @@ A comprehensive prompt generator written based on WanXiang 2.2 official document
 </div>
 </td>
 </tr>
-
 <tr>
 <td><b>Extra Options List</b><br><code>ExtraOptions</code></td>
 <td>A universal extra options list, similar to JoyCaption's design, with a master switch and independent prompt input box. Suitable for adding auxiliary prompts or control parameters, enhancing workflow flexibility.<br><br>
@@ -351,24 +353,6 @@ A comprehensive prompt generator written based on WanXiang 2.2 official document
 </div>
 </td>
 </tr>
-<tr>
-<td><b>Prompt Expander</b><br><code>PromptExpander</code></td>
-<td>Uses AI large models to expand short prompts into detailed, high-quality content.
-
-<b>Features</b>:
-- <b>Dual Core Styles</b>: Supports natural language expansion and tag-based expansion
-- <b>Multi-Platform Support</b>: Supports OpenAI, Anthropic, Google, Zhipu AI, DeepSeek, SiliconFlow, Moonshot, Minimax, Alibaba Cloud, OpenRouter, Tencent, NVIDIA platforms
-- <b>Custom Prompts</b>: Supports fully customizable system prompts for personalized needs
-- <b>Multi-Language Output</b>: Supports Chinese and English output languages
-
-<br>
-<div align="left">
-<a href="images/Prompt Expander.jpg" target="_blank">
-<img src="images/Prompt Expander.jpg" alt="Prompt Expander" width="45%"/>
-</a>
-</div>
-</td>
-</tr>
 </table>
 
 ### 🖼️ Image Processing Nodes
@@ -395,7 +379,7 @@ A comprehensive prompt generator written based on WanXiang 2.2 official document
 <td>Intelligent image aspect ratio setting tool, supporting multiple preset modes and custom size configurations.
 
 <b>Features</b>:
-- <b>Multiple Preset Support</b>: Built-in dedicated aspect ratio presets for mainstream models such as Qwen, Flux, Wan, SDXL, and LTX2.3
+- <b>Multiple Preset Support</b>: Built-in dedicated aspect ratio presets for mainstream models such as Qwen, Flux, Flux.2, Flux2 klein, Wan, SDXL, LTX2.3, Z-image, Krea2 and MiniMax H3
 - <b>Custom Mode</b>: Supports completely custom width and height settings
 - <b>Aspect Ratio Lock</b>: Provides aspect ratio locking function, automatically adjusting one dimension when modifying the other
 - <b>Size Swap</b>: One-click swap width and height values for easy portrait/landscape orientation adjustment
@@ -513,6 +497,19 @@ Batch loads image files from a specified directory, supporting multiple sorting 
 </div>
 </td>
 </tr>
+<tr>
+<td><b>Image Indexer</b><br><code>ImageIndexer</code></td>
+<td>
+Labels upstream images as Img 1…Img N (图1…图N in the Chinese UI) and previews them as a numbered thumbnail grid on the node, while passing the images through unchanged. The numbering follows exactly the order downstream multi-image nodes expand, so a prompt can refer to "the third image" without guessing.
+
+<b>Features</b>:
+- <b>Order Alignment</b>: numbers each unit in the downstream expansion order, splitting batch tensors image by image
+- <b>Pass-through Output</b>: output images are the same tensors as the input, so the node can be inserted anywhere before a consumer
+- <b>Thumbnail Preview</b>: click a tile to open the zoom viewer; the first 32 images get previews while every image is still counted and passed through
+- <b>Live Selection Preview</b>: with the Multimedia Loader upstream, changing the selection updates the grid right away without running the graph (marked "not run"); a run then switches it to the node's actual output. Reloading a workflow shows the last run's result first (keeping the saved height) until you change the selection
+
+</td>
+</tr>
 </table>
 
 ### 🎞️ Film Post-Processing Nodes
@@ -538,7 +535,6 @@ Adds realistic film grain effects to images, creating a classic film texture.
 </div>
 </td>
 </tr>
-
 <tr>
 <td><b>Laplacian Sharpening</b><br><code>LaplacianSharpen</code></td>
 <td>
@@ -638,7 +634,7 @@ Professional video frame extraction tool that supports extracting a specified nu
 <tr>
 <td><b>Suno Lyrics Generator</b><br><code>SunoLyricsGenerator</code></td>
 <td>
-Professional AI lyrics creation tool that generates structured singable lyrics based on online LLMs, supporting multiple music styles and languages.
+Assembles the user's description with theme, lyrics language, vocal arrangement, lyrics style, mood and genre choices (randomizable) into one structured songwriting instruction that carries the Suno section-tag format rules, ready to feed an LLM node or Suno. The node itself runs fully offline.
 
 <br>
 <div align="left">
@@ -668,11 +664,8 @@ Professional song style prompt generation tool that combines user preferences an
 Calculates audio file duration information, outputting seconds, formatted time, and milliseconds.
 
 <b>Features</b>:
-- <b>Multi-Format Output</b>: Simultaneously outputs seconds, formatted time (HH:MM:SS.mmm), and milliseconds
-- <b>Auto-Adaptation</b>: Automatically adapts to audio tensors of different dimensions
-- <b>Precise Calculation</b>: Precise duration calculation based on sample rate
-
-<br>
+- <b>Formatted Time</b>: outputs HH:MM:SS.mmm, ready to paste into a prompt or file name
+- <b>Auto-Adaptation</b>: handles audio tensors of different dimensions and computes duration precisely from the sample rate
 </td>
 </tr>
 </table>
@@ -685,125 +678,36 @@ Calculates audio file duration information, outputting seconds, formatted time, 
 <th>Function Description</th>
 </tr>
 <tr>
-<td><b>Qwen3-VL Basic</b><br><code>Qwen3VLBasic</code></td>
+<td><b>Image Understanding Online</b><br><code>ImageUnderstandingOnline</code></td>
 <td>
-Basic vision understanding node based on Alibaba's Qwen3-VL model, providing concise and efficient image and video analysis functions, supporting multiple model versions and quantization options, a simplified version of Qwen3-VL Advanced.
-
-<br>
-<div align="left">
-<a href="images/Qwen3-VL Basic.jpg" target="_blank">
-<img src="images/Qwen3-VL Basic.jpg" alt="Qwen3-VL Basic" width="45%"/>
-</a>
-</div>
-</td>
-</tr>
-
-<tr>
-<td><b>Qwen3-VL Advanced</b><br><code>Qwen3VLAdvanced</code></td>
-<td>
-Professional-grade vision understanding node based on Alibaba's Qwen3-VL model, integrating numerous preset prompt templates, supporting intelligent batch processing, advanced quantization techniques, and chain-of-thought reasoning functions. Provides various preset modes from tag generation to creative analysis, with advanced features such as limit unlocking, multi-language output, and batch processing.
-
-**Parameter Details Document**: [Qwen3VL_Parameters_Guide.md](doc/Qwen3VL_Parameters_Guide.md)
-
-<br>
-<div align="left">
-<a href="images/Qwen3VL高级版.jpg" target="_blank">
-<img src="images/Qwen3VL高级版.jpg" alt="Qwen3-VL Advanced" width="45%"/>
-</a>
-</div>
-</td>
-</tr>
-<tr>
-<td><b>Qwen3-VL Online</b><br><code>Qwen3VLAPI</code></td>
-<td>
-Powerful cloud-based vision understanding node, supporting multi-platform online API calls and batch image analysis, providing rich model selection and flexible configuration methods.
+Image understanding node that calls any OpenAI-compatible online multimodal endpoint. Configure several platforms in the communication settings and switch between them right on the node.
 
 <b>Supported Platforms</b>:
-- <b>SiliconFlow Platform, ModelScope Platform, Custom API</b>
+- <b>Any OpenAI-compatible endpoint (custom configurations)</b>
 
 <b>Core Features</b>:
 - <b>Cloud Deployment</b>: No local GPU required, calls cloud models through API
-- <b>Dual Configuration Modes</b>: Platform presets and fully custom modes
-- <b>Batch Processing</b>: Supports folder batch processing with automatic result saving
+- <b>Multiple Platforms</b>: Up to 6 custom configurations, switched from a dropdown on the node
+- <b>Single & Multiple Images</b>: Takes one image or an image list; multiple images are all merged into a single request (consistent with the LM Studio node), ideal for difference analysis where every image must be seen at once
+- <b>Text Prompt Port</b>: Dock any string output and the linked text replaces the entire prompt section (preset, user prompt and system prompt are all ignored); the panel's Prompt card locks as a whole and shows "Prompt supplied by the text port" (consistent with the LM Studio node)
+- <b>Text-only Capable</b>: With no image docked it automatically runs as a plain text node against the same platform, honouring the prompt and sampling parameters
 - <b>Template Categories</b>: Prompt templates shared with the LM Studio node support single-level categories — filter, create, rename and delete them
-
-<br>
-<div align="left">
-<a href="images/Qwen3-VL API.jpg" target="_blank">
-<img src="images/Qwen3-VL API.jpg" alt="Qwen3-VL Online" width="45%"/>
-</a>
-<a href="images/Qwen3-VL API2.jpg" target="_blank">
-<img src="images/Qwen3-VL API2.jpg" alt="Qwen3-VL Online2" width="45%"/>
-</a>
-</div>
+- <b>Batch Processing</b>: The same batch capability as the LM Studio node — reads images only from the folder set in "Batch Folder", sends one request per image and writes each result to a <code>.txt</code> next to the image. "Skip Existing" skips images that already have a txt file, which makes resuming easy. The read mode is switchable in the settings dialog between "Recursive Mode" (traverse all subfolders at once) and "Sequential Mode" (process folders in order by name, with progress persisted so an interrupted run continues from where it stopped). The path can be set by dragging a folder onto the field, clicking "Set" to pick a directory, or typing it manually
 </td>
 </tr>
 <tr>
-<td><b>Qwen3-VL Extra Options</b><br><code>Qwen3VLExtraOptions</code></td>
+<td><b>LLM Extra Options</b><br><code>LLMExtraOptions</code></td>
 <td>
-Provides detailed output control options for Qwen3-VL nodes, including advanced configuration parameters such as character information, lighting analysis, camera angles, and watermark detection.
+Provides detailed output control options for LLM nodes, including advanced configuration parameters such as character information, lighting analysis, camera angles, and watermark detection.
 
 <br>
 <div align="left">
-<a href="images/Qwen3VL额外选项.jpg" target="_blank">
-<img src="images/Qwen3VL额外选项.jpg" alt="Qwen3-VL Extra Options" width="45%"/>
+<a href="images/LLM额外选项.jpg" target="_blank">
+<img src="images/LLM额外选项.jpg" alt="LLM Extra Options" width="45%"/>
 </a>
 </div>
 </td>
 </tr>
-<tr>
-<td><b>Qwen3-VL Image Loader</b><br><code>ImageLoader</code></td>
-<td>
-Image loading node optimized for Qwen3-VL, supporting multiple image formats and batch loading functionality.
-
-<br>
-<div align="left">
-<a href="images/Qwen3-VL Image Loader.jpg" target="_blank">
-<img src="images/Qwen3-VL Image Loader.jpg" alt="Qwen3-VL Image Loader" width="45%"/>
-</a>
-</div>
-</td>
-</tr>
-<tr>
-<td><b>Qwen3-VL Video Loader</b><br><code>VideoLoader</code></td>
-<td>
-Video loading node optimized for Qwen3-VL, supporting multiple video formats and frame extraction functionality.
-
-<br>
-<div align="left">
-<a href="images/Qwen3-VL Video Loader.jpg" target="_blank">
-<img src="images/Qwen3-VL Video Loader.jpg" alt="Qwen3-VL Video Loader" width="45%"/>
-</a>
-</div>
-</td>
-</tr>
-<tr>
-<td><b>Qwen3-VL Multiple Paths Input</b><br><code>MultiplePathsInput</code></td>
-<td>
-Input node supporting simultaneous processing of multiple file paths, facilitating batch processing of image and video files.
-
-<br>
-<div align="left">
-<a href="images/Qwen3-VL Multiple Paths Input.jpg" target="_blank">
-<img src="images/Qwen3-VL Multiple Paths Input.jpg" alt="Qwen3-VL Multiple Paths Input" width="45%"/>
-</a>
-</div>
-</td>
-</tr>
-<tr>
-<td><b>Qwen3-VL Path Switch</b><br><code>PathSwitch</code></td>
-<td>
-Dual-channel path switcher, supporting both manual and automatic switching modes. Can intelligently switch between two path inputs from MultiplePathsInput nodes, supports comment labels for easy management. In manual mode, you can specify the selected channel; in automatic mode, it intelligently selects the first non-empty input, suitable for conditional branching and dynamic switching in workflows. Output can be directly connected to the source_path input of Qwen3-VL Advanced.
-
-<br>
-<div align="left">
-<a href="images/Qwen3-VL Path Switch.jpg" target="_blank">
-<img src="images/Qwen3-VL Path Switch.jpg" alt="Qwen3-VL Path Switch" width="45%"/>
-</a>
-</div>
-</td>
-</tr>
-
 <tr>
 <td><b>Florence2 Plus</b><br><code>Florence2Plus</code></td>
 <td>
@@ -832,42 +736,6 @@ Professional image analysis node based on Microsoft's Florence-2 vision understa
 </div>
 </td>
 </tr>
-
-<tr>
-<td><b>Sa2VA Advanced</b><br><code>Sa2VAAdvanced</code></td>
-<td>
-Professional-grade image segmentation node based on ByteDance's Sa2VA model, providing precise intelligent segmentation functionality, supporting multiple model versions and quantization configurations. Controls segmentation regions through natural language prompts, achieving precise segmentation of specific objects in images, outputting high-quality mask data.
-
-<b>Core Functions</b>:
-- <b>Intelligent Segmentation</b>: Precise image object segmentation based on natural language prompts
-- <b>Multi-model Support</b>: Supports multiple Sa2VA model versions, including InternVL3 and Qwen series
-- <b>Quantization Optimization</b>: Provides 4bit and 8bit quantization options to optimize performance and resource usage
-- <b>Flash Attention</b>: Supports Flash Attention technology to improve inference efficiency
-- <b>Model Management</b>: Built-in model download and management functions, supporting local caching
-<br>
-<div align="left">
-<a href="images/Sa2VA Advanced1.jpg" target="_blank">
-<img src="images/Sa2VA Advanced1.jpg" alt="Sa2VA Advanced-Interface1" width="45%"/>
-</a>
-<a href="images/Sa2VA Advanced2.jpg" target="_blank">
-<img src="images/Sa2VA Advanced2.jpg" alt="Sa2VA Advanced-Interface2" width="45%"/>
-</a>
-</div>
-</td>
-</tr>
-<tr>
-<td><b>Sa2VA Segmentation Preset</b><br><code>Sa2VASegmentationPreset</code></td>
-<td>
-An interactive segmentation preset selection tool node that allows selecting common parts/objects in the interface and generating Chinese segmentation prompt text output to drive Sa2VA Advanced segmentation. Connect the <code>segmentation_preset</code> output of this node to the same-name input of Sa2VA Advanced to take effect. If this input is empty, Sa2VA Advanced will use the <code>segmentation_prompt</code> from the string input box instead.
-
-<br>
-<div align="left">
-<a href="images/Sa2VA Segmentation Preset.jpg" target="_blank">
-<img src="images/Sa2VA Segmentation Preset.jpg" alt="Sa2VA Segmentation Preset" width="45%"/>
-</a>
-</div>
-</td>
-</tr>
 <tr>
 <td><b>LM Studio Node</b><br><code>LMStudioNode</code></td>
 <td>
@@ -885,7 +753,9 @@ A vision understanding node that connects to a local LM Studio server, supportin
 - <b>Output Language Control</b>: Supports Chinese, English, and bilingual output
 - <b>Auto Model Discovery</b>: Automatically fetches loaded model list from LM Studio
 - <b>Model Refresh</b>: One-click refresh button to reload model list when display issues occur
-- <b>Multi-Image Input</b>: one image socket on the canvas — a spare port appears after each image you connect, up to 12 images per run
+- <b>Multi-Image Input</b>: a single image socket on the canvas — dock the Multimedia Loader's image output (an image list) and it becomes one multi-image prompt; the count is decided upstream
+- <b>Text Prompt Port</b>: dock any string output to it and the linked text becomes the prompt — the whole prompt section is disabled
+- <b>Model Unload Switch</b>: tick <code>unload_model</code> to unload the loaded model automatically after inference and free the VRAM
 - <b>Inference Log Panel</b>: Displays real-time inference logs with current run information only
 - <b>Visual Settings</b>: Provides status settings interface for easy parameter configuration
 
@@ -982,12 +852,11 @@ A new generation of intelligent tag management system, integrating massive prese
 </a>
 </div></td>
 </tr>
-
 <tr>
 <td><b>Multi-Platform Translation</b><br><code>MultiPlatformTranslate</code></td>
 <td>
 
-Multi-platform translation node, supporting Baidu, Alibaba Cloud, Youdao, Zhipu AI, and free translation services. Users can set API keys for each platform through the configuration management interface to achieve high-quality professional translation services.
+Multi-platform translation node, supporting Baidu, Alibaba Cloud, Youdao, Zhipu AI and Google — 5 platforms in total. Users can set API keys for each platform through the configuration management interface to achieve high-quality professional translation services.
 
 <b>Features</b>:
 - <b>Multi-platform Support</b>: Supports mainstream translation platforms to meet different needs
@@ -1049,20 +918,6 @@ Text encoder release tool that unloads the connected CLIP (text encoder) from VR
 </td>
 </tr>
 <tr>
-<td><b>Workflow Pauser</b><br><code>PauseWorkflow</code></td>
-<td>
-
-Intelligent workflow control node that can pause workflow execution at any position, waiting for user interaction to continue or cancel execution.
-
-<b>Features</b>:
-- <b>Universal Input</b>: Supports input and output of any data type, can be inserted at any position in the workflow
-- <b>Interactive Control</b>: Provides two operation options: continue and cancel
-- <b>State Management</b>: Intelligently manages the pause state of each node instance
-- <b>Exception Handling</b>: Throws an interrupt exception when canceled, safely terminating the workflow
-
-</td>
-</tr>
-<tr>
 <td><b>Integer Node</b><br><code>IntNode</code></td>
 <td>
 
@@ -1101,6 +956,33 @@ Visual group switch management tool that automatically detects all groups in the
 </div>
 </td>
 </tr>
+<tr>
+<td><b>Multimedia Loader</b><br><code>MultimediaAdvancedLoader</code></td>
+<td>
+
+Browse the images, videos and audio in the `input` directory as a thumbnail grid and pick the assets to send downstream.
+
+<b>Core Features</b>:
+- <b>Three Asset Types</b>: Images, videos and audio browsed and selected in a single grid
+- <b>Load Mode</b>: Loads everything by default and outputs the MiniMax H3 media bundle port; switching to "Images only" hides audio and video and outputs the image port alone
+- <b>Output Modes</b>: "Click to select" outputs only the picked items, "Smart numbering" outputs all of them in numbered order
+- <b>Downstream Wiring</b>: the media output docks directly with the LM Studio node and the Image Understanding Online node
+
+</td>
+</tr>
+<tr>
+<td><b>Video Preview</b><br><code>VideoPreview</code></td>
+<td>
+
+Plays an incoming video directly on the node, so results can be previewed without saving to the output directory first.
+
+<b>Core Features</b>:
+- <b>In-Node Playback</b>: the video plays right in the node panel, skipping the output directory
+- <b>Lossless Packaging</b>: the video is only remuxed losslessly into the temp directory and reused across runs; frames are never decoded
+- <b>Pass-through</b>: the output socket returns the video unchanged, so it can feed downstream nodes such as Save Video
+
+</td>
+</tr>
 </table>
 
 ---
@@ -1111,7 +993,7 @@ Visual group switch management tool that automatically detects all groups in the
 
 1. Install [ComfyUI Manager](https://github.com/ltdrdata/ComfyUI-Manager)
 2. Select "Install Custom Nodes" in the Manager menu
-3. Search for `zhihui_nodes_comfyui` and click the "Install" button
+3. Search for `zhiai_nodes_comfyui` and click the "Install" button
 4. Restart ComfyUI after installation completes
 
 ### 🔧 Method 2: Install via Git
@@ -1119,7 +1001,7 @@ Visual group switch management tool that automatically detects all groups in the
 Navigate to the `custom_nodes` directory of ComfyUI and run:
 
 ```bash
-git clone https://github.com/ZhiHui6/zhihui_nodes_comfyui.git
+git clone https://github.com/ZhiHui6/zhiai_nodes_comfyui.git
 ```
 
 Restart ComfyUI to use the nodes.
@@ -1127,27 +1009,50 @@ Restart ComfyUI to use the nodes.
 ### 📁 Method 3: Manual Installation
 
 1. Download the ZIP file of this repository and extract it
-2. Copy the entire `zhihui_nodes_comfyui` folder to the `custom_nodes` directory of ComfyUI
+2. Copy the entire `zhiai_nodes_comfyui` folder to the `custom_nodes` directory of ComfyUI
 3. Restart ComfyUI
 
 ---
 
+### 🧭 Where The Nodes Live
+
+After installation every node sits under the **Zhi.AI** top-level category of the right-click menu, split into Text, Generator, Image, MovieTools, Video, Loaders, Latent, Toolkit, Utility, Audio, LM Studio, Image Understanding, Florence2 and LLM Extra Options submenus. These labels follow the ComfyUI interface language, with product names such as LM Studio and Florence2 left as-is. Restart ComfyUI after installing or updating the pack so the nodes get registered.
+
+### 🔑 First-run Configuration
+
+- **Network access**: translation, AI expansion and online image understanding call remote endpoints; the text, image and latent tools run entirely locally.
+- **LLM platform keys**: open the ComfyUI **Settings** panel → **ZhiAI** → click "📝 API Settings" to fill in API Key, Base URL and model name for OpenAI, Google, ZhipuAI, DeepSeek, SiliconFlow, MoonshotAI, MiniMax, Alibaba, VolcEngine, Tencent, ModelScope, NVIDIA and any custom endpoint, with a connection test included. The Tag Selector's AI expansion reads this configuration directly (`platform` set to auto picks whichever profile is available), and Image Understanding Online shares the same storage for its endpoint profiles.
+- **Translation keys**: click the "⚙️ Config Management" button on the Multi-Platform Translation node to enter the credentials of Baidu, Alibaba Cloud, Youdao, Zhipu AI and Google separately.
+- **LM Studio**: run LM Studio locally with its server enabled (default port 1234); see the Prerequisites of that node above.
+- **Florence2 Plus**: downloads the model weights of the selected checkpoint from HuggingFace or ModelScope on first run, so allow disk space and network.
+
 ### 📋 Dependencies
 
-Most functions of this node collection do not require additional dependencies and work out of the box. Some online functions (such as translation, prompt optimization) require an internet connection.
-
-To manually install dependencies, you can execute:
+Dependencies are installed automatically when you install through ComfyUI Manager; for a manual setup run:
 
 ```bash
 pip install -r requirements.txt
 ```
 
-## 🤝 Contributing Guidelines
+What each dependency is used for:
 
-We welcome contributions in various forms, including but not limited to:
-<div align="left">
-[🔴 Report issues and suggestions] | [💡 Submit feature requests] | [📚 Improve documentation] | [💻 Submit code contributions]<br>
+- **opencv-python**: Color Removal, Image Rotate Tool, Video Frame Extractor, LM Studio Node
+- **scikit-image**: Color Match To Reference
+- **transformers / huggingface_hub / modelscope / timm / einops**: Florence2 Plus
+- **openai**: Image Understanding Online
+- **nvidia-ml-py**: Reserved VRAM Setter (requires an NVIDIA driver)
+- **cryptography**: decryption of the built-in data pack used by the Tag Selector character extractor
 
-</div>
+## 📄 License
+
+This project is open source under the **GPL-3.0** license; see [LICENSE](LICENSE) for the full terms.
+
+## 🤝 Contributing
+
+Contributions of every kind are welcome:
+
+- 🐛 [Report a bug](https://github.com/ZhiHui6/zhiai_nodes_comfyui/issues/new?labels=bug)
+- 💡 [Suggest a feature](https://github.com/ZhiHui6/zhiai_nodes_comfyui/issues/new?labels=enhancement)
+- 📚 Documentation improvements and 💻 code contributions: open a [Pull Request](https://github.com/ZhiHui6/zhiai_nodes_comfyui/compare)
 
 If you have any ideas or suggestions, please feel free to submit an Issue or Pull Request.

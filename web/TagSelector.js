@@ -370,7 +370,7 @@ function getDescriptionHTML() {
 </ul>
 <div style="margin-top:12px;padding-top:10px;border-top:1px solid rgba(251,191,36,0.15);display:flex;align-items:center;justify-content:space-between;">
 <span style="color:#94a3b8;font-size:12px;">${$t('clickToConfig')}</span>
-<button id="zhihui-open-settings-btn" style="background:linear-gradient(135deg, #f59e0b 0%, #d97706 100%);color:#fff;border:none;border-radius:6px;padding:5px 10px;font-size:13px;font-weight:600;cursor:pointer;transition:all 0.2s ease;box-shadow:0 2px 6px rgba(245,158,11,0.25);display:inline-flex;align-items:center;gap:4px;">⚙️ ${$t('openSettingsBtn')}</button>
+<button id="zhiai-open-settings-btn" style="background:linear-gradient(135deg, #f59e0b 0%, #d97706 100%);color:#fff;border:none;border-radius:6px;padding:5px 10px;font-size:13px;font-weight:600;cursor:pointer;transition:all 0.2s ease;box-shadow:0 2px 6px rgba(245,158,11,0.25);display:inline-flex;align-items:center;gap:4px;">⚙️ ${$t('openSettingsBtn')}</button>
 </div>
 </div>
 <h4 style="margin:12px 0 8px 0;color:#38bdf8;font-size:14px;font-weight:600;text-transform:uppercase;letter-spacing:0.5px;">${$t('randomTitle')}</h4>
@@ -398,18 +398,18 @@ function createHelpPopup(description, onClose) {
     document.body.appendChild(docElement);
 
     const bindSettingsBtn = () => {
-        const settingsBtn = docElement.querySelector('#zhihui-open-settings-btn');
+        const settingsBtn = docElement.querySelector('#zhiai-open-settings-btn');
         if (settingsBtn) {
             const newBtn = settingsBtn.cloneNode(true);
             settingsBtn.parentNode.replaceChild(newBtn, settingsBtn);
             
             newBtn.addEventListener('click', () => {
-                if (typeof window.openZhihuiApiSettings === 'function') {
+                if (typeof window.openZhiaiApiSettings === 'function') {
                     if (docElement.parentNode) {
                         docElement.remove();
                     }
                     if (onClose) onClose();
-                    window.openZhihuiApiSettings();
+                    window.openZhiaiApiSettings();
                 }
             });
             newBtn.addEventListener('mouseenter', () => {
@@ -586,7 +586,7 @@ function setupButtonHoverEffect(element, normalStyles, hoverStyles) {
 }
 
 app.registerExtension({
-    name: "zhihui.TagSelector",
+    name: "zhiai.TagSelector",
     async beforeRegisterNodeDef(nodeType, nodeData, app) {
         if (nodeData.name === "TagSelector") {
             const iconSize = 24;
@@ -639,7 +639,6 @@ app.registerExtension({
 
                 const x = this.size[0] - iconSize - iconMargin;
                 const y = -LiteGraph.NODE_TITLE_HEIGHT + (LiteGraph.NODE_TITLE_HEIGHT - iconSize) / 2;
-                // 展开中或鼠标悬停时高亮
                 const helpActive = !!(this._tagSelectorHelp || this._tagSelectorHelpHovered);
 
                 ctx.save();
@@ -668,7 +667,6 @@ app.registerExtension({
                 return r;
             };
 
-            // 帮助按钮悬停高亮
             const mouseMove = nodeType.prototype.onMouseMove;
             nodeType.prototype.onMouseMove = function (e, localPos, canvas) {
                 const r = mouseMove ? mouseMove.apply(this, arguments) : undefined;
@@ -1080,7 +1078,6 @@ function $tcReverse(englishCategoryName) {
     return englishCategoryName;
 }
 
-// 共用的 adultCategories 配置 - 非成人预设使用（全部禁用）
 const DISABLED_ADULT_CATEGORIES = {
     '涩影湿.性暗示': { enabled: false, weight: 1, count: 1 },
     '涩影湿.性行为.性行为类型': { enabled: false, weight: 1, count: 1 },
@@ -1092,7 +1089,6 @@ const DISABLED_ADULT_CATEGORIES = {
     '涩影湿.性行为.欲望表情': { enabled: false, weight: 1, count: 1 }
 };
 
-// 成人预设使用的 adultCategories 配置（部分启用）
 const ENABLED_ADULT_CATEGORIES = {
     '涩影湿.性暗示': { enabled: true, weight: 2, count: 1 },
     '涩影湿.性行为.性行为类型': { enabled: true, weight: 3, count: 2 },
@@ -2485,7 +2481,7 @@ async function openTagSelector(node) {
 
 async function loadTagsData() {
     try {
-        const response = await fetch('/zhihui/tags');
+        const response = await fetch('/zhiai/tags');
         if (response.ok) {
             const rawData = await response.json();
             tagsData = convertTagsFormat(rawData);
@@ -2504,7 +2500,7 @@ async function loadTagsData() {
 
 async function loadCustomTagCategories() {
     try {
-        const response = await fetch('/zhihui/user_tag_categories');
+        const response = await fetch('/zhiai/user_tag_categories');
         if (response.ok) {
             customTagCategories = await response.json();
         } else {
@@ -2518,7 +2514,7 @@ async function loadCustomTagCategories() {
 
 async function saveCustomTagCategories(categories) {
     try {
-        const response = await fetch('/zhihui/user_tag_categories', {
+        const response = await fetch('/zhiai/user_tag_categories', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({ categories })
@@ -2603,7 +2599,7 @@ function getDefaultTagsData() {
 
 async function loadRandomSettings() {
     try {
-        const response = await fetch('/zhihui/random_settings');
+        const response = await fetch('/zhiai/random_settings');
         if (response.ok) {
             const data = await response.json();
             if (data) {
@@ -2618,7 +2614,7 @@ async function loadRandomSettings() {
 
 async function loadExtractorSettings() {
     try {
-        const response = await fetch('/zhihui/extractor_settings');
+        const response = await fetch('/zhiai/extractor_settings');
         if (response.ok) {
             const data = await response.json();
             if (data) {
@@ -2630,7 +2626,7 @@ async function loadExtractorSettings() {
 
 async function saveExtractorSettings() {
     try {
-        await fetch('/zhihui/extractor_settings', {
+        await fetch('/zhiai/extractor_settings', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({ enabled: true, ...extractorSettings })
@@ -2640,7 +2636,7 @@ async function saveExtractorSettings() {
 
 async function saveRandomSettings() {
     try {
-        await fetch('/zhihui/random_settings', {
+        await fetch('/zhiai/random_settings', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify(randomSettings)
@@ -3618,7 +3614,7 @@ function createTagSelectorDialog() {
                 requestData.preview_image = currentPreviewImage;
             }
 
-            const response = await fetch('/zhihui/user_tags', {
+            const response = await fetch('/zhiai/user_tags', {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
@@ -3687,7 +3683,7 @@ function createTagSelectorDialog() {
 
     const rightButtonsSection = DOM.div(`display: flex; align-items: center; gap: 12px; margin-left: 20px; margin-right: 8px; flex-shrink: 0;`);
 
-    const clearButtonContainer = DOM.div(`display: flex; align-items: center; position: absolute; left: 50%; /* 水平居中 */ top: 50%; transform: translate(-50%, -50%); /* 水平垂直居中 */ margin-left: 0; z-index: 10; gap: 12px;`);
+    const clearButtonContainer = DOM.div(`display: flex; align-items: center; position: absolute; left: 50%;  top: 50%; transform: translate(-50%, -50%);  margin-left: 0; z-index: 10; gap: 12px;`);
 
     const quickRandomBtn = document.createElement('button');
     quickRandomBtn.innerHTML = `<span style="font-size: 14px; font-weight: 600; display: block;">${$t('quickRandom')}</span>`;
@@ -3864,7 +3860,7 @@ function createTagSelectorDialog() {
         }
 
         try {
-            const response = await fetch('/zhihui/cosplay-prompt', {
+            const response = await fetch('/zhiai/cosplay-prompt', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({ seed, excluded, custom_prompt: customPrompt })
@@ -3883,7 +3879,7 @@ function createTagSelectorDialog() {
                 if (tagSelectorDialog.characterHistory.length > 10) {
                     tagSelectorDialog.characterHistory.pop();
                 }
-                localStorage.setItem('zhihui_character_history', JSON.stringify(tagSelectorDialog.characterHistory));
+                localStorage.setItem('zhiai_character_history', JSON.stringify(tagSelectorDialog.characterHistory));
 
                 updateCharacterHistoryList();
                 
@@ -4051,7 +4047,7 @@ let adultLockoutUntil = 0;
 const ADULT_SESSION_TIMEOUT = 4 * 60 * 60 * 1000;
 const ADULT_MAX_FAILED_ATTEMPTS = 5;
 const ADULT_LOCKOUT_DURATION = 30000;
-const ADULT_STORAGE_SALT = 'zhihui_adult_v2_salt_2024';
+const ADULT_STORAGE_SALT = 'zhiai_adult_v2_salt_2024';
 
 window.adultContentEnabled = adultContentEnabled;
 window.adultContentUnlocked = adultContentUnlocked;
@@ -4073,14 +4069,14 @@ function _adultStorageHash(data) {
 
 function loadAdultContentSettings() {
     try {
-        const raw = localStorage.getItem('zhihui_adult_settings');
+        const raw = localStorage.getItem('zhiai_adult_settings');
         if (!raw) return;
         const parsed = JSON.parse(raw);
         const expectedHash = _adultStorageHash(
             String(parsed.enabled) + String(parsed.unlocked) + String(parsed.timestamp || 0)
         );
         if (parsed._sig !== expectedHash) {
-            localStorage.removeItem('zhihui_adult_settings');
+            localStorage.removeItem('zhiai_adult_settings');
             return;
         }
         adultContentEnabled = parsed.enabled || false;
@@ -4098,7 +4094,7 @@ function loadAdultContentSettings() {
         }
         updateWindowAdultStatus();
     } catch (e) {
-        localStorage.removeItem('zhihui_adult_settings');
+        localStorage.removeItem('zhiai_adult_settings');
     }
 }
 
@@ -4112,7 +4108,7 @@ function saveAdultContentSettings() {
         data._sig = _adultStorageHash(
             String(data.enabled) + String(data.unlocked) + String(data.timestamp)
         );
-        localStorage.setItem('zhihui_adult_settings', JSON.stringify(data));
+        localStorage.setItem('zhiai_adult_settings', JSON.stringify(data));
     } catch (e) {}
 }
 
@@ -4469,7 +4465,7 @@ function showAdultCloseConfirmDialog(onConfirm) {
 
 function loadNodeSettings() {
     try {
-        const saved = localStorage.getItem('zhihui_tag_selector_node_settings');
+        const saved = localStorage.getItem('zhiai_tag_selector_node_settings');
         if (saved) {
             const settings = JSON.parse(saved);
             return {
@@ -4484,7 +4480,7 @@ function loadNodeSettings() {
 
 function saveNodeSettings(settings) {
     try {
-        localStorage.setItem('zhihui_tag_selector_node_settings', JSON.stringify(settings));
+        localStorage.setItem('zhiai_tag_selector_node_settings', JSON.stringify(settings));
     } catch (e) {}
 }
 
@@ -5635,7 +5631,7 @@ async function showCharacterExtractor() {
         if (tagSelectorDialog.characterHistory && tagSelectorDialog.characterHistory.length > 0) {
             showConfirmDialog($t('confirmClearHistoryTitle'), $t('confirmClearHistoryMessage'), () => {
                 tagSelectorDialog.characterHistory = [];
-                localStorage.removeItem('zhihui_character_history');
+                localStorage.removeItem('zhiai_character_history');
                 updateCharacterHistoryList();
             });
         }
@@ -5723,7 +5719,7 @@ async function showCharacterExtractor() {
     tagSelectorDialog.characterExtractorResetBtn = resetBtn;
     
     if (!tagSelectorDialog.characterHistory) {
-        const savedHistory = localStorage.getItem('zhihui_character_history');
+        const savedHistory = localStorage.getItem('zhiai_character_history');
         if (savedHistory) {
             try {
                 tagSelectorDialog.characterHistory = JSON.parse(savedHistory);
@@ -5976,7 +5972,7 @@ function updateCharacterHistoryList() {
             deleteTooltip.style.opacity = '0';
             deleteTooltip.style.visibility = 'hidden';
             tagSelectorDialog.characterHistory.splice(index, 1);
-            localStorage.setItem('zhihui_character_history', JSON.stringify(tagSelectorDialog.characterHistory));
+            localStorage.setItem('zhiai_character_history', JSON.stringify(tagSelectorDialog.characterHistory));
             updateCharacterHistoryList();
         };
 
@@ -7449,7 +7445,7 @@ function createCustomTagTooltip(tagValue, tagName, tagObj) {
     previewImg.style.cssText = `object-fit: contain; background-color: transparent; display: block; max-width: 220px; max-height: 160px; width: auto; height: auto; border-radius: 8px; transition: all 0.3s ease; opacity: 0;`;
 
     const timestamp = tagObj && tagObj.imageTimestamp ? `?t=${tagObj.imageTimestamp}` : '';
-    const imageUrl = `/zhihui/user_tags/preview/${encodeURIComponent(tagName)}${timestamp}`;
+    const imageUrl = `/zhiai/user_tags/preview/${encodeURIComponent(tagName)}${timestamp}`;
     previewImg.src = imageUrl;
     previewImg.alt = `${$t('previewAlt')}: ${tagName}`;
     const loadingDiv = DOM.div(`position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); color: #94a3b8; font-size: 12px; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 8px; z-index: 2;`);
@@ -8041,7 +8037,7 @@ async function showCustomTagManagement() {
             const confirmDelete = async () => {
                 try {
                     if (currentFilter === '__all__') {
-                        const response = await fetch('/zhihui/user_tags/all', {
+                        const response = await fetch('/zhiai/user_tags/all', {
                             method: 'DELETE',
                             headers: { 'Content-Type': 'application/json' }
                         });
@@ -8067,7 +8063,7 @@ async function showCustomTagManagement() {
                         }
                     } else {
                         const deletePromises = filteredTags.map(tag =>
-                            fetch('/zhihui/user_tags', {
+                            fetch('/zhiai/user_tags', {
                                 method: 'DELETE',
                                 headers: { 'Content-Type': 'application/json' },
                                 body: JSON.stringify({ name: tag.display })
@@ -8150,7 +8146,7 @@ async function showCustomTagManagement() {
         });
         backupBtn.onclick = async () => {
             try {
-                const response = await fetch('/zhihui/user_tags/backup', {
+                const response = await fetch('/zhiai/user_tags/backup', {
                     method: 'GET',
                     headers: {
                         'Content-Type': 'application/json',
@@ -8202,7 +8198,7 @@ async function showCustomTagManagement() {
                 const formData = new FormData();
                 formData.append('backup_file', file);
                 try {
-                    const response = await fetch('/zhihui/user_tags/restore', {
+                    const response = await fetch('/zhiai/user_tags/restore', {
                         method: 'POST',
                         body: formData
                     });
@@ -8355,7 +8351,7 @@ async function showCustomTagManagement() {
             
             const img = document.createElement('img');
             const timestamp = tag.imageTimestamp ? `?t=${tag.imageTimestamp}` : '';
-            const imageUrl = `/zhihui/user_tags/preview/${encodeURIComponent(tag.display)}${timestamp}`;
+            const imageUrl = `/zhiai/user_tags/preview/${encodeURIComponent(tag.display)}${timestamp}`;
             img.src = imageUrl;
             img.alt = `${$t('previewAlt')}: ${tag.display}`;
             img.style.cssText = `object-fit: cover; width: 100%; height: 100%; display: block;`;
@@ -8450,7 +8446,7 @@ async function showCustomTagManagement() {
                 deleteTooltip.style.visibility = 'hidden';
                 showConfirmDialog($t('confirmDeleteTag').replace('{name}', tag.display), '', async () => {
                     try {
-                        const response = await fetch('/zhihui/user_tags', {
+                        const response = await fetch('/zhiai/user_tags', {
                             method: 'DELETE',
                             headers: {
                                 'Content-Type': 'application/json',
@@ -8618,7 +8614,7 @@ function showCategoryDialog(existingCategory, onSave) {
                 if (tag.category === existingCategory) {
                     tag.category = value;
                     updatePromises.push(
-                        fetch('/zhihui/user_tags', {
+                        fetch('/zhiai/user_tags', {
                             method: 'POST',
                             headers: { 'Content-Type': 'application/json' },
                             body: JSON.stringify({
@@ -8733,7 +8729,7 @@ function showCategoryDropdown(anchorEl, filterSelect, updateFilterOptions) {
         }
         showConfirmDialog($t('deleteAllCategoriesConfirm'), '', async () => {
             try {
-                const response = await fetch('/zhihui/user_tag_categories/all', {
+                const response = await fetch('/zhiai/user_tag_categories/all', {
                     method: 'DELETE',
                     headers: { 'Content-Type': 'application/json' }
                 });
@@ -8745,7 +8741,7 @@ function showCategoryDropdown(anchorEl, filterSelect, updateFilterOptions) {
                         const updatePromises = customTags.map(tag => {
                             if (tag.category) {
                                 tag.category = '';
-                                return fetch('/zhihui/user_tags', {
+                                return fetch('/zhiai/user_tags', {
                                     method: 'POST',
                                     headers: { 'Content-Type': 'application/json' },
                                     body: JSON.stringify({
@@ -8849,7 +8845,7 @@ function showCategoryDropdown(anchorEl, filterSelect, updateFilterOptions) {
                 e.stopPropagation();
                 showConfirmDialog($t('categoryDeleteConfirm').replace('{name}', cat), '', async () => {
                     try {
-                        const response = await fetch('/zhihui/user_tag_categories', {
+                        const response = await fetch('/zhiai/user_tag_categories', {
                             method: 'DELETE',
                             headers: { 'Content-Type': 'application/json' },
                             body: JSON.stringify({ name: cat })
@@ -8938,7 +8934,7 @@ function createTagManagementForm(tagToEdit = null) {
     
     if (tagToEdit) {
         const timestamp = tagToEdit.imageTimestamp ? `?t=${tagToEdit.imageTimestamp}` : '';
-        previewImg.src = `/zhihui/user_tags/preview/${encodeURIComponent(tagToEdit.display)}${timestamp}`;
+        previewImg.src = `/zhiai/user_tags/preview/${encodeURIComponent(tagToEdit.display)}${timestamp}`;
         previewImg.onload = function() {
             this.style.display = 'block';
             noImageHint.style.display = 'none';
@@ -9558,7 +9554,7 @@ function createTagManagementForm(tagToEdit = null) {
                 requestData.original_name = tagToEdit.display;
             }
             
-            const response = await fetch('/zhihui/user_tags', {
+            const response = await fetch('/zhiai/user_tags', {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
@@ -10414,12 +10410,12 @@ function saveViewState() {
         activeSubSubCategory: tagSelectorDialog.activeSubSubCategory,
         activeSubSubSubCategory: tagSelectorDialog.activeSubSubSubCategory
     };
-    localStorage.setItem('zhihui_tag_selector_state', JSON.stringify(state));
+    localStorage.setItem('zhiai_tag_selector_state', JSON.stringify(state));
 }
 
 function loadViewState() {
     try {
-        const saved = localStorage.getItem('zhihui_tag_selector_state');
+        const saved = localStorage.getItem('zhiai_tag_selector_state');
         if (saved) {
             return JSON.parse(saved);
         }
@@ -11226,7 +11222,7 @@ function showSaveToCustomDialog(prompt) {
         }
 
         try {
-            const response = await fetch('/zhihui/user_tags', {
+            const response = await fetch('/zhiai/user_tags', {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',

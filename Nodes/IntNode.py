@@ -11,7 +11,7 @@ class IntNode:
     RETURN_NAMES = ("int",)
     FUNCTION = "get_int"
     CATEGORY = "Zhi.AI/Toolkit"
-    DESCRIPTION = "Int Node: Output a configurable integer value for unified parameter control."
+    DESCRIPTION = "Outputs a configurable integer value for unified parameter control."
 
     def get_int(self, value):
         return (value,)

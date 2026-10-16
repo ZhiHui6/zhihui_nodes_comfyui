@@ -29,27 +29,18 @@ from .Nodes.MovieTools.FilmGrain import FilmGrain
 from .Nodes.LatentSwitchDualMode import LatentSwitchDualMode
 from .Nodes.ImageAspectRatio import ImageAspectRatio
 from .Nodes.Preview_or_Compare_Images import PreviewOrCompareImages
-from .Nodes.PauseWorkflow import PauseWorkflow
 from .Nodes.TextEditorWithContinue import TextEditorWithContinue
 from .Nodes.TagSelector.TagSelector import TagSelector
 from .Nodes.PromptCardSelector.PromptCardSelector import PromptCardSelector
 from .Nodes.SunoTools.SunoSongStylePromptGenerator import SunoSongStylePromptGenerator
 from .Nodes.SunoTools.SunoLyricsGenerator import SunoLyricsGenerator
-from .Nodes.Qwen3VL.Qwen3VLAdvanced import Qwen3VLAdvanced
-from .Nodes.Qwen3VL.Qwen3VLBasic import Qwen3VLBasic
-from .Nodes.Qwen3VL.Qwen3VLExtraOptions import Qwen3VLExtraOptions
-from .Nodes.Qwen3VL.ImageLoader import ImageLoader
-from .Nodes.Qwen3VL.VideoLoader import VideoLoader
-from .Nodes.Qwen3VL.MultiplePathsInput import MultiplePathsInput
-from .Nodes.Qwen3VL.PathSwitch import PathSwitch
-from .Nodes.Qwen3VL_API.Qwen3VLAPI import Qwen3VLAPI
+from .Nodes.llm_extra_options import LLMExtraOptions
+from .Nodes.ImageUnderstandingOnline.image_understanding_online import ImageUnderstandingOnline
 from .Nodes.ImageRotateTool import ImageRotateTool
 from .Nodes.ImageFormatConverter import ImageFormatConverter
-from .Nodes.Sa2VA.Sa2VAAdvanced import Sa2VAAdvanced
-from .Nodes.Sa2VA.Sa2VASegmentationPreset import Sa2VASegmentationPreset
 from .Nodes.Batch_loading_of_images import BatchLoadingOfImages
 from .Nodes.GetImageSizes import GetImageSizes
-from .Nodes.PhotographPromptGen.zhihui_api import *
+from .Nodes.PhotographPromptGen.zhiai_api import *
 from .Nodes.ResourceCleaner import ResourceCleaner
 from .Nodes.ReservedVRAMSetter import ReservedVRAMSetter
 from .Nodes.TextEncoderRelease import TextEncoderRelease
@@ -62,12 +53,12 @@ from .Nodes.PromptDelete import PromptDelete
 from .Nodes.AudioDuration import AudioDuration
 from .Nodes.VideoFrameExtractor import VideoFrameExtractor
 from .Nodes.IntNode import IntNode
-from .Nodes.PromptExpander import PromptExpander
 from .Nodes.LMStudio.lmstudio_node import LMStudioNode
 from .Nodes.LMStudio import lmstudio_api
 from .Nodes.GroupSwitchManager import GroupSwitchManager
 from .Nodes.MultimediaAdvancedLoader import MultimediaAdvancedLoader
 from .Nodes.VideoPreview import VideoPreview
+from .Nodes.ImageIndexer import ImageIndexer
 
 import os
 
@@ -99,28 +90,19 @@ NODE_CLASS_MAPPINGS = {
     "ColorMatchToReference": ColorMatchToReference,
     "FilmGrain": FilmGrain,
     "LatentSwitchDualMode": LatentSwitchDualMode,
-    "PathSwitch": PathSwitch,
     "ImageAspectRatio": ImageAspectRatio,
     "GetImageSizes": GetImageSizes,
     "PreviewOrCompareImages": PreviewOrCompareImages,
-    "PauseWorkflow": PauseWorkflow,
     "TextEditorWithContinue": TextEditorWithContinue,
     "TagSelector": TagSelector,
     "PromptCardSelector": PromptCardSelector,
     "SunoSongStylePromptGenerator": SunoSongStylePromptGenerator,
     "SunoLyricsGenerator": SunoLyricsGenerator,
-    "Qwen3VLAdvanced": Qwen3VLAdvanced,
-    "Qwen3VLBasic": Qwen3VLBasic,
-    "Qwen3VLExtraOptions": Qwen3VLExtraOptions,
-    "ImageLoader": ImageLoader,
-    "VideoLoader": VideoLoader,
-    "MultiplePathsInput": MultiplePathsInput,
+    "LLMExtraOptions": LLMExtraOptions,
     "ImageRotateTool": ImageRotateTool,
     "ImageFormatConverter": ImageFormatConverter,
-    "Sa2VAAdvanced": Sa2VAAdvanced,
-    "Sa2VASegmentationPreset": Sa2VASegmentationPreset,
     "BatchLoadingOfImages": BatchLoadingOfImages,
-    "Qwen3VLAPI": Qwen3VLAPI,
+    "ImageUnderstandingOnline": ImageUnderstandingOnline,
     "ResourceCleaner": ResourceCleaner,
     "ReservedVRAMSetter": ReservedVRAMSetter,
     "TextEncoderRelease": TextEncoderRelease,
@@ -132,11 +114,11 @@ NODE_CLASS_MAPPINGS = {
     "AudioDuration": AudioDuration,
     "VideoFrameExtractor": VideoFrameExtractor,
     "IntNode": IntNode,
-    "PromptExpander": PromptExpander,
     "LMStudioNode": LMStudioNode,
     "GroupSwitchManager": GroupSwitchManager,
     "MultimediaAdvancedLoader": MultimediaAdvancedLoader,
     "VideoPreview": VideoPreview,
+    "ImageIndexer": ImageIndexer,
 }
 
 NODE_DISPLAY_NAME_MAPPINGS = {
@@ -170,25 +152,16 @@ NODE_DISPLAY_NAME_MAPPINGS = {
     "ImageAspectRatio": "Image Aspect Ratio",
     "GetImageSizes": "Get Image Sizes",
     "PreviewOrCompareImages": "Preview or Compare Images",
-    "PauseWorkflow": "Pause Workflow",
     "TextEditorWithContinue": "Text Editor with Continue",
     "TagSelector": "Tag Selector",
     "PromptCardSelector": "Prompt Card Selector",
     "SunoSongStylePromptGenerator": "Suno Song Style Prompt Generator",
     "SunoLyricsGenerator": "Suno AI Lyrics Generator",
-    "Qwen3VLAdvanced": "Qwen3-VL Advanced",
-    "Qwen3VLBasic": "Qwen3-VL Basic",
-    "Qwen3VLExtraOptions": "Qwen3-VL Extra Options",
-    "ImageLoader": "Qwen3-VL Image Loader",
-    "VideoLoader": "Qwen3-VL Video Loader",
-    "MultiplePathsInput": "Qwen3-VL Multiple Paths Input",
-    "PathSwitch": "Qwen3-VL Path Switch",
+    "LLMExtraOptions": "LLM Extra Options",
     "ImageRotateTool": "Image Rotate Tool",
     "ImageFormatConverter": "Image Format Converter",
-    "Sa2VAAdvanced": "Sa2VA Advanced",
-    "Sa2VASegmentationPreset": "Sa2VA Segmentation Preset",
     "BatchLoadingOfImages": "Batch Loading Of Images",
-    "Qwen3VLAPI": "Qwen3-VL API",
+    "ImageUnderstandingOnline": "Image Understanding Online",
     "ResourceCleaner": "Resource Cleaner",
     "ReservedVRAMSetter": "Reserved VRAM Setter",
     "TextEncoderRelease": "Text Encoder Release",
@@ -200,14 +173,15 @@ NODE_DISPLAY_NAME_MAPPINGS = {
     "AudioDuration": "Audio Duration",
     "VideoFrameExtractor": "Video Frame Extractor",
     "IntNode": "Int",
-    "PromptExpander": "Prompt Expander",
     "LMStudioNode": "LM Studio Node",
     "GroupSwitchManager": "Group Switch Manager",
     "MultimediaAdvancedLoader": "Multimedia Loader",
     "VideoPreview": "Video Preview",
+    "ImageIndexer": "Image Indexer",
 }
 
 from . import locale_api
+from .Nodes.ZhiAIApiConfig import ZhiAIApiConfig  # noqa: F401
 
 WEB_DIRECTORY = os.path.join(os.path.dirname(os.path.abspath(__file__)), "web")
 __all__ = ['NODE_CLASS_MAPPINGS', 'NODE_DISPLAY_NAME_MAPPINGS', "WEB_DIRECTORY"]

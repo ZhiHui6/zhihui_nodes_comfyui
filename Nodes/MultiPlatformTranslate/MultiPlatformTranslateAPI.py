@@ -74,11 +74,9 @@ class MultiPlatformTranslateAPI:
         }
 
     def get_empty_config(self):
-        """获取清空后的配置（保留平台结构但清空配置值）"""
         config = self.get_default_config()
         for platform in config["platforms"]:
             if "config" in config["platforms"][platform]:
-                # 清空配置项的值
                 for key in config["platforms"][platform]["config"]:
                     config["platforms"][platform]["config"][key] = ""
         return config
@@ -136,7 +134,6 @@ class MultiPlatformTranslateAPI:
             if not access_key_id or not access_key_secret:
                 return {"success": False, "error": "Access Key ID 和 Access Key Secret 不能为空"}
 
-            # 使用阿里云翻译API进行测试
             url = "https://mt.cn-hangzhou.aliyuncs.com/api/translate/web/general"
             params = {
                 "FormatType": "text",
@@ -166,10 +163,6 @@ class MultiPlatformTranslateAPI:
             return {"success": False, "error": f"连接异常: {str(e)}"}
 
     def truncate(self, q):
-        """
-        计算input参数
-        input=q前10个字符 + q长度 + q后10个字符（当q长度大于20）或 input=q字符串（当q长度小于等于20）
-        """
         if len(q) <= 20:
             return q
         else:
@@ -187,7 +180,7 @@ class MultiPlatformTranslateAPI:
             test_text = "hello"
             salt = str(random.randint(1000000000, 9999999999))
             curtime = str(int(time.time()))
-            input_str = self.truncate(test_text)  # 正确计算input参数
+            input_str = self.truncate(test_text)
             sign_str = app_key + input_str + salt + curtime + app_secret
             sign = hashlib.sha256(sign_str.encode()).hexdigest()
             
@@ -295,9 +288,7 @@ class MultiPlatformTranslateAPI:
 
     async def handle_config_clear(self, request):
         try:
-            # 获取清空后的配置
             empty_config = self.get_empty_config()
-            # 保存清空后的配置
             success = self.save_config(empty_config)
             if success:
                 return web.json_response({"success": True})
@@ -335,18 +326,18 @@ class MultiPlatformTranslateAPI:
 translate_api = MultiPlatformTranslateAPI()
 
 if PROMPT_SERVER_AVAILABLE and PromptServer:
-    @PromptServer.instance.routes.get("/zhihui_nodes/translate/config")
+    @PromptServer.instance.routes.get("/zhiai_nodes/translate/config")
     async def get_translate_config(request):
         return await translate_api.handle_config_get(request)
 
-    @PromptServer.instance.routes.post("/zhihui_nodes/translate/config")
+    @PromptServer.instance.routes.post("/zhiai_nodes/translate/config")
     async def post_translate_config(request):
         return await translate_api.handle_config_post(request)
 
-    @PromptServer.instance.routes.post("/zhihui_nodes/translate/clear")
+    @PromptServer.instance.routes.post("/zhiai_nodes/translate/clear")
     async def clear_translate_config(request):
         return await translate_api.handle_config_clear(request)
 
-    @PromptServer.instance.routes.post("/zhihui_nodes/translate/test")
+    @PromptServer.instance.routes.post("/zhiai_nodes/translate/test")
     async def test_translate_connection(request):
         return await translate_api.handle_test_post(request)

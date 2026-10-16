@@ -20,7 +20,7 @@ class PromptReplace:
     FUNCTION = "replace_text"
     OUTPUT_NODE = False
     CATEGORY = "Zhi.AI/Text"
-    DESCRIPTION = "Prompt Replacement: Search and replace text with up to 10 pairs of strings."
+    DESCRIPTION = "Searches and replaces text with up to 10 pairs of strings."
 
     def replace_text(self, text_input, inputcount, unify_replace=False, unified_replace="", **kwargs):
         if text_input is None:

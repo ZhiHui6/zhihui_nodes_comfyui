@@ -120,7 +120,7 @@ app.registerExtension({
 
     async setup() {
         try {
-            const res = await fetch("/zhihui_nodes/aspect_ratio/presets");
+            const res = await fetch("/zhiai_nodes/aspect_ratio/presets");
             if (!res.ok) throw new Error(`HTTP ${res.status}`);
             aspectRatioPresetsCache = await res.json();
         } catch (e) {
@@ -635,7 +635,6 @@ app.registerExtension({
                     helpElement.style.top = `${transform.f + bcr.y}px`;
                 }
 
-                // 展开中或鼠标悬停时高亮
                 const helpActive = !!(this._imageAspectRatioHelp || this._imageAspectRatioHelpHovered);
 
                 ctx.save();
@@ -664,7 +663,6 @@ app.registerExtension({
                 return r;
             };
 
-            // 帮助按钮悬停高亮
             const mouseMove = nodeType.prototype.onMouseMove;
             nodeType.prototype.onMouseMove = function (e, localPos, canvas) {
                 const r = mouseMove ? mouseMove.apply(this, arguments) : undefined;

@@ -476,7 +476,7 @@ function showNotification(message, type = 'success', duration = 3000) {
 }
 
 app.registerExtension({
-    name: "zhihui.PromptCardSelector",
+    name: "zhiai.PromptCardSelector",
     async setup() {
         initLocaleWatcher();
         onLocaleChange((newLocale) => {
@@ -577,7 +577,7 @@ function disableMainUIInteraction() {
             );
             
             if (isTextInput && (e.ctrlKey || e.metaKey)) {
-                const allowedKeys = ['c', 'v', 'x', 'a', 'z']; // Copy, Paste, Cut, Select All, Undo
+                const allowedKeys = ['c', 'v', 'x', 'a', 'z'];
                 if (allowedKeys.includes(e.key.toLowerCase())) {
                     return true;
                 }
@@ -770,14 +770,14 @@ function createDialog(){
     tabFiles.click();
 }
 
-async function fetchPromptCards(){ try { const res = await fetch('/zhihui/prompt_cards'); const data = await res.json(); return Array.isArray(data.files) ? data.files : []; } catch(e){ return []; } }
-async function fetchPromptCardContent(name, source){ try { const src = source || 'system'; const res = await fetch(`/zhihui/prompt_card?name=${encodeURIComponent(name)}&source=${encodeURIComponent(src)}`); const data = await res.json(); let content = data.content || '';
+async function fetchPromptCards(){ try { const res = await fetch('/zhiai/prompt_cards'); const data = await res.json(); return Array.isArray(data.files) ? data.files : []; } catch(e){ return []; } }
+async function fetchPromptCardContent(name, source){ try { const src = source || 'system'; const res = await fetch(`/zhiai/prompt_card?name=${encodeURIComponent(name)}&source=${encodeURIComponent(src)}`); const data = await res.json(); let content = data.content || '';
     return content; } catch(e){ return ''; } }
-async function savePromptCard(name, content, source, confirm){ const res = await fetch('/zhihui/prompt_cards', { method:'POST', headers:{'Content-Type':'application/json'}, body:JSON.stringify({ name, content, source: source||'user', confirm }) }); return res.ok; }
-async function deletePromptCard(name, source, confirm){ const res = await fetch('/zhihui/prompt_cards', { method:'DELETE', headers:{'Content-Type':'application/json'}, body:JSON.stringify({ name, source: source||'user', confirm }) }); return res.ok; }
-async function selectPromptCards(params){ const res = await fetch('/zhihui/prompt_cards/select', { method:'POST', headers:{'Content-Type':'application/json'}, body:JSON.stringify(params) }); return await res.json(); }
-async function getPromptCardSettings(){ try { const res = await fetch('/zhihui/prompt_cards/settings'); const data = await res.json(); return data && typeof data === 'object' ? data : {}; } catch(e){ return {}; } }
-async function savePromptCardSettings(st){ try { const res = await fetch('/zhihui/prompt_cards/settings', { method:'POST', headers:{'Content-Type':'application/json'}, body: JSON.stringify(st||{}) }); return res.ok; } catch(e){ return false; } }
+async function savePromptCard(name, content, source, confirm){ const res = await fetch('/zhiai/prompt_cards', { method:'POST', headers:{'Content-Type':'application/json'}, body:JSON.stringify({ name, content, source: source||'user', confirm }) }); return res.ok; }
+async function deletePromptCard(name, source, confirm){ const res = await fetch('/zhiai/prompt_cards', { method:'DELETE', headers:{'Content-Type':'application/json'}, body:JSON.stringify({ name, source: source||'user', confirm }) }); return res.ok; }
+async function selectPromptCards(params){ const res = await fetch('/zhiai/prompt_cards/select', { method:'POST', headers:{'Content-Type':'application/json'}, body:JSON.stringify(params) }); return await res.json(); }
+async function getPromptCardSettings(){ try { const res = await fetch('/zhiai/prompt_cards/settings'); const data = await res.json(); return data && typeof data === 'object' ? data : {}; } catch(e){ return {}; } }
+async function savePromptCardSettings(st){ try { const res = await fetch('/zhiai/prompt_cards/settings', { method:'POST', headers:{'Content-Type':'application/json'}, body: JSON.stringify(st||{}) }); return res.ok; } catch(e){ return false; } }
 
 async function backupUserPromptCards() {
     try {
@@ -1094,7 +1094,7 @@ async function showPromptCardPoolFiles(){
     clearBtn.onclick = () => { selected.clear(); chipIndex.forEach(ch => markSelected(ch, false)); updateSelectedCount(); saveSettingsNow(); };
     
     const todayStr = new Date().toISOString().slice(0,10);
-    const noSelNoticeKey = `zhihui_nodes_no_selection_notice_disabled_PromptCardSelector_${todayStr}`;
+    const noSelNoticeKey = `zhiai_nodes_no_selection_notice_disabled_PromptCardSelector_${todayStr}`;
     let noSelNoticeOpen = false; let noSelNoticeDismissMs = 10000;
     const showNoSelectionNotice = () => {
         try {
@@ -1315,7 +1315,6 @@ function showPromptCardPoolManage(){
     };
     backupBtn.onclick = () => { backupUserPromptCards(); };
     
-    // 处理导入备份压缩包
     importBackupInput.onchange = async () => {
         const files = Array.from(importBackupInput.files || []);
         if (!files.length) return;

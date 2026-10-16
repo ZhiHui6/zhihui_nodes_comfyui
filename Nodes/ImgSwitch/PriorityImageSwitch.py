@@ -1,7 +1,7 @@
 import torch
 
 class PriorityImageSwitch:
-    DESCRIPTION = "Priority Image Switch: When both image A and image B ports are connected, prioritize output from port B; if port B has no input, output from image A port; if both ports have no input, prompt to connect at least one input port."
+    DESCRIPTION = "Outputs image B when both inputs are connected, falls back to image A, and warns when neither is connected."
     
     RETURN_TYPES = ("IMAGE",)
     RETURN_NAMES = ("output_image",)

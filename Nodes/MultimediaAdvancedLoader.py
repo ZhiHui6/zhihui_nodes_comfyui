@@ -45,7 +45,7 @@ except Exception:
 
 MEDIA_BUNDLE_TYPE = "MINIMAX_H3_MEDIA_BUNDLE"
 _MEDIA_KINDS = ("image", "audio", "video")
-_API_PREFIX = "/zhihui/media_loader"
+_API_PREFIX = "/zhiai/media_loader"
 _THUMB_CACHE = {}
 _THUMB_CACHE_LIMIT = 512
 
@@ -264,12 +264,7 @@ class MultimediaAdvancedLoader:
     RETURN_TYPES = (f"IMAGE,{MEDIA_BUNDLE_TYPE}",)
     RETURN_NAMES = ("media_bundle",)
     OUTPUT_IS_LIST = (False,)
-    DESCRIPTION = (
-        "Ordered image, video and audio library for ComfyUI input files. "
-        "The load mode picks the single output socket: the default mode exposes the MiniMax H3 media "
-        "bundle for the whole library, images only exposes the IMAGE list and hides audio and video. "
-        "Click-select outputs the chosen items; smart numbering outputs every item in order."
-    )
+    DESCRIPTION = "Manages images, videos and audio from the input folder as a thumbnail grid, outputting either a MiniMax H3 media bundle or an image-only port."
 
     @classmethod
     def INPUT_TYPES(cls):

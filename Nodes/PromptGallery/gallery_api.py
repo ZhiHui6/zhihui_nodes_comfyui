@@ -61,7 +61,7 @@ def _select_directory_sync():
     except Exception:
         return ""
 
-@PromptServer.instance.routes.get("/zhihui/gallery/list_files")
+@PromptServer.instance.routes.get("/zhiai/gallery/list_files")
 async def list_gallery_files(request):
     try:
         dir_path = request.rel_url.query.get("path", "")
@@ -92,8 +92,8 @@ async def list_gallery_files(request):
     except Exception as e:
         return web.json_response({"error": str(e)}, status=500)
 
-@PromptServer.instance.routes.get("/zhihui/gallery/style.css")
-async def zhihui_gallery_style(request):
+@PromptServer.instance.routes.get("/zhiai/gallery/style.css")
+async def zhiai_gallery_style(request):
     try:
         base_dir = os.path.dirname(os.path.abspath(__file__))
         css_path = os.path.join(base_dir, "PromptGallery.css")
@@ -105,7 +105,7 @@ async def zhihui_gallery_style(request):
     except Exception as e:
         return web.Response(status=500, text=str(e))
 
-@PromptServer.instance.routes.get("/zhihui/gallery/view_image")
+@PromptServer.instance.routes.get("/zhiai/gallery/view_image")
 async def view_gallery_image(request):
     try:
         dir_path = request.rel_url.query.get("path", "")
@@ -154,7 +154,7 @@ async def view_gallery_image(request):
     except Exception as e:
         return web.Response(status=500, text=str(e))
 
-@PromptServer.instance.routes.get("/zhihui/gallery/select_directory")
+@PromptServer.instance.routes.get("/zhiai/gallery/select_directory")
 async def select_gallery_directory(request):
     try:
         loop = asyncio.get_running_loop()
@@ -167,14 +167,14 @@ async def select_gallery_directory(request):
     except Exception as e:
         return web.json_response({"error": str(e)}, status=500)
 
-@PromptServer.instance.routes.get("/zhihui/gallery/settings")
+@PromptServer.instance.routes.get("/zhiai/gallery/settings")
 async def get_gallery_settings(request):
     try:
         return web.json_response(_read_settings())
     except Exception as e:
         return web.json_response({"error": str(e)}, status=500)
 
-@PromptServer.instance.routes.post("/zhihui/gallery/settings")
+@PromptServer.instance.routes.post("/zhiai/gallery/settings")
 async def set_gallery_settings(request):
     try:
         body = await request.json()

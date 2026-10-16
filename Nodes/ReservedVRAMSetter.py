@@ -50,6 +50,8 @@ class AlwaysEqualProxy(str):
 any_type = AlwaysEqualProxy("*")
 
 class ReservedVRAMSetter:
+    DESCRIPTION = "Reserves GPU VRAM manually or automatically from current usage, optionally clearing used VRAM first."
+
     @classmethod
     def INPUT_TYPES(s):
         return {

@@ -209,7 +209,6 @@ const StyleManager = {
                     overflow: hidden;
                 }
                 
-                /* 顶部标签页样式 */
                 #${uniqueId} .platform-tabs { 
                     display:flex;
                     background: #0f172a;
@@ -444,7 +443,6 @@ const StyleManager = {
                     100% { transform: rotate(360deg); } 
                 }
                 
-                /* 响应式设计 */
                 @media (max-width: 768px) {
                     #${uniqueId} .form-row {
                         grid-template-columns: 1fr;
@@ -500,12 +498,12 @@ function createDialog() {
 }
 
 async function loadConfig() {
-    const result = await Utils.apiCall("/zhihui_nodes/translate/config", { method: "GET" });
+    const result = await Utils.apiCall("/zhiai_nodes/translate/config", { method: "GET" });
     return result.ok && result.data ? result.data : null;
 }
 
 async function saveConfig(config) {
-    const result = await Utils.apiCall("/zhihui_nodes/translate/config", {
+    const result = await Utils.apiCall("/zhiai_nodes/translate/config", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(config)
@@ -514,7 +512,7 @@ async function saveConfig(config) {
 }
 
 async function clearConfig() {
-    const result = await Utils.apiCall("/zhihui_nodes/translate/clear", {
+    const result = await Utils.apiCall("/zhiai_nodes/translate/clear", {
         method: "POST",
         headers: { "Content-Type": "application/json" }
     });
@@ -776,14 +774,12 @@ async function openSettings(node) {
             });
         });
 
-        // 监听平台选择变化（针对谷歌翻译的警告）
         const platformSelect = dialog.querySelector('#field-platform');
         if (platformSelect && currentPlatform === 'google') {
             platformSelect.addEventListener('change', (e) => {
             });
         }
 
-        // 翻译指令功能已移除，只允许使用默认专业指令
 
         dialog.querySelector("#close-button").addEventListener("click", closeDialog);
 
@@ -996,7 +992,7 @@ async function openSettings(node) {
 }
 
 app.registerExtension({
-    name: "zhihui_nodes.MultiPlatformTranslate",
+    name: "zhiai_nodes.MultiPlatformTranslate",
     async beforeRegisterNodeDef(nodeType, nodeData, app) {
         if (nodeData.name === "MultiPlatformTranslate") {
             const onNodeCreated = nodeType.prototype.onNodeCreated;
@@ -1015,7 +1011,7 @@ app.registerExtension({
 let dialog = null;
 let overlay = null;
 let keyboardBlockHandler = null;
-let uniqueId = 'zhihui-translate-settings-' + Math.random().toString(36).substr(2, 9);
+let uniqueId = 'zhiai-translate-settings-' + Math.random().toString(36).substr(2, 9);
 
 function disableMainUIInteraction() {
     let modalOverlay = document.getElementById('translate-settings-modal-overlay');

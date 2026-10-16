@@ -15,6 +15,8 @@ except ImportError:
 
 
 class VideoFrameExtractor(ComfyNodeABC):
+    DESCRIPTION = "Extracts frames by frame count, frame step, time or time interval, optionally within a range, and saves them to a folder."
+
     @classmethod
     def INPUT_TYPES(cls):
         return {

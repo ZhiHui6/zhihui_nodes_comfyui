@@ -1,5 +1,5 @@
 import { app } from "../../scripts/app.js";
-import { getLocale, zhNodeInfo } from "./zhihui_i18n.js";
+import { getLocale, zhNodeInfo } from "./zhiai_i18n.js";
 import { drawNodeHelpButton } from "./node_title_icons.js";
 
 const HELP_ICON_SIZE = 24;
@@ -13,7 +13,7 @@ const CUSTOM_HELP_TYPES = new Set([
     "LMStudioNode",
     "ImageAspectRatio",
     "GroupSwitchManager",
-    "Qwen3VLAPI",
+    "ImageUnderstandingOnline",
     "TagSelector",
     "TextEditorWithContinue",
 ]);
@@ -197,24 +197,31 @@ function openPopup(node) {
     active.popup = createPopup(node.__zhaiHelpData ?? { name: node.type });
 }
 
-function placePopup(popup, node) {
-    const canvas = app.canvas;
-    const el = canvas?.canvas;
-    if (!el) return;
-    const rect = el.getBoundingClientRect();
-    const ds = canvas.ds ?? canvas;
-    const scale = typeof ds.scale === "number" ? ds.scale : 1;
-    const offset = ds.offset ?? [0, 0];
-    const anchorX = rect.left + (offset[0] ?? 0) + (node.pos[0] + node.size[0]) * scale;
-    const anchorY = rect.top + (offset[1] ?? 0) + node.pos[1] * scale;
+function placePopup(popup, node, ctx) {
+    const canvasEl = app.canvas?.canvas;
+    if (!canvasEl || !ctx?.canvas) return;
+
+    const rect = ctx.canvas.getBoundingClientRect();
+    const scaleX = rect.width / ctx.canvas.width;
+    const scaleY = rect.height / ctx.canvas.height;
+    const transform = new DOMMatrix()
+        .scaleSelf(scaleX, scaleY)
+        .multiplySelf(ctx.getTransform())
+        .translateSelf(node.size[0] * scaleX * Math.max(1.0, window.devicePixelRatio), 0)
+        .translateSelf(POPUP_GAP, -32);
+
+    const bcr = canvasEl.getBoundingClientRect();
     const w = popup.offsetWidth;
     const h = popup.offsetHeight;
-    let left = anchorX + POPUP_GAP;
-    if (left + w > window.innerWidth - EDGE_PAD) left = anchorX - node.size[0] * scale - w - POPUP_GAP;
+
+    let left = transform.e + bcr.x;
+    if (left + w > window.innerWidth - EDGE_PAD) left = Math.max(EDGE_PAD, window.innerWidth - w - EDGE_PAD);
     if (left < EDGE_PAD) left = EDGE_PAD;
-    let top = anchorY - 28;
+
+    let top = transform.f + bcr.y;
     if (top + h > window.innerHeight - EDGE_PAD) top = Math.max(EDGE_PAD, window.innerHeight - h - EDGE_PAD);
     if (top < EDGE_PAD) top = EDGE_PAD;
+
     popup.style.left = `${left}px`;
     popup.style.top = `${top}px`;
 }
@@ -286,7 +293,7 @@ function patchNodeType(nodeType, nodeData) {
                 active.popup.querySelector("div").innerHTML = buildHelpHtml(this.__zhaiHelpData);
                 active.locale = getLocale();
             }
-            placePopup(active.popup, this);
+            placePopup(active.popup, this, ctx);
         }
         const activeBtn = !!this._zhaiHelp || !!this._zhaiHelpHovered;
         ctx.save();
@@ -347,7 +354,7 @@ function patchNodeType(nodeType, nodeData) {
 }
 
 app.registerExtension({
-    name: "ZhihuiNodes.NodeHelp",
+    name: "ZhiaiNodes.NodeHelp",
     async beforeRegisterNodeDef(nodeType, nodeData) {
         if (!isPackNode(nodeData)) return;
         patchNodeType(nodeType, nodeData);

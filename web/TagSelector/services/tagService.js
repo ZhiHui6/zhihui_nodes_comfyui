@@ -39,7 +39,7 @@ function hasDeepNesting(obj, depth = 0) {
 
 async function loadTagsData() {
     try {
-        const response = await fetch('/zhihui_nodes/tags_data');
+        const response = await fetch('/zhiai_nodes/tags_data');
         if (!response.ok) {
             throw new Error(`HTTP error! status: ${response.status}`);
         }

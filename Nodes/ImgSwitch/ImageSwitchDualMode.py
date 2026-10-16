@@ -23,7 +23,7 @@ class ImageSwitchDualMode:
     RETURN_NAMES = ("output_image",)
     FUNCTION = "execute"
     CATEGORY = "Zhi.AI/Image"
-    DESCRIPTION = "Dynamic Image Switcher: Switches among a dynamic number of image inputs. Supports manual mode (select by index) and auto mode (outputs the single non-empty input, errors if multiple). Input count is controlled via 'inputcount', and the UI can update ports accordingly. Newly added inputs are optional."
+    DESCRIPTION = "Switches among a variable number of image inputs, in manual index mode or auto mode that requires exactly one non-empty input."
 
     def execute(self, mode, select_image, inputcount, image1=None, image2=None, image1_note="", image2_note="", **kwargs):
 

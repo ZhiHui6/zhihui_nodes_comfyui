@@ -20,7 +20,7 @@ class LaplacianSharpen:
     RETURN_NAMES = ("image_output",)
     FUNCTION = "apply_laplacian"
     CATEGORY = "Zhi.AI/MovieTools"
-    DESCRIPTION = "Laplacian Sharpen: Uses Laplacian operator to sharpen images, enhancing edges and details. Supports sharpen strength adjustment, suitable for improving image clarity and detail performance. Commonly used in film post-production and image enhancement."
+    DESCRIPTION = "Sharpens images with the Laplacian operator, with adjustable strength."
 
     def apply_laplacian(self, image_input: torch.Tensor = None, sharpen_strength: float = 0.5, switch: bool = True) -> Tuple[torch.Tensor]:
         if not switch:

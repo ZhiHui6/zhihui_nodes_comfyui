@@ -1,11 +1,416 @@
 import { app } from "../../../scripts/app.js";
 import { drawNodeHelpButton } from "./node_title_icons.js";
 
-let marked = null;
-let markedLoading = false;
+const SA_FONT = "PingFang SC, Source Han Sans SC, Noto Sans, 'Microsoft YaHei', sans-serif";
+const SA_TYPE = {
+    micro: "11.5px",
+    label: "12.5px",
+    lhBase: "1.7",
+};
+const SA_COLOR = {
+    text: "#DDE9F5",
+    textBright: "#F2FAFF",
+    textDim: "#93A9C4",
+    textFaint: "#7C93B0",
+    primary: "#60A5FA",
+    primaryLight: "#93C5FD",
+    border: "rgba(96,165,250,0.18)",
+    borderHi: "rgba(147,197,253,0.42)",
+};
+
+
+const MARKDOWN_CSS = `
+.sa-md { font-family: inherit; font-size: inherit; line-height: 1.7; color: #DDE9F5; }
+.sa-md > *:first-child { margin-top: 0; }
+.sa-md > *:last-child { margin-bottom: 0; }
+.sa-md h1, .sa-md h2, .sa-md h3, .sa-md h4, .sa-md h5, .sa-md h6 {
+    margin: 16px 0 8px; color: #60A5FA; font-weight: 600; line-height: 1.35;
+}
+.sa-md h1 { font-size: 20px; font-weight: 700; }
+.sa-md h2 { font-size: 17px; font-weight: 700; }
+.sa-md h3 { font-size: 15px; }
+.sa-md h4 { font-size: 13.5px; }
+.sa-md h5, .sa-md h6 { font-size: 12.5px; }
+.sa-md p { margin: 8px 0; }
+.sa-md a { color: #60A5FA; text-decoration: none; border-bottom: 1px solid rgba(96,165,250,0.4); }
+.sa-md strong { color: #F2FAFF; font-weight: 600; }
+.sa-md em { color: #CBD5E1; font-style: italic; }
+.sa-md del { color: #93A9C4; }
+.sa-md code {
+    font-family: Consolas, "Cascadia Mono", Menlo, Consolas, monospace;
+    font-size: 11.5px; padding: 1px 5px; border-radius: 4px;
+    background: rgba(96,165,250,0.15); color: #93C5FD;
+}
+.sa-md pre {
+    margin: 8px 0; padding: 9px 10px; border-radius: 6px; overflow-x: auto;
+    background: rgba(3,9,18,0.62); border: 1px solid rgba(96,165,250,0.2);
+}
+.sa-md pre code {
+    display: block; padding: 0; background: none; color: #DDE9F5;
+    font-size: 11.5px; line-height: 1.6; white-space: pre;
+}
+.sa-md blockquote {
+    margin: 8px 0; padding: 2px 0 2px 10px;
+    border-left: 3px solid rgba(96,165,250,0.5); color: #B4C7DE;
+}
+.sa-md ul, .sa-md ol { margin: 8px 0; padding-left: 20px; }
+.sa-md ul { list-style: disc; }
+.sa-md ol { list-style: decimal; }
+.sa-md li { margin: 3px 0; }
+.sa-md li > ul, .sa-md li > ol { margin: 3px 0; }
+.sa-md li.sa-md-task { list-style: none; margin-left: -16px; }
+.sa-md li.sa-md-task > input { margin-right: 6px; vertical-align: -1px; }
+.sa-md hr { margin: 12px 0; border: none; border-top: 1px solid rgba(96,165,250,0.3); }
+.sa-md img { max-width: 100%; border-radius: 6px; }
+.sa-md table { margin: 8px 0; width: 100%; border-collapse: collapse; font-size: 12px; }
+.sa-md th, .sa-md td { padding: 5px 8px; border: 1px solid rgba(96,165,250,0.24); }
+.sa-md th { background: rgba(96,165,250,0.12); color: #F2FAFF; font-weight: 600; }
+`;
+
+
+const HTML_ESCAPES = { "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" };
+
+function escapeHtml(text) {
+    return String(text == null ? "" : text).replace(/[&<>"']/g, (ch) => HTML_ESCAPES[ch]);
+}
+
+function safeUrl(url) {
+    const raw = String(url == null ? "" : url).trim();
+    if (/^(?:https?:|mailto:|data:image\/|#|\/|\.\/|\.\.\/)/i.test(raw)) return raw;
+    return "#";
+}
+
+function renderInline(source) {
+    const text = source == null ? "" : String(source);
+    if (!text) return "";
+
+    let out = "";
+    const parts = text.split(/(`+)/);
+    let inCode = false;
+    for (let i = 0; i < parts.length; i++) {
+        const part = parts[i];
+        if (/^`+$/.test(part)) {
+            inCode = !inCode;
+            out += inCode ? "\u0000CODE\u0000" : "\u0000ENDCODE\u0000";
+            continue;
+        }
+        out += inCode ? part : renderInlineText(part);
+    }
+
+    out = out.replace(/\u0000CODE\u0000([\s\S]*?)\u0000ENDCODE\u0000/g,
+        (m, code) => `<code>${escapeHtml(code)}</code>`);
+    out = out.replace(/\u0000ENDCODE\u0000/g, "").replace(/\u0000CODE\u0000/g, "");
+    return out;
+}
+
+function renderInlineText(raw) {
+    let s = escapeHtml(raw);
+
+    s = s.replace(/!\[([^\]]*)\]\(\s*([^)\s]+)(?:\s+&quot;([^&]*)&quot;)?\s*\)/g,
+        (m, alt, src, title) =>
+            `<img src="${escapeHtml(safeUrl(src))}" alt="${alt}"${title ? ` title="${title}"` : ""}>`);
+
+    s = s.replace(/\[([^\]]+)\]\(\s*([^)\s]+)(?:\s+&quot;([^&]*)&quot;)?\s*\)/g,
+        (m, label, href, title) =>
+            `<a href="${escapeHtml(safeUrl(href))}" target="_blank" rel="noreferrer"${title ? ` title="${title}"` : ""}>${label}</a>`);
+
+    s = s.replace(/&lt;(https?:\/\/[^\s&]+)&gt;/g,
+        (m, href) => `<a href="${href}" target="_blank" rel="noreferrer">${href}</a>`);
+
+    s = s.replace(/\*\*([^*\n]+)\*\*/g, "<strong>$1</strong>");
+    s = s.replace(/__([^_\n]+)__/g, "<strong>$1</strong>");
+    s = s.replace(/(^|[^\w*])\*([^*\n]+)\*(?=[^\w*]|$)/g, "$1<em>$2</em>");
+    s = s.replace(/(^|[^\w_])_([^_\n]+)_(?=[^\w_]|$)/g, "$1<em>$2</em>");
+    s = s.replace(/~~([^~\n]+)~~/g, "<del>$1</del>");
+    return s;
+}
+
+
+const RX_FENCE = /^\s*(`{3,}|~{3,})\s*([A-Za-z0-9#+._-]*)\s*$/;
+const RX_HEADING = /^\s{0,3}(#{1,6})\s+(.*?)\s*#*\s*$/;
+const RX_HR = /^\s{0,3}([-*_])(?:\s*\1){2,}\s*$/;
+const RX_QUOTE = /^\s{0,3}>\s?(.*)$/;
+const RX_LIST = /^(\s*)(?:([-*+])|(\d+)[.)])\s+(.*)$/;
+const RX_TABLE_SEP = /^\s*\|?\s*:?-{1,}:?\s*(\|\s*:?-{1,}:?\s*)*\|?\s*$/;
+const RX_TASK = /^\[([ xX])\]\s*(.*)$/;
+
+function isBlockStart(line) {
+    return RX_FENCE.test(line) || RX_HEADING.test(line) || RX_HR.test(line)
+        || RX_QUOTE.test(line) || RX_LIST.test(line);
+}
+
+function isTableStart(lines, i) {
+    return lines[i].includes("|") && i + 1 < lines.length && RX_TABLE_SEP.test(lines[i + 1])
+        && lines[i + 1].includes("-");
+}
+
+function splitRow(line) {
+    let s = line.trim();
+    if (s.startsWith("|")) s = s.slice(1);
+    if (s.endsWith("|")) s = s.slice(0, -1);
+    return s.split("|").map((cell) => cell.trim());
+}
+
+function renderTable(lines, start) {
+    const header = splitRow(lines[start]);
+    const aligns = splitRow(lines[start + 1]).map((cell) => {
+        const left = cell.startsWith(":");
+        const right = cell.endsWith(":");
+        if (left && right) return "center";
+        if (right) return "right";
+        if (left) return "left";
+        return "";
+    });
+    const rows = [];
+    let i = start + 2;
+    for (; i < lines.length; i++) {
+        const line = lines[i];
+        if (!line.trim() || !line.includes("|")) break;
+        rows.push(splitRow(line));
+    }
+    const cell = (tag, content, index) => {
+        const align = aligns[index] ? ` style="text-align:${aligns[index]}"` : "";
+        return `<${tag}${align}>${renderInline(content)}</${tag}>`;
+    };
+    const head = `<tr>${header.map((c, n) => cell("th", c, n)).join("")}</tr>`;
+    const body = rows.map((row) => {
+        const cells = [];
+        for (let n = 0; n < header.length; n++) cells.push(cell("td", row[n] ?? "", n));
+        return `<tr>${cells.join("")}</tr>`;
+    }).join("");
+    return { html: `<table><thead>${head}</thead><tbody>${body}</tbody></table>`, next: i };
+}
+
+function renderCodeBlock(lines, start, fence) {
+    const marker = fence[1];
+    const lang = fence[2] || "";
+    const closer = new RegExp(`^\\s*${marker[0]}{${marker.length},}\\s*$`);
+    const body = [];
+    let i = start + 1;
+    for (; i < lines.length; i++) {
+        if (closer.test(lines[i])) { i++; break; }
+        body.push(lines[i]);
+    }
+    const cls = lang ? ` class="language-${escapeHtml(lang)}"` : "";
+    return { html: `<pre><code${cls}>${escapeHtml(body.join("\n"))}</code></pre>`, next: i };
+}
+
+function renderQuote(lines, start) {
+    const inner = [];
+    let i = start;
+    for (; i < lines.length; i++) {
+        const m = RX_QUOTE.exec(lines[i]);
+        if (!m) break;
+        inner.push(m[1]);
+    }
+    return { html: `<blockquote>${renderBlocks(inner)}</blockquote>`, next: i };
+}
+
+function renderList(lines, start) {
+    const first = RX_LIST.exec(lines[start]);
+    const ordered = !!first[3];
+    const items = [];
+    let baseIndent = null;
+    let current = null;
+    let i = start;
+
+    for (; i < lines.length; i++) {
+        const line = lines[i];
+        const m = RX_LIST.exec(line);
+        if (m) {
+            const indent = m[1].length;
+            if (baseIndent === null) baseIndent = indent;
+            if (indent <= baseIndent) {
+                if (!!m[3] !== ordered) break;
+                current = {
+                    lines: [m[4]],
+                    contentCol: m[1].length + (m[2] ? 1 : String(m[3]).length + 1),
+                };
+                items.push(current);
+                continue;
+            }
+        }
+        if (!current) break;
+        if (!line.trim()) {
+            let hasMore = false;
+            for (let k = i + 1; k < lines.length; k++) {
+                if (!lines[k].trim()) continue;
+                const mm = RX_LIST.exec(lines[k]);
+                hasMore = !!(mm && mm[1].length >= (baseIndent ?? 0) && !!mm[3] === ordered);
+                break;
+            }
+            if (!hasMore) break;
+            current.lines.push("");
+            continue;
+        }
+        const lead = line.length - line.trimStart().length;
+        current.lines.push(line.slice(Math.min(lead, current.contentCol)));
+    }
+
+    const tag = ordered ? "ol" : "ul";
+    const html = items.map((item) => {
+        let content = item.lines;
+        let task = null;
+        const firstLine = content[0] || "";
+        const tm = RX_TASK.exec(firstLine.trim());
+        if (tm) {
+            task = tm[1].toLowerCase() === "x";
+            content = [tm[2], ...content.slice(1)];
+        }
+        let body = renderBlocks(content);
+        if ((body.match(/<p>/g) || []).length === 1) {
+            body = body.replace(/^([\s\S]*?)<p>([\s\S]*?)<\/p>/, "$1$2");
+        }
+        const cls = task === null ? "" : ' class="sa-md-task"';
+        const box = task === null ? ""
+            : `<input type="checkbox" disabled${task ? " checked" : ""}>`;
+        return `<li${cls}>${box}${body}</li>`;
+    }).join("");
+
+    return { html: `<${tag}>${html}</${tag}>`, next: i };
+}
+
+function renderParagraph(lines) {
+    return `<p>${renderInline(lines.join("\n")).replace(/\n/g, "<br>")}</p>`;
+}
+
+function renderBlocks(lines) {
+    let html = "";
+    let i = 0;
+    while (i < lines.length) {
+        const line = lines[i];
+        if (!line.trim()) { i++; continue; }
+
+        const fence = RX_FENCE.exec(line);
+        if (fence) {
+            const res = renderCodeBlock(lines, i, fence);
+            html += res.html;
+            i = res.next;
+            continue;
+        }
+        const heading = RX_HEADING.exec(line);
+        if (heading) {
+            const level = heading[1].length;
+            html += `<h${level}>${renderInline(heading[2])}</h${level}>`;
+            i++;
+            continue;
+        }
+        if (RX_HR.test(line)) { html += "<hr>"; i++; continue; }
+        if (RX_QUOTE.test(line)) {
+            const res = renderQuote(lines, i);
+            html += res.html;
+            i = res.next;
+            continue;
+        }
+        if (isTableStart(lines, i)) {
+            const res = renderTable(lines, i);
+            html += res.html;
+            i = res.next;
+            continue;
+        }
+        if (RX_LIST.test(line)) {
+            const res = renderList(lines, i);
+            html += res.html;
+            i = res.next;
+            continue;
+        }
+
+        const para = [line];
+        i++;
+        while (i < lines.length && lines[i].trim() && !isBlockStart(lines[i])
+               && !isTableStart(lines, i)) {
+            para.push(lines[i]);
+            i++;
+        }
+        html += renderParagraph(para);
+    }
+    return html;
+}
+
+function renderMarkdown(source) {
+    const text = source == null ? "" : String(source);
+    if (!text.trim()) return "";
+    try {
+        const normalized = text.replace(/\r\n?/g, "\n");
+        return `<div class="sa-md">${renderBlocks(normalized.split("\n"))}</div>`;
+    } catch (err) {
+        console.warn("ShowAny: markdown render failed", err);
+        return `<div class="sa-md"><p>${escapeHtml(text).replace(/\n/g, "<br>")}</p></div>`;
+    }
+}
 
 const SHOW_ANY_MIN_WIDTH = 520;
 const SHOW_ANY_MIN_HEIGHT = 300;
+
+const SHOW_ANY_CSS = `
+.sa-box {
+    display: flex;
+    flex-direction: column;
+    width: 100%;
+    height: 100%;
+    box-sizing: border-box;
+    overflow: hidden;
+    background: rgba(3, 9, 18, 0.62);
+    border: 1px solid ${SA_COLOR.border};
+    border-radius: 6px;
+    font-family: ${SA_FONT};
+    font-size: ${SA_TYPE.micro};
+}
+.sa-box__body {
+    flex: 1 1 auto;
+    min-height: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    overflow: auto;
+    box-sizing: border-box;
+    padding: 8px 9px;
+    scrollbar-width: thin;
+    scrollbar-color: rgba(147, 197, 253, 0.45) transparent;
+}
+.sa-box__body::-webkit-scrollbar { width: 6px; height: 6px; }
+.sa-box__body::-webkit-scrollbar-track { background: transparent; }
+.sa-box__body::-webkit-scrollbar-thumb {
+    background: rgba(147, 197, 253, 0.45);
+    border-radius: 3px;
+}
+.sa-box__body::-webkit-scrollbar-thumb:hover { background: rgba(147, 197, 253, 0.7); }
+.sa-box__foot {
+    flex: 0 0 auto;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    box-sizing: border-box;
+    padding: 4px 8px;
+    white-space: nowrap;
+    border-top: 1px solid ${SA_COLOR.border};
+    background: rgba(96, 165, 250, 0.07);
+    color: ${SA_COLOR.textDim};
+}
+.sa-src {
+    margin: 0;
+    color: ${SA_COLOR.text};
+    font-size: ${SA_TYPE.micro};
+    line-height: ${SA_TYPE.lhBase};
+    white-space: pre-wrap;
+    word-break: break-word;
+}
+.sa-empty {
+    color: ${SA_COLOR.textFaint};
+    font-size: ${SA_TYPE.micro};
+    line-height: ${SA_TYPE.lhBase};
+}
+`;
+
+let _saStylesInjected = false;
+function injectShowAnyStyles() {
+    if (_saStylesInjected) return;
+    _saStylesInjected = true;
+    const style = document.createElement("style");
+    style.id = "showany-styles";
+    style.textContent = SHOW_ANY_CSS + MARKDOWN_CSS;
+    document.head.appendChild(style);
+}
 
 function clampShowAnySize(node) {
     if (!node) return false;
@@ -30,197 +435,26 @@ function widestInlineWidth(texts, fontCss) {
     return Math.ceil(width);
 }
 
-async function loadMarked() {
-    if (marked) return true;
-    if (markedLoading) return false;
-    markedLoading = true;
-    
-    try {
-        if (window.marked) {
-            marked = window.marked;
-            return true;
-        }
-        
-        const script = document.createElement('script');
-        script.src = 'https://cdn.jsdelivr.net/npm/marked/marked.min.js';
-        script.crossOrigin = 'anonymous';
-        
-        await new Promise((resolve, reject) => {
-            script.onload = resolve;
-            script.onerror = reject;
-            document.head.appendChild(script);
-        });
-        
-        if (window.marked) {
-            marked = window.marked;
-            return true;
-        }
-        return false;
-    } catch (e) {
-        console.warn("ShowAny: Could not load marked library", e);
-        return false;
-    }
-}
-
-function createStyledRenderer() {
-    const renderer = new marked.Renderer();
-    
-    renderer.heading = function(data) {
-        const { tokens, depth } = data;
-        const text = this.parser.parseInline(tokens);
-        const sizes = { 1: '24px', 2: '20px', 3: '16px', 4: '14px', 5: '13px', 6: '12px' };
-        const margins = { 1: '20px 0 12px 0', 2: '16px 0 10px 0', 3: '14px 0 8px 0', 4: '12px 0 6px 0', 5: '10px 0 4px 0', 6: '8px 0 4px 0' };
-        return `<h${depth} style="color:#60a5fa;font-size:${sizes[depth] || '12px'};font-weight:${depth <= 2 ? '700' : '600'};margin:${margins[depth] || '8px 0 4px 0'};line-height:1.3;">${text}</h${depth}>`;
-    };
-    
-    renderer.paragraph = function(data) {
-        const { tokens } = data;
-        return `<p style="margin:8px 0;line-height:1.7;color:#e2e8f0;">${this.parser.parseInline(tokens)}</p>`;
-    };
-    
-    renderer.list = function(data) {
-        const { ordered, items, start } = data;
-        const tag = ordered ? 'ol' : 'ul';
-        const startAttr = ordered && start !== 1 ? ` start="${start}"` : '';
-        let body = '';
-        for (const item of items) {
-            body += renderer.listitem(item);
-        }
-        return `<${tag}${startAttr} style="margin:8px 0;padding-left:20px;list-style:${ordered ? 'decimal' : 'disc'};color:#e2e8f0;">${body}</${tag}>`;
-    };
-    
-    renderer.listitem = function(data) {
-        const { tokens, task, checked } = data;
-        let item = '';
-        if (task) {
-            item += `<input type="checkbox" ${checked ? 'checked' : ''} disabled style="margin-right:4px;">`;
-        }
-        item += renderer.parser.parse(tokens, true);
-        return `<li style="margin:4px 0;line-height:1.6;color:#e2e8f0;">${item}</li>`;
-    };
-    
-    renderer.code = function(data) {
-        const { text, lang } = data;
-        const langClass = lang ? ` class="language-${lang}"` : '';
-        return `<pre style="background:rgba(15,23,42,0.8);color:#e2e8f0;padding:12px;border-radius:8px;overflow-x:auto;font-family:monospace;font-size:11px;line-height:1.5;margin:8px 0;border:1px solid rgba(96,165,250,0.2);"><code${langClass}>${text}</code></pre>`;
-    };
-    
-    renderer.codespan = function(data) {
-        const { text } = data;
-        return `<code style="background:rgba(96,165,250,0.15);color:#60a5fa;padding:2px 6px;border-radius:4px;font-family:monospace;font-size:11px;">${text}</code>`;
-    };
-    
-    renderer.strong = function(data) {
-        const { tokens } = data;
-        return `<strong style="color:#f1f5f9;font-weight:600;">${this.parser.parseInline(tokens)}</strong>`;
-    };
-    
-    renderer.em = function(data) {
-        const { tokens } = data;
-        return `<em style="color:#cbd5e1;">${this.parser.parseInline(tokens)}</em>`;
-    };
-    
-    renderer.link = function(data) {
-        const { href, title, tokens } = data;
-        const text = this.parser.parseInline(tokens);
-        const titleAttr = title ? ` title="${title}"` : '';
-        return `<a href="${href}"${titleAttr} target="_blank" style="color:#60a5fa;text-decoration:none;border-bottom:1px solid rgba(96,165,250,0.4);">${text}</a>`;
-    };
-    
-    renderer.blockquote = function(data) {
-        const { tokens } = data;
-        const body = this.parser.parse(tokens);
-        return `<blockquote style="margin:8px 0;padding:8px 16px;border-left:4px solid #60a5fa;background:rgba(96,165,250,0.1);color:#e2e8f0;">${body}</blockquote>`;
-    };
-    
-    renderer.hr = function() {
-        return `<hr style="border:none;border-top:1px solid rgba(96,165,250,0.3);margin:16px 0;">`;
-    };
-    
-    renderer.br = function() {
-        return '<br>';
-    };
-    
-    renderer.del = function(data) {
-        const { tokens } = data;
-        return `<del style="color:#94a3b8;text-decoration:line-through;">${this.parser.parseInline(tokens)}</del>`;
-    };
-    
-    renderer.table = function(data) {
-        const { header, rows } = data;
-        let head = '<thead><tr>';
-        for (const cell of header) {
-            head += renderer.tablecell(cell);
-        }
-        head += '</tr></thead>';
-        let body = '<tbody>';
-        for (const row of rows) {
-            body += '<tr>';
-            for (const cell of row) {
-                body += renderer.tablecell(cell);
-            }
-            body += '</tr>';
-        }
-        body += '</tbody>';
-        return `<table style="width:100%;border-collapse:collapse;margin:8px 0;color:#e2e8f0;">${head}${body}</table>`;
-    };
-    
-    renderer.tablecell = function(data) {
-        const { tokens, header, align } = data;
-        const content = this.parser.parseInline(tokens);
-        const tag = header ? 'th' : 'td';
-        const alignStyle = align ? `text-align:${align};` : '';
-        return `<${tag} style="border:1px solid rgba(96,165,250,0.3);padding:8px;${alignStyle}">${content}</${tag}>`;
-    };
-    
-    return renderer;
-}
-
-function parseMarkdownSync(text) {
-    if (!marked || !text || typeof text !== 'string') return '';
-    
-    try {
-        const renderer = createStyledRenderer();
-        return marked.parse(text, { 
-            renderer, 
-            gfm: true,
-            breaks: true
-        });
-    } catch (e) {
-        console.warn('ShowAny: Markdown parse error', e);
-        return escapeHtml(text);
-    }
-}
-
-function escapeHtml(text) {
-    const div = document.createElement('div');
-    div.textContent = text;
-    return div.innerHTML;
-}
-
 const i18n = {
     zh: {
         nodeTitle: "ShowAny 节点",
         description: "用于显示任意类型的数据内容。",
         featuresTitle: "功能",
         feature1: "支持显示字符串、数字、数组等多种数据类型",
-        feature2: "提供标准模式、排错模式和Markdown模式三种预览模式",
-        feature3: "自动处理编码问题",
+        feature2: "提供源码模式和Markdown模式两种预览模式",
         usageTitle: "使用说明",
-        standardMode: "标准模式",
-        standardModeDesc: "直接显示原始内容",
-        debugMode: "排错模式",
-        debugModeDesc: "自动修复编码问题，适合处理乱码",
+        standardMode: "源码模式",
+        standardModeDesc: "按原始文本显示，不做任何解析",
         markdownMode: "Markdown模式",
-        markdownModeDesc: "解析并渲染Markdown格式的文本",
+        markdownModeDesc: "把文本按Markdown排版渲染成可视化预览",
         inputTitle: "输入",
         inputDesc: "接受任意类型的输入数据",
         outputTitle: "输出",
         outputDesc: "在节点内显示格式化后的内容",
         previewMode: "预览模式：",
-        standard: "标准",
-        debug: "排错",
+        standard: "源码",
         markdown: "Markdown",
+        emptyPreview: "暂无内容",
         copy: "复制",
         copied: "已复制",
         copyFailed: "复制失败",
@@ -231,23 +465,20 @@ const i18n = {
         description: "Used to display any type of data content.",
         featuresTitle: "Features",
         feature1: "Supports displaying various data types such as strings, numbers, arrays, etc.",
-        feature2: "Provides three preview modes: Standard, Debug and Markdown",
-        feature3: "Automatically handles encoding issues",
+        feature2: "Provides two preview modes: Source and Markdown",
         usageTitle: "Usage",
-        standardMode: "Standard Mode",
-        standardModeDesc: "Displays raw content directly",
-        debugMode: "Debug Mode",
-        debugModeDesc: "Automatically fixes encoding issues, suitable for handling garbled text",
+        standardMode: "Source Mode",
+        standardModeDesc: "Shows the raw text without any parsing",
         markdownMode: "Markdown Mode",
-        markdownModeDesc: "Parses and renders Markdown formatted text",
+        markdownModeDesc: "Renders the text as a formatted Markdown preview",
         inputTitle: "Input",
         inputDesc: "Accepts any type of input data",
         outputTitle: "Output",
         outputDesc: "Displays formatted content within the node",
         previewMode: "Preview Mode:",
-        standard: "Standard",
-        debug: "Debug",
+        standard: "Source",
         markdown: "Markdown",
+        emptyPreview: "Nothing to preview",
         copy: "Copy",
         copied: "Copied",
         copyFailed: "Copy failed",
@@ -272,12 +503,10 @@ function getDescriptionHTML() {
 <ul style="margin:0;padding:0;">
 <li style="margin:4px 0;padding-left:6px;list-style:none;position:relative;color:#e2e8f0;">${t('feature1')}</li>
 <li style="margin:4px 0;padding-left:6px;list-style:none;position:relative;color:#e2e8f0;">${t('feature2')}</li>
-<li style="margin:4px 0;padding-left:6px;list-style:none;position:relative;color:#e2e8f0;">${t('feature3')}</li>
 </ul>
 <h4 style="margin:12px 0 8px 0;color:#38bdf8;font-size:14px;font-weight:600;text-transform:uppercase;letter-spacing:0.5px;">${t('usageTitle')}</h4>
 <ul style="margin:0;padding:0;">
 <li style="margin:4px 0;padding-left:6px;list-style:none;position:relative;"><strong style="color:#f1f5f9;font-weight:500;">${t('standardMode')}</strong>: <span style="color:#e2e8f0;">${t('standardModeDesc')}</span></li>
-<li style="margin:4px 0;padding-left:6px;list-style:none;position:relative;"><strong style="color:#f1f5f9;font-weight:500;">${t('debugMode')}</strong>: <span style="color:#e2e8f0;">${t('debugModeDesc')}</span></li>
 <li style="margin:4px 0;padding-left:6px;list-style:none;position:relative;"><strong style="color:#f1f5f9;font-weight:500;">${t('markdownMode')}</strong>: <span style="color:#e2e8f0;">${t('markdownModeDesc')}</span></li>
 </ul>
 <h4 style="margin:12px 0 8px 0;color:#38bdf8;font-size:14px;font-weight:600;text-transform:uppercase;letter-spacing:0.5px;">${t('inputTitle')}</h4>
@@ -326,27 +555,8 @@ app.registerExtension({
         if (nodeData.name === "ShowAny") {
             let uniqueCounter = 0;
 
-            function fixEncoding(str, isDebugMode = false) {
-                if (!isDebugMode || typeof str !== 'string') {
-                    return str;
-                }
-                try {
-                    if (/[\u0080-\u00FF]/.test(str) && !/[\u4E00-\u9FFF]/.test(str)) {
-                        const bytes = new Uint8Array(str.length);
-                        for (let i = 0; i < str.length; i++) {
-                            bytes[i] = str.charCodeAt(i) & 0xFF;
-                        }
-                        const decoder = new TextDecoder('utf-8');
-                        return decoder.decode(bytes);
-                    }
-                } catch (e) {}
-                return str;
-            }
-
             function getCopyText(node) {
                 const data = node.__showAnyRawData;
-                const mode = node.properties.showAnyMode || "Standard";
-                const isDebugMode = mode === "Debug";
                 let items = [];
                 if (Array.isArray(data)) {
                     items = data;
@@ -356,7 +566,7 @@ app.registerExtension({
                 return items
                     .map((item) => {
                         if (item === null || item === undefined) return "";
-                        return fixEncoding(String(item), isDebugMode);
+                        return String(item);
                     })
                     .join("\n");
             }
@@ -399,56 +609,37 @@ app.registerExtension({
                 }, 1500);
             }
 
-            function createItemContainer(text, isDebugMode) {
-                const container = document.createElement("div");
-                container.style.cssText = "display:flex;flex-direction:column;gap:4px;width:100%;box-sizing:border-box;";
-
-                const textarea = document.createElement("textarea");
-                textarea.readOnly = true;
-                textarea.style.cssText = "width:100%;resize:none;background:#1f2430;color:#e5e7eb;border:1px solid rgba(255,255,255,0.12);border-radius:8px;padding:10px;font-size:12px;line-height:1.5;box-sizing:border-box;";
-                textarea.value = fixEncoding(text, isDebugMode);
-
-                container.appendChild(textarea);
-                return { container, textarea };
+            function createSourceItem(text) {
+                const el = document.createElement("div");
+                el.className = "sa-src";
+                el.textContent = text;
+                return el;
             }
 
-            function createMarkdownContainer(text) {
-                const container = document.createElement("div");
-                container.style.cssText = "display:flex;flex-direction:column;gap:4px;width:100%;box-sizing:border-box;";
-
-                const contentDiv = document.createElement("div");
-                contentDiv.style.cssText = "width:100%;background:#1f2430;color:#e5e7eb;border:1px solid rgba(255,255,255,0.12);border-radius:8px;padding:10px;font-size:12px;line-height:1.6;box-sizing:border-box;overflow:auto;";
-                
-                if (marked) {
-                    contentDiv.innerHTML = parseMarkdownSync(text);
-                } else {
-                    loadMarked().then(() => {
-                        contentDiv.innerHTML = parseMarkdownSync(text);
-                    });
-                    contentDiv.innerHTML = escapeHtml(text).replace(/\n/g, '<br>');
-                }
-
-                container.appendChild(contentDiv);
-                return { container, contentDiv };
+            function createMarkdownItem(text) {
+                const el = document.createElement("div");
+                el.innerHTML = renderMarkdown(text);
+                return el;
             }
 
             function ensurePreviewUI(node) {
                 if (node.__showAnyPreview) {
                     return;
                 }
+                injectShowAnyStyles();
 
                 const host = document.createElement("div");
-                host.style.cssText = "display:flex;flex-direction:column;gap:8px;width:100%;height:100%;box-sizing:border-box;";
+                host.className = "sa-box";
 
                 const itemsContainer = document.createElement("div");
-                itemsContainer.style.cssText = "display:flex;flex-direction:column;gap:8px;width:100%;overflow-y:auto;flex:1;";
+                itemsContainer.className = "sa-box__body";
 
                 const footer = document.createElement("div");
-                footer.style.cssText = "display:flex;align-items:center;gap:8px;width:100%;font-size:12px;color:#cbd5e1;flex-shrink:0;box-sizing:border-box;white-space:nowrap;";
+                footer.className = "sa-box__foot";
 
                 const modeLabel = document.createElement("span");
                 modeLabel.textContent = t("previewMode");
-                modeLabel.style.cssText = "margin-right:4px;flex-shrink:0;white-space:nowrap;";
+                modeLabel.style.cssText = "flex-shrink:0;white-space:nowrap;";
 
                 const modeWrap = document.createElement("div");
                 modeWrap.style.cssText = "display:flex;align-items:center;gap:10px;flex-shrink:0;white-space:nowrap;";
@@ -463,21 +654,19 @@ app.registerExtension({
                     input.type = "radio";
                     input.name = radioName;
                     input.value = value;
-                    input.style.cssText = "accent-color:#60a5fa;margin:0;";
+                    input.style.cssText = "accent-color:#60a5fa;margin:0;width:11px;height:11px;";
                     const span = document.createElement("span");
                     span.textContent = text;
-                    span.style.cssText = "color:#e5e7eb;";
+                    span.style.cssText = `color:${SA_COLOR.textDim};font-size:${SA_TYPE.micro};`;
                     label.appendChild(input);
                     label.appendChild(span);
                     return { label, input };
                 };
 
                 const radioStandard = mkRadio("Standard", t("standard"));
-                const radioDebug = mkRadio("Debug", t("debug"));
                 const radioMarkdown = mkRadio("Markdown", t("markdown"));
 
                 modeWrap.appendChild(radioStandard.label);
-                modeWrap.appendChild(radioDebug.label);
                 modeWrap.appendChild(radioMarkdown.label);
 
                 const copyButton = document.createElement("button");
@@ -487,7 +676,7 @@ app.registerExtension({
                 copyLabel.style.cssText = "display:block;line-height:1;";
                 copyButton.appendChild(copyLabel);
                 copyButton._label = copyLabel;
-                copyButton.style.cssText = "margin-left:auto;flex-shrink:0;display:inline-flex;align-items:center;justify-content:center;height:20px;white-space:nowrap;background:rgba(96,165,250,0.15);color:#93c5fd;border:1px solid rgba(96,165,250,0.4);border-radius:4px;padding:0 6px;font-size:11px;text-align:center;box-sizing:border-box;cursor:pointer;outline:none;appearance:none;-webkit-appearance:none;transition:background 0.15s ease,color 0.15s ease,border-color 0.15s ease;";
+                copyButton.style.cssText = "margin-left:auto;flex-shrink:0;display:inline-flex;align-items:center;justify-content:center;height:18px;white-space:nowrap;background:rgba(96,165,250,0.15);color:#93c5fd;border:1px solid rgba(96,165,250,0.4);border-radius:4px;padding:0 6px;font-size:11px;text-align:center;box-sizing:border-box;cursor:pointer;outline:none;appearance:none;-webkit-appearance:none;transition:background 0.15s ease,color 0.15s ease,border-color 0.15s ease;";
                 copyButton._syncWidth = () => {
                     copyButton.style.minWidth = widestInlineWidth(
                         [t("copy"), t("copied"), t("copyFailed"), t("copyEmpty")],
@@ -529,12 +718,10 @@ app.registerExtension({
                     host,
                     itemsContainer,
                     radioStandard,
-                    radioDebug,
                     radioMarkdown,
                     modeLabel,
                     copyButton,
                     radioStandardLabel: radioStandard.label.querySelector('span'),
-                    radioDebugLabel: radioDebug.label.querySelector('span'),
                     radioMarkdownLabel: radioMarkdown.label.querySelector('span')
                 };
 
@@ -543,34 +730,28 @@ app.registerExtension({
                 }
 
                 const savedMode = node.properties.showAnyMode || node.properties.showtextMode;
-                const initialMode = savedMode === "Debug" ? "Debug" : savedMode === "Markdown" ? "Markdown" : "Standard";
+                const initialMode = savedMode === "Markdown" ? "Markdown" : "Standard";
                 node.properties.showAnyMode = initialMode;
                 node.__showAnyPreview.radioStandard.input.checked = initialMode === "Standard";
-                node.__showAnyPreview.radioDebug.input.checked = initialMode === "Debug";
                 node.__showAnyPreview.radioMarkdown.input.checked = initialMode === "Markdown";
 
                 const syncRadioColors = () => {
-                    node.__showAnyPreview.radioStandardLabel.style.color = node.__showAnyPreview.radioStandard.input.checked ? "#93c5fd" : "#e5e7eb";
-                    node.__showAnyPreview.radioDebugLabel.style.color = node.__showAnyPreview.radioDebug.input.checked ? "#93c5fd" : "#e5e7eb";
-                    node.__showAnyPreview.radioMarkdownLabel.style.color = node.__showAnyPreview.radioMarkdown.input.checked ? "#93c5fd" : "#e5e7eb";
+                    node.__showAnyPreview.radioStandardLabel.style.color = node.__showAnyPreview.radioStandard.input.checked ? SA_COLOR.primaryLight : SA_COLOR.textDim;
+                    node.__showAnyPreview.radioMarkdownLabel.style.color = node.__showAnyPreview.radioMarkdown.input.checked ? SA_COLOR.primaryLight : SA_COLOR.textDim;
                 };
                 syncRadioColors();
                 node.__showAnyPreview.radioStandard.input.addEventListener("change", syncRadioColors);
-                node.__showAnyPreview.radioDebug.input.addEventListener("change", syncRadioColors);
                 node.__showAnyPreview.radioMarkdown.input.addEventListener("change", syncRadioColors);
 
                 const onModeChange = () => {
                     let mode = "Standard";
-                    if (node.__showAnyPreview.radioDebug.input.checked) {
-                        mode = "Debug";
-                    } else if (node.__showAnyPreview.radioMarkdown.input.checked) {
+                    if (node.__showAnyPreview.radioMarkdown.input.checked) {
                         mode = "Markdown";
                     }
                     node.properties.showAnyMode = mode;
                     updatePreview(node, node.__showAnyRawData);
                 };
                 node.__showAnyPreview.radioStandard.input.addEventListener("change", onModeChange);
-                node.__showAnyPreview.radioDebug.input.addEventListener("change", onModeChange);
                 node.__showAnyPreview.radioMarkdown.input.addEventListener("change", onModeChange);
 
                 clampShowAnySize(node);
@@ -580,7 +761,6 @@ app.registerExtension({
                 ensurePreviewUI(node);
                 node.__showAnyRawData = data;
                 const mode = node.properties.showAnyMode || "Standard";
-                const isDebugMode = mode === "Debug";
                 const isMarkdownMode = mode === "Markdown";
                 const itemsContainer = node.__showAnyPreview.itemsContainer;
 
@@ -593,45 +773,21 @@ app.registerExtension({
                     items = [data];
                 }
 
-                const isSingleItem = items.length === 1;
-
-                itemsContainer.style.overflowY = "auto";
-                itemsContainer.style.flex = "1";
-
-                items.forEach((item, index) => {
-                    let text = "";
-                    if (item === null || item === undefined) {
-                        text = "";
-                    } else {
-                        text = String(item);
-                    }
-                    
-                    if (isMarkdownMode) {
-                        const { container, contentDiv } = createMarkdownContainer(text);
-                        itemsContainer.appendChild(container);
-                        if (isSingleItem) {
-                            container.style.height = "100%";
-                            container.style.flex = "1";
-                            container.style.minHeight = "0";
-                            contentDiv.style.height = "100%";
-                        } else {
-                            contentDiv.style.maxHeight = "200px";
-                        }
-                    } else {
-                        const { container, textarea } = createItemContainer(text, isDebugMode);
-                        itemsContainer.appendChild(container);
-                        if (isSingleItem) {
-                            container.style.height = "100%";
-                            container.style.flex = "1";
-                            container.style.minHeight = "0";
-                            textarea.style.height = "100%";
-                            textarea.style.overflow = "auto";
-                        } else {
-                            textarea.style.height = "80px";
-                            textarea.style.overflow = "auto";
-                        }
-                    }
-                });
+                const isEmpty = items.length === 0
+                    || items.every((item) => String(item ?? "").trim() === "");
+                if (isEmpty) {
+                    const placeholder = document.createElement("div");
+                    placeholder.className = "sa-empty";
+                    placeholder.textContent = t("emptyPreview");
+                    itemsContainer.appendChild(placeholder);
+                } else {
+                    items.forEach((item) => {
+                        const text = item === null || item === undefined ? "" : String(item);
+                        itemsContainer.appendChild(
+                            isMarkdownMode ? createMarkdownItem(text) : createSourceItem(text)
+                        );
+                    });
+                }
 
                 app.graph.setDirtyCanvas(true, false);
             }
@@ -641,8 +797,9 @@ app.registerExtension({
                 
                 node.__showAnyPreview.modeLabel.textContent = t("previewMode");
                 node.__showAnyPreview.radioStandardLabel.textContent = t("standard");
-                node.__showAnyPreview.radioDebugLabel.textContent = t("debug");
                 node.__showAnyPreview.radioMarkdownLabel.textContent = t("markdown");
+                const placeholder = node.__showAnyPreview.itemsContainer.querySelector(".sa-empty");
+                if (placeholder) placeholder.textContent = t("emptyPreview");
                 if (!node.__showAnyPreview.copyButton._copyFlashTimer) {
                     (node.__showAnyPreview.copyButton._label || node.__showAnyPreview.copyButton).textContent = t("copy");
                 }
@@ -656,7 +813,6 @@ app.registerExtension({
                 this._showAnyHelp = false;
                 this._showAnyLocale = getLocale();
                 updatePreview(this, [""]);
-                loadMarked();
                 return r;
             };
 
@@ -749,7 +905,6 @@ app.registerExtension({
                     helpElement.style.top = `${transform.f + bcr.y}px`;
                 }
 
-                // 展开中或鼠标悬停时高亮
                 const helpActive = !!(this._showAnyHelp || this._showAnyHelpHovered);
 
                 ctx.save();
@@ -778,7 +933,6 @@ app.registerExtension({
                 return r;
             };
 
-            // 帮助按钮悬停高亮
             const mouseMove = nodeType.prototype.onMouseMove;
             nodeType.prototype.onMouseMove = function (e, localPos, canvas) {
                 const r = mouseMove ? mouseMove.apply(this, arguments) : undefined;

@@ -6,6 +6,8 @@ from aiohttp import web
 from server import PromptServer
 
 class PromptCardSelector:
+    DESCRIPTION = "Draws prompts from a card pool in random or sequential order, with a built-in pool manager for browsing, searching and import/export."
+
     CATEGORY = "Zhi.AI/Generator"
     FUNCTION = "output"
     RETURN_TYPES = ("STRING",)
@@ -258,13 +260,11 @@ class PromptCardSelector:
         selected = files[:]
         pool_shuffle = None
         try:
-            # allow pool shuffle from settings by default
             st = cls.load_settings()
             pool_shuffle = str(st.get('pool_shuffle') or 'sequential')
         except Exception:
             pool_shuffle = 'sequential'
         try:
-            # If names items carry an override (dict with pool_shuffle), honor it
             if isinstance(names, dict):
                 ps = names.get('pool_shuffle')
                 if isinstance(ps, str):
@@ -372,7 +372,7 @@ class PromptCardSelector:
         out = '\n'.join([c for c in chosen if c])
         return {"text": out, "names": selected}
 
-@PromptServer.instance.routes.get('/zhihui/prompt_cards')
+@PromptServer.instance.routes.get('/zhiai/prompt_cards')
 async def get_prompt_cards(request):
     try:
         files = PromptCardSelector.list_prompt_cards()
@@ -380,7 +380,7 @@ async def get_prompt_cards(request):
     except Exception as e:
         return web.json_response({"error": str(e)}, status=500)
 
-@PromptServer.instance.routes.get('/zhihui/prompt_card')
+@PromptServer.instance.routes.get('/zhiai/prompt_card')
 async def get_prompt_card_content(request):
     try:
         name = request.query.get('name', '')
@@ -390,7 +390,7 @@ async def get_prompt_card_content(request):
     except Exception as e:
         return web.json_response({"error": str(e)}, status=500)
 
-@PromptServer.instance.routes.post('/zhihui/prompt_cards')
+@PromptServer.instance.routes.post('/zhiai/prompt_cards')
 async def save_prompt_card(request):
     try:
         data = await request.json()
@@ -411,7 +411,7 @@ async def save_prompt_card(request):
     except Exception as e:
         return web.json_response({"error": str(e)}, status=500)
 
-@PromptServer.instance.routes.delete('/zhihui/prompt_cards')
+@PromptServer.instance.routes.delete('/zhiai/prompt_cards')
 async def delete_prompt_card(request):
     try:
         data = await request.json()
@@ -431,7 +431,7 @@ async def delete_prompt_card(request):
     except Exception as e:
         return web.json_response({"error": str(e)}, status=500)
 
-@PromptServer.instance.routes.post('/zhihui/prompt_cards/select')
+@PromptServer.instance.routes.post('/zhiai/prompt_cards/select')
 async def select_prompt_cards(request):
     try:
         data = await request.json()
@@ -454,7 +454,7 @@ async def select_prompt_cards(request):
     except Exception as e:
         return web.json_response({"error": str(e)}, status=500)
 
-@PromptServer.instance.routes.get('/zhihui/prompt_cards/settings')
+@PromptServer.instance.routes.get('/zhiai/prompt_cards/settings')
 async def get_prompt_card_settings(request):
     try:
         st = PromptCardSelector.load_settings()
@@ -462,7 +462,7 @@ async def get_prompt_card_settings(request):
     except Exception as e:
         return web.json_response({"error": str(e)}, status=500)
 
-@PromptServer.instance.routes.post('/zhihui/prompt_cards/settings')
+@PromptServer.instance.routes.post('/zhiai/prompt_cards/settings')
 async def save_prompt_card_settings(request):
     try:
         data = await request.json()

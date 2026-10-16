@@ -20,7 +20,7 @@ class SobelSharpen:
     RETURN_NAMES = ("image_output",)
     FUNCTION = "apply_sobel"
     CATEGORY = "Zhi.AI/MovieTools"
-    DESCRIPTION = "Sobel Sharpen: Uses Sobel operator for edge detection and sharpening, enhancing edge information by calculating image gradients. Supports sharpen strength adjustment, particularly suitable for highlighting image contours and edge details. Commonly used in image preprocessing and artistic effect creation."
+    DESCRIPTION = "Sharpens images with the Sobel operator, with adjustable strength."
 
     def apply_sobel(self, input_image: torch.Tensor = None, sharpen_strength: float = 0.5, switch: bool = True) -> Tuple[torch.Tensor]:
         if not switch:

@@ -42,14 +42,16 @@ class TagSelectorCache:
     def _get_default_config_path(cls):
         return os.path.join(
             os.path.dirname(os.path.dirname(os.path.dirname(__file__))),
-            "zhiai_api_config.json",
+            "config",
+            "api_config.json",
         )
 
     @classmethod
     def _get_default_keys_path(cls):
         return os.path.join(
             os.path.dirname(os.path.dirname(os.path.dirname(__file__))),
-            "zhiai_api_keys.json",
+            "config",
+            "api_keys.json",
         )
 
     @classmethod
@@ -98,18 +100,12 @@ class TagSelectorCache:
 
 
 class TagSelector:
-    DESCRIPTION = "Provides a visual tag selection interface, allowing users to select tags from preset categories. Supports hierarchical browsing, search functionality, and automatic deduplication. Selected tags are output as comma-separated strings."
+    DESCRIPTION = "Provides a visual tag selection interface for browsing and searching preset tags, outputting the selection as a comma-separated string."
 
     def __init__(self):
         self.selected_tags = ""
-        self.config_path = os.path.join(
-            os.path.dirname(os.path.dirname(os.path.dirname(__file__))),
-            "zhiai_api_config.json",
-        )
-        self.keys_path = os.path.join(
-            os.path.dirname(os.path.dirname(os.path.dirname(__file__))),
-            "zhiai_api_keys.json",
-        )
+        self.config_path = TagSelectorCache._get_default_config_path()
+        self.keys_path = TagSelectorCache._get_default_keys_path()
         self._cache = TagSelectorCache
         self.config = TagSelectorCache.get_config(self.config_path)
         self.api_keys = TagSelectorCache.get_api_keys(self.keys_path)
@@ -259,11 +255,11 @@ class TagSelector:
         try:
             tags_data = self.get_tags_config()
             if not tags_data:
-                print("[Zhihui] Random Tags: No tags data available")
+                print("[Zhiai] Random Tags: No tags data available")
                 return ""
 
             random_settings = self.get_random_settings()
-            print(f"[Zhihui] Random Tags: loaded settings, categories count={len(random_settings.get('categories', {}))}")
+            print(f"[Zhiai] Random Tags: loaded settings, categories count={len(random_settings.get('categories', {}))}")
 
             generated_tags = []
             used_tags = set()
@@ -273,7 +269,7 @@ class TagSelector:
                 for path, setting in random_settings["categories"].items()
                 if setting["enabled"]
             ]
-            print(f"[Zhihui] Random Tags: enabled_categories count={len(enabled_categories)}")
+            print(f"[Zhiai] Random Tags: enabled_categories count={len(enabled_categories)}")
 
             if random_settings.get("adultCategories"):
                 enabled_adult_categories = [
@@ -284,7 +280,7 @@ class TagSelector:
                 enabled_categories.extend(enabled_adult_categories)
 
             if not enabled_categories:
-                print("[Zhihui] Random Tags: No enabled categories, returning empty")
+                print("[Zhiai] Random Tags: No enabled categories, returning empty")
                 return ""
 
             for category_path in enabled_categories:
@@ -328,11 +324,11 @@ class TagSelector:
                     generated_tags.extend(additional_tags)
 
             result = ", ".join(generated_tags)
-            print(f"[Zhihui] Random Tags: generated {len(generated_tags)} tags, result length={len(result)}")
+            print(f"[Zhiai] Random Tags: generated {len(generated_tags)} tags, result length={len(result)}")
             return result
 
         except Exception as e:
-            print(f"[Zhihui] Error generating random tags: {e}")
+            print(f"[Zhiai] Error generating random tags: {e}")
             import traceback
             traceback.print_exc()
             return ""
@@ -348,25 +344,25 @@ class TagSelector:
             if seed == -1:
                 seed = random.randint(0, 0xffffffffffffffff)
 
-            print(f"[Zhihui] Character Extractor: seed={seed}, excluded={excluded}, custom_prompt={custom_prompt}")
+            print(f"[Zhiai] Character Extractor: seed={seed}, excluded={excluded}, custom_prompt={custom_prompt}")
             prompt_data = fetch_cosplay_prompt(seed, excluded, custom_prompt)
-            print(f"[Zhihui] Character Extractor: prompt_data type={type(prompt_data).__name__}")
+            print(f"[Zhiai] Character Extractor: prompt_data type={type(prompt_data).__name__}")
 
             if isinstance(prompt_data, str):
-                print(f"[Zhihui] Character Extractor error: {prompt_data}")
+                print(f"[Zhiai] Character Extractor error: {prompt_data}")
                 return ""
 
             original_prompt = prompt_data.get("prompt", "")
-            print(f"[Zhihui] Character Extractor: original_prompt length={len(original_prompt)}")
+            print(f"[Zhiai] Character Extractor: original_prompt length={len(original_prompt)}")
             if not original_prompt:
                 return ""
 
             filtered_prompt = filter_prompt_by_excluded(original_prompt, excluded)
-            print(f"[Zhihui] Character Extractor: filtered_prompt length={len(filtered_prompt)}")
+            print(f"[Zhiai] Character Extractor: filtered_prompt length={len(filtered_prompt)}")
             return filtered_prompt
 
         except Exception as e:
-            print(f"[Zhihui] Error generating extractor tags: {e}")
+            print(f"[Zhiai] Error generating extractor tags: {e}")
             import traceback
             traceback.print_exc()
             return ""
@@ -956,7 +952,7 @@ class TagSelector:
                 if isinstance(data, str):
                     converted_tags[name] = {
                         "content": data,
-                        "preview": f"/zhihui/user_tags/preview/{name}",
+                        "preview": f"/zhiai/user_tags/preview/{name}",
                     }
                 else:
                     converted_tags[name] = data
@@ -1040,7 +1036,7 @@ class TagSelector:
             return False
 
 
-@PromptServer.instance.routes.get("/zhihui/random_settings")
+@PromptServer.instance.routes.get("/zhiai/random_settings")
 async def get_random_settings(request):
     try:
         settings = TagSelector.get_random_settings()
@@ -1049,7 +1045,7 @@ async def get_random_settings(request):
         return web.json_response({"error": str(e)}, status=500)
 
 
-@PromptServer.instance.routes.post("/zhihui/random_settings")
+@PromptServer.instance.routes.post("/zhiai/random_settings")
 async def save_random_settings(request):
     try:
         data = await request.json()
@@ -1064,7 +1060,7 @@ async def save_random_settings(request):
         return web.json_response({"error": str(e)}, status=500)
 
 
-@PromptServer.instance.routes.get("/zhihui/tags")
+@PromptServer.instance.routes.get("/zhiai/tags")
 async def get_tags(request):
     try:
         tags_data = TagSelector.get_tags_config()
@@ -1083,7 +1079,7 @@ async def get_tags(request):
         return web.json_response({"error": str(e)}, status=500)
 
 
-@PromptServer.instance.routes.post("/zhihui/user_tags")
+@PromptServer.instance.routes.post("/zhiai/user_tags")
 async def save_user_tag(request):
     try:
         data = await request.json()
@@ -1109,7 +1105,7 @@ async def save_user_tag(request):
         user_tags[name] = {"content": content}
 
         if not delete_image:
-            user_tags[name]["preview"] = f"/zhihui/user_tags/preview/{name}"
+            user_tags[name]["preview"] = f"/zhiai/user_tags/preview/{name}"
 
         category = data.get("category", "")
         if category:
@@ -1131,7 +1127,7 @@ async def save_user_tag(request):
         return web.json_response({"error": str(e)}, status=500)
 
 
-@PromptServer.instance.routes.delete("/zhihui/user_tags")
+@PromptServer.instance.routes.delete("/zhiai/user_tags")
 async def delete_user_tag(request):
     try:
         data = await request.json()
@@ -1154,7 +1150,7 @@ async def delete_user_tag(request):
         return web.json_response({"error": str(e)}, status=500)
 
 
-@PromptServer.instance.routes.get("/zhihui/user_tags/preview/{tag_name}")
+@PromptServer.instance.routes.get("/zhiai/user_tags/preview/{tag_name}")
 async def get_user_tag_preview(request):
     try:
         tag_name = request.match_info["tag_name"]
@@ -1168,7 +1164,7 @@ async def get_user_tag_preview(request):
         return web.json_response({"error": str(e)}, status=500)
 
 
-@PromptServer.instance.routes.delete("/zhihui/user_tags/all")
+@PromptServer.instance.routes.delete("/zhiai/user_tags/all")
 async def delete_all_user_tags_and_images(request):
     try:
         user_tags = TagSelector.get_user_tags()
@@ -1205,7 +1201,7 @@ async def delete_all_user_tags_and_images(request):
         return web.json_response({"error": str(e)}, status=500)
 
 
-@PromptServer.instance.routes.get("/zhihui/user_tag_categories")
+@PromptServer.instance.routes.get("/zhiai/user_tag_categories")
 async def get_user_tag_categories(request):
     try:
         categories_path = os.path.join(os.path.dirname(__file__), "user_tag_categories.json")
@@ -1219,7 +1215,7 @@ async def get_user_tag_categories(request):
         return web.json_response({"error": str(e)}, status=500)
 
 
-@PromptServer.instance.routes.post("/zhihui/user_tag_categories")
+@PromptServer.instance.routes.post("/zhiai/user_tag_categories")
 async def save_user_tag_categories(request):
     try:
         data = await request.json()
@@ -1233,7 +1229,7 @@ async def save_user_tag_categories(request):
         return web.json_response({"error": str(e)}, status=500)
 
 
-@PromptServer.instance.routes.delete("/zhihui/user_tag_categories")
+@PromptServer.instance.routes.delete("/zhiai/user_tag_categories")
 async def delete_user_tag_category(request):
     try:
         data = await request.json()
@@ -1264,7 +1260,7 @@ async def delete_user_tag_category(request):
         return web.json_response({"error": str(e)}, status=500)
 
 
-@PromptServer.instance.routes.delete("/zhihui/user_tag_categories/all")
+@PromptServer.instance.routes.delete("/zhiai/user_tag_categories/all")
 async def delete_all_user_tag_categories(request):
     try:
         categories_path = os.path.join(os.path.dirname(__file__), "user_tag_categories.json")
@@ -1282,7 +1278,7 @@ async def delete_all_user_tag_categories(request):
         return web.json_response({"error": str(e)}, status=500)
 
 
-@PromptServer.instance.routes.get("/zhihui/user_tags/backup")
+@PromptServer.instance.routes.get("/zhiai/user_tags/backup")
 async def backup_user_tags(request):
     try:
         import zipfile
@@ -1327,7 +1323,7 @@ async def backup_user_tags(request):
         return web.json_response({"error": str(e)}, status=500)
 
 
-@PromptServer.instance.routes.post("/zhihui/user_tags/restore")
+@PromptServer.instance.routes.post("/zhiai/user_tags/restore")
 async def restore_user_tags(request):
     try:
         import zipfile
@@ -1426,7 +1422,7 @@ def filter_prompt_by_excluded(original_prompt, excluded_str):
     return '，'.join(filtered_segments)
 
 
-@PromptServer.instance.routes.post("/zhihui/cosplay-prompt")
+@PromptServer.instance.routes.post("/zhiai/cosplay-prompt")
 async def get_cosplay_prompt(request):
     try:
         data = await request.json()
@@ -1455,7 +1451,7 @@ async def get_cosplay_prompt(request):
         return web.json_response({"success": False, "error": str(e)}, status=500)
 
 
-@PromptServer.instance.routes.get("/zhihui/extractor_settings")
+@PromptServer.instance.routes.get("/zhiai/extractor_settings")
 async def get_extractor_settings_api(request):
     try:
         settings = TagSelector.get_extractor_settings()
@@ -1464,7 +1460,7 @@ async def get_extractor_settings_api(request):
         return web.json_response({"error": str(e)}, status=500)
 
 
-@PromptServer.instance.routes.post("/zhihui/extractor_settings")
+@PromptServer.instance.routes.post("/zhiai/extractor_settings")
 async def save_extractor_settings_api(request):
     try:
         data = await request.json()

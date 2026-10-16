@@ -83,9 +83,6 @@ app.registerExtension({
                 const inputcountWidget = this.widgets.find(w => w.name === "inputcount");
                 const isChinese = inputcountWidget && (inputcountWidget.label === "输入数量" || inputcountWidget.name === "输入数量");
 
-                // 补齐 find_/replace_。不要删除或重排 widget——widgets 数组的顺序
-                // 必须与 INPUT_TYPES 定义顺序一致，否则 configure 按位置恢复值会错位，
-                // 导致 unify_replace 被写入文本值（truthy）而意外自动启用并丢失全部参数。
                 for (let i = 1; i <= 10; i++) {
                     const findName = `find_${i}`;
                     const replaceName = `replace_${i}`;

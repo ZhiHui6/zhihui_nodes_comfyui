@@ -19,7 +19,7 @@ class TextModifier:
     FUNCTION = "substr"
     OUTPUT_NODE = False 
     CATEGORY = "Zhi.AI/Text"
-    DESCRIPTION = "Text Modifier: Extracts text content between specified start and end text. Supports optional cleanup: remove empty lines, remove spaces, remove newlines."
+    DESCRIPTION = "Extracts the text between a start and end marker, with optional removal of empty lines, spaces or newlines."
     
     def __init__(self):
         self.start_text = ""
@@ -46,7 +46,6 @@ class TextModifier:
             start_index = text_input.find(start_text) + len(start_text)
             end_index = text_input.find(end_text, start_index)
             out = text_input[start_index:end_index]
-        # 清理步骤：先去空行，再去换行，最后去空格
         if remove_empty_lines:
             lines = out.splitlines()
             lines = [ln for ln in lines if ln.strip() != ""]

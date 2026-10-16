@@ -86,7 +86,7 @@ class PhotographPromptGenerator:
     RETURN_NAMES = ("output",)
     FUNCTION = "generate_text"
     CATEGORY ="Zhi.AI/Generator"
-    DESCRIPTION = "Photography Prompt Generator: Professional photography prompt generator with 16 customizable dimensions (camera, lens, lighting, pose, clothing, etc.). Features dual output modes - Tags for tag combinations and Template for formatted text. Supports custom user options and template editing helper."
+    DESCRIPTION = "Builds photography prompts from 16 dimensions such as camera, lens, lighting, pose and clothing, in Tags or Template mode."
 
     LANGUAGE_MAP = {}
 

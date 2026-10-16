@@ -26,7 +26,7 @@ class MultiPlatformTranslate:
     RETURN_NAMES = ("translation_result",)
     FUNCTION = "translate"
     CATEGORY = "Zhi.AI/Text"
-    DESCRIPTION = "Multi-platform translation node supporting Baidu, Tencent, Aliyun, Youdao and free translation services. Click 'Configuration Management' button below to manage API settings for each platform."
+    DESCRIPTION = "Translates text with Baidu, Aliyun, Youdao, Zhipu AI or a free service, with API settings managed from the Configuration Management dialog."
 
     def __init__(self):
         self.config_path = os.path.join(os.path.dirname(__file__), "MultiPlatformTranslateConfig.json")
@@ -154,10 +154,6 @@ class MultiPlatformTranslate:
             return self.translate_google({}, source_language, target_language, text)
 
     def truncate(self, q):
-        """
-        计算input参数
-        input=q前10个字符 + q长度 + q后10个字符（当q长度大于20）或 input=q字符串（当q长度小于等于20）
-        """
         if len(q) <= 20:
             return q
         else:
@@ -174,7 +170,7 @@ class MultiPlatformTranslate:
         
         salt = str(random.randint(1000000000, 9999999999))
         curtime = str(int(time.time()))
-        input_str = self.truncate(text)  # 正确计算input参数
+        input_str = self.truncate(text)
         sign_str = app_key + input_str + salt + curtime + app_secret
         sign = hashlib.sha256(sign_str.encode()).hexdigest()
         
@@ -198,13 +194,11 @@ class MultiPlatformTranslate:
             raise Exception(f"Youdao Translate error: {result.get('errorCode', 'Unknown error')}")
 
     def translate_google(self, config, source_language, target_language, text):
-        """免费翻译方法，使用谷歌翻译"""
         if not text.strip():
             return text
         return self._translate_with_google(source_language, target_language, text)
     
     def _translate_with_google(self, source_language, target_language, text):
-        """使用谷歌翻译进行翻译"""
         lang_map = {
             "auto": "auto",
             "zh": "zh-CN", 
@@ -239,7 +233,6 @@ class MultiPlatformTranslate:
             response = requests.get(url, params=params, headers=headers, timeout=10)
             if response.status_code == 200:
                 result = response.json()
-                # 谷歌翻译返回的结构是 [[["翻译结果", "源文本", ...], ...], ...]
                 if result and isinstance(result, list) and len(result) > 0:
                     translated_parts = []
                     for part in result[0]:
@@ -298,7 +291,6 @@ class MultiPlatformTranslate:
             raise Exception(f"Zhipu AI translation error: {error_msg}")
 
     def get_language_name(self, lang_code):
-        """获取语言代码对应的语言名称"""
         lang_names = {
             "zh": "中文",
             "en": "英语", 

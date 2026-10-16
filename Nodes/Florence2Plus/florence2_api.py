@@ -100,7 +100,7 @@ def run_download(model_name, platform, use_mirror):
             print(f"Download error: {e}")
 
 if HAS_SERVER:
-    @PromptServer.instance.routes.get("/zhihui/florence2/models")
+    @PromptServer.instance.routes.get("/zhiai/florence2/models")
     async def get_models(request):
         config = load_config()
         active_models = config.get("active_models", {})
@@ -124,7 +124,7 @@ if HAS_SERVER:
             
         return web.json_response(models_info)
 
-    @PromptServer.instance.routes.post("/zhihui/florence2/toggle")
+    @PromptServer.instance.routes.post("/zhiai/florence2/toggle")
     async def toggle_model(request):
         data = await request.json()
         model_name = data.get("model_name")
@@ -142,7 +142,7 @@ if HAS_SERVER:
         
         return web.json_response({"status": "success"})
 
-    @PromptServer.instance.routes.post("/zhihui/florence2/download")
+    @PromptServer.instance.routes.post("/zhiai/florence2/download")
     async def download_model(request):
         global download_status
         if download_status["status"] == "downloading":
@@ -159,11 +159,11 @@ if HAS_SERVER:
         threading.Thread(target=run_download, args=(model_name, platform, use_mirror)).start()
         return web.json_response({"status": "started"})
 
-    @PromptServer.instance.routes.get("/zhihui/florence2/download_status")
+    @PromptServer.instance.routes.get("/zhiai/florence2/download_status")
     async def get_download_status(request):
         return web.json_response(download_status)
 
-    @PromptServer.instance.routes.delete("/zhihui/florence2/models")
+    @PromptServer.instance.routes.delete("/zhiai/florence2/models")
     async def delete_model(request):
         data = await request.json()
         model_name = data.get("model_name")

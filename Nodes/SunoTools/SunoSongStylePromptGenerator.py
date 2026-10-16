@@ -162,8 +162,8 @@ class SunoSongStylePromptGenerator:
     RETURN_TYPES = ("STRING",)
     RETURN_NAMES = ("prompt",)
     FUNCTION = "generate"
-    CATEGORY = "Zhi.AI/Generator"
-    DESCRIPTION = "Suno Song Style Prompt Generator: Combines lyrical preferences with musical elements to generate structured Suno prompts. (AI generation functionality removed as platform is defunct). Outputs the constructed prompt for use with other LLMs."
+    CATEGORY = "Zhi.AI/Audio"
+    DESCRIPTION = "Combines lyrical preferences and musical elements into a structured Suno style prompt."
 
     def _random_choice(self, value, options):
         if value == "Random":

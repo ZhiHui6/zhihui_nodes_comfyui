@@ -29,8 +29,8 @@ class ImageFormatConverter:
     RETURN_TYPES = ("IMAGE", "STRING")
     RETURN_NAMES = ("converted_image", "conversion_info")
     FUNCTION = "convert_format"
-    CATEGORY = "Zhi.AI/Toolkit"
-    DESCRIPTION = "Image Format Converter: Converts images between different formats (JPEG, PNG, WEBP, BMP, TIFF) with customizable quality settings. Supports batch folder processing with content-based format detection. Features optimization, progressive encoding, and lossless compression options. Perfect for format standardization, file size optimization, and batch conversion tasks."
+    CATEGORY = "Zhi.AI/Image"
+    DESCRIPTION = "Converts images between JPEG, PNG, WEBP, BMP and TIFF with quality control and batch folder processing."
 
     def convert_format(self, output_format, quality, folder_path, optimize=True, progressive=False, lossless=False):
         

@@ -7,8 +7,8 @@
   },
   "preset": "Ignore",
   "prompt_version": "default",
-  "show_log_panel": false,
-  "folder_read_mode": "recursive",
+  "show_log_panel": true,
+  "folder_read_mode": "sequential",
   "batch_progress": {
     "current_folder": "",
     "processed_folders": [],

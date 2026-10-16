@@ -1,4 +1,6 @@
 class TextMergerNode:
+    DESCRIPTION = "Merges text_1 to text_N inputs into a single output joined by a separator."
+
     @classmethod
     def INPUT_TYPES(s):
         return {

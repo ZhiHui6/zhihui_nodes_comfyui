@@ -1,0 +1,316 @@
+{
+    "ShowAny": {
+        "outputs": {
+            "STRING": "字符串"
+        }
+    },
+    "MultiLineTextNode": {
+        "outputs": {
+            "text_output": "文本输出"
+        }
+    },
+    "TextCombinerNode": {
+        "outputs": {
+            "text_output": "文本输出"
+        }
+    },
+    "TextMergerNode": {
+        "outputs": {
+            "merged_text": "合并文本"
+        }
+    },
+    "PromptDelete": {
+        "outputs": {
+            "text_output": "文本输出"
+        }
+    },
+    "TextModifier": {
+        "outputs": {
+            "text_output": "文本输出",
+            "help": "帮助信息"
+        }
+    },
+    "TextExtractor": {
+        "outputs": {
+            "text_output": "文本输出"
+        }
+    },
+    "TriggerWordMerger": {
+        "outputs": {
+            "text_output": "文本输出"
+        }
+    },
+    "TextSwitchDualMode": {
+        "outputs": {
+            "output_text": "输出文本"
+        }
+    },
+    "TagSelector": {
+        "outputs": {
+            "tags": "标签"
+        }
+    },
+    "ImageAspectRatio": {
+        "outputs": {
+            "width": "宽度",
+            "height": "高度",
+            "latent": "潜空间"
+        }
+    },
+    "GetImageSizes": {
+        "outputs": {
+            "width": "宽度",
+            "height": "高度"
+        }
+    },
+    "ImageScaler": {
+        "outputs": {
+            "image_output": "图像输出"
+        }
+    },
+    "ImageSwitchDualMode": {
+        "outputs": {
+            "output_image": "输出图像"
+        }
+    },
+    "PriorityImageSwitch": {
+        "outputs": {
+            "output_image": "输出图像"
+        }
+    },
+    "PriorityTextSwitch": {
+        "outputs": {
+            "output_text": "输出文本"
+        }
+    },
+    "LatentSwitchDualMode": {
+        "outputs": {
+            "output_latent": "输出潜在空间"
+        }
+    },
+    "ColorRemoval": {
+        "outputs": {
+            "image_output": "图像输出"
+        }
+    },
+    "PromptPresetOneChoice": {
+        "outputs": {
+            "prompt": "提示词"
+        }
+    },
+    "SystemPromptLoader": {
+        "outputs": {
+            "system_prompt": "系统提示词"
+        }
+    },
+    "USMSharpen": {
+        "outputs": {
+            "image_output": "图像输出"
+        }
+    },
+    "SobelSharpen": {
+        "outputs": {
+            "image_output": "图像输出"
+        }
+    },
+    "ExtraOptions": {
+        "outputs": {
+            "guide_output": "引导输出"
+        }
+    },
+    "LaplacianSharpen": {
+        "outputs": {
+            "image_output": "图像输出"
+        }
+    },
+    "FilmGrain": {
+        "outputs": {
+            "image_output": "图像输出"
+        }
+    },
+    "ColorMatchToReference": {
+        "outputs": {
+            "image_output": "图像输出"
+        }
+    },
+    "PhotographPromptGenerator": {
+        "outputs": {
+            "output": "输出"
+        }
+    },
+    "PromptPresetMultipleChoice": {
+        "outputs": {
+            "output_text": "输出文本"
+        }
+    },
+    "ImageEditingPresets": {
+        "outputs": {
+            "prompt_content": "提示词内容"
+        }
+    },
+    "IntNode": {
+        "outputs": {
+            "int": "整数"
+        }
+    },
+    "WanPromptGenerator": {
+        "outputs": {
+            "source_prompt": "源提示词",
+            "prompt_output": "提示词输出"
+        }
+    },
+    "TextEditorWithContinue": {
+        "outputs": {
+            "text_output": "文本输出"
+        }
+    },
+    "SunoSongStylePromptGenerator": {
+        "outputs": {
+            "prompt": "提示词"
+        }
+    },
+    "SunoLyricsGenerator": {
+        "outputs": {
+            "lyrics": "歌词"
+        }
+    },
+    "LLMExtraOptions": {
+        "outputs": {
+            "extra_options": "额外选项"
+        }
+    },
+    "ImageRotateTool": {
+        "outputs": {
+            "IMAGE": "图像"
+        }
+    },
+    "ImageFormatConverter": {
+        "outputs": {
+            "converted_image": "转换后图像",
+            "conversion_info": "转换信息"
+        }
+    },
+    "ImageUnderstandingOnline": {
+        "outputs": {
+            "text_output": "文本输出"
+        },
+        "options": {
+            "prompt_length": {
+                "Standard": "标准",
+                "Short": "短",
+                "Medium": "中",
+                "Long": "长"
+            },
+            "prompt_format": {
+                "Structured JSON": "结构化Json",
+                "Tag": "Tag标签",
+                "Natural": "自然语言"
+            },
+            "output_language": {
+                "Chinese": "中文",
+                "English": "英文",
+                "Chinese&English": "中英"
+            }
+        }
+    },
+    "BatchLoadingOfImages": {
+        "outputs": {
+            "IMAGE": "图像",
+            "MASK": "遮罩",
+            "FILE PATH": "文件路径"
+        }
+    },
+    "PromptCardSelector": {
+        "outputs": {
+            "text": "文本"
+        }
+    },
+    "PromptGallery": {
+        "outputs": {
+            "text_content": "提示词文本"
+        }
+    },
+    "MultiPlatformTranslate": {
+        "outputs": {
+            "translation_result": "翻译结果"
+        }
+    },
+    "ResourceCleaner": {
+        "outputs": {
+            "passthrough": "透传输出",
+            "cleaning_report": "清理报告"
+        }
+    },
+    "ReservedVRAMSetter": {
+        "outputs": {
+            "output": "输出",
+            "SEED": "随机种子",
+            "Reserved(GB)": "预留显存(GB)"
+        }
+    },
+    "Florence2Plus": {
+        "outputs": {
+            "text": "文本"
+        }
+    },
+    "TypeDesigner": {
+        "outputs": {
+            "prompt_text": "提示词文本"
+        }
+    },
+    "PromptReplace": {
+        "outputs": {
+            "text_output": "提示词"
+        }
+    },
+    "AudioDuration": {
+        "outputs": {
+            "duration_seconds": "时长(秒)",
+            "formatted_time": "格式化时间",
+            "duration_ms": "时长(毫秒)"
+        }
+    },
+    "VideoFrameExtractor": {
+        "outputs": {
+            "IMAGES": "图像列表"
+        },
+        "options": {
+            "extract_mode": {
+                "frame_count": "按帧（逐帧）",
+                "frame_interval": "按帧（跳帧）",
+                "time_count": "按时间（逐个时间）",
+                "time_interval": "按时间（间隔时间）"
+            },
+            "time_unit": {
+                "seconds": "秒",
+                "minutes": "分钟"
+            }
+        }
+    },
+    "LMStudioNode": {
+        "outputs": {
+            "text_output": "文本输出"
+        }
+    },
+    "TextEncoderRelease": {
+        "outputs": {
+            "model": "模型"
+        }
+    },
+    "MultimediaAdvancedLoader": {
+        "outputs": {
+            "images": "图像输出",
+            "media_bundle": "媒体输出"
+        }
+    },
+    "VideoPreview": {
+        "outputs": {
+            "VIDEO": "视频"
+        }
+    },
+    "ImageIndexer": {
+        "outputs": {
+            "images": "图像（原序透传）"
+        }
+    }
+}

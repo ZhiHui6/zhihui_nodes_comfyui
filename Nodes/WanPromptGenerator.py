@@ -5,7 +5,7 @@ class WanPromptGenerator:
     FUNCTION = "generate_prompt"
     RETURN_TYPES = ("STRING", "STRING")
     RETURN_NAMES = ("source_prompt", "prompt_output")
-    DESCRIPTION = "Universal Prompt Generator: Generates professional image prompts through rich parameter options. Supports multi-dimensional settings such as subject type, emotion, action, scene, lighting, composition, etc. Built-in movie scene presets, suitable for various creative image generation needs."
+    DESCRIPTION = "Combines 17 dimensions such as camera movement, scene, lighting and composition into a professional Wan 2.2 video prompt."
 
     subject_type_options = [
         "关闭", "随机", 

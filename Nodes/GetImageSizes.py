@@ -11,7 +11,7 @@ class GetImageSizes:
     RETURN_NAMES = ("width", "height")
     FUNCTION = "get_size"
     CATEGORY = "Zhi.AI/Image"
-    DESCRIPTION = "Get Image Sizes: Extract width/height from input image and show a live size preview on the node."
+    DESCRIPTION = "Extracts width/height from the input image and shows a live size preview on the node."
 
     def get_size(self, image):
         try:

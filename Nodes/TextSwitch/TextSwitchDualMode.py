@@ -23,7 +23,7 @@ class TextSwitchDualMode:
     RETURN_NAMES = ("output_text",)
     FUNCTION = "execute"
     CATEGORY = "Zhi.AI/Text"
-    DESCRIPTION = "Dynamic Text Switcher: Switches among a dynamic number of text inputs. Supports manual mode (select by index) and auto mode (outputs the single non-empty input, errors if multiple). Input count is controlled via the 'inputcount' slider, and the 'Update inputs' button updates ports accordingly. The select_text options and textN_comment fields synchronize with inputcount. Newly added inputs are optional."
+    DESCRIPTION = "Switches among a variable number of text inputs, in manual index mode or auto mode that requires exactly one non-empty input."
 
     def execute(self, inputcount, mode, select_text, text1_comment="", text2_comment="",
                 text1=None, text2=None, **kwargs):

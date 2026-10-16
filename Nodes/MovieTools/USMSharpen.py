@@ -21,7 +21,7 @@ class USMSharpen:
     RETURN_NAMES = ("image_output",)
     FUNCTION = "apply_unsharp"
     CATEGORY = "Zhi.AI/MovieTools"
-    DESCRIPTION = "USM Sharpen: Uses Unsharp Mask technique for image sharpening, which is the most commonly used sharpening method in professional image processing. Enhances details by creating a blurred version and comparing it with the original image. Supports sharpen strength adjustment, suitable for high-quality image post-processing."
+    DESCRIPTION = "Sharpens images with the Unsharp Mask technique, with adjustable strength."
 
     def apply_unsharp(self, input_image: torch.Tensor, sharpen_strength: float, switch: bool) -> Tuple[torch.Tensor]:
         if not switch:

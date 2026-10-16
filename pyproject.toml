@@ -1,8 +1,9 @@
 [project]
-name = "zhihui_nodes_comfyui"
-description = "ComfyUI custom nodes collection with 55+ nodes: multi-engine translation, text processing, prompt generators, image tools, Qwen3-VL vision understanding, LM Studio integration, and more."
-version = "1.1.1"
-license = {file = "LICENSE"}
+name = "zhiai-nodes-comfyui"
+description = "ComfyUI custom nodes collection with 56 nodes: multi-engine translation, text processing, prompt generators, image tools, Qwen3-VL vision understanding, Florence2 image analysis, LM Studio integration, and more."
+version = "2.0.0"
+license = { file = "LICENSE" }
+requires-python = ">=3.10"
 classifiers = [
     "Operating System :: OS Independent",
     "Environment :: GPU :: NVIDIA CUDA",
@@ -10,39 +11,30 @@ classifiers = [
     "Programming Language :: Python :: 3.10",
     "Programming Language :: Python :: 3.11",
     "Programming Language :: Python :: 3.12",
+    "Programming Language :: Python :: 3.13",
 ]
 
 dependencies = [
     "opencv-python",
-    "torchvision",
-    "torchaudio",
-    "numpy",
-    "requests",
-    "Pillow",
-    "aiohttp",
     "huggingface_hub",
     "modelscope",
-    "accelerate",
-    "optimum",
-    "av",
-    "qwen-vl-utils",
-    "bitsandbytes",
-    "torch>=2.0.0",
     "transformers>=4.57.0",
     "openai>=1.0.0",
-    "nvidia-ml-py",
     "timm>=0.9.16",
-    "sentencepiece",
+    "nvidia-ml-py",
     "einops",
+    "cryptography",
+    "scikit-image",
 ]
 
 [project.urls]
-Repository = "https://github.com/zhihui6/zhihui_nodes_comfyui"
-Documentation = "https://github.com/zhihui6/zhihui_nodes_comfyui#readme"
-"Bug Tracker" = "https://github.com/zhihui6/zhihui_nodes_comfyui/issues"
+Homepage = "https://github.com/ZhiHui6/zhiai_nodes_comfyui"
+Repository = "https://github.com/ZhiHui6/zhiai_nodes_comfyui"
+Documentation = "https://github.com/ZhiHui6/zhiai_nodes_comfyui#readme"
+Issues = "https://github.com/ZhiHui6/zhiai_nodes_comfyui/issues"
 
 [tool.comfy]
-PublisherId = "zhihui6"
-DisplayName = "Zhihui Nodes"
-Icon = ""
+PublisherId = "ZhiHui6"
+DisplayName = "ZhiAI Nodes"
+Icon = "https://raw.githubusercontent.com/ZhiHui6/zhiai_nodes_comfyui/main/icon.png"
 includes = []

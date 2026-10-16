@@ -11,7 +11,7 @@ any_type = AnyType("*")
 class ResourceCleaner:
     CATEGORY = "Zhi.AI/Toolkit"
     OUTPUT_NODE = True
-    DESCRIPTION = "Resource Cleaner: Provides independent controls for clearing RAM, VRAM, and cache. Each cleaning function can be toggled individually to selectively release system resources."
+    DESCRIPTION = "Independently clears RAM, VRAM and cache."
     
     @classmethod
     def INPUT_TYPES(cls):

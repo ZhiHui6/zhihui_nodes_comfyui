@@ -49,6 +49,8 @@ def sort_by(items, base_path='.', method=None):
         return items
 
 class BatchLoadingOfImages:
+    DESCRIPTION = "Loads images from a folder sorted by name, number or time, with a start index and count limit, outputting images, masks and file paths."
+
     @classmethod
     def INPUT_TYPES(s):
         return {

@@ -89,7 +89,7 @@ function $t(key) {
 }
 
 app.registerExtension({
-    name: "zhihui.TypeDesigner",
+    name: "zhiai.TypeDesigner",
     async beforeRegisterNodeDef(nodeType, nodeData, app) {
         if (nodeData.name === "TypeDesigner") {
             const onNodeCreated = nodeType.prototype.onNodeCreated;
@@ -107,7 +107,7 @@ app.registerExtension({
 async function openTypeDesignerDialog(node) {
     let stylesData = null;
     try {
-        const response = await api.fetchApi("/zhihui/typedesigner/styles");
+        const response = await api.fetchApi("/zhiai/typedesigner/styles");
         if (response.ok) {
             stylesData = await response.json();
         } else {
@@ -172,7 +172,6 @@ async function openTypeDesignerDialog(node) {
         #type-designer-dialog.visible .td-container {
             transform: scale(1);
         }
-        /* Header */
         .td-header {
             display: flex;
             align-items: center;
@@ -219,7 +218,7 @@ async function openTypeDesignerDialog(node) {
             outline: none;
         }
         .td-search::placeholder {
-            color: #b0b0b0; /* Brighter placeholder color */
+            color: #b0b0b0;
             opacity: 1;
         }
         .td-search:focus {
@@ -242,19 +241,18 @@ async function openTypeDesignerDialog(node) {
             display: flex;
             align-items: center;
             justify-content: center;
-            border-radius: 6px; /* Rounded rectangle */
+            border-radius: 6px;
             transition: all 0.2s;
             color: var(--td-text-secondary);
-            border: 1px solid var(--td-border-color); /* Added border */
-            font-weight: 900; /* Bold symbol */
+            border: 1px solid var(--td-border-color);
+            font-weight: 900;
             font-size: 14px;
         }
         .td-close:hover {
-            background: #ff4d4f; /* Red background on hover */
-            color: #fff; /* White text on hover */
+            background: #ff4d4f;
+            color: #fff;
             border-color: #ff4d4f;
         }
-        /* Layout */
         .td-body {
             display: flex;
             flex: 1;
@@ -266,7 +264,7 @@ async function openTypeDesignerDialog(node) {
             flex-direction: column;
             border-right: 1px solid var(--td-border-color);
             background: var(--td-bg-color);
-            min-width: 0; /* Prevent flex overflow */
+            min-width: 0;
         }
         .td-sidebar {
             width: 450px;
@@ -277,7 +275,6 @@ async function openTypeDesignerDialog(node) {
             box-shadow: -1px 0 5px rgba(0,0,0,0.02);
             z-index: 10;
         }
-        /* Tabs */
         .td-tabs-container {
             padding: 8px 24px;
             background: var(--td-sidebar-bg);
@@ -288,7 +285,7 @@ async function openTypeDesignerDialog(node) {
             display: flex;
             gap: 5px;
             overflow-x: auto;
-            scrollbar-width: none; /* Firefox */
+            scrollbar-width: none;
             padding-bottom: 4px;
         }
         .td-tabs::-webkit-scrollbar { display: none; }
@@ -306,7 +303,7 @@ async function openTypeDesignerDialog(node) {
             border: 1px solid transparent;
         }
         .td-tab:hover {
-            background: rgba(0, 123, 255, 0.2); /* Selected color with 20% opacity */
+            background: rgba(0, 123, 255, 0.2);
             color: #fff;
         }
         .td-tab.active {
@@ -314,7 +311,6 @@ async function openTypeDesignerDialog(node) {
             color: #fff;
             box-shadow: 0 2px 4px rgba(0,0,0,0.2);
         }
-        /* Grid */
         .td-grid {
             flex: 1;
             display: grid;
@@ -330,7 +326,7 @@ async function openTypeDesignerDialog(node) {
             border-top: 1px solid var(--td-border-color);
             font-size: 12px;
             color: var(--td-text-secondary);
-            text-align: left; /* Left align */
+            text-align: left;
             flex-shrink: 0;
             user-select: none;
         }
@@ -364,7 +360,7 @@ async function openTypeDesignerDialog(node) {
         }
         .td-card-img {
             width: 100%;
-            padding-top: 100%; /* Square aspect ratio for image area */
+            padding-top: 100%;
             background-color: #333;
             position: relative;
             overflow: hidden;
@@ -376,7 +372,7 @@ async function openTypeDesignerDialog(node) {
             background: linear-gradient(to bottom, transparent 60%, rgba(0,0,0,0.6));
         }
         .td-card-name {
-            padding: 6px 8px; /* Reduced height */
+            padding: 6px 8px;
             font-size: 14px;
             line-height: 1.2;
             font-weight: 600;
@@ -385,7 +381,6 @@ async function openTypeDesignerDialog(node) {
             background: var(--td-sidebar-bg);
             border-top: 1px solid var(--td-border-color);
         }
-        /* Sidebar Elements */
         .td-section-title {
             font-size: 20px;
             font-family: "SimHei", "Microsoft YaHei", sans-serif;
@@ -461,7 +456,6 @@ async function openTypeDesignerDialog(node) {
             background: #f8f9fa;
             border-color: #ccc;
         }
-        /* Custom Scrollbar */
         ::-webkit-scrollbar { width: 10px; height: 10px; }
         ::-webkit-scrollbar-track { background: transparent; }
         ::-webkit-scrollbar-thumb { background: var(--td-selected-ring); border-radius: 5px; }
@@ -588,7 +582,7 @@ async function openTypeDesignerDialog(node) {
             cardImg.className = "td-card-img";
             const hue = Math.abs(styleName.split('').reduce((a,b)=>a+(b.charCodeAt(0)),0)) % 360;
             cardImg.style.backgroundColor = `hsl(${hue}, 60%, 30%)`;
-            cardImg.style.backgroundImage = `url(/zhihui/typedesigner/images?style=${encodeURIComponent(styleName)})`;
+            cardImg.style.backgroundImage = `url(/zhiai/typedesigner/images?style=${encodeURIComponent(styleName)})`;
             cardImg.style.backgroundSize = "cover";
             cardImg.style.backgroundPosition = "center";
             const cardName = document.createElement("div");

@@ -1,3 +1,5 @@
+import { attachPanelTooltip } from "./panel_kit.js";
+
 const STYLE_ID = "zhiai-template-category-styles";
 const MAX_LENGTH = 24;
 
@@ -5,8 +7,9 @@ export const CATEGORY_ALL = "__all__";
 export const CATEGORY_NONE = "__none__";
 export const CATEGORY_MAX_LENGTH = MAX_LENGTH;
 
-const RENAME_URL = "/zhihui_nodes/template_categories/rename";
-const REMOVE_URL = "/zhihui_nodes/template_categories/remove";
+const RENAME_URL = "/zhiai_nodes/template_categories/rename";
+const REMOVE_URL = "/zhiai_nodes/template_categories/remove";
+const CREATE_URL = "/zhiai_nodes/template_categories/create";
 
 const ICONS = {
     pen: '<path d="M12 20h9"/><path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4Z"/>',
@@ -23,7 +26,7 @@ const CATEGORY_CSS = `
 .tc-filter[hidden] { display: none; }
 .tc-chip {
     display: inline-flex; align-items: center; gap: 5px; max-width: 100%;
-    padding: 4px 10px; font-family: inherit; font-size: var(--tc-chip-font, 12px); line-height: 1.45;
+    padding: 6px 13px; font-family: inherit; font-size: var(--tc-chip-font, 13.5px); line-height: 1.45;
     color: var(--tc-chip-fg, #AFC4DC); background: var(--tc-chip-bg, rgba(255,255,255,.05));
     border: 1px solid var(--tc-chip-border, rgba(255,255,255,.12)); border-radius: var(--tc-chip-radius, 999px);
     cursor: pointer; transition: color 140ms ease, background-color 140ms ease, border-color 140ms ease;
@@ -34,10 +37,38 @@ const CATEGORY_CSS = `
 }
 .tc-chip--active {
     color: var(--tc-chip-fg-active, #0A1120); background: var(--tc-chip-bg-active, #9CC2F5);
-    border-color: var(--tc-chip-border-active, #9CC2F5);
+    border-color: transparent;
 }
 .tc-chip__label { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
 .tc-chip__count { font-size: 0.92em; opacity: 0.7; }
+.tc-filter--list {
+    flex-direction: column; align-items: stretch; flex-wrap: nowrap; gap: 1px;
+}
+.tc-filter--list .tc-chip {
+    position: relative; width: 100%; max-width: none; justify-content: flex-start;
+    padding: 7px 10px 7px 12px; border: none; border-radius: 5px;
+    background: transparent; text-align: left;
+}
+.tc-filter--list .tc-chip:not(.tc-chip--active):hover {
+    color: var(--tc-chip-fg-hover, #DCE9F7);
+    background: var(--tc-chip-bg-hover, rgba(255,255,255,.07));
+}
+.tc-filter--list .tc-chip--active {
+    color: var(--tc-chip-fg-active-list, var(--tc-chip-fg-hover, #F2FAFF));
+    background: var(--tc-chip-bg-active-list, rgba(96,165,250,.16));
+}
+.tc-filter--list .tc-chip--active::before {
+    content: ""; position: absolute; left: 0; top: 5px; bottom: 5px; width: 2px;
+    border-radius: 0 2px 2px 0; background: var(--tc-accent, #93C5FD);
+}
+.tc-filter--list .tc-chip__label { flex: 1 1 auto; }
+.tc-filter--list .tc-chip__count { flex: none; font-size: 13px; opacity: 0.55; }
+.tc-filter--list .tc-manage-btn {
+    width: 100%; justify-content: center; margin-top: 6px; padding: 6px 8px;
+    border: none; border-top: 1px solid var(--tc-popover-divider, rgba(255,255,255,.1));
+    border-radius: 0;
+}
+.tc-filter--list .tc-manage-btn:hover { background: transparent; }
 .tc-tool {
     display: inline-flex; align-items: center; justify-content: center; width: 17px; height: 17px; padding: 0;
     color: inherit; background: transparent; border: none; border-radius: 50%; cursor: pointer; opacity: 0.62;
@@ -48,8 +79,8 @@ const CATEGORY_CSS = `
 .tc-tool--danger { color: var(--tc-danger, #DC2626); opacity: 0.9; }
 .tc-filter :focus-visible { outline: 2px solid var(--tc-focus, #9CC2F5); outline-offset: 2px; }
 .tc-manage-btn {
-    display: inline-flex; align-items: center; gap: 5px; padding: 4px 10px;
-    font-family: inherit; font-size: var(--tc-chip-font, 12px); line-height: 1.45;
+    display: inline-flex; align-items: center; gap: 6px; padding: 6px 13px;
+    font-family: inherit; font-size: var(--tc-chip-font, 13.5px); line-height: 1.45;
     color: var(--tc-chip-fg, #AFC4DC); background: transparent;
     border: 1px dashed var(--tc-chip-border, rgba(255,255,255,.12));
     border-radius: var(--tc-chip-radius, 999px); cursor: pointer;
@@ -62,14 +93,14 @@ const CATEGORY_CSS = `
 .tc-manage {
     position: fixed; z-index: 10050; box-sizing: border-box; overflow: hidden;
     display: flex; flex-direction: column; padding: 10px 12px 12px;
-    font-family: inherit; font-size: var(--tc-field-font, 13px); color: var(--tc-field-fg, #DDE9F5);
+    font-family: inherit; font-size: var(--tc-field-font, 15px); color: var(--tc-field-fg, #DDE9F5);
     max-height: min(320px, 60vh); max-width: calc(100vw - 12px);
     background: var(--tc-popover-bg, rgba(9,17,32,.97)); border: 1px solid var(--tc-popover-border, #2C5080);
     border-radius: var(--tc-popover-radius, 8px); box-shadow: var(--tc-popover-shadow, 0 18px 40px rgba(2,6,23,.62));
     outline: none;
 }
 .tc-manage__head { display: flex; align-items: center; gap: 10px; margin: 0 0 8px; }
-.tc-manage__title { flex: 1; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; font-size: 1.08em; font-weight: 600; }
+.tc-manage__title { flex: 1; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; font-size: 1.15em; font-weight: 600; }
 .tc-manage__close {
     display: inline-flex; align-items: center; justify-content: center; flex: none; width: 26px; height: 26px; padding: 0;
     color: #FFFFFF; background: var(--tc-danger, #DC2626); border: 1px solid var(--tc-danger, #DC2626); border-radius: 6px; cursor: pointer;
@@ -98,13 +129,13 @@ const CATEGORY_CSS = `
 .tc-manage__empty { padding: 20px 8px; text-align: center; opacity: 0.72; }
 .tc-manage :focus-visible { outline: 2px solid var(--tc-focus, #9CC2F5); outline-offset: 2px; }
 .tc-badge {
-    display: inline-flex; align-items: center; padding: 1px 8px; font-size: var(--tc-badge-font, 11.5px); line-height: 1.5;
+    display: inline-flex; align-items: center; padding: 2px 9px; font-size: var(--tc-badge-font, 13px); line-height: 1.5;
     color: var(--tc-badge-fg, #9CC2F5); background: var(--tc-badge-bg, rgba(156,194,245,.12));
     border: 1px solid var(--tc-badge-border, rgba(156,194,245,.28)); border-radius: var(--tc-badge-radius, 999px);
 }
 .tc-picker { display: inline-flex; align-items: center; gap: 6px; width: 100%; }
 .tc-select, .tc-input {
-    box-sizing: border-box; font-family: inherit; font-size: var(--tc-field-font, 13px); line-height: 1.5;
+    box-sizing: border-box; font-family: inherit; font-size: var(--tc-field-font, 15px); line-height: 1.5;
     color: var(--tc-field-fg, #DDE9F5); background: var(--tc-field-bg, rgba(255,255,255,.04));
     border: 1px solid var(--tc-field-border, #2C5080); border-radius: var(--tc-field-radius, 6px);
     padding: var(--tc-field-padding, 7px 9px);
@@ -124,7 +155,7 @@ const CATEGORY_CSS = `
     position: fixed; z-index: 10050; box-sizing: border-box;
     display: flex; flex-direction: column; padding: 6px;
     max-width: calc(100vw - 12px);
-    font-family: inherit; font-size: var(--tc-field-font, 13px); color: var(--tc-field-fg, #DDE9F5);
+    font-family: inherit; font-size: var(--tc-field-font, 15px); color: var(--tc-field-fg, #DDE9F5);
     max-height: var(--tc-popover-max-height, 264px); overflow-y: auto;
     background: var(--tc-popover-bg, rgba(9,17,32,.97)); border: 1px solid var(--tc-popover-border, #2C5080);
     border-radius: var(--tc-popover-radius, 8px); box-shadow: var(--tc-popover-shadow, 0 18px 40px rgba(2,6,23,.62));
@@ -135,7 +166,7 @@ const CATEGORY_CSS = `
 .tc-popup::-webkit-scrollbar-track { background: transparent; }
 .tc-option {
     display: flex; align-items: center; gap: 8px; flex: none; width: 100%;
-    padding: 7px 8px; font-family: inherit; font-size: inherit; line-height: 1.4; text-align: left;
+    padding: 9px 10px; font-family: inherit; font-size: inherit; line-height: 1.4; text-align: left;
     color: inherit; background: transparent; border: none; border-radius: 6px; cursor: pointer;
     transition: background-color 120ms ease, color 120ms ease;
 }
@@ -153,7 +184,7 @@ const CATEGORY_CSS = `
 `;
 
 export const COMFY_CATEGORY_THEME = {
-    "tc-chip-font": "11.5px",
+    "tc-chip-font": "13.5px",
     "tc-chip-fg": "var(--descrip-text)",
     "tc-chip-bg": "rgba(255, 255, 255, 0.03)",
     "tc-chip-border": "var(--border-color)",
@@ -162,14 +193,13 @@ export const COMFY_CATEGORY_THEME = {
     "tc-chip-border-hover": "#667eea",
     "tc-chip-bg-active": "#667eea",
     "tc-chip-fg-active": "#FFFFFF",
-    "tc-chip-border-active": "#667eea",
     "tc-tool-bg-hover": "rgba(255, 255, 255, 0.16)",
     "tc-focus": "#667eea",
-    "tc-badge-font": "11px",
+    "tc-badge-font": "13px",
     "tc-badge-fg": "#A5B4FC",
     "tc-badge-bg": "rgba(102, 126, 234, 0.16)",
     "tc-badge-border": "rgba(102, 126, 234, 0.4)",
-    "tc-field-font": "13px",
+    "tc-field-font": "15px",
     "tc-field-fg": "var(--input-text)",
     "tc-field-bg": "var(--comfy-input-bg)",
     "tc-field-border": "var(--border-color)",
@@ -249,6 +279,12 @@ function isLocalOnly(name) {
 
 function registerLocalCategory(name) {
     LOCAL_CATEGORY_NAMES.add(name);
+    return fetch(CREATE_URL, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ name }),
+    }).then((response) => response.ok)
+        .catch(() => false);
 }
 
 export function countByCategory(templates) {
@@ -324,6 +360,7 @@ export function buildCategoryFilter(options = {}) {
         closeLabel = "Close",
         manage = true,
         showCounts = true,
+        variant = "chip",
         onPick = () => {},
         onRenamed = () => {},
         onRequestRemove = () => {},
@@ -337,16 +374,16 @@ export function buildCategoryFilter(options = {}) {
     let anchor = null;
 
     const element = document.createElement("div");
-    element.className = "tc-filter";
+    element.className = variant === "list" ? "tc-filter tc-filter--list" : "tc-filter";
 
     function entries() {
         const counts = countByCategory(templates);
         const list = [{ key: CATEGORY_ALL, label: allLabel, count: templates.length, category: null }];
+        const uncategorized = counts.get("") || 0;
+        if (uncategorized > 0) list.push({ key: CATEGORY_NONE, label: noneLabel, count: uncategorized, category: null });
         for (const name of deriveCategories(templates)) {
             list.push({ key: name, label: name, count: counts.get(name) || 0, category: name });
         }
-        const uncategorized = counts.get("") || 0;
-        if (uncategorized > 0) list.push({ key: CATEGORY_NONE, label: noneLabel, count: uncategorized, category: null });
         return list;
     }
 
@@ -362,7 +399,7 @@ export function buildCategoryFilter(options = {}) {
         const button = document.createElement("button");
         button.type = "button";
         button.className = variant ? "tc-tool tc-tool--" + variant : "tc-tool";
-        button.title = label;
+        attachPanelTooltip(button, () => label);
         button.setAttribute("aria-label", label);
         button.innerHTML = iconSvg(icon, 12);
         button.onclick = (event) => {
@@ -398,7 +435,7 @@ export function buildCategoryFilter(options = {}) {
         const button = document.createElement("button");
         button.type = "button";
         button.className = "tc-manage-btn";
-        button.title = manageLabel;
+        attachPanelTooltip(button, () => manageLabel);
         button.setAttribute("aria-label", manageLabel);
         button.setAttribute("aria-haspopup", "dialog");
         button.setAttribute("aria-expanded", "false");
@@ -438,11 +475,16 @@ export function buildCategoryFilter(options = {}) {
         return (countByCategory(templates).get(name) || 0) > 0;
     }
 
-    function removeCategory(name) {
-        LOCAL_CATEGORY_NAMES.delete(name);
+    async function removeCategory(name) {
         if (hasTemplates(name)) {
             onRequestRemove(name);
             return;
+        }
+        const response = await requestCategoryRemove(name);
+        if (response.ok || response.result?.message === "Category not found") {
+            LOCAL_CATEGORY_NAMES.delete(name);
+        } else {
+            onError(response);
         }
         render();
     }
@@ -466,8 +508,14 @@ export function buildCategoryFilter(options = {}) {
                 return;
             }
             if (!hasTemplates(name)) {
-                LOCAL_CATEGORY_NAMES.delete(name);
-                if (!deriveCategories(templates).includes(next)) LOCAL_CATEGORY_NAMES.add(next);
+                const response = await requestCategoryRename(name, next);
+                if (response.ok) {
+                    LOCAL_CATEGORY_NAMES.delete(name);
+                    LOCAL_CATEGORY_NAMES.add(next);
+                } else {
+                    LOCAL_CATEGORY_NAMES.add(name);
+                    onError(response);
+                }
                 if (active === name) active = next;
                 render();
                 return;
@@ -523,11 +571,19 @@ export function buildCategoryFilter(options = {}) {
         input.placeholder = newPlaceholder;
         input.setAttribute("aria-label", newPlaceholder);
 
-        const commit = () => {
+        const commit = async () => {
             const name = normalizeCategory(input.value);
             if (!name) return;
             input.value = "";
-            if (!deriveCategories(templates).includes(name)) registerLocalCategory(name);
+            if (!deriveCategories(templates).includes(name)) {
+                const saved = await registerLocalCategory(name);
+                if (!saved) {
+                    LOCAL_CATEGORY_NAMES.delete(name);
+                    onError({ message: "create-failed" });
+                    render();
+                    return;
+                }
+            }
             render();
         };
 
@@ -615,7 +671,7 @@ export function buildCategoryFilter(options = {}) {
         const closeButton = document.createElement("button");
         closeButton.type = "button";
         closeButton.className = "tc-manage__close";
-        closeButton.title = closeLabel;
+        attachPanelTooltip(closeButton, () => closeLabel);
         closeButton.setAttribute("aria-label", closeLabel);
         closeButton.innerHTML = iconSvg("close", 14);
         closeButton.onclick = closeManager;
@@ -655,8 +711,12 @@ export function buildCategoryFilter(options = {}) {
         renderPanel();
     }
 
-    function sync(nextTemplates) {
+    function sync(nextTemplates, categories) {
         templates = Array.isArray(nextTemplates) ? nextTemplates : [];
+        for (const item of Array.isArray(categories) ? categories : []) {
+            const name = normalizeCategory(item);
+            if (name) LOCAL_CATEGORY_NAMES.add(name);
+        }
         const list = entries();
         if (active !== CATEGORY_ALL && (deriveCategories(templates).length === 0 || !list.some((entry) => entry.key === active))) {
             active = CATEGORY_ALL;

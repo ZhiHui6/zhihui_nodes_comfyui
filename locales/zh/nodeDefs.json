@@ -1,0 +1,1851 @@
+{
+    "ShowAny": {
+        "display_name": "显示任何",
+        "description": "把任意类型的内容直接显示在节点上，便于调试与预览。",
+        "inputs": {
+            "input": {
+                "name": "输入"
+            }
+        }
+    },
+    "MultiLineTextNode": {
+        "display_name": "多行文本节点",
+        "description": "输入与传递多行长文本，支持启用/禁用和注释。",
+        "inputs": {
+            "enable_node": {
+                "name": "启用节点"
+            },
+            "comment": {
+                "name": "注释"
+            },
+            "text_content": {
+                "name": "文本内容"
+            }
+        }
+    },
+    "TextCombinerNode": {
+        "display_name": "文本组合器",
+        "description": "按指定分隔符把两段文本拼成一段输出，两段可各自启用或禁用。",
+        "inputs": {
+            "prompt1_comment": {
+                "name": "提示词1注释"
+            },
+            "enable_prompt1": {
+                "name": "启用提示词1"
+            },
+            "prompt2_comment": {
+                "name": "提示词2注释"
+            },
+            "enable_prompt2": {
+                "name": "启用提示词2"
+            },
+            "separator": {
+                "name": "分隔符"
+            },
+            "prompt1": {
+                "name": "提示词1"
+            },
+            "prompt2": {
+                "name": "提示词2"
+            }
+        }
+    },
+    "TextMergerNode": {
+        "display_name": "文本合并器",
+        "description": "按分隔符把 text_1～text_N 多路输入合并成一段文本输出。",
+        "inputs": {
+            "inputcount": {
+                "name": "输入数量"
+            },
+            "separator": {
+                "name": "分隔符"
+            },
+            "text_1": {
+                "name": "文本1"
+            },
+            "text_2": {
+                "name": "文本2"
+            },
+            "text_3": {
+                "name": "文本3"
+            },
+            "text_4": {
+                "name": "文本4"
+            },
+            "text_5": {
+                "name": "文本5"
+            },
+            "text_6": {
+                "name": "文本6"
+            },
+            "text_7": {
+                "name": "文本7"
+            },
+            "text_8": {
+                "name": "文本8"
+            },
+            "text_9": {
+                "name": "文本9"
+            },
+            "text_10": {
+                "name": "文本10"
+            },
+            "text_11": {
+                "name": "文本11"
+            },
+            "text_12": {
+                "name": "文本12"
+            },
+            "text_13": {
+                "name": "文本13"
+            },
+            "text_14": {
+                "name": "文本14"
+            },
+            "text_15": {
+                "name": "文本15"
+            },
+            "text_16": {
+                "name": "文本16"
+            },
+            "text_17": {
+                "name": "文本17"
+            },
+            "text_18": {
+                "name": "文本18"
+            },
+            "text_19": {
+                "name": "文本19"
+            },
+            "text_20": {
+                "name": "文本20"
+            }
+        }
+    },
+    "PromptDelete": {
+        "display_name": "提示词删除",
+        "description": "按最多 10 个关键词搜索并删除文本，可选自动清理标点与空格。",
+        "inputs": {
+            "inputcount": {
+                "name": "输入数量"
+            },
+            "auto_format": {
+                "name": "自动格式化"
+            },
+            "find_1": {
+                "name": "查找1"
+            },
+            "find_2": {
+                "name": "查找2"
+            },
+            "find_3": {
+                "name": "查找3"
+            },
+            "find_4": {
+                "name": "查找4"
+            },
+            "find_5": {
+                "name": "查找5"
+            },
+            "find_6": {
+                "name": "查找6"
+            },
+            "find_7": {
+                "name": "查找7"
+            },
+            "find_8": {
+                "name": "查找8"
+            },
+            "find_9": {
+                "name": "查找9"
+            },
+            "find_10": {
+                "name": "查找10"
+            },
+            "text_input": {
+                "name": "文本输入"
+            }
+        }
+    },
+    "TextModifier": {
+        "display_name": "文本修改器",
+        "description": "截取指定起止文本之间的内容，并可选择性去除空行、空格或换行。",
+        "inputs": {
+            "remove_empty_lines": {
+                "name": "删除空行"
+            },
+            "remove_spaces": {
+                "name": "删除空格"
+            },
+            "remove_newlines": {
+                "name": "删除换行符"
+            },
+            "delete_text": {
+                "name": "删除文本"
+            },
+            "start_text": {
+                "name": "起始文本"
+            },
+            "end_text": {
+                "name": "结束文本"
+            },
+            "text_input": {
+                "name": "文本输入"
+            }
+        }
+    },
+    "TextExtractor": {
+        "display_name": "文本提取器",
+        "description": "按所选类型只保留文本中的中文或英文内容（含标点与数字）。",
+        "inputs": {
+            "extraction_type": {
+                "name": "提取类型"
+            },
+            "text_input": {
+                "name": "文本输入"
+            }
+        }
+    },
+    "TriggerWordMerger": {
+        "display_name": "触发词合并器",
+        "description": "把触发词并入文本，可自动加括号与权重值。",
+        "inputs": {
+            "trigger_word": {
+                "name": "触发词"
+            },
+            "add_weight": {
+                "name": "添加权重"
+            },
+            "weight_value": {
+                "name": "权重值"
+            },
+            "text_input": {
+                "name": "文本输入"
+            }
+        }
+    },
+    "TextSwitchDualMode": {
+        "display_name": "文本切换器",
+        "description": "在可变数量的文本输入间切换，支持手动选索引与自动取唯一非空项。",
+        "inputs": {
+            "mode": {
+                "name": "模式"
+            },
+            "select_text": {
+                "name": "选择文本"
+            },
+            "inputcount": {
+                "name": "输入数量"
+            },
+            "text1_comment": {
+                "name": "文本1注释"
+            },
+            "text2_comment": {
+                "name": "文本2注释"
+            },
+            "text3_comment": {
+                "name": "文本3注释"
+            },
+            "text4_comment": {
+                "name": "文本4注释"
+            },
+            "text5_comment": {
+                "name": "文本5注释"
+            },
+            "text6_comment": {
+                "name": "文本6注释"
+            },
+            "text7_comment": {
+                "name": "文本7注释"
+            },
+            "text8_comment": {
+                "name": "文本8注释"
+            },
+            "text9_comment": {
+                "name": "文本9注释"
+            },
+            "text10_comment": {
+                "name": "文本10注释"
+            },
+            "text11_comment": {
+                "name": "文本11注释"
+            },
+            "text12_comment": {
+                "name": "文本12注释"
+            },
+            "text1": {
+                "name": "文本1"
+            },
+            "text2": {
+                "name": "文本2"
+            },
+            "text3": {
+                "name": "文本3"
+            },
+            "text4": {
+                "name": "文本4"
+            },
+            "text5": {
+                "name": "文本5"
+            },
+            "text6": {
+                "name": "文本6"
+            },
+            "text7": {
+                "name": "文本7"
+            },
+            "text8": {
+                "name": "文本8"
+            },
+            "text9": {
+                "name": "文本9"
+            },
+            "text10": {
+                "name": "文本10"
+            },
+            "text11": {
+                "name": "文本11"
+            },
+            "text12": {
+                "name": "文本12"
+            }
+        }
+    },
+    "TagSelector": {
+        "display_name": "标签选择器",
+        "description": "可视化浏览并搜索预设标签，选中的标签以逗号分隔输出。",
+        "inputs": {
+            "random_logic": {
+                "name": "随机逻辑"
+            },
+            "expand_mode": {
+                "name": "扩写模式"
+            },
+            "output_language": {
+                "name": "输出语言"
+            },
+            "platform": {
+                "name": "API平台"
+            },
+            "max_tokens": {
+                "name": "最大令牌数"
+            },
+            "tag_edit": {
+                "name": "标签编辑"
+            }
+        }
+    },
+    "ImageAspectRatio": {
+        "display_name": "图像宽高比",
+        "description": "为 Qwen、Flux、Wan、SDXL 等模型快速选定比例或自定义尺寸，可输出潜空间。",
+        "inputs": {
+            "preset_mode": {
+                "name": "预设模式"
+            },
+            "aspect_category": {
+                "name": "比例类别"
+            },
+            "aspect_size": {
+                "name": "尺寸选项"
+            },
+            "custom_width": {
+                "name": "自定义宽度"
+            },
+            "custom_height": {
+                "name": "自定义高度"
+            },
+            "aspect_lock": {
+                "name": "宽高比锁定"
+            },
+            "batch_size": {
+                "name": "批量大小"
+            }
+        }
+    },
+    "GetImageSizes": {
+        "display_name": "获取图像尺寸",
+        "description": "从输入图像提取宽高，并在节点上实时显示尺寸预览。",
+        "inputs": {
+            "image": {
+                "name": "图像"
+            }
+        }
+    },
+    "ImageScaler": {
+        "display_name": "图像缩放器",
+        "description": "按长边或短边等比缩放到目标尺寸，可选多种插值算法。",
+        "inputs": {
+            "scale_basis": {
+                "name": "缩放基准"
+            },
+            "target_size": {
+                "name": "目标尺寸"
+            },
+            "interpolation_method": {
+                "name": "插值方法"
+            },
+            "image_input": {
+                "name": "图像输入"
+            }
+        }
+    },
+    "ImageSwitchDualMode": {
+        "display_name": "图像切换器",
+        "description": "在可变数量的图像输入间切换，支持手动选索引与自动取唯一非空项。",
+        "inputs": {
+            "mode": {
+                "name": "模式"
+            },
+            "select_image": {
+                "name": "选择图像"
+            },
+            "inputcount": {
+                "name": "输入数量"
+            },
+            "image1_note": {
+                "name": "图像1备注"
+            },
+            "image2_note": {
+                "name": "图像2备注"
+            },
+            "image3_note": {
+                "name": "图像3备注"
+            },
+            "image4_note": {
+                "name": "图像4备注"
+            },
+            "image5_note": {
+                "name": "图像5备注"
+            },
+            "image6_note": {
+                "name": "图像6备注"
+            },
+            "image7_note": {
+                "name": "图像7备注"
+            },
+            "image8_note": {
+                "name": "图像8备注"
+            },
+            "image9_note": {
+                "name": "图像9备注"
+            },
+            "image10_note": {
+                "name": "图像10备注"
+            },
+            "image11_note": {
+                "name": "图像11备注"
+            },
+            "image12_note": {
+                "name": "图像12备注"
+            },
+            "image1": {
+                "name": "图像1"
+            },
+            "image2": {
+                "name": "图像2"
+            },
+            "image3": {
+                "name": "图像3"
+            },
+            "image4": {
+                "name": "图像4"
+            },
+            "image5": {
+                "name": "图像5"
+            },
+            "image6": {
+                "name": "图像6"
+            },
+            "image7": {
+                "name": "图像7"
+            },
+            "image8": {
+                "name": "图像8"
+            },
+            "image9": {
+                "name": "图像9"
+            },
+            "image10": {
+                "name": "图像10"
+            },
+            "image11": {
+                "name": "图像11"
+            },
+            "image12": {
+                "name": "图像12"
+            }
+        }
+    },
+    "PriorityImageSwitch": {
+        "display_name": "优先级图像切换器",
+        "description": "A、B 都有输入时优先输出 B，B 为空则输出 A，都为空则提示接线。",
+        "inputs": {
+            "mode": {
+                "name": "模式"
+            },
+            "imageA_note": {
+                "name": "图像A备注"
+            },
+            "imageB_note": {
+                "name": "图像B备注"
+            },
+            "imageA": {
+                "name": "图像A"
+            },
+            "imageB": {
+                "name": "图像B"
+            }
+        }
+    },
+    "PriorityTextSwitch": {
+        "display_name": "优先级文本切换器",
+        "description": "A、B 都有输入时优先输出 B，B 为空则输出 A，都为空则输出空文本。",
+        "inputs": {
+            "textA_note": {
+                "name": "文本A备注"
+            },
+            "textB_note": {
+                "name": "文本B备注"
+            },
+            "textA": {
+                "name": "文本A"
+            },
+            "textB": {
+                "name": "文本B"
+            }
+        }
+    },
+    "LatentSwitchDualMode": {
+        "display_name": "潜在空间切换器",
+        "description": "在可变数量的潜变量输入间切换，支持手动选索引与自动取唯一非空项。",
+        "inputs": {
+            "mode": {
+                "name": "模式"
+            },
+            "select_latent": {
+                "name": "选择潜在空间"
+            },
+            "inputcount": {
+                "name": "输入数量"
+            },
+            "latent1_note": {
+                "name": "潜在空间1备注"
+            },
+            "latent2_note": {
+                "name": "潜在空间2备注"
+            },
+            "latent3_note": {
+                "name": "潜在空间3备注"
+            },
+            "latent4_note": {
+                "name": "潜在空间4备注"
+            },
+            "latent5_note": {
+                "name": "潜在空间5备注"
+            },
+            "latent6_note": {
+                "name": "潜在空间6备注"
+            },
+            "latent7_note": {
+                "name": "潜在空间7备注"
+            },
+            "latent8_note": {
+                "name": "潜在空间8备注"
+            },
+            "latent9_note": {
+                "name": "潜在空间9备注"
+            },
+            "latent10_note": {
+                "name": "潜在空间10备注"
+            },
+            "latent11_note": {
+                "name": "潜在空间11备注"
+            },
+            "latent12_note": {
+                "name": "潜在空间12备注"
+            },
+            "latent1": {
+                "name": "潜在空间1"
+            },
+            "latent2": {
+                "name": "潜在空间2"
+            },
+            "latent3": {
+                "name": "潜在空间3"
+            },
+            "latent4": {
+                "name": "潜在空间4"
+            },
+            "latent5": {
+                "name": "潜在空间5"
+            },
+            "latent6": {
+                "name": "潜在空间6"
+            },
+            "latent7": {
+                "name": "潜在空间7"
+            },
+            "latent8": {
+                "name": "潜在空间8"
+            },
+            "latent9": {
+                "name": "潜在空间9"
+            },
+            "latent10": {
+                "name": "潜在空间10"
+            },
+            "latent11": {
+                "name": "潜在空间11"
+            },
+            "latent12": {
+                "name": "潜在空间12"
+            }
+        }
+    },
+    "ColorRemoval": {
+        "display_name": "颜色移除",
+        "description": "把彩色图像转为灰度，保留亮度信息。",
+        "inputs": {
+            "input_image": {
+                "name": "输入图像"
+            }
+        }
+    },
+    "PromptPresetOneChoice": {
+        "display_name": "单选提示词预设",
+        "description": "从 6 条预设提示词中选一条输出，每条可加注释。",
+        "inputs": {
+            "prompt1_comment": {
+                "name": "提示词1注释"
+            },
+            "prompt2_comment": {
+                "name": "提示词2注释"
+            },
+            "prompt3_comment": {
+                "name": "提示词3注释"
+            },
+            "prompt4_comment": {
+                "name": "提示词4注释"
+            },
+            "prompt5_comment": {
+                "name": "提示词5注释"
+            },
+            "prompt6_comment": {
+                "name": "提示词6注释"
+            },
+            "select_prompt": {
+                "name": "选择提示词"
+            },
+            "prompt1": {
+                "name": "提示词1"
+            },
+            "prompt2": {
+                "name": "提示词2"
+            },
+            "prompt3": {
+                "name": "提示词3"
+            },
+            "prompt4": {
+                "name": "提示词4"
+            },
+            "prompt5": {
+                "name": "提示词5"
+            },
+            "prompt6": {
+                "name": "提示词6"
+            }
+        }
+    },
+    "SystemPromptLoader": {
+        "display_name": "系统提示词加载器",
+        "description": "直接从预设文件加载系统提示词模板，只输出系统提示词。",
+        "inputs": {
+            "system_preset": {
+                "name": "系统预设"
+            },
+            "enable_node": {
+                "name": "启用节点"
+            }
+        }
+    },
+    "USMSharpen": {
+        "display_name": "USM锐化",
+        "description": "用反锐化掩模增强图像细节，强度可调。",
+        "inputs": {
+            "switch": {
+                "name": "开关"
+            },
+            "sharpen_strength": {
+                "name": "锐化强度"
+            },
+            "input_image": {
+                "name": "输入图像"
+            }
+        }
+    },
+    "SobelSharpen": {
+        "display_name": "Sobel锐化",
+        "description": "用 Sobel 算子计算梯度来增强边缘，强度可调。",
+        "inputs": {
+            "switch": {
+                "name": "开关"
+            },
+            "sharpen_strength": {
+                "name": "锐化强度"
+            },
+            "input_image": {
+                "name": "输入图像"
+            }
+        }
+    },
+    "ExtraOptions": {
+        "display_name": "额外引导选项（通用）",
+        "description": "为图像反推提供描述类型，以及光照、机位、构图等细节选项。",
+        "inputs": {
+            "guide_text": {
+                "name": "引导文本"
+            },
+            "reverse_type": {
+                "name": "反推类型"
+            },
+            "options_master_switch": {
+                "name": "选项主开关"
+            },
+            "exclude_unchangeable_character_info_but_include_changeable_attributes": {
+                "name": "排除不可变角色信息但包含可变属性"
+            },
+            "include_lighting_info": {
+                "name": "包含光照信息"
+            },
+            "include_camera_angle_info": {
+                "name": "包含相机角度信息"
+            },
+            "include_watermark_info": {
+                "name": "包含水印信息"
+            },
+            "include_jpeg_artifacts_info": {
+                "name": "包含JPEG伪影信息"
+            },
+            "include_camera_details_for_photos": {
+                "name": "为照片包含相机详细信息"
+            },
+            "exclude_sexual_content_keep_pg": {
+                "name": "排除色情内容保持PG级"
+            },
+            "exclude_image_resolution": {
+                "name": "排除图像分辨率"
+            },
+            "include_subjective_aesthetic_quality": {
+                "name": "包含主观美学质量"
+            },
+            "include_composition_style_info": {
+                "name": "包含构图风格信息"
+            },
+            "exclude_text_in_image": {
+                "name": "排除图像中的文本"
+            },
+            "specify_depth_of_field": {
+                "name": "指定景深"
+            },
+            "mention_lighting_sources": {
+                "name": "提及光源"
+            },
+            "avoid_ambiguous_language": {
+                "name": "避免模糊语言"
+            },
+            "include_content_rating": {
+                "name": "包含内容评级"
+            },
+            "describe_only_important_elements": {
+                "name": "仅描述重要元素"
+            },
+            "exclude_artist_name_and_title": {
+                "name": "排除艺术家姓名和作品标题"
+            },
+            "identify_image_orientation": {
+                "name": "识别图像方向"
+            },
+            "use_vulgar_slang": {
+                "name": "使用粗俗俚语"
+            },
+            "avoid_polite_euphemisms": {
+                "name": "避免礼貌委婉语"
+            },
+            "include_character_ages": {
+                "name": "包含角色年龄"
+            },
+            "include_camera_shot_types": {
+                "name": "包含相机拍摄类型"
+            },
+            "exclude_mood_feelings": {
+                "name": "排除情绪感受"
+            },
+            "include_camera_vantage_height": {
+                "name": "包含相机视角高度"
+            },
+            "mention_watermarks": {
+                "name": "提及水印"
+            },
+            "avoid_meta_descriptive_phrases": {
+                "name": "避免元描述性短语"
+            }
+        }
+    },
+    "LaplacianSharpen": {
+        "display_name": "拉普拉斯锐化",
+        "description": "用拉普拉斯算子强化边缘与细节，强度可调。",
+        "inputs": {
+            "switch": {
+                "name": "开关"
+            },
+            "sharpen_strength": {
+                "name": "锐化强度"
+            },
+            "image_input": {
+                "name": "输入图像"
+            }
+        }
+    },
+    "FilmGrain": {
+        "display_name": "胶片颗粒",
+        "description": "为图像叠加胶片颗粒质感，可调强度、混色比例与颗粒分布。",
+        "inputs": {
+            "switch": {
+                "name": "开关"
+            },
+            "grain_strength": {
+                "name": "颗粒强度"
+            },
+            "saturation_blend": {
+                "name": "饱和度混合"
+            },
+            "grain_distribution": {
+                "name": "颗粒分布"
+            },
+            "input_image": {
+                "name": "输入图像"
+            }
+        }
+    },
+    "ColorMatchToReference": {
+        "display_name": "颜色匹配参考",
+        "description": "按参考图的配色调整输入图的色调、饱和度与亮度，强度可调。",
+        "inputs": {
+            "switch": {
+                "name": "开关"
+            },
+            "match_strength": {
+                "name": "匹配强度"
+            },
+            "reference_image": {
+                "name": "参考图像"
+            },
+            "input_image": {
+                "name": "输入图像"
+            }
+        }
+    },
+    "PhotographPromptGenerator": {
+        "display_name": "摄影提示词生成器",
+        "description": "从相机、镜头、光照、姿势、服装等 16 个维度组合出摄影提示词，支持标签与模板两种输出。",
+        "inputs": {
+            "output_mode": {
+                "name": "输出模式"
+            },
+            "character": {
+                "name": "角色"
+            },
+            "gender": {
+                "name": "性别"
+            },
+            "pose": {
+                "name": "姿势"
+            },
+            "movement": {
+                "name": "动作"
+            },
+            "orientation": {
+                "name": "朝向"
+            },
+            "top": {
+                "name": "上装"
+            },
+            "bottom": {
+                "name": "下装"
+            },
+            "boots": {
+                "name": "鞋子"
+            },
+            "accessories": {
+                "name": "配饰"
+            },
+            "camera": {
+                "name": "相机"
+            },
+            "lens": {
+                "name": "镜头"
+            },
+            "lighting": {
+                "name": "光照"
+            },
+            "perspective": {
+                "name": "视角"
+            },
+            "location": {
+                "name": "地点"
+            },
+            "weather": {
+                "name": "天气"
+            },
+            "season": {
+                "name": "季节"
+            },
+            "color_tone": {
+                "name": "色调"
+            },
+            "mood_atmosphere": {
+                "name": "氛围"
+            },
+            "photography_style": {
+                "name": "摄影风格"
+            },
+            "post_processing": {
+                "name": "后处理"
+            },
+            "depth_of_field": {
+                "name": "景深"
+            },
+            "composition": {
+                "name": "构图"
+            },
+            "texture": {
+                "name": "纹理"
+            },
+            "theme": {
+                "name": "主题"
+            },
+            "template": {
+                "name": "模板"
+            },
+            "facial_expressions": {
+                "name": "面部表情"
+            },
+            "hair_style": {
+                "name": "发型"
+            },
+            "hair_color": {
+                "name": "发色"
+            },
+            "head_movements": {
+                "name": "头部动作"
+            },
+            "hand_movements": {
+                "name": "手部动作"
+            },
+            "leg_foot_movements": {
+                "name": "腿部/脚部动作"
+            },
+            "photography_technique": {
+                "name": "摄影技法"
+            },
+            "socks": {
+                "name": "袜子"
+            },
+            "tattoo": {
+                "name": "纹身"
+            },
+            "tattoo_location": {
+                "name": "纹身位置"
+            }
+        }
+    },
+    "PromptPresetMultipleChoice": {
+        "display_name": "多选提示词预设",
+        "description": "从 6 条预设提示词中任选多条组合输出，每条可独立启用。",
+        "inputs": {
+            "master_switch": {
+                "name": "主开关"
+            },
+            "prompt1_switch": {
+                "name": "提示词1开关"
+            },
+            "prompt1_comment": {
+                "name": "提示词1注释"
+            },
+            "prompt2_switch": {
+                "name": "提示词2开关"
+            },
+            "prompt2_comment": {
+                "name": "提示词2注释"
+            },
+            "prompt3_switch": {
+                "name": "提示词3开关"
+            },
+            "prompt3_comment": {
+                "name": "提示词3注释"
+            },
+            "prompt4_switch": {
+                "name": "提示词4开关"
+            },
+            "prompt4_comment": {
+                "name": "提示词4注释"
+            },
+            "prompt5_switch": {
+                "name": "提示词5开关"
+            },
+            "prompt5_comment": {
+                "name": "提示词5注释"
+            },
+            "prompt6_switch": {
+                "name": "提示词6开关"
+            },
+            "prompt6_comment": {
+                "name": "提示词6注释"
+            },
+            "prompt1": {
+                "name": "提示词1"
+            },
+            "prompt2": {
+                "name": "提示词2"
+            },
+            "prompt3": {
+                "name": "提示词3"
+            },
+            "prompt4": {
+                "name": "提示词4"
+            },
+            "prompt5": {
+                "name": "提示词5"
+            },
+            "prompt6": {
+                "name": "提示词6"
+            },
+            "parallel_text": {
+                "name": "并行文本"
+            }
+        }
+    },
+    "ImageEditingPresets": {
+        "display_name": "图像编辑预设",
+        "description": "提供可分类管理的编辑预设库，支持自定义内容与完整信息输出。",
+        "inputs": {
+            "preset": {
+                "name": "预设"
+            },
+            "output_full_info": {
+                "name": "输出完整信息"
+            }
+        }
+    },
+    "IntNode": {
+        "display_name": "整数节点",
+        "description": "输出一个可配置的整数，用于统一控制数值参数。",
+        "inputs": {
+            "value": {
+                "name": "整数值"
+            }
+        }
+    },
+    "WanPromptGenerator": {
+        "display_name": "万相视频提示词生成器",
+        "description": "从运镜、场景、光线、构图等 17 个维度组合出专业视频提示词。",
+        "inputs": {
+            "enable_node": {
+                "name": "启用节点"
+            },
+            "subject_type": {
+                "name": "主体类型"
+            },
+            "character_emotion": {
+                "name": "角色情感"
+            },
+            "action_pose": {
+                "name": "动作姿态"
+            },
+            "scene_type": {
+                "name": "场景类型"
+            },
+            "light_source": {
+                "name": "光源"
+            },
+            "light_type": {
+                "name": "光线类型"
+            },
+            "time_period": {
+                "name": "时间段"
+            },
+            "shot_type": {
+                "name": "镜头类型"
+            },
+            "composition": {
+                "name": "构图"
+            },
+            "lens_focal_length": {
+                "name": "镜头焦距"
+            },
+            "camera_angle": {
+                "name": "相机角度"
+            },
+            "lens_type": {
+                "name": "镜头类型"
+            },
+            "color_tone": {
+                "name": "色调"
+            },
+            "camera_movement": {
+                "name": "相机运动"
+            },
+            "motion_type": {
+                "name": "运动类型"
+            },
+            "visual_style": {
+                "name": "视觉风格"
+            },
+            "special_effect": {
+                "name": "特殊效果"
+            },
+            "preset_combination": {
+                "name": "预设组合"
+            },
+            "add_prefix": {
+                "name": "添加前缀"
+            },
+            "model_brand": {
+                "name": "模型品牌"
+            },
+            "supplementary_text": {
+                "name": "补充文本"
+            },
+            "custom_system_prompt": {
+                "name": "自定义系统提示"
+            }
+        }
+    },
+    "PreviewOrCompareImages": {
+        "display_name": "图像预览/对比",
+        "description": "预览单张图像或并排对比两张，悬停时可拖动分割线。",
+        "inputs": {
+            "image_1": {
+                "name": "主要图像（必需）"
+            },
+            "image_2": {
+                "name": "次要图像（可选）"
+            }
+        }
+    },
+    "TextEditorWithContinue": {
+        "display_name": "文本编辑器（继续运行）",
+        "description": "暂停工作流并把上游文本同步到可编辑框，点继续后恢复执行。",
+        "inputs": {
+            "text": {
+                "name": "文本"
+            }
+        }
+    },
+    "SunoSongStylePromptGenerator": {
+        "display_name": "Suno歌曲风格提示词生成器",
+        "description": "结合歌词偏好与音乐元素，拼出结构化的 Suno 风格提示词。",
+        "inputs": {
+            "preference": {
+                "name": "偏好"
+            },
+            "Theme": {
+                "name": "主题"
+            },
+            "Melody": {
+                "name": "旋律"
+            },
+            "Harmony": {
+                "name": "和声"
+            },
+            "Rhythm": {
+                "name": "节奏"
+            },
+            "Structure or Form": {
+                "name": "结构或形式"
+            },
+            "Instrumentation": {
+                "name": "配器"
+            },
+            "Style/Genre": {
+                "name": "风格/流派"
+            },
+            "Emotion": {
+                "name": "情绪"
+            },
+            "Dynamics": {
+                "name": "动态"
+            },
+            "Production": {
+                "name": "制作"
+            },
+            "Originality and Creativity": {
+                "name": "原创性和创造力"
+            },
+            "Vocal Style and Performance": {
+                "name": "声乐风格和表现力"
+            },
+            "Output_original_text": {
+                "name": "输出原文"
+            }
+        }
+    },
+    "SunoLyricsGenerator": {
+        "display_name": "Suno歌词生成器",
+        "description": "按主题、语言、演唱编制、风格、情绪与流派生成结构化、可演唱的歌词。",
+        "inputs": {
+            "Theme": {
+                "name": "主题"
+            },
+            "Lyrics Language": {
+                "name": "歌词语言"
+            },
+            "Vocal Arrangement": {
+                "name": "演唱编制"
+            },
+            "Lyrics Style": {
+                "name": "歌词风格"
+            },
+            "Mood": {
+                "name": "情绪"
+            },
+            "Style/Genre": {
+                "name": "风格/流派"
+            },
+            "Output_original_text": {
+                "name": "输出原文"
+            },
+            "preference": {
+                "name": "歌词创意"
+            }
+        }
+    },
+    "LLMExtraOptions": {
+        "display_name": "LLM额外选项",
+        "description": "为 LLM 图像描述提供人物、光照、机位、美学等多维度控制选项。",
+        "inputs": {
+            "extra_options_control": {
+                "name": "额外选项控制"
+            },
+            "refer_character_name": {
+                "name": "参考角色名称"
+            },
+            "exclude_people_info": {
+                "name": "排除人物信息"
+            },
+            "include_lighting": {
+                "name": "包含光照信息"
+            },
+            "include_camera_angle": {
+                "name": "包含相机角度"
+            },
+            "include_watermark": {
+                "name": "包含水印信息"
+            },
+            "include_JPEG_artifacts": {
+                "name": "包含JPEG伪影"
+            },
+            "include_exif": {
+                "name": "包含EXIF信息"
+            },
+            "exclude_sexual": {
+                "name": "排除性内容"
+            },
+            "exclude_image_resolution": {
+                "name": "排除图像分辨率"
+            },
+            "include_aesthetic_quality": {
+                "name": "包含美学质量"
+            },
+            "include_composition_style": {
+                "name": "包含构图风格"
+            },
+            "exclude_text": {
+                "name": "排除文本"
+            },
+            "specify_depth_field": {
+                "name": "指定景深"
+            },
+            "specify_lighting_sources": {
+                "name": "指定光源"
+            },
+            "do_not_use_ambiguous_language": {
+                "name": "不使用模糊语言"
+            },
+            "include_nsfw": {
+                "name": "包含NSFW信息"
+            },
+            "only_describe_most_important_elements": {
+                "name": "只描述最重要元素"
+            },
+            "do_not_include_artist_name_or_title": {
+                "name": "不包含艺术家名或标题"
+            },
+            "identify_image_orientation": {
+                "name": "识别图像方向"
+            },
+            "use_vulgar_slang_and_profanity": {
+                "name": "使用粗俗俚语和脏话"
+            },
+            "do_not_use_polite_euphemisms": {
+                "name": "不使用礼貌委婉语"
+            },
+            "include_character_age": {
+                "name": "包含角色年龄"
+            },
+            "include_camera_shot_type": {
+                "name": "包含相机镜头类型"
+            },
+            "exclude_mood_feeling": {
+                "name": "排除情绪感受"
+            },
+            "include_camera_vantage_height": {
+                "name": "包含相机视角高度"
+            },
+            "mention_watermark": {
+                "name": "提及水印"
+            },
+            "avoid_meta_descriptive_phrases": {
+                "name": "避免元描述性短语"
+            },
+            "character_name": {
+                "name": "角色名称"
+            }
+        }
+    },
+    "ImageRotateTool": {
+        "display_name": "图像旋转工具",
+        "description": "支持 90°/180°/270°/360° 旋转与水平、垂直翻转，可选扩画布、裁空白或禁用。",
+        "inputs": {
+            "preset": {
+                "name": "预设"
+            },
+            "custom_angle": {
+                "name": "自定义角度"
+            },
+            "canvas_mode": {
+                "name": "画布模式"
+            },
+            "image": {
+                "name": "图像"
+            }
+        }
+    },
+    "ImageFormatConverter": {
+        "display_name": "图像格式转换器",
+        "description": "在 JPEG、PNG、WEBP、BMP、TIFF 之间互转，可调质量并支持批量处理。",
+        "inputs": {
+            "output_format": {
+                "name": "输出格式"
+            },
+            "quality": {
+                "name": "质量"
+            },
+            "folder_path": {
+                "name": "文件夹路径"
+            },
+            "optimize": {
+                "name": "优化"
+            },
+            "progressive": {
+                "name": "渐进式"
+            },
+            "lossless": {
+                "name": "无损压缩"
+            }
+        }
+    },
+    "ImageUnderstandingOnline": {
+        "display_name": "图像理解在线版",
+        "description": "通过 OpenAI 兼容接口调用在线多模态模型理解图像并输出文本，支持多平台切换。",
+        "inputs": {
+            "user_prompt": {
+                "name": "用户提示词"
+            },
+            "system_prompt": {
+                "name": "系统提示词"
+            },
+            "use_preset": {
+                "name": "使用预设"
+            },
+            "preset_prompt": {
+                "name": "模式"
+            },
+            "prompt_length": {
+                "name": "篇幅"
+            },
+            "prompt_format": {
+                "name": "格式"
+            },
+            "output_language": {
+                "name": "语言"
+            },
+            "platform": {
+                "name": "平台"
+            },
+            "model": {
+                "name": "模型"
+            },
+            "size_limitation": {
+                "name": "图像边长"
+            },
+            "max_tokens": {
+                "name": "最大词元数"
+            },
+            "temperature": {
+                "name": "温度"
+            },
+            "repetition_penalty": {
+                "name": "重复惩罚"
+            },
+            "top_k": {
+                "name": "Top K采样"
+            },
+            "top_p": {
+                "name": "Top P采样"
+            },
+            "seed": {
+                "name": "随机种子"
+            },
+            "batch_mode": {
+                "name": "批处理模式"
+            },
+            "batch_folder_path": {
+                "name": "批处理路径"
+            },
+            "skip_exists": {
+                "name": "跳过重复"
+            },
+            "images": {
+                "name": "图像输入"
+            },
+            "text_prompt": {
+                "name": "文本提示词"
+            }
+        }
+    },
+    "BatchLoadingOfImages": {
+        "display_name": "批量图像加载",
+        "description": "从目录按字母、数字或时间排序批量读图，可限定起始索引与数量，输出图像、掩码与路径。",
+        "inputs": {
+            "directory": {
+                "name": "目录路径"
+            },
+            "image_load_cap": {
+                "name": "加载上限"
+            },
+            "start_index": {
+                "name": "起始索引"
+            },
+            "load_always": {
+                "name": "每次强制重新加载"
+            },
+            "sort_method": {
+                "name": "排序方式"
+            }
+        }
+    },
+    "PromptCardSelector": {
+        "display_name": "提示词卡选择器",
+        "description": "从卡池中随机或顺序抽取提示词输出，内置卡池管理、搜索与导入导出。",
+        "inputs": {
+            "open_card_pool": {
+                "name": "卡池管理器"
+            }
+        }
+    },
+    "PromptGallery": {
+        "display_name": "提示词图库",
+        "description": "从图文库中选图后，输出与图片同名的 .txt 提示词。",
+        "inputs": {
+            "directory": {
+                "name": "目录"
+            },
+            "selected_image": {
+                "name": "所选图像"
+            }
+        }
+    },
+    "MultiPlatformTranslate": {
+        "display_name": "多平台翻译器",
+        "description": "调用百度、阿里云、有道、智谱 AI 或免费服务翻译文本。",
+        "inputs": {
+            "enable_translate": {
+                "name": "启用翻译"
+            },
+            "platform": {
+                "name": "翻译平台"
+            },
+            "source_language": {
+                "name": "源语言"
+            },
+            "target_language": {
+                "name": "目标语言"
+            },
+            "your_text": {
+                "name": "输入文本"
+            }
+        }
+    },
+    "ResourceCleaner": {
+        "display_name": "资源清理器",
+        "description": "可分别开关地清理内存、显存与缓存。",
+        "inputs": {
+            "clear_ram": {
+                "name": "清理内存"
+            },
+            "clear_vram": {
+                "name": "清理显存"
+            },
+            "clear_cache": {
+                "name": "清理缓存"
+            },
+            "any_input": {
+                "name": "任意输入"
+            }
+        }
+    },
+    "ReservedVRAMSetter": {
+        "display_name": "预留显存设置器",
+        "description": "手动或按当前占用自动设置显存预留量，设置前可先清理显存。",
+        "inputs": {
+            "reserved": {
+                "name": "预留显存"
+            },
+            "mode": {
+                "name": "模式"
+            },
+            "seed": {
+                "name": "随机种子"
+            },
+            "auto_max_reserved": {
+                "name": "自动最大预留显存"
+            },
+            "clean_gpu_before": {
+                "name": "前置GPU显存清理"
+            },
+            "anything": {
+                "name": "任意输入"
+            }
+        }
+    },
+    "Florence2Plus": {
+        "display_name": "Florence2 增强版",
+        "description": "基于 Florence-2 做图像描述与分析，可选任务模式、精度与注意力机制。",
+        "inputs": {
+            "model_name": {
+                "name": "模型名称"
+            },
+            "precision": {
+                "name": "精度"
+            },
+            "attention": {
+                "name": "注意力机制"
+            },
+            "unload_mode": {
+                "name": "卸载方式"
+            },
+            "task": {
+                "name": "任务类型"
+            },
+            "batch_mode": {
+                "name": "批量模式"
+            },
+            "batch_directory": {
+                "name": "批量文件夹路径"
+            },
+            "seed": {
+                "name": "随机种子"
+            },
+            "max_new_tokens": {
+                "name": "最大生成长度"
+            },
+            "num_beams": {
+                "name": "波束搜索数量"
+            },
+            "do_sample": {
+                "name": "启用采样"
+            },
+            "manage_models": {
+                "name": "模型管理"
+            },
+            "image": {
+                "name": "图像"
+            }
+        }
+    },
+    "TypeDesigner": {
+        "display_name": "字体设计师",
+        "description": "浏览并选择 3D、霓虹、金属等字体艺术风格，自动给出对应提示词。",
+        "inputs": {
+            "text": {
+                "name": "文本"
+            }
+        }
+    },
+    "PromptReplace": {
+        "display_name": "提示词替换",
+        "description": "对文本做动态数量的查找替换。",
+        "inputs": {
+            "inputcount": {
+                "name": "输入数量"
+            },
+            "find_1": {
+                "name": "搜索_1"
+            },
+            "replace_1": {
+                "name": "替换_1"
+            },
+            "find_2": {
+                "name": "搜索_2"
+            },
+            "replace_2": {
+                "name": "替换_2"
+            },
+            "find_3": {
+                "name": "搜索_3"
+            },
+            "replace_3": {
+                "name": "替换_3"
+            },
+            "find_4": {
+                "name": "搜索_4"
+            },
+            "replace_4": {
+                "name": "替换_4"
+            },
+            "find_5": {
+                "name": "搜索_5"
+            },
+            "replace_5": {
+                "name": "替换_5"
+            },
+            "find_6": {
+                "name": "搜索_6"
+            },
+            "replace_6": {
+                "name": "替换_6"
+            },
+            "find_7": {
+                "name": "搜索_7"
+            },
+            "replace_7": {
+                "name": "替换_7"
+            },
+            "find_8": {
+                "name": "搜索_8"
+            },
+            "replace_8": {
+                "name": "替换_8"
+            },
+            "find_9": {
+                "name": "搜索_9"
+            },
+            "replace_9": {
+                "name": "替换_9"
+            },
+            "find_10": {
+                "name": "搜索_10"
+            },
+            "replace_10": {
+                "name": "替换_10"
+            },
+            "text_input": {
+                "name": "提示词"
+            }
+        }
+    },
+    "AudioDuration": {
+        "display_name": "音频时长",
+        "description": "计算音频时长，并以秒、格式化时间或毫秒输出。",
+        "inputs": {
+            "audio": {
+                "name": "音频"
+            }
+        }
+    },
+    "VideoFrameExtractor": {
+        "display_name": "视频抽帧",
+        "description": "按帧数、帧间隔、时间或时间间隔抽取视频帧，可限定范围并保存到指定目录。",
+        "inputs": {
+            "extract_mode": {
+                "name": "抽取模式"
+            },
+            "num_frames": {
+                "name": "抽取帧数"
+            },
+            "frame_interval_value": {
+                "name": "帧间隔"
+            },
+            "time_interval_value": {
+                "name": "时间间隔"
+            },
+            "time_unit": {
+                "name": "时间单位"
+            },
+            "start_frame": {
+                "name": "起始帧"
+            },
+            "end_frame": {
+                "name": "结束帧"
+            },
+            "start_time": {
+                "name": "起始时间"
+            },
+            "end_time": {
+                "name": "结束时间"
+            },
+            "max_output_frames": {
+                "name": "最大输出帧数"
+            },
+            "custom_path": {
+                "name": "自定义路径"
+            },
+            "output_directory": {
+                "name": "输出目录"
+            },
+            "filename_prefix": {
+                "name": "文件名前缀"
+            },
+            "video_path": {
+                "name": "视频路径"
+            }
+        }
+    },
+    "LMStudioNode": {
+        "display_name": "LM工作室节点",
+        "description": "连接本地 LM Studio 做多模态分析与文本生成，可在节点上切换平台、预设与输出语言。",
+        "inputs": {
+            "endpoint": {
+                "name": "服务端点"
+            },
+            "model": {
+                "name": "模型"
+            },
+            "system_prompt": {
+                "name": "系统提示词"
+            },
+            "user_prompt": {
+                "name": "用户提示词"
+            },
+            "preset_prompt": {
+                "name": "预设提示词"
+            },
+            "output_language": {
+                "name": "输出语言"
+            },
+            "max_tokens": {
+                "name": "最大令牌数"
+            },
+            "temperature": {
+                "name": "温度"
+            },
+            "size_limitation": {
+                "name": "图像边长"
+            },
+            "batch_mode": {
+                "name": "批量模式"
+            },
+            "skip_exists": {
+                "name": "跳过已存在"
+            },
+            "top_p": {
+                "name": "Top P"
+            },
+            "top_k": {
+                "name": "Top K"
+            },
+            "repetition_penalty": {
+                "name": "重复惩罚"
+            },
+            "presence_penalty": {
+                "name": "存在惩罚"
+            },
+            "seed": {
+                "name": "种子"
+            },
+            "video_frames": {
+                "name": "视频采样帧数"
+            },
+            "batch_folder_path": {
+                "name": "批量文件夹路径"
+            },
+            "unload_model": {
+                "name": "卸载模型"
+            },
+            "remove_think_tags": {
+                "name": "移除思考标签"
+            },
+            "image": {
+                "name": "图像输入"
+            },
+            "media_bundle": {
+                "name": "媒体输入"
+            },
+            "text_prompt": {
+                "name": "文本提示词"
+            }
+        }
+    },
+    "GroupSwitchManager": {
+        "display_name": "组开关管理器",
+        "description": "可视化控制工作流中各组的启用/禁用，并配置组间联动规则。"
+    },
+    "TextEncoderRelease": {
+        "display_name": "释放文本编码器（采样前）",
+        "description": "在采样前把所连 CLIP 从显存卸载，条件端口保证编码完成后才卸载。",
+        "inputs": {
+            "enabled": {
+                "name": "启用"
+            },
+            "verbose": {
+                "name": "详细日志"
+            },
+            "model": {
+                "name": "模型"
+            },
+            "clip": {
+                "name": "CLIP"
+            },
+            "conditioning": {
+                "name": "条件"
+            },
+            "conditioning_2": {
+                "name": "条件2"
+            },
+            "conditioning_3": {
+                "name": "条件3"
+            }
+        }
+    },
+    "MultimediaAdvancedLoader": {
+        "display_name": "多媒体加载器",
+        "description": "以缩略图网格管理 input 目录的图片、视频与音频，按载入模式输出媒体包或图像端口。",
+        "inputs": {
+            "output_mode": {
+                "name": "输出模式"
+            },
+            "load_mode": {
+                "name": "载入模式"
+            }
+        }
+    },
+    "VideoPreview": {
+        "display_name": "视频预览",
+        "description": "在节点上直接播放上游视频，无损封装进 temp 复用，不解码帧并原样透传下游。",
+        "inputs": {
+            "video": {
+                "name": "视频"
+            }
+        }
+    },
+    "ImageIndexer": {
+        "display_name": "图像编号看板",
+        "description": "把上游图像按顺序编号为 图1..图N，在节点上以带编号徽标的缩略图预览，图像原样透传给下游。上游为多媒体加载器时，改选图片即刷新预览，无需先运行。",
+        "inputs": {
+            "images": {
+                "name": "图像"
+            }
+        }
+    }
+}

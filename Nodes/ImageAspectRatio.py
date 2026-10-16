@@ -414,7 +414,6 @@ class ImageAspectRatio:
         },
     }
 
-    # 单一数据源：模式名 -> 尺寸预设。前端与后端均从此处派生，避免重复维护。
     PRESET_MODES = {
         "Qwen image": PRESETS_QWEN,
         "Flux": PRESETS_FLUX,
@@ -459,7 +458,7 @@ class ImageAspectRatio:
     RETURN_NAMES = ("width", "height", "latent")
     FUNCTION = "get_dimensions"
     CATEGORY = "Zhi.AI/Image"
-    DESCRIPTION = "Smart image aspect ratio setting node, supporting preset dimensions for multiple models like Qwen, Flux, Wan, SDXL, with quick selection of common ratios or custom sizes"
+    DESCRIPTION = "Sets an image aspect ratio from preset dimensions for Qwen, Flux, Wan and SDXL models, or from a custom ratio and size, with optional latent output."
 
     def get_dimensions(self, preset_mode, aspect_category, aspect_size, custom_width=1328, custom_height=1328, aspect_lock=False, batch_size=1):
         if custom_width is None:
@@ -496,7 +495,7 @@ def _serialize_presets():
     return result
 
 
-@PromptServer.instance.routes.get("/zhihui_nodes/aspect_ratio/presets")
+@PromptServer.instance.routes.get("/zhiai_nodes/aspect_ratio/presets")
 async def get_aspect_ratio_presets(request):
     try:
         return web.json_response(_serialize_presets())

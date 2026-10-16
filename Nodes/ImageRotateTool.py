@@ -5,6 +5,8 @@ from PIL import Image
 import cv2
 
 class ImageRotateTool:
+    DESCRIPTION = "Rotates images by 90/180/270/360 degrees or a custom angle, flips horizontally or vertically, and can expand, crop or keep the canvas."
+
     def __init__(self):
         pass
     
@@ -77,7 +79,7 @@ class ImageRotateTool:
                     fillcolor=(0, 0, 0)
                 )
                 pil = self._center_crop_or_pad(pil, (new_w, new_h))
-            else:  # canvas_mode == "Crop Blank"
+            else:
                 pil = pil.rotate(-custom_angle, expand=False, fillcolor=(0, 0, 0))
 
             np_img = np.array(pil).astype(np.float32) / 255.0

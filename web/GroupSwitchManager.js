@@ -1002,7 +1002,6 @@ app.registerExtension({
                     }
                 }
 
-                /* 联动配置对话框 */
                 .gmm-linkage-dialog {
                     position: fixed;
                     top: 50%;
@@ -1613,9 +1612,6 @@ app.registerExtension({
                 );
             }
 
-            // Migrate legacy configs that only stored the title. Once assigned to the
-            // first matching group, the key prevents a second same-title group from
-            // reusing that config.
             if (!groupConfig) {
                 const legacyConfigs = this.properties.groups.filter(config =>
                     !config.group_key && !config.group_color && config.group_name === group.title
@@ -1701,7 +1697,7 @@ app.registerExtension({
 
             let hasActiveNode = false;
             reduceNodesDepthFirst(nodes, (node) => {
-                if (node.mode === 0) { // LiteGraph.ALWAYS = 0
+                if (node.mode === 0) {
                     hasActiveNode = true;
                 }
             });
@@ -2211,15 +2207,12 @@ app.registerExtension({
                 const toggleRestriction = this.properties.toggleRestriction || 'unlimited';
                 const skipAlwaysOne = options.skipAlwaysOne === true;
 
-                // Always One 逻辑：仅当非跳过模式、且为开启操作时生效
                 if (enable && toggleRestriction === 'always_one' && !skipAlwaysOne) {
-                    // 关键修复：仅获取当前 Match 模式过滤出的可见组
                     const enabledOthers = this.getFilteredGroups().filter(otherGroup => {
                         if (otherGroup === group) return false;
                         return this.getGroupConfig(otherGroup)?.enabled;
                     });
 
-                    // 关闭其他可见组，传入 skipAlwaysOne: true 防止递归 enforcement，但保留联动执行
                     enabledOthers.forEach(otherGroup => {
                         this.toggleGroup(otherGroup, false, { skipAlwaysOne: true, skipUIUpdate: true });
                     });
@@ -2304,7 +2297,6 @@ app.registerExtension({
 
             rules.forEach(rule => {
                 const targetEnable = rule.action === "enable";
-                // 关键修复：联动触发时跳过 Always One 限制和 UI 刷新，避免级联污染，但完整保留联动链执行
                 this.toggleGroup(rule.target_group, targetEnable, { skipAlwaysOne: true, skipUIUpdate: true });
             });
         };
@@ -2986,7 +2978,6 @@ app.registerExtension({
                 this._gmmHelpElement.style.top = `${transform.f + bcr.y}px`;
             }
 
-            // 展开中或鼠标悬停时高亮
             const helpActive = !!(this._gmmHelp || this._gmmHelpHovered);
 
             ctx.save();
@@ -3015,7 +3006,6 @@ app.registerExtension({
             return r;
         };
 
-        // 帮助按钮悬停高亮
         const mouseMove = nodeType.prototype.onMouseMove;
         nodeType.prototype.onMouseMove = function (e, localPos, canvas) {
             const r = mouseMove ? mouseMove.apply(this, arguments) : undefined;

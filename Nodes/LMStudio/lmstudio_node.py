@@ -5,24 +5,38 @@ import urllib.error
 import os
 import threading
 import time
+import wave
 from io import BytesIO
 import numpy as np
 from PIL import Image
-import requests  # pyright: ignore[reportMissingModuleSource]  # requests 为 ComfyUI 运行时依赖
+import requests
+
+try:
+    import cv2
+except Exception:
+    cv2 = None
 
 CONFIG_DIR = os.path.dirname(__file__)
 CONFIG_FILE = os.path.join(CONFIG_DIR, "lmstudio_config.json")
 PROMPT_PRESETS_FILE = os.path.join(CONFIG_DIR, "lmstudio_prompt_presets.json")
-# 提示词预设仅一套，键名为 default
 PROMPT_PRESETS_KEY = "default"
 NO_MODELS_FOUND = "(no models found)"
 
-# 推理日志文案：运行时同时生成中英两版，由前端按界面语言选择
+MEDIA_BUNDLE_TYPE = "MINIMAX_H3_MEDIA_BUNDLE"
+IMAGE_INPUT = "image"
+BUNDLE_INPUT = "media_bundle"
+TEXT_INPUT = "text_prompt"
+MEDIA_KINDS = ("image", "video", "audio")
+MAX_MEDIA_PARTS = 16
+MAX_VIDEO_FRAMES = 12
+MAX_AUDIO_SECONDS = 60.0
+
 LOG_TEXT = {
     "zh": {
         "model": "🤖 模型: {value}",
         "batchMode": "📦 批处理模式: 启用",
         "imageCount": "🖼️ 图片数量: {value}",
+        "media": "🧩 媒体: {value}",
         "processed": "✅ 成功处理: {value}",
         "failed": "❌ 失败数量: {value}",
         "duration": "⏱️ 耗时: {value:.2f}秒",
@@ -34,6 +48,7 @@ LOG_TEXT = {
         "model": "🤖 Model: {value}",
         "batchMode": "📦 Batch mode: enabled",
         "imageCount": "🖼️ Images: {value}",
+        "media": "🧩 Media: {value}",
         "processed": "✅ Processed: {value}",
         "failed": "❌ Failed: {value}",
         "duration": "⏱️ Duration: {value:.2f}s",
@@ -43,11 +58,21 @@ LOG_TEXT = {
     },
 }
 
-# 日志中会出现的固定错误提示（中英两版）
 LOG_ERROR_TEXT = {
     "subfolderNotFound": {"zh": "未找到子文件夹", "en": "No subfolders found"},
     "imageNotFound": {"zh": "未找到图片文件", "en": "No image files found"},
-    "noImagesInBatch": {"zh": "批处理模式下未提供图片", "en": "No images provided in batch mode"},
+    "batchFolderRequired": {
+        "zh": "批处理模式需要填写「批处理文件夹」路径；该模式下不从媒体端口读取数据",
+        "en": "Batch mode requires a batch folder path; it does not read from the media ports",
+    },
+    "batchMediaConflict": {
+        "zh": "批处理模式仅从文件夹读取，但媒体端口仍有连线；请禁用上游节点的输出，或关闭批处理模式",
+        "en": "Batch mode reads from the folder only, but a media port is still linked; mute the upstream node's output, or turn batch mode off",
+    },
+    "portsExclusive": {
+        "zh": "图像端口与媒体端口互斥，只能接一个",
+        "en": "The image port and the media port are mutually exclusive; connect only one",
+    },
 }
 
 def _load_config():
@@ -91,7 +116,6 @@ def _get_batch_progress():
     })
 
 def _load_prompt_presets():
-    """加载提示词预设（仅一套，键名 default）。"""
     if not os.path.exists(PROMPT_PRESETS_FILE):
         return {}
     try:
@@ -104,7 +128,6 @@ def _load_prompt_presets():
 LMSTUDIO_PROMPT_PRESETS = _load_prompt_presets()
 
 def _get_prompt_presets(config):
-    """取当前生效的预设集合；键名缺失时回退到 default（兼容旧的 new 写法）。"""
     version = config.get("prompt_version", PROMPT_PRESETS_KEY)
     presets = LMSTUDIO_PROMPT_PRESETS.get(version)
     if isinstance(presets, dict) and presets:
@@ -118,7 +141,6 @@ def _normalise_base(endpoint: str) -> str:
     return base
 
 def _check_server_connection(endpoint: str) -> tuple[bool, str | None]:
-    """检查LM Studio服务器连接状态，返回 (是否成功, 错误信息)"""
     base = _normalise_base(endpoint)
     timeout = _get_timeout("fetch_models", 5)
     
@@ -153,7 +175,6 @@ def _check_server_connection(endpoint: str) -> tuple[bool, str | None]:
     return False, f"无法连接到LM Studio服务器 ({endpoint})。请确认服务器已启动并启用了API服务"
 
 def _check_model_available(endpoint: str, model: str) -> tuple[bool, str | None]:
-    """检查指定模型是否可用，返回 (是否成功, 错误信息)"""
     if not model or model == NO_MODELS_FOUND or model == "未找到模型":
         return False, "未选择有效的模型。请先在节点设置中刷新模型列表并选择一个模型"
 
@@ -219,12 +240,10 @@ _refresh_thread = None
 
 
 def is_discovery_ok() -> bool:
-    """上次模型发现是否成功"""
     return _last_refresh_ok
 
 
 def refresh_models_now(endpoint: str) -> list[str]:
-    """同步查询 LM Studio 并更新模型缓存（阻塞）。不要在事件循环线程中调用。"""
     global _cached_endpoint, _cached_models, _last_refresh_time, _last_refresh_ok
     models, ok = _fetch_models_with_status(endpoint)
     with _refresh_lock:
@@ -250,11 +269,6 @@ def _refresh_models_in_background(endpoint: str) -> None:
 
 
 def _maybe_refresh(endpoint: str, force: bool = False, blocking: bool = False) -> list[str]:
-    """返回缓存的模型列表；需要刷新时在后台线程（或 blocking=True 时当前线程）执行
-
-    发现成功后按 _refresh_interval 刷新，发现失败后按 _failure_backoff 退避，
-    因此失败的发现不会在每次调用时都重试。
-    """
     global _cached_endpoint, _last_refresh_time
     with _refresh_lock:
         endpoint_changed = endpoint != _cached_endpoint
@@ -279,40 +293,50 @@ def _maybe_refresh(endpoint: str, force: bool = False, blocking: bool = False) -
             _refresh_models_in_background(endpoint)
     return models
 
-def _image_inputs(cls):
-    inputs = {
-        "image": (
+def _media_inputs():
+    return {
+        IMAGE_INPUT: (
             "IMAGE",
             {
-                "tooltip": "Optional image (B,H,W,C float32). Requires a vision-capable model. "
-                           "One socket is enough: a spare one appears after each image you connect.",
+                "tooltip": "Image input. Dock it to the Multimedia Loader's image output (a list of "
+                           "images becomes one multi-image prompt) or to any single IMAGE tensor. "
+                           "The two media ports are exclusive: docking here releases the media link.",
             },
-        )
+        ),
+        BUNDLE_INPUT: (
+            MEDIA_BUNDLE_TYPE,
+            {
+                "tooltip": "Media input. Dock it to the Multimedia Loader's media output: ordered "
+                           "images, videos (sampled into frames) and audio (sent as WAV). The two "
+                           "media ports are exclusive: docking here releases the image link.",
+            },
+        ),
     }
-    for index in range(2, cls.MAX_LINKED_IMAGES + 1):
-        inputs[f"image_{index}"] = (
-            "IMAGE",
-            {"tooltip": f"Image {index} of the multi-image prompt (up to {cls.MAX_LINKED_IMAGES})."},
-        )
-    return inputs
+
+def _text_inputs():
+    return {
+        TEXT_INPUT: (
+            "STRING",
+            {
+                "default": "",
+                "multiline": True,
+                "forceInput": True,
+                "tooltip": "Text prompt input. Dock any string output to it: the linked text becomes "
+                           "the prompt and the whole prompt section of the panel is disabled (preset "
+                           "prompt, length, format, output language, user prompt and system prompt "
+                           "are all ignored while the link is kept).",
+            },
+        ),
+    }
 
 class LMStudioNode:
     CATEGORY = "Zhi.AI/LM Studio"
     FUNCTION = "run"
+    INPUT_IS_LIST = True
     RETURN_TYPES = ("STRING",)
-    RETURN_NAMES = ("result",)
+    RETURN_NAMES = ("text_output",)
     OUTPUT_NODE = True
-    MAX_LINKED_IMAGES = 12
-    DESCRIPTION = "Connect to local LM Studio server for image analysis and text generation. Supports multiple preset templates, output language control, and auto model discovery. Requires LM Studio software running with a vision-capable model loaded."
-
-    @classmethod
-    def _collect_images(cls, image, extra_slots):
-        images = [] if image is None else [image]
-        for index in range(2, cls.MAX_LINKED_IMAGES + 1):
-            slot = extra_slots.get(f"image_{index}")
-            if slot is not None:
-                images.append(slot)
-        return images
+    DESCRIPTION = "Connect to a local LM Studio server for multimodal analysis and text generation, with platform switching, presets and output language control on the node."
 
     @classmethod
     def INPUT_TYPES(cls):
@@ -320,8 +344,6 @@ class LMStudioNode:
         endpoint = config.get("endpoint", "http://localhost:1234")
         models = list(_maybe_refresh(endpoint))
         presets = _get_prompt_presets(config)
-        # 下拉只列出预设文件里的实际预设，不再提供「不使用预设」选项
-        # （旧工作流若仍保存着 "Ignore"，run() 中的 Ignore 分支保持原语义）
         preset_keys = [key for key in presets.keys() if key != "Ignore"] or ["Ignore"]
         return {
             "required": {
@@ -351,7 +373,7 @@ class LMStudioNode:
                     {
                         "default": "",
                         "multiline": True,
-                        "tooltip": "User message sent to the model. Any wired text_input is appended here.",
+                        "tooltip": "User message sent to the model. Panel-only field: it has no input socket.",
                     },
                 ),
                 "system_prompt": (
@@ -505,13 +527,25 @@ class LMStudioNode:
                         "tooltip": "Skip images that already have a txt file with the same name",
                     },
                 ),
+                "video_frames": (
+                    "INT",
+                    {
+                        "default": 4,
+                        "min": 1,
+                        "max": MAX_VIDEO_FRAMES,
+                        "step": 1,
+                        "tooltip": "Frames sampled per video from the media port. Frames are spread over the clip and limited by Size Limitation.",
+                    },
+                ),
             },
-            "optional": _image_inputs(cls),
+            "optional": {**_media_inputs(), **_text_inputs()},
         }
 
     @classmethod
-    def IS_CHANGED(cls, endpoint: str, **kwargs):
-        _maybe_refresh(endpoint)
+    def IS_CHANGED(cls, endpoint="", **kwargs):
+        if isinstance(endpoint, (list, tuple)):
+            endpoint = endpoint[0] if endpoint else ""
+        _maybe_refresh(str(endpoint))
         return str(time.time())
 
     @staticmethod
@@ -529,7 +563,6 @@ class LMStudioNode:
 
     @staticmethod
     def _apply_prompt_length(prompt: str, prompt_length: str) -> str:
-        """篇幅约束：Standard 不追加（沿用预设自身长度），Short/Medium/Long 在末尾追加长度要求。"""
         if not isinstance(prompt, str) or not prompt.strip():
             return prompt
         guidance = {
@@ -541,7 +574,6 @@ class LMStudioNode:
 
     @staticmethod
     def _apply_prompt_format(prompt: str, prompt_format: str) -> str:
-        """格式约束：Natural 不追加（模型默认即自然语言），Tag/Structured JSON 在末尾追加输出格式要求。"""
         if not isinstance(prompt, str) or not prompt.strip():
             return prompt
         guidance = {
@@ -560,23 +592,210 @@ class LMStudioNode:
         return text
 
     @staticmethod
-    def _tensor_to_base64(image_tensor, size_limitation=None) -> str:
-        img_np = (image_tensor[0].cpu().numpy() * 255).clip(0, 255).astype(np.uint8)
-        pil_img = Image.fromarray(img_np, mode="RGB")
-
+    def _pil_to_base64(pil_image, size_limitation=None) -> str:
         if size_limitation is not None and size_limitation > 0:
             target = min(size_limitation, 2500)
-            w, h = pil_img.size
+            w, h = pil_image.size
             long_edge = max(w, h)
             if long_edge > target:
                 scale = target / float(long_edge)
                 new_w = max(1, int(round(w * scale)))
                 new_h = max(1, int(round(h * scale)))
-                pil_img = pil_img.resize((new_w, new_h), Image.Resampling.LANCZOS)
+                pil_image = pil_image.resize((new_w, new_h), Image.Resampling.LANCZOS)
 
         buf = BytesIO()
-        pil_img.save(buf, format="PNG")
+        pil_image.save(buf, format="PNG")
         return base64.b64encode(buf.getvalue()).decode("utf-8")
+
+    @classmethod
+    def _tensor_to_base64(cls, image_tensor, size_limitation=None) -> str:
+        img_np = (image_tensor[0].cpu().numpy() * 255).clip(0, 255).astype(np.uint8)
+        pil_image = Image.fromarray(img_np, mode="RGB")
+        return cls._pil_to_base64(pil_image, size_limitation)
+
+    @staticmethod
+    def _unwrap(value):
+        if isinstance(value, (list, tuple)):
+            if not value:
+                return None
+            if len(value) == 1:
+                return LMStudioNode._unwrap(value[0])
+            if all(isinstance(item, str) for item in value):
+                return "\n".join(value)
+            return value[0]
+        return value
+
+    @staticmethod
+    def _flatten_media(value):
+        if value is None:
+            return []
+        if isinstance(value, (list, tuple)):
+            flattened = []
+            for item in value:
+                flattened.extend(LMStudioNode._flatten_media(item))
+            return flattened
+        return [value]
+
+    @staticmethod
+    def _is_image_value(value) -> bool:
+        return hasattr(value, "shape") and hasattr(value, "ndim") and value.ndim >= 2
+
+    @classmethod
+    def _bundle_items(cls, values):
+        entries = []
+        for value in values:
+            inner = getattr(value, "items", None)
+            if isinstance(inner, (list, tuple)):
+                entries.extend(inner)
+            else:
+                entries.append(value)
+        ordered = []
+        for entry in entries:
+            kind = str(getattr(entry, "media_type", "") or "").strip().lower()
+            payload = getattr(entry, "value", None)
+            if kind not in MEDIA_KINDS or payload is None:
+                continue
+            try:
+                position = int(getattr(entry, "input_index", 0) or 0)
+            except (TypeError, ValueError):
+                position = len(ordered)
+            ordered.append((position, len(ordered), kind, payload))
+        ordered.sort(key=lambda item: (item[0], item[1]))
+        return [(kind, payload) for _position, _fallback, kind, payload in ordered]
+
+    @classmethod
+    def _normalize_media(cls, image_raw, bundle_raw):
+        images = [value for value in cls._flatten_media(image_raw) if cls._is_image_value(value)]
+        bundles = cls._flatten_media(bundle_raw)
+        if images and bundles:
+            return (), LOG_ERROR_TEXT["portsExclusive"]
+        if images:
+            return tuple(("image", value) for value in images), ""
+        return tuple(cls._bundle_items(bundles)), ""
+
+    @classmethod
+    def _sample_video_frames(cls, video, frame_count):
+        if cv2 is None:
+            raise ValueError("OpenCV is unavailable, cannot sample video frames")
+        source = getattr(video, "get_stream_source", None)
+        path = source() if callable(source) else video
+        if not isinstance(path, str):
+            try:
+                path = os.fspath(path)
+            except TypeError:
+                raise ValueError("video payload is not a readable file path")
+        if not isinstance(path, str) or not os.path.isfile(path):
+            raise ValueError("video payload is not a readable file path")
+
+        wanted = max(1, min(int(frame_count or 1), MAX_VIDEO_FRAMES))
+        capture = cv2.VideoCapture(path)
+        frames = []
+        try:
+            if not capture.isOpened():
+                raise ValueError(f"cannot open video: {os.path.basename(path)}")
+            total = int(capture.get(cv2.CAP_PROP_FRAME_COUNT) or 0)
+            if total <= 0:
+                raise ValueError(f"video has no decodable frames: {os.path.basename(path)}")
+            span = max(total - 1, 1)
+            indices = [0 if wanted == 1 else int(index * span / (wanted - 1)) for index in range(wanted)]
+            for index in dict.fromkeys(indices):
+                capture.set(cv2.CAP_PROP_POS_FRAMES, index)
+                ok, frame = capture.read()
+                if not ok or frame is None:
+                    continue
+                frames.append(Image.fromarray(cv2.cvtColor(frame, cv2.COLOR_BGR2RGB)))
+        finally:
+            capture.release()
+        if not frames:
+            raise ValueError(f"no frames sampled from video: {os.path.basename(path)}")
+        return frames
+
+    @staticmethod
+    def _audio_to_wav_base64(audio):
+        if not isinstance(audio, dict):
+            raise ValueError("audio payload is not a waveform dictionary")
+        waveform = audio.get("waveform")
+        if waveform is None:
+            raise ValueError("audio payload has no waveform")
+        sample_rate = int(audio.get("sample_rate") or 32000)
+        arr = np.asarray(getattr(waveform, "cpu", lambda: waveform)(), dtype=np.float32)
+        if arr.ndim == 3:
+            arr = arr[0]
+        if arr.ndim == 1:
+            arr = arr[None, :]
+        if arr.ndim != 2 or arr.shape[-1] < 1 or not np.isfinite(arr).any():
+            raise ValueError("audio payload has no usable samples")
+        limit = int(MAX_AUDIO_SECONDS * sample_rate)
+        if 0 < limit < arr.shape[-1]:
+            arr = arr[..., :limit]
+        pcm = np.ascontiguousarray((np.clip(arr, -1.0, 1.0) * 32767.0).astype("<i2").T)
+        buf = BytesIO()
+        with wave.open(buf, "wb") as writer:
+            writer.setnchannels(int(arr.shape[0]))
+            writer.setsampwidth(2)
+            writer.setframerate(sample_rate)
+            writer.writeframes(pcm.tobytes())
+        return base64.b64encode(buf.getvalue()).decode("ascii")
+
+    @staticmethod
+    def _image_part(encoded: str):
+        return {"type": "image_url", "image_url": {"url": f"data:image/png;base64,{encoded}"}}
+
+    @classmethod
+    def _media_item_parts(cls, item, size_limitation, video_frames, expand_batch=False):
+        kind, value = item
+        limit = size_limitation if size_limitation and size_limitation > 0 else None
+        parts = []
+        if kind == "image":
+            batch = value if value.ndim == 4 else value[None, ...]
+            count = batch.shape[0] if expand_batch else 1
+            for index in range(count):
+                parts.append(cls._image_part(cls._tensor_to_base64(batch[index : index + 1], limit)))
+        elif kind == "video":
+            for frame in cls._sample_video_frames(value, video_frames):
+                parts.append(cls._image_part(cls._pil_to_base64(frame, limit)))
+        else:
+            parts.append(
+                {
+                    "type": "input_audio",
+                    "input_audio": {"data": cls._audio_to_wav_base64(value), "format": "wav"},
+                }
+            )
+        return parts
+
+    @classmethod
+    def _build_media_parts(cls, media, size_limitation, video_frames):
+        parts = []
+        for item in media:
+            try:
+                parts.extend(cls._media_item_parts(item, size_limitation, video_frames))
+            except Exception as e:
+                print(f"[LMStudio] skipped unreadable {item[0]}: {e}")
+            if len(parts) >= MAX_MEDIA_PARTS:
+                break
+        return parts[:MAX_MEDIA_PARTS]
+
+    @staticmethod
+    def _media_summary(media, video_frames):
+        counts = {kind: 0 for kind in MEDIA_KINDS}
+        for kind, _value in media:
+            counts[kind] += 1
+        segments = []
+        if counts["image"]:
+            segments.append((f"{counts['image']} 图", f"{counts['image']} images"))
+        if counts["video"]:
+            frames = max(1, min(int(video_frames or 1), MAX_VIDEO_FRAMES))
+            segments.append(
+                (f"{counts['video']} 视频×{frames}帧", f"{counts['video']} videos x{frames} frames")
+            )
+        if counts["audio"]:
+            segments.append((f"{counts['audio']} 音频", f"{counts['audio']} audio"))
+        if not segments:
+            return ""
+        return {
+            "zh": " / ".join(zh for zh, _en in segments),
+            "en": " / ".join(en for _zh, en in segments),
+        }
 
     @staticmethod
     def _load_image_from_path(image_path):
@@ -830,6 +1049,7 @@ class LMStudioNode:
         size_limitation: int,
         batch_mode: bool,
         image_count: int = 0,
+        media_summary=None,
         success: bool = True,
         error_msg: str = "",
         processed_count: int = 0,
@@ -841,7 +1061,6 @@ class LMStudioNode:
         if not show_log:
             return ""
 
-        # 一次生成中英两版，前端按界面语言显示（切换语言时也能即时重渲染）
         log_texts = {}
         for lang in ("zh", "en"):
             labels = LOG_TEXT[lang]
@@ -857,6 +1076,14 @@ class LMStudioNode:
             elif image_count > 0:
                 log_lines.append(labels["imageCount"].format(value=image_count))
 
+            if media_summary:
+                if isinstance(media_summary, dict):
+                    summary_value = media_summary.get(lang) or media_summary.get("zh") or ""
+                else:
+                    summary_value = str(media_summary)
+                if summary_value:
+                    log_lines.append(labels["media"].format(value=summary_value))
+
             if duration > 0:
                 log_lines.append(labels["duration"].format(value=duration))
 
@@ -865,7 +1092,6 @@ class LMStudioNode:
             else:
                 log_lines.append(labels["statusFailed"])
                 if error_msg:
-                    # error_msg 允许为 {"zh": ..., "en": ...}；普通字符串则两版一致
                     if isinstance(error_msg, dict):
                         error_value = error_msg.get(lang) or error_msg.get("zh") or error_msg.get("en") or ""
                     else:
@@ -891,7 +1117,6 @@ class LMStudioNode:
         if unload_model:
             self._unload_model(endpoint)
 
-        # log_info: {"zh": ..., "en": ...}（同时下发两版）；非字典时两版使用同一文本
         if isinstance(log_info, dict):
             texts = {lang: str(log_info.get(lang, "") or "") for lang in ("zh", "en")}
         else:
@@ -906,7 +1131,14 @@ class LMStudioNode:
             "result": (result,),
         }
 
-    def run(
+    def run(self, **kwargs):
+        image_raw = kwargs.pop(IMAGE_INPUT, None)
+        bundle_raw = kwargs.pop(BUNDLE_INPUT, None)
+        scalars = {key: self._unwrap(value) for key, value in kwargs.items()}
+        media, media_error = self._normalize_media(image_raw, bundle_raw)
+        return self._execute(media=media, media_error=media_error, **scalars)
+
+    def _execute(
         self,
         preset_prompt: str,
         use_preset: bool,
@@ -930,9 +1162,35 @@ class LMStudioNode:
         batch_folder_path: str,
         skip_exists: bool = False,
         remove_think_tags: bool = False,
-        image=None,
-        **image_slots,
+        video_frames: int = 4,
+        text_prompt=None,
+        media=(),
+        media_error="",
+        **_extra,
     ):
+        if media_error:
+            log_info = self._generate_log_info(
+                model=str(model or ""),
+                endpoint=str(endpoint or ""),
+                preset_prompt=str(preset_prompt or ""),
+                output_language=str(output_language or ""),
+                max_tokens=max_tokens,
+                temperature=temperature,
+                top_p=top_p,
+                top_k=top_k,
+                repetition_penalty=repetition_penalty,
+                presence_penalty=presence_penalty,
+                seed=seed,
+                size_limitation=size_limitation,
+                batch_mode=batch_mode,
+                success=False,
+                error_msg=media_error,
+            )
+            return self._prepare_return(
+                "", endpoint, unload_model, remove_think_tags, log_info
+            )
+
+        media_summary = self._media_summary(media, video_frames)
 
         server_ok, server_error = _check_server_connection(endpoint)
         if not server_ok:
@@ -955,26 +1213,26 @@ class LMStudioNode:
         presets = _get_prompt_presets(config)
         preset_text = presets.get(preset_prompt, "")
 
-        # 「使用预设」开关：关闭时整组预设（预设提示词 / 篇幅 / 格式 / 输出语言）都不参与请求，
-        # 改用用户提示词与系统提示词；旧工作流用 preset_prompt == "Ignore" 表达同一含义，保持兼容
         preset_active = bool(use_preset) and preset_prompt != "Ignore"
+        external_prompt = text_prompt.strip() if isinstance(text_prompt, str) else ""
 
-        if preset_active:
+        if external_prompt:
+            full_user_text = external_prompt
+        elif preset_active:
             full_user_text = user_prompt.strip() if user_prompt.strip() else preset_text
-            # 预设组的附加指令仅在启用预设时生效（与面板的禁用状态一致）
             full_user_text = self._apply_output_language(full_user_text, output_language)
             full_user_text = self._apply_prompt_length(full_user_text, prompt_length)
             full_user_text = self._apply_prompt_format(full_user_text, prompt_format)
         else:
             full_user_text = user_prompt.strip() if user_prompt.strip() else ""
 
-        effective_system_prompt = "" if preset_active else system_prompt
+        effective_system_prompt = "" if preset_active or external_prompt else system_prompt
 
         if not batch_mode:
-            all_images = self._collect_images(image, image_slots)
-            image_count = len(all_images)
+            media_parts = self._build_media_parts(media, size_limitation, video_frames)
+            image_count = sum(1 for part in media_parts if part["type"] == "image_url")
 
-            if image_count == 0:
+            if not media_parts:
                 messages = []
                 if effective_system_prompt.strip():
                     messages.append(
@@ -1042,22 +1300,7 @@ class LMStudioNode:
                         "", endpoint, unload_model, remove_think_tags, log_info
                     )
 
-            user_content = []
-            
-            for img in all_images:
-                if len(img.shape) == 4 and img.shape[0] > 0:
-                    image_tensor = img[0:1]
-                else:
-                    image_tensor = img
-                
-                b64 = self._tensor_to_base64(
-                    image_tensor, size_limitation if size_limitation > 0 else None
-                )
-                user_content.append({
-                    "type": "image_url",
-                    "image_url": {"url": f"data:image/png;base64,{b64}"},
-                })
-            
+            user_content = list(media_parts)
             user_content.append({"type": "text", "text": full_user_text})
 
             messages = []
@@ -1094,6 +1337,7 @@ class LMStudioNode:
                     size_limitation=size_limitation,
                     batch_mode=batch_mode,
                     image_count=image_count,
+                    media_summary=media_summary,
                     success=True,
                     duration=duration,
                 )
@@ -1117,6 +1361,7 @@ class LMStudioNode:
                     size_limitation=size_limitation,
                     batch_mode=batch_mode,
                     image_count=image_count,
+                    media_summary=media_summary,
                     success=False,
                     error_msg=str(e),
                     duration=duration,
@@ -1127,6 +1372,28 @@ class LMStudioNode:
 
         else:
             results = []
+
+            if media:
+                log_info = self._generate_log_info(
+                    model=model,
+                    endpoint=endpoint,
+                    preset_prompt=preset_prompt,
+                    output_language=output_language,
+                    max_tokens=max_tokens,
+                    temperature=temperature,
+                    top_p=top_p,
+                    top_k=top_k,
+                    repetition_penalty=repetition_penalty,
+                    presence_penalty=presence_penalty,
+                    seed=seed,
+                    size_limitation=size_limitation,
+                    batch_mode=batch_mode,
+                    success=False,
+                    error_msg=LOG_ERROR_TEXT["batchMediaConflict"],
+                )
+                return self._prepare_return(
+                    "", endpoint, unload_model, remove_think_tags, log_info
+                )
 
             if batch_folder_path and batch_folder_path.strip():
                 try:
@@ -1454,85 +1721,6 @@ class LMStudioNode:
                     )
 
             else:
-                if image is None:
-                    log_info = self._generate_log_info(
-                        model=model,
-                        endpoint=endpoint,
-                        preset_prompt=preset_prompt,
-                        output_language=output_language,
-                        max_tokens=max_tokens,
-                        temperature=temperature,
-                        top_p=top_p,
-                        top_k=top_k,
-                        repetition_penalty=repetition_penalty,
-                        presence_penalty=presence_penalty,
-                        seed=seed,
-                        size_limitation=size_limitation,
-                        batch_mode=batch_mode,
-                        success=False,
-                        error_msg=LOG_ERROR_TEXT["noImagesInBatch"],
-                    )
-                    return self._prepare_return(
-                        "", endpoint, unload_model, remove_think_tags, log_info
-                    )
-
-                total_images = image.shape[0] if len(image.shape) == 4 else 1
-                processed_count = 0
-                error_count = 0
-                error_details = []
-
-                for i in range(total_images):
-                    try:
-                        if len(image.shape) == 4:
-                            image_tensor = image[i : i + 1]
-                        else:
-                            image_tensor = image
-
-                        b64 = self._tensor_to_base64(
-                            image_tensor,
-                            size_limitation if size_limitation > 0 else None,
-                        )
-                        user_content = [
-                            {
-                                "type": "image_url",
-                                "image_url": {"url": f"data:image/png;base64,{b64}"},
-                            },
-                            {"type": "text", "text": full_user_text},
-                        ]
-
-                        messages = []
-                        if effective_system_prompt.strip():
-                            messages.append(
-                                {"role": "system", "content": effective_system_prompt}
-                            )
-                        messages.append({"role": "user", "content": user_content})
-
-                        result = self._call_api(
-                            endpoint,
-                            model,
-                            messages,
-                            max_tokens,
-                            temperature,
-                            top_p,
-                            top_k,
-                            repetition_penalty,
-                            presence_penalty,
-                            seed,
-                        )
-                        results.append(f"Image {i + 1}/{total_images}:\n{result}")
-                        processed_count += 1
-
-                    except Exception as e:
-                        error_count += 1
-                        error_msg = str(e)
-                        error_details.append(f"[Image {i + 1}] {error_msg}")
-
-                duration = time.time() - start_time
-                combined_result = "\n\n" + "=" * 50 + "\n\n".join(results)
-                summary = f"Batch processing completed!\nTotal: {total_images} images\nSuccess: {processed_count}\nFailed: {error_count}"
-                if error_details:
-                    summary += "\n\nFailure details:\n" + "\n".join(error_details)
-                combined_result = summary + "\n\n" + "=" * 50 + "\n" + combined_result
                 log_info = self._generate_log_info(
                     model=model,
                     endpoint=endpoint,
@@ -1547,12 +1735,9 @@ class LMStudioNode:
                     seed=seed,
                     size_limitation=size_limitation,
                     batch_mode=batch_mode,
-                    image_count=total_images,
-                    success=True,
-                    processed_count=processed_count,
-                    error_count=error_count,
-                    duration=duration,
+                    success=False,
+                    error_msg=LOG_ERROR_TEXT["batchFolderRequired"],
                 )
                 return self._prepare_return(
-                    combined_result, endpoint, unload_model, remove_think_tags, log_info
+                    "", endpoint, unload_model, remove_think_tags, log_info
                 )

@@ -12,8 +12,8 @@ class GroupSwitchManager:
     RETURN_TYPES = ()
     RETURN_NAMES = ()
     FUNCTION = "execute"
-    CATEGORY = "Zhi.AI/Utility"
-    DESCRIPTION = "Group Switch Manager, used for visual management of group on/off states and configuration of inter-group linkage rules"
+    CATEGORY = "Zhi.AI/Toolkit"
+    DESCRIPTION = "Visually toggles groups on or off and configures linkage rules between groups."
     OUTPUT_NODE = True
 
     @classmethod

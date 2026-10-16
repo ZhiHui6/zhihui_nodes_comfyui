@@ -163,6 +163,8 @@ def describe_single_pil_image(
 
 
 class Florence2Plus:
+    DESCRIPTION = "Describes and analyses images with Microsoft's Florence-2 model, with selectable task mode, precision and attention."
+
     def __init__(self):
         self.model = None
         self.processor = None

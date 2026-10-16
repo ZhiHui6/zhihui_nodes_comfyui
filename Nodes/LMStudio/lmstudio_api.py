@@ -27,12 +27,12 @@ def _save_config(config):
     except Exception:
         return False
 
-@PromptServer.instance.routes.get("/zhihui/lmstudio/config")
+@PromptServer.instance.routes.get("/zhiai/lmstudio/config")
 async def get_lmstudio_config(request):
     config = _load_config()
     return web.json_response(config)
 
-@PromptServer.instance.routes.post("/zhihui/lmstudio/config")
+@PromptServer.instance.routes.post("/zhiai/lmstudio/config")
 async def save_lmstudio_config(request):
     try:
         data = await request.json()
@@ -52,7 +52,6 @@ async def save_lmstudio_config(request):
         if "folder_read_mode" in data:
             config["folder_read_mode"] = data["folder_read_mode"]
         if "last_batch_folder" in data:
-            # 记住最近使用的批处理文件夹：供「按名称定位文件夹」优先搜索
             config["last_batch_folder"] = str(data.get("last_batch_folder") or "").strip()
         if _save_config(config):
             return web.json_response({"status": "success"})
@@ -62,7 +61,7 @@ async def save_lmstudio_config(request):
         return web.json_response({"status": "error", "message": str(e)}, status=500)
 
 
-@PromptServer.instance.routes.post("/zhihui/lmstudio/refresh_models")
+@PromptServer.instance.routes.post("/zhiai/lmstudio/refresh_models")
 async def refresh_lmstudio_models(request):
     try:
         data = await request.json()
@@ -91,7 +90,6 @@ async def refresh_lmstudio_models(request):
 
 
 def _select_directory_sync():
-    """服务端弹出系统原生目录选择框（与 PromptGallery 同款实现），返回绝对路径。"""
     try:
         import tkinter as tk
         from tkinter import filedialog
@@ -109,12 +107,8 @@ def _select_directory_sync():
         return ""
 
 
-@PromptServer.instance.routes.get("/zhihui/lmstudio/select_directory")
+@PromptServer.instance.routes.get("/zhiai/lmstudio/select_directory")
 async def select_lmstudio_directory(request):
-    """
-    批处理文件夹路径的「设定」按钮：在运行 ComfyUI 的机器上弹出系统选目录对话框。
-    取消选择时返回 cancelled 标记（前端不提示错误），异常时返回 500。
-    """
     try:
         loop = asyncio.get_running_loop()
         path = await loop.run_in_executor(None, _select_directory_sync)
@@ -127,11 +121,7 @@ async def select_lmstudio_directory(request):
         return web.json_response({"status": "error", "message": str(e)}, status=500)
 
 
-# ---- 按名称定位文件夹 ------------------------------------------------------
-# 浏览器出于安全限制，拖入文件夹只能拿到「文件夹名」而拿不到绝对路径。
-# 这里把名称交给服务端，在若干「可能的根目录」里检索同名目录并回传，供前端确认。
 
-# 搜索时跳过的系统/无关目录（小写比较）
 _FOLDER_SEARCH_SKIP = {
     "windows", "program files", "program files (x86)", "programdata", "appdata",
     "system volume information", "$recycle.bin", "recovery", "perflogs",
@@ -140,7 +130,6 @@ _FOLDER_SEARCH_SKIP = {
 
 
 def _folder_search_roots():
-    """候选根目录，按命中可能性从高到低排列。"""
     roots = []
 
     def push(path):
@@ -153,12 +142,10 @@ def _folder_search_roots():
         if os.path.isdir(real) and real not in roots:
             roots.append(real)
 
-    # ① 上次用过的批处理文件夹所在目录（最可能命中）
     last = _load_config().get("last_batch_folder")
     if isinstance(last, str) and last.strip():
         push(os.path.dirname(os.path.abspath(last.strip())))
 
-    # ② ComfyUI 根目录
     try:
         import folder_paths  # type: ignore
 
@@ -166,13 +153,11 @@ def _folder_search_roots():
     except Exception:
         pass
 
-    # ③ 用户目录与常见子目录
     home = os.path.expanduser("~")
     push(home)
     for sub in ("Desktop", "Documents", "Downloads", "Pictures", "datasets", "dataset"):
         push(os.path.join(home, sub))
 
-    # ④ Windows 盘符根（放最后，靠深度/耗时预算限制开销）
     if os.name == "nt":
         for letter in "CDEFGHIJKLMNOPQRSTUVWXYZ":
             push(f"{letter}:\\")
@@ -181,12 +166,6 @@ def _folder_search_roots():
 
 
 def _search_folder_by_name(name, limit=50, max_depth=3, max_visited=20000, budget_seconds=4.0):
-    """
-    按名称定位目录：对候选根逐个做「逐层推进」的广度优先搜索。
-    关键点是 BFS 而非 DFS —— 浅层的同名目录（如 D:\\dataset\\images）会先被找到，
-    不会因为某个大盘的深层子树把时间预算吃光而漏掉。
-    深度、访问目录数、耗时三重预算，命中上限即早退。
-    """
     target = str(name or "").strip().lower()
     if not target:
         return [], 0
@@ -224,9 +203,8 @@ def _search_folder_by_name(name, limit=50, max_depth=3, max_visited=20000, budge
     return matches, scanned
 
 
-@PromptServer.instance.routes.get("/zhihui/lmstudio/locate_folder")
+@PromptServer.instance.routes.get("/zhiai/lmstudio/locate_folder")
 async def locate_lmstudio_folder(request):
-    """拖入文件夹只能拿到名称时：按名称在候选根目录里定位，返回匹配的绝对路径列表。"""
     try:
         name = (request.rel_url.query.get("name") or "").strip()
         if not name:

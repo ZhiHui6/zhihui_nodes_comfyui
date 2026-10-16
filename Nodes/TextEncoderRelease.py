@@ -3,7 +3,7 @@ import comfy.model_management as model_management
 
 class TextEncoderRelease:
     CATEGORY = "Zhi.AI/Toolkit"
-    DESCRIPTION = "Release the connected text encoder (CLIP) from VRAM before sampling. The CONDITIONING sockets are execution dependencies: they hold the node until encoding is done, so the encoder is unloaded only after the last text was encoded. MODEL is passed through unchanged."
+    DESCRIPTION = "Unloads the connected CLIP from VRAM before sampling, with conditioning sockets acting as execution dependencies."
 
     @classmethod
     def INPUT_TYPES(cls):

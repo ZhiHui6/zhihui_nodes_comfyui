@@ -63,11 +63,11 @@ function $t(key) {
 const link = document.createElement("link");
 link.rel = "stylesheet";
 link.type = "text/css";
-link.href = "/zhihui/gallery/style.css";
+link.href = "/zhiai/gallery/style.css";
 document.head.appendChild(link);
 
 app.registerExtension({
-    name: "Zhihui.Gallery",
+    name: "Zhiai.Gallery",
     async beforeRegisterNodeDef(nodeType, nodeData, app) {
         if (nodeData.name === "PromptGallery") {
             const onNodeCreated = nodeType.prototype.onNodeCreated;
@@ -79,11 +79,11 @@ app.registerExtension({
 
                 node.properties = node.properties || {};
                 const defaultSettings = { rememberPath: true, useWindowsPicker: false, lastDir: "" };
-                let settings = (node.properties.zhihuiGallerySettings && typeof node.properties.zhihuiGallerySettings === "object")
-                    ? node.properties.zhihuiGallerySettings
+                let settings = (node.properties.zhiaiGallerySettings && typeof node.properties.zhiaiGallerySettings === "object")
+                    ? node.properties.zhiaiGallerySettings
                     : { ...defaultSettings };
                 settings = { ...defaultSettings, ...settings };
-                node.properties.zhihuiGallerySettings = settings;
+                node.properties.zhiaiGallerySettings = settings;
                 
                 function createHiddenWidget(name, value = "") {
                     const w = node.addWidget("text", name, value, (v) => {}, {});
@@ -141,16 +141,16 @@ app.registerExtension({
                 };
 
                 const container = document.createElement("div");
-                container.className = "zhihui-gallery-container";
+                container.className = "zhiai-gallery-container";
                 container.style.position = "absolute"; 
                 container.style.pointerEvents = "auto";
                 container.style.display = "none";
 
                 const topBar = document.createElement("div");
-                topBar.className = "zhihui-gallery-topbar";
+                topBar.className = "zhiai-gallery-topbar";
                 
                 const pathInput = document.createElement("input");
-                pathInput.className = "zhihui-gallery-path-input";
+                pathInput.className = "zhiai-gallery-path-input";
                 pathInput.type = "text";
                 pathInput.placeholder = $t('enterDirectoryPath');
                 pathInput.value = dirWidget.value || "";            
@@ -159,11 +159,11 @@ app.registerExtension({
                 };
 
                 const browseBtn = document.createElement("button");
-                browseBtn.className = "zhihui-gallery-btn";
+                browseBtn.className = "zhiai-gallery-btn";
                 browseBtn.innerText = $t('browse');
                 browseBtn.onclick = async () => {
                     try {
-                        const response = await api.fetchApi(`/zhihui/gallery/select_directory`);
+                        const response = await api.fetchApi(`/zhiai/gallery/select_directory`);
                         const data = await response.json();
                         if (!response.ok) {
                             throw new Error(translateError(data?.error) || `HTTP ${response.status}`);
@@ -177,14 +177,14 @@ app.registerExtension({
                 };
 
                 const goBtn = document.createElement("button");
-                goBtn.className = "zhihui-gallery-btn";
+                goBtn.className = "zhiai-gallery-btn";
                 goBtn.innerText = $t('load');
                 goBtn.onclick = () => {
                     applyDirectory(pathInput.value, true);
                 };
 
                 const settingsBtn = document.createElement("button");
-                settingsBtn.className = "zhihui-gallery-gear-btn";
+                settingsBtn.className = "zhiai-gallery-gear-btn";
                 settingsBtn.type = "button";
                 settingsBtn.innerText = "⚙️";
                 settingsBtn.onclick = () => {
@@ -201,10 +201,10 @@ app.registerExtension({
                 container.appendChild(topBar);
 
                 const grid = document.createElement("div");
-                grid.className = "zhihui-gallery-grid";
+                grid.className = "zhiai-gallery-grid";
                 container.appendChild(grid);
                 const footer = document.createElement("div");
-                footer.className = "zhihui-gallery-footer";
+                footer.className = "zhiai-gallery-footer";
                 const footerLeft = document.createElement("div");
                 footerLeft.className = "left";
                 const footerStats = document.createElement("span");
@@ -219,16 +219,16 @@ app.registerExtension({
                 footer.appendChild(footerRight);
                 container.appendChild(footer);
                 const settingsOverlay = document.createElement("div");
-                settingsOverlay.className = "zhihui-gallery-settings-overlay";
+                settingsOverlay.className = "zhiai-gallery-settings-overlay";
                 const settingsDialog = document.createElement("div");
-                settingsDialog.className = "zhihui-gallery-settings-dialog";
+                settingsDialog.className = "zhiai-gallery-settings-dialog";
                 settingsOverlay.appendChild(settingsDialog);
                 const settingsTitle = document.createElement("div");
-                settingsTitle.className = "zhihui-gallery-settings-title";
+                settingsTitle.className = "zhiai-gallery-settings-title";
                 const settingsTitleText = document.createElement("div");
                 settingsTitleText.innerText = `⚙️ ${$t('settings')}`;
                 const settingsClose = document.createElement("button");
-                settingsClose.className = "zhihui-gallery-settings-close";
+                settingsClose.className = "zhiai-gallery-settings-close";
                 settingsClose.type = "button";
                 settingsClose.innerHTML = "&times;";
                 settingsClose.onclick = () => {
@@ -239,7 +239,7 @@ app.registerExtension({
                 settingsDialog.appendChild(settingsTitle);
 
                 const rememberRow = document.createElement("label");
-                rememberRow.className = "zhihui-gallery-settings-row";
+                rememberRow.className = "zhiai-gallery-settings-row";
                 const rememberCheckbox = document.createElement("input");
                 rememberCheckbox.type = "checkbox";
                 rememberCheckbox.checked = !!settings.rememberPath;
@@ -250,7 +250,7 @@ app.registerExtension({
                 settingsDialog.appendChild(rememberRow);
 
                 const windowsPickerRow = document.createElement("label");
-                windowsPickerRow.className = "zhihui-gallery-settings-row";
+                windowsPickerRow.className = "zhiai-gallery-settings-row";
                 const windowsPickerCheckbox = document.createElement("input");
                 windowsPickerCheckbox.type = "checkbox";
                 windowsPickerCheckbox.checked = !!settings.useWindowsPicker;
@@ -281,7 +281,7 @@ app.registerExtension({
                 updateBrowseBtnVisibility();
 
                 const applySettingsToNode = () => {
-                    node.properties.zhihuiGallerySettings = {
+                    node.properties.zhiaiGallerySettings = {
                         rememberPath: !!settings.rememberPath,
                         useWindowsPicker: !!settings.useWindowsPicker,
                         lastDir: typeof settings.lastDir === "string" ? settings.lastDir : ""
@@ -298,10 +298,10 @@ app.registerExtension({
                     pendingSaveTimer = setTimeout(async () => {
                         pendingSaveTimer = null;
                         try {
-                            await api.fetchApi("/zhihui/gallery/settings", {
+                            await api.fetchApi("/zhiai/gallery/settings", {
                                 method: "POST",
                                 headers: { "Content-Type": "application/json" },
-                                body: JSON.stringify(node.properties.zhihuiGallerySettings)
+                                body: JSON.stringify(node.properties.zhiaiGallerySettings)
                             });
                         } catch (e) {
                             setStatus(`${$t('error')}: ${e.message}`);
@@ -311,7 +311,7 @@ app.registerExtension({
 
                 const loadSettingsFromFile = async () => {
                     try {
-                        const response = await api.fetchApi("/zhihui/gallery/settings");
+                        const response = await api.fetchApi("/zhiai/gallery/settings");
                         const data = await response.json();
                         if (!response.ok) {
                             throw new Error(data?.error || `HTTP ${response.status}`);
@@ -439,7 +439,7 @@ app.registerExtension({
                         const screenWidth = elWidth * scale;
                         const screenHeight = elHeight * scale;
 
-                        container.style.display = "flex"; // Changed to flex for layout
+                        container.style.display = "flex";
                         container.style.left = `${screenX}px`;
                         container.style.top = `${screenY}px`;
                         container.style.width = `${screenWidth}px`;
@@ -484,7 +484,7 @@ app.registerExtension({
                     setStatus($t('loading'));
                     
                     try {
-                        const response = await api.fetchApi(`/zhihui/gallery/list_files?path=${encodeURIComponent(trimmed)}`);
+                        const response = await api.fetchApi(`/zhiai/gallery/list_files?path=${encodeURIComponent(trimmed)}`);
                         const data = await response.json();
                         if (seq !== fetchSeq) return;
                         renderGallery(data.files, trimmed);
@@ -514,13 +514,13 @@ app.registerExtension({
 
                     files.forEach(file => {
                         const item = document.createElement("div");
-                        item.className = "zhihui-gallery-item";
+                        item.className = "zhiai-gallery-item";
                         if (file.filename === currentSelection) {
                             item.classList.add("selected");
                         }
 
                         const img = document.createElement("img");
-                        const thumbUrl = `/zhihui/gallery/view_image?path=${encodeURIComponent(dir)}&filename=${encodeURIComponent(file.filename)}&thumbnail=true`;
+                        const thumbUrl = `/zhiai/gallery/view_image?path=${encodeURIComponent(dir)}&filename=${encodeURIComponent(file.filename)}&thumbnail=true`;
                         
                         img.dataset.src = thumbUrl;
                         img.src = "";

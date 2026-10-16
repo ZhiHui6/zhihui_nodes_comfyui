@@ -1,6 +1,8 @@
 import os
 
 class PromptGallery:
+    DESCRIPTION = "Picks an image from the gallery and outputs the .txt prompt stored next to it."
+
     @classmethod
     def INPUT_TYPES(s):
         return {

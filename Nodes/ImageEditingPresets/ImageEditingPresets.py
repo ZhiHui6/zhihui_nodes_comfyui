@@ -21,7 +21,6 @@ class ImageEditingPresets:
         
         all_presets = []
 
-        # Load Unified presets
         try:
             with open(unified_presets_file, 'r', encoding='utf-8') as f:
                 content = f.read()
@@ -59,7 +58,7 @@ class ImageEditingPresets:
     RETURN_NAMES = ("prompt_content",)
     FUNCTION = "get_preset"
     CATEGORY = "Zhi.AI/Generator"
-    DESCRIPTION = "Kontext Presets Plus: Provides a preset library with custom content input. Suitable for advanced image editing and creative generation workflows."
+    DESCRIPTION = "A categorised preset library with custom content input for advanced image editing workflows."
     
     @classmethod
     def get_brief_by_name(cls, display_name):
@@ -71,8 +70,6 @@ class ImageEditingPresets:
     
     def get_preset(self, preset):
         data = self.load_presets()
-        # Note: preset argument here is the display_name from INPUT_TYPES
-        # e.g. "Context Fusion" (previously "[Basic] Context Fusion")
             
         brief_content = self.get_brief_by_name(preset)
         

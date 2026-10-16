@@ -8,6 +8,8 @@ styles_path = os.path.join(current_path, "styles.json")
 images_dir = os.path.join(current_path, "Preview_images")
 
 class TypeDesigner:
+    DESCRIPTION = "Browses typographic art styles such as 3D, neon and metal, and supplies the matching prompt."
+
     @classmethod
     def INPUT_TYPES(s):
         return {
@@ -27,7 +29,7 @@ class TypeDesigner:
     def process(self, text, prompt=None, extra_pnginfo=None):
         return (text,)
 
-@PromptServer.instance.routes.get("/zhihui/typedesigner/styles")
+@PromptServer.instance.routes.get("/zhiai/typedesigner/styles")
 async def get_styles(request):
     if os.path.exists(styles_path):
         try:
@@ -66,7 +68,7 @@ def build_image_map():
 
 build_image_map()
 
-@PromptServer.instance.routes.get("/zhihui/typedesigner/images")
+@PromptServer.instance.routes.get("/zhiai/typedesigner/images")
 async def get_image(request):
     style = request.query.get("style")
     if not style:

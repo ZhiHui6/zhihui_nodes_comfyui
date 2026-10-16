@@ -65,7 +65,7 @@ function $t(key) {
 }
 
 const style = `
-.zhihui-florence-modal {
+.zhiai-florence-modal {
     position: fixed;
     top: 50%;
     left: 50%;
@@ -84,7 +84,7 @@ const style = `
     box-shadow: 0 10px 40px rgba(0,0,0,0.6);
     font-family: 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
 }
-.zhihui-florence-overlay {
+.zhiai-florence-overlay {
     position: fixed;
     top: 0;
     left: 0;
@@ -94,7 +94,7 @@ const style = `
     z-index: 999;
     backdrop-filter: blur(2px);
 }
-.zhihui-florence-header {
+.zhiai-florence-header {
     display: flex;
     justify-content: space-between;
     align-items: center;
@@ -102,14 +102,14 @@ const style = `
     border-bottom: 2px solid #444;
     padding-bottom: 15px;
 }
-.zhihui-florence-header h3 {
+.zhiai-florence-header h3 {
     margin: 0;
     font-size: 1.5em;
     background: linear-gradient(90deg, #4dabf7, #74c0fc);
     -webkit-background-clip: text;
     -webkit-text-fill-color: transparent;
 }
-.zhihui-florence-list {
+.zhiai-florence-list {
     flex-grow: 1;
     overflow-y: auto;
     margin-bottom: 15px;
@@ -117,7 +117,7 @@ const style = `
     border-radius: 8px;
     padding: 5px;
 }
-.zhihui-florence-item {
+.zhiai-florence-item {
     display: flex;
     justify-content: space-between;
     align-items: center;
@@ -125,19 +125,19 @@ const style = `
     border-bottom: 1px solid #3a3a3a;
     transition: background 0.2s;
 }
-.zhihui-florence-item:hover {
+.zhiai-florence-item:hover {
     background: rgba(255,255,255,0.05);
 }
-.zhihui-florence-item:last-child {
+.zhiai-florence-item:last-child {
     border-bottom: none;
 }
-.zhihui-florence-actions {
+.zhiai-florence-actions {
     display: flex;
     align-items: center;
     gap: 10px;
     white-space: nowrap;
 }
-.zhihui-florence-actions button {
+.zhiai-florence-actions button {
     padding: 6px 14px;
     cursor: pointer;
     background: #333;
@@ -148,7 +148,7 @@ const style = `
     transition: all 0.2s;
     font-weight: 500;
 }
-.zhihui-florence-actions button:hover {
+.zhiai-florence-actions button:hover {
     transform: translateY(-1px);
     box-shadow: 0 2px 5px rgba(0,0,0,0.2);
 }
@@ -170,26 +170,26 @@ const style = `
 .btn-success:hover {
     filter: brightness(1.1);
 }
-.zhihui-florence-platform-selector {
+.zhiai-florence-platform-selector {
     margin-bottom: 20px;
     padding: 15px;
     background: rgba(255,255,255,0.03);
     border-radius: 8px;
     border: 1px solid #3a3a3a;
 }
-.zhihui-florence-platform-selector label {
+.zhiai-florence-platform-selector label {
     margin-right: 20px;
     cursor: pointer;
     display: inline-flex;
     align-items: center;
     gap: 5px;
 }
-.zhihui-hf-group {
+.zhiai-hf-group {
     display: inline-flex;
     align-items: center;
     gap: 6px;
 }
-.zhihui-hf-options {
+.zhiai-hf-options {
     display: inline-flex;
     align-items: center;
     gap: 6px;
@@ -214,7 +214,7 @@ styleEl.textContent = style;
 document.head.appendChild(styleEl);
 
 app.registerExtension({
-    name: "zhihui.florence2.manager",
+    name: "zhiai.florence2.manager",
     async beforeRegisterNodeDef(nodeType, nodeData, app) {
         if (nodeData.name === "Florence2Plus") {
             const onNodeCreated = nodeType.prototype.onNodeCreated;
@@ -233,14 +233,14 @@ app.registerExtension({
 
 async function showManagerModal(nodeInstance) {
 
-    const existing = document.querySelector(".zhihui-florence-overlay");
+    const existing = document.querySelector(".zhiai-florence-overlay");
     if (existing) existing.remove();
 
     const overlay = document.createElement("div");
-    overlay.className = "zhihui-florence-overlay";
+    overlay.className = "zhiai-florence-overlay";
     
     const modal = document.createElement("div");
-    modal.className = "zhihui-florence-modal";
+    modal.className = "zhiai-florence-modal";
     
     overlay.appendChild(modal);
     document.body.appendChild(overlay);
@@ -251,17 +251,17 @@ async function showManagerModal(nodeInstance) {
     };
     
     const header = document.createElement("div");
-    header.className = "zhihui-florence-header";
+    header.className = "zhiai-florence-header";
     header.innerHTML = `<h3>${$t('modelsManager')}</h3><button id="close-btn">×</button>`;
     modal.appendChild(header);
     header.querySelector("#close-btn").onclick = close;
     
     const platformDiv = document.createElement("div");
-    platformDiv.className = "zhihui-florence-platform-selector";
+    platformDiv.className = "zhiai-florence-platform-selector";
     platformDiv.innerHTML = `
         <div style="margin-bottom: 10px; font-weight: bold; color: #ffffffff;">${$t('downloadSource')}:</div>
         <label><input type="radio" name="platform" value="ModelScope" checked> ${$t('modelScope')}</label>
-        <span class="zhihui-hf-group"><label><input type="radio" name="platform" value="Hugging Face"> ${$t('huggingFace')}</label><span id="hf-options" class="zhihui-hf-options"><label><input type="checkbox" id="use-mirror"> ${$t('useChinaMirror')}</label></span></span>
+        <span class="zhiai-hf-group"><label><input type="radio" name="platform" value="Hugging Face"> ${$t('huggingFace')}</label><span id="hf-options" class="zhiai-hf-options"><label><input type="checkbox" id="use-mirror"> ${$t('useChinaMirror')}</label></span></span>
     `;
     modal.appendChild(platformDiv);
     
@@ -282,7 +282,7 @@ async function showManagerModal(nodeInstance) {
     updatePreview();
     
     const content = document.createElement("div");
-    content.className = "zhihui-florence-list";
+    content.className = "zhiai-florence-list";
     content.innerHTML = `<div style="padding:20px; text-align:center;">${$t('loading')}</div>`;
     modal.appendChild(content);
     
@@ -299,7 +299,7 @@ async function showManagerModal(nodeInstance) {
     const refresh = async () => {
         content.innerHTML = `<div style="padding:20px; text-align:center;">${$t('loading')}</div>`;
         try {
-            const res = await api.fetchApi("/zhihui/florence2/models");
+            const res = await api.fetchApi("/zhiai/florence2/models");
             const models = await res.json();
             renderList(models);
         } catch (e) {
@@ -316,7 +316,7 @@ async function showManagerModal(nodeInstance) {
         
         models.forEach(m => {
             const item = document.createElement("div");
-            item.className = "zhihui-florence-item";
+            item.className = "zhiai-florence-item";
             
             const info = document.createElement("div");
             const statusColor = m.installed ? "#40c057" : "#868e96";
@@ -334,7 +334,7 @@ async function showManagerModal(nodeInstance) {
             item.appendChild(info);
             
             const actions = document.createElement("div");
-            actions.className = "zhihui-florence-actions";
+            actions.className = "zhiai-florence-actions";
             
             if (m.installed) {
                 const delBtn = document.createElement("button");
@@ -343,7 +343,7 @@ async function showManagerModal(nodeInstance) {
                 delBtn.onclick = async () => {
                     if (confirm(`${$t('confirmDelete')} ${m.name}?`)) {
                         try {
-                            const res = await api.fetchApi("/zhihui/florence2/models", {
+                            const res = await api.fetchApi("/zhiai/florence2/models", {
                                 method: "DELETE",
                                 body: JSON.stringify({ model_name: m.name })
                             });
@@ -364,7 +364,7 @@ async function showManagerModal(nodeInstance) {
                     const useMirror = platformDiv.querySelector('#use-mirror').checked;
                     
                     try {
-                        const res = await api.fetchApi("/zhihui/florence2/download", {
+                        const res = await api.fetchApi("/zhiai/florence2/download", {
                             method: "POST",
                             body: JSON.stringify({
                                 model_name: m.name,
@@ -394,7 +394,7 @@ async function showManagerModal(nodeInstance) {
         statusDiv.textContent = $t('startingDownload');
         pollInterval = setInterval(async () => {
             try {
-                const res = await api.fetchApi("/zhihui/florence2/download_status");
+                const res = await api.fetchApi("/zhiai/florence2/download_status");
                 const status = await res.json();
                 
                 if (status.status === "downloading") {

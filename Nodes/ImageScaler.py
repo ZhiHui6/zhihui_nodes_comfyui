@@ -23,7 +23,7 @@ class ImageScaler:
     RETURN_NAMES = ("image_output",)
     FUNCTION = "scale_image"
     CATEGORY = "Zhi.AI/Image"
-    DESCRIPTION = "Image Scaler: Intelligently scales images to specified dimensions based on long side or short side. Supports multiple interpolation methods (nearest neighbor, bilinear, bicubic, etc.), adjusting size while maintaining image proportions. Suitable for image preprocessing, size standardization and batch processing."
+    DESCRIPTION = "Scales images to a target long or short edge while keeping the aspect ratio, with selectable interpolation."
 
     def scale_image(self, image_input, scale_basis, target_size, interpolation_method):
         B, H, W, C = image_input.shape

@@ -21,7 +21,7 @@ class ColorMatchToReference:
     RETURN_NAMES = ("image_output",)
     FUNCTION = "match_color"
     CATEGORY = "Zhi.AI/MovieTools"
-    DESCRIPTION = "Color Match to Reference: Adjusts the color of the input image to match the reference image. Analyzes the color distribution of the reference image and automatically adjusts the hue, saturation, and brightness of the input image. Supports match strength adjustment, suitable for cinematic color grading and color consistency processing."
+    DESCRIPTION = "Adjusts the hue, saturation and brightness of the input image to match a reference image, with adjustable strength."
 
     def match_color(self, input_image: torch.Tensor = None, reference_image: torch.Tensor = None, match_strength: float = 1.0, switch: bool = True) -> Tuple[torch.Tensor]:
         if not switch or input_image is None:

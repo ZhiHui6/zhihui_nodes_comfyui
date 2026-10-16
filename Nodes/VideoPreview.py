@@ -10,10 +10,7 @@ class VideoPreview:
     OUTPUT_NODE = True
     RETURN_TYPES = ("VIDEO",)
     RETURN_NAMES = ("VIDEO",)
-    DESCRIPTION = (
-        "Preview an upstream video on the node without saving it to the output folder. "
-        "The clip is remuxed losslessly into the temp directory and reused across runs; no frame decoding."
-    )
+    DESCRIPTION = "Preview an upstream video on the node without saving it, remuxing losslessly into temp and passing the video through."
 
     @classmethod
     def INPUT_TYPES(cls):

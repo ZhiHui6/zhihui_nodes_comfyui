@@ -51,7 +51,7 @@ def get_preset_content(preset_path):
                 return None
     return None
 
-@PromptServer.instance.routes.get("/zhihui/system_prompt/translations")
+@PromptServer.instance.routes.get("/zhiai/system_prompt/translations")
 async def get_preset_translations(request):
     try:
         translations = load_translations()
@@ -59,7 +59,7 @@ async def get_preset_translations(request):
     except Exception as e:
         return web.json_response({"error": str(e)}, status=500)
 
-@PromptServer.instance.routes.get("/zhihui/system_prompt/presets")
+@PromptServer.instance.routes.get("/zhiai/system_prompt/presets")
 async def get_presets(request):
     try:
         presets = get_all_preset_options()
@@ -67,7 +67,7 @@ async def get_presets(request):
     except Exception as e:
         return web.json_response({"error": str(e)}, status=500)
 
-@PromptServer.instance.routes.get("/zhihui/system_prompt/preview")
+@PromptServer.instance.routes.get("/zhiai/system_prompt/preview")
 async def get_preset_preview(request):
     try:
         preset_path = request.query.get("path", "")

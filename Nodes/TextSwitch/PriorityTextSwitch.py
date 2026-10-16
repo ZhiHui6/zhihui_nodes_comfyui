@@ -1,5 +1,5 @@
 class PriorityTextSwitch:
-    DESCRIPTION = "Priority Text Switch: When both text A and text B ports are connected, prioritize output from port B; if port B has no input, output from text A port; if both ports have no input, prompt to connect at least one input port."
+    DESCRIPTION = "Outputs text B when both inputs are connected, falls back to text A, and outputs empty text when neither is connected."
 
     RETURN_TYPES = ("STRING",)
     RETURN_NAMES = ("output_text",)

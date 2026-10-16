@@ -62,9 +62,9 @@ class SystemPromptLoader:
     RETURN_TYPES = ("STRING",)
     RETURN_NAMES = ("system_prompt",)
     FUNCTION = "load_preset"
-    CATEGORY = "Zhi.AI/Toolkit"
+    CATEGORY = "Zhi.AI/Generator"
     OUTPUT_NODE = True
-    DESCRIPTION = "System Prompt Loader: A simplified system prompt loader that loads system prompt templates directly from preset files. Supports various scenario presets, suitable for scenarios that require pure system prompt output without user prompt processing functionality."
+    DESCRIPTION = "Loads system prompt templates straight from preset files and outputs only the system prompt."
 
     def load_preset(self, enable_node, system_preset):
         

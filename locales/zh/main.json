@@ -1,0 +1,15 @@
+{
+    "nodeCategories": {
+        "Text": "文本",
+        "Generator": "生成器",
+        "Image": "图像",
+        "MovieTools": "影视工具",
+        "Video": "视频",
+        "Loaders": "加载器",
+        "Latent": "潜空间",
+        "Toolkit": "工具箱",
+        "Audio": "音频",
+        "Image Understanding": "图像理解",
+        "LLM Extra Options": "LLM 扩展选项"
+    }
+}

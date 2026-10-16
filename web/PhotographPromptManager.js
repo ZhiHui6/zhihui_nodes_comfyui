@@ -25,7 +25,7 @@ function $t(key) {
 }
 
 app.registerExtension({
-    name: "zhihui.PhotographPromptManager",
+    name: "zhiai.PhotographPromptManager",
     async beforeRegisterNodeDef(nodeType, nodeData, app) {
         if (nodeData.name === "PhotographPromptGenerator") {
             const onNodeCreated = nodeType.prototype.onNodeCreated;
@@ -89,10 +89,8 @@ let categoryData = {};
 
 async function translateText(text, targetLang) {
     try {
-        // 使用腾讯翻译君API（免费，无需API key）
         const url = "https://transmart.qq.com/api/imt";
 
-        // 生成唯一的client_key
         const clientKey = `browser-chrome-${generateUUID()}`;
 
         const postData = {
@@ -138,7 +136,6 @@ async function translateText(text, targetLang) {
     }
 }
 
-// 生成UUID的辅助函数
 function generateUUID() {
     return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, function(c) {
         const r = Math.random() * 16 | 0;
@@ -633,7 +630,7 @@ async function loadCategoryData() {
     try {
         updateStatus('正在加载数据... · Loading data...');
         
-        const response = await api.fetchApi('/zhihui/photograph/categories', {
+        const response = await api.fetchApi('/zhiai/photograph/categories', {
             method: 'GET'
         });
         
@@ -650,7 +647,7 @@ async function loadCategoryData() {
         
         for (const category of effectiveCategories) {
             try {
-                const dataResponse = await api.fetchApi(`/zhihui/photograph/category/${category}`, {
+                const dataResponse = await api.fetchApi(`/zhiai/photograph/category/${category}`, {
                     method: 'GET'
                 });
                 
@@ -704,7 +701,6 @@ async function loadCategoryData() {
 }
 
 const CATEGORY_NAME_MAP = {
-    // 节点参数名映射
     'character': '人物 · Character',
     'gender': '性别 · Gender',
     'facial_expressions': '面部表情 · Facial Expressions',
@@ -737,7 +733,6 @@ const CATEGORY_NAME_MAP = {
     'depth_of_field': '景深 · Depth of Field',
     'composition': '构图 · Composition',
     'texture': '质感 · Texture',
-    // 文件名映射（当文件名与节点参数名不同时）
     'body_pose': '身躯姿势 · Body Pose',
     'bottoms': '下装 · Bottom',
     'tops': '上衣 · Top',
@@ -1858,7 +1853,7 @@ async function autoSaveCategory(categoryName) {
             return entry;
         });
 
-        const response = await api.fetchApi(`/zhihui/photograph/category/${categoryName}`, {
+        const response = await api.fetchApi(`/zhiai/photograph/category/${categoryName}`, {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json'
@@ -2014,7 +2009,7 @@ function importUserOptions() {
                         importCount += newEntries.length;
 
                         try {
-                            const response = await api.fetchApi(`/zhihui/photograph/category/${category}`, {
+                            const response = await api.fetchApi(`/zhiai/photograph/category/${category}`, {
                                 method: 'POST',
                                 headers: {
                                     'Content-Type': 'application/json'
@@ -2683,7 +2678,7 @@ function createTemplateEditorHelperDialog() {
 
 async function populatePresetTemplates(container) {
     try {
-        const response = await fetch('/zhihui/photograph/template_presets');
+        const response = await fetch('/zhiai/photograph/template_presets');
         const templatePresets = await response.json();
         
         container.innerHTML = '';
@@ -4409,17 +4404,14 @@ function shuffleAllFields() {
 
         const select = document.querySelector(`.browser-select[data-field="${fieldName}"]`);
         if (select && select.options.length > 0) {
-            // 获取所有可选项，排除 "Ignore" 和 "Random"
             const validOptions = Array.from(select.options)
                 .map(opt => opt.value)
                 .filter(val => val !== 'Ignore' && val !== 'Random');
 
             if (validOptions.length > 0) {
-                // 随机选择一个选项
                 const randomIndex = Math.floor(Math.random() * validOptions.length);
                 const randomValue = validOptions[randomIndex];
 
-                // 更新界面和待变更数据
                 select.value = randomValue;
                 browserPendingChanges[fieldName] = randomValue;
                 count++;
@@ -4436,7 +4428,6 @@ function toggleAllFields(value, currentState, otherState, button, otherButton) {
     const categories = Object.keys(BROWSER_CATEGORY_MAP);
 
     if (currentState.active) {
-        // 当前按钮已激活，点击则恢复
         let count = 0;
         categories.forEach(category => {
             const categoryInfo = BROWSER_CATEGORY_MAP[category];
@@ -4461,9 +4452,7 @@ function toggleAllFields(value, currentState, otherState, button, otherButton) {
         const actionText = value === 'Random' ? '随机' : '忽略';
         showToast(`✅ 已恢复${actionText}前的 ${count} 个字段（请点击应用生效）`, 'success');
     } else {
-        // 当前按钮未激活，点击则应用
 
-        // 如果另一个按钮是激活的，先将其重置（只重置状态和UI，不恢复字段值）
         if (otherState.active) {
             otherState.active = false;
             otherState.savedState = {};

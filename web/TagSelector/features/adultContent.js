@@ -2,7 +2,7 @@ import { getState, setState, ADULT_SESSION_TIMEOUT, ADULT_MAX_FAILED_ATTEMPTS, A
 import { showToast } from '../utils/dom.js';
 import { getLocale } from '../utils/helpers.js';
 
-const ADULT_STORAGE_KEY = 'zhihui_adult_settings';
+const ADULT_STORAGE_KEY = 'zhiai_adult_settings';
 
 function _adultStorageHash(data) {
     let hash = 5381;

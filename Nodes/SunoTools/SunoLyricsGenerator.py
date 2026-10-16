@@ -110,8 +110,8 @@ class SunoLyricsGenerator:
     RETURN_TYPES = ("STRING",)
     RETURN_NAMES = ("lyrics",)
     FUNCTION = "generate"
-    CATEGORY = "Zhi.AI/Generator"
-    DESCRIPTION = "Suno AI Lyrics Generator: Generates structured lyrics prompts based on theme, language, vocal arrangement, style, mood, and genre. (Note: AI generation removed due to defunct platform)"
+    CATEGORY = "Zhi.AI/Audio"
+    DESCRIPTION = "Generates structured, singable lyrics from theme, language, vocal arrangement, style, mood and genre."
 
     def _random_choice(self, value, options):
         if value == "Random":

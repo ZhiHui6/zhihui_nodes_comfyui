@@ -29,7 +29,7 @@ class TextCombinerNode:
     RETURN_TYPES = ("STRING",)
     RETURN_NAMES = ("text_output",)
     FUNCTION = "execute"
-    DESCRIPTION = "Text Combiner: Combines two text inputs with a specified separator into a single text output. Each text can be independently enabled or disabled, supports custom separators, suitable for prompt combination and text concatenation."
+    DESCRIPTION = "Joins two text inputs with a chosen separator, each side independently enable-able."
     
     def execute(self, prompt1_comment: str, prompt1: str, prompt2_comment: str, prompt2: str, separator: str, enable_prompt1: bool, enable_prompt2: bool) -> tuple:
          self.prompt1 = prompt1 if enable_prompt1 else ""
