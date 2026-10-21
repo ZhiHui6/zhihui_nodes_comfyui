@@ -337,7 +337,7 @@
     },
     "ImageAspectRatio": {
         "display_name": "图像宽高比",
-        "description": "为 Qwen、Flux、Wan、SDXL 等模型快速选定比例或自定义尺寸，可输出潜空间。",
+        "description": "为 Qwen / Qwen-Image 2.1、Flux、Wan、SDXL、MOSS-Image 等模型快速选定比例或自定义尺寸，可输出潜空间。",
         "inputs": {
             "preset_mode": {
                 "name": "预设模式"

@@ -428,7 +428,7 @@
 <td>智能图像宽高比设置工具，支持多种预设模式和自定义尺寸配置。
 
 <b>特点</b>：
-- <b>多预设支持</b>：内置Qwen、Flux、Flux.2、Flux2 klein、Wan、SDXL、LTX2.3、Z-image、Krea2、MiniMax H3等主流模型的专用宽高比预设
+- <b>多预设支持</b>：内置Qwen、Qwen-Image 2.1、Flux、Flux.2、Flux2 klein、Wan、SDXL、LTX2.3、Z-image、Krea2、MiniMax H3、MOSS-Image等主流模型的专用宽高比预设（Qwen-Image 2.1 覆盖官方 7 组 2K 原生比例并提供 1K 档，MOSS-Image 按官方推荐的 1M / 1.5M / 2M 像素分档；所有尺寸均为 16 的整数倍）
 - <b>自定义模式</b>：支持完全自定义的宽度和高度设置
 - <b>宽高比锁定</b>：提供宽高比锁定功能，修改一个维度时自动调整另一个维度
 - <b>尺寸互换</b>：一键互换宽高数值，方便调整横竖屏方向
@@ -1026,7 +1026,7 @@ git clone https://github.com/ZhiHui6/zhiai_nodes_comfyui.git
 
 ### 🧭 节点菜单位置
 
-安装后所有节点都在右键菜单的 **Zhi.AI** 顶级分类下，按用途分为 Text（文本）、Generator（生成器）、Image（图像）、MovieTools（影视工具）、Video（视频）、Loaders（加载器）、Latent（潜空间）、Toolkit（工具箱）、Audio（音频）、AI Assistant（AI 助手）等子菜单；子菜单名跟随 ComfyUI 界面语言切换，LM Studio、Florence2 等产品名保持原样。新增或更新节点包后需要重启 ComfyUI 才会完成注册。
+安装后所有节点都在右键菜单的 **Zhi.AI** 顶级分类下，按用途分为 Text（文本）、Generator（生成器）、Image（图像）、MovieTools（影视工具）、Video（视频）、Loaders（加载器）、Latent（潜空间）、Toolkit（工具箱）、Audio（音频）、AI Assistant（AI 助手）等子菜单；子菜单名跟随 ComfyUI 界面语言切换。新增或更新节点包后需要重启 ComfyUI 才会完成注册。
 
 ### 🔑 首次使用配置
 

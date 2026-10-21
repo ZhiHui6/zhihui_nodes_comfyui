@@ -415,7 +415,7 @@ A comprehensive prompt generator written based on WanXiang 2.2 official document
 <td>Intelligent image aspect ratio setting tool, supporting multiple preset modes and custom size configurations.
 
 <b>Features</b>:
-- <b>Multiple Preset Support</b>: Built-in dedicated aspect ratio presets for mainstream models such as Qwen, Flux, Flux.2, Flux2 klein, Wan, SDXL, LTX2.3, Z-image, Krea2 and MiniMax H3
+- <b>Multiple Preset Support</b>: Built-in dedicated aspect ratio presets for mainstream models such as Qwen, Qwen-Image 2.1, Flux, Flux.2, Flux2 klein, Wan, SDXL, LTX2.3, Z-image, Krea2, MiniMax H3 and MOSS-Image (Qwen-Image 2.1 covers all 7 official 2K-native ratios plus a 1K tier; MOSS-Image presets follow the official 1M / 1.5M / 2M pixel tiers; all dimensions are multiples of 16)
 - <b>Custom Mode</b>: Supports completely custom width and height settings
 - <b>Aspect Ratio Lock</b>: Provides aspect ratio locking function, automatically adjusting one dimension when modifying the other
 - <b>Size Swap</b>: One-click swap width and height values for easy portrait/landscape orientation adjustment
@@ -1022,7 +1022,7 @@ Restart ComfyUI to use the nodes.
 
 ### 🧭 Where The Nodes Live
 
-After installation every node sits under the **Zhi.AI** top-level category of the right-click menu, split into Text, Generator, Image, MovieTools, Video, Loaders, Latent, Toolkit, Audio, AI Assistant submenus. These labels follow the ComfyUI interface language, with product names such as LM Studio and Florence2 left as-is. Restart ComfyUI after installing or updating the pack so the nodes get registered.
+After installation every node sits under the **Zhi.AI** top-level category of the right-click menu, split into Text, Generator, Image, MovieTools, Video, Loaders, Latent, Toolkit, Audio, AI Assistant submenus. These labels follow the ComfyUI interface language. Restart ComfyUI after installing or updating the pack so the nodes get registered.
 
 ### 🔑 First-run Configuration
 

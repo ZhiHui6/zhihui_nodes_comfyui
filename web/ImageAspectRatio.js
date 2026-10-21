@@ -7,7 +7,7 @@ const i18n = {
         nodeTitle: "图像纵横比节点",
         description: "用于设置图像的纵横比和尺寸，支持多种模型的预设尺寸，可快速选择常用比例或自定义尺寸。",
         featuresTitle: "功能",
-        feature1: "支持多种模型的预设尺寸（Qwen、Flux、Wan、SDXL等）",
+        feature1: "支持多种模型的预设尺寸（Qwen、Qwen-Image 2.1、Flux、Wan、SDXL、MOSS-Image等）",
         feature2: "提供常用纵横比快速选择",
         feature3: "支持自定义尺寸和宽高锁定",
         feature4: "支持批量大小设置",
@@ -29,7 +29,7 @@ const i18n = {
         nodeTitle: "Image Aspect Ratio Node",
         description: "Used to set image aspect ratio and dimensions, supporting preset dimensions for multiple models, with quick selection of common ratios or custom sizes.",
         featuresTitle: "Features",
-        feature1: "Supports preset dimensions for multiple models (Qwen, Flux, Wan, SDXL, etc.)",
+        feature1: "Supports preset dimensions for multiple models (Qwen, Qwen-Image 2.1, Flux, Wan, SDXL, MOSS-Image, etc.)",
         feature2: "Provides quick selection of common aspect ratios",
         feature3: "Supports custom dimensions and aspect ratio locking",
         feature4: "Supports batch size setting",
@@ -691,6 +691,10 @@ app.registerExtension({
             const onRemoved = nodeType.prototype.onRemoved;
             nodeType.prototype.onRemoved = function () {
                 const r = onRemoved ? onRemoved.apply(this, []) : undefined;
+                if (this.aspectRatioTimer) {
+                    clearInterval(this.aspectRatioTimer);
+                    this.aspectRatioTimer = null;
+                }
                 if (helpElement) {
                     helpElement.remove();
                     helpElement = null;

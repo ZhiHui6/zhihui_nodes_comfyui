@@ -1,4 +1,5 @@
 import torch
+import comfy.model_management
 from aiohttp import web
 from server import PromptServer
 
@@ -32,6 +33,37 @@ class ImageAspectRatio:
         "Video": {
             "720p 1232x672": (1232, 672),
             "1080p 1904x1008": (1904, 1008),
+        },
+    }
+
+    PRESETS_QWEN_21 = {
+        "1:1": {
+            "1K 1024x1024": (1024, 1024),
+            "2K 2048x2048": (2048, 2048),
+        },
+        "4:3": {
+            "1K 1200x896": (1200, 896),
+            "2K 2400x1792": (2400, 1792),
+        },
+        "3:4": {
+            "1K 896x1200": (896, 1200),
+            "2K 1792x2400": (1792, 2400),
+        },
+        "3:2": {
+            "1K 1264x848": (1264, 848),
+            "2K 2528x1696": (2528, 1696),
+        },
+        "2:3": {
+            "1K 848x1264": (848, 1264),
+            "2K 1696x2528": (1696, 2528),
+        },
+        "16:9": {
+            "1K 1376x768": (1376, 768),
+            "2K 2752x1536": (2752, 1536),
+        },
+        "9:16": {
+            "1K 768x1376": (768, 1376),
+            "2K 1536x2752": (1536, 2752),
         },
     }
 
@@ -414,8 +446,67 @@ class ImageAspectRatio:
         },
     }
 
+    PRESETS_MOSS_IMAGE = {
+        "1:1": {
+            "1M 1024x1024": (1024, 1024),
+            "1.5M 1248x1248": (1248, 1248),
+            "2M 1456x1456": (1456, 1456),
+        },
+        "16:9": {
+            "1M 1360x768": (1360, 768),
+            "1.5M 1680x944": (1680, 944),
+            "2M 1936x1088": (1936, 1088),
+        },
+        "9:16": {
+            "1M 768x1360": (768, 1360),
+            "1.5M 944x1680": (944, 1680),
+            "2M 1088x1936": (1088, 1936),
+        },
+        "4:3": {
+            "1M 1200x896": (1200, 896),
+            "1.5M 1472x1104": (1472, 1104),
+            "2M 1664x1248": (1664, 1248),
+        },
+        "3:4": {
+            "1M 896x1200": (896, 1200),
+            "1.5M 1104x1472": (1104, 1472),
+            "2M 1248x1664": (1248, 1664),
+        },
+        "3:2": {
+            "1M 1248x832": (1248, 832),
+            "1.5M 1536x1024": (1536, 1024),
+            "2M 1776x1184": (1776, 1184),
+        },
+        "2:3": {
+            "1M 832x1248": (832, 1248),
+            "1.5M 1024x1536": (1024, 1536),
+            "2M 1184x1776": (1184, 1776),
+        },
+        "5:4": {
+            "1M 1136x912": (1136, 912),
+            "1.5M 1424x1136": (1424, 1136),
+            "2M 1600x1280": (1600, 1280),
+        },
+        "4:5": {
+            "1M 912x1136": (912, 1136),
+            "1.5M 1136x1424": (1136, 1424),
+            "2M 1280x1600": (1280, 1600),
+        },
+        "21:9": {
+            "1M 1568x672": (1568, 672),
+            "1.5M 1904x816": (1904, 816),
+            "2M 2240x960": (2240, 960),
+        },
+        "9:21": {
+            "1M 672x1568": (672, 1568),
+            "1.5M 816x1904": (816, 1904),
+            "2M 960x2240": (960, 2240),
+        },
+    }
+
     PRESET_MODES = {
         "Qwen image": PRESETS_QWEN,
+        "Qwen image 2.1": PRESETS_QWEN_21,
         "Flux": PRESETS_FLUX,
         "Flux.2": PRESETS_FLUX2,
         "Flux2 klein": PRESETS_FLUX2_KLEIN,
@@ -425,26 +516,29 @@ class ImageAspectRatio:
         "Z-image": PRESETS_ZIMAGE,
         "Krea2": PRESETS_KREA2,
         "MiniMax H3": PRESETS_MINIMAX_H3,
+        "MOSS-Image": PRESETS_MOSS_IMAGE,
     }
 
     @classmethod
     def INPUT_TYPES(s):
         all_presets = list(s.PRESET_MODES.values())
-        all_categories = list(set(
+        all_categories = sorted(set(
             category for preset in all_presets for category in preset.keys()
         ))
 
-        all_sizes = list(set(
+        all_sizes = sorted(set(
             size for preset in all_presets
             for category_sizes in preset.values()
             for size in category_sizes.keys()
         ))
 
+        default_size = "1024x1024" if "1024x1024" in all_sizes else (all_sizes[0] if all_sizes else "default")
+
         return {
             "required": {
                 "preset_mode": (list(s.PRESET_MODES.keys()) + ["Custom Size"], {"default": "Z-image"}),
                 "aspect_category": (all_categories, {"default": "1:1"}),
-                "aspect_size": (all_sizes, {"default": all_sizes[0] if all_sizes else "default"}),
+                "aspect_size": (all_sizes, {"default": default_size}),
             },
             "optional": {
                 "custom_width": ("INT", {"default": 1328, "min": 1, "max": 8192, "step": 1}),
@@ -458,7 +552,7 @@ class ImageAspectRatio:
     RETURN_NAMES = ("width", "height", "latent")
     FUNCTION = "get_dimensions"
     CATEGORY = "Zhi.AI/Image"
-    DESCRIPTION = "Sets an image aspect ratio from preset dimensions for Qwen, Flux, Wan and SDXL models, or from a custom ratio and size, with optional latent output."
+    DESCRIPTION = "Sets an image aspect ratio from preset dimensions for Qwen, Qwen-Image 2.1, Flux, Wan, SDXL and MOSS-Image models, or from a custom ratio and size, with optional latent output."
 
     def get_dimensions(self, preset_mode, aspect_category, aspect_size, custom_width=1328, custom_height=1328, aspect_lock=False, batch_size=1):
         if custom_width is None:
@@ -480,7 +574,14 @@ class ImageAspectRatio:
 
         latent_height = height // 8
         latent_width = width // 8
-        latent = {"samples": torch.zeros([batch_size, 4, latent_height, latent_width])}
+        latent = {
+            "samples": torch.zeros(
+                [batch_size, 4, latent_height, latent_width],
+                device=comfy.model_management.intermediate_device(),
+                dtype=comfy.model_management.intermediate_dtype(),
+            ),
+            "downscale_ratio_spacial": 8,
+        }
 
         return (width, height, latent)
 
